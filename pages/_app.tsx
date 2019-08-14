@@ -1,9 +1,13 @@
+// import 'module-alias/register'
 import { Provider } from 'mobx-react'
 import { getSnapshot } from 'mobx-state-tree'
 import App from 'next/app'
 import React from 'react'
 import { initializeStore, IStore } from '../stores/store'
 
+import { ConfigProvider } from 'antd';
+
+import '../assets/styles/imports.css'
 import '../assets/styles/style.css'
 
 interface IOwnProps {
@@ -45,7 +49,9 @@ class MyApp extends App {
     const { Component, pageProps } = this.props
     return (
       <Provider store={this.store}>
-        <Component {...pageProps} />
+        <ConfigProvider prefixCls="komplent">
+          <Component {...pageProps} />
+        </ConfigProvider>
       </Provider>
     )
   }

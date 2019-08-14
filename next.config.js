@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
+const packagejson = require('./package.json')
+
 const withPlugins = require('next-compose-plugins');
 const { IgnorePlugin } = require('webpack');
 const { PHASE_PRODUCTION_BUILD, PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_SERVER } = require('next-server/constants');
@@ -75,6 +77,7 @@ module.exports = withConfig(
         
             //config.plugins.push(new Dotenv({ path: './public.env' }));
             config.plugins.push(new IgnorePlugin(/^\.\/locale$/, /moment$/));
+            Object.entries((packagejson._moduleAliases  || {})).forEach(([k, v]) => {config.resolve.alias[k] =  path.resolve(__dirname, v)})
         
             // if (dev) {
             //   config.module.rules.push({
