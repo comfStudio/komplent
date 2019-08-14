@@ -51,7 +51,8 @@
   "_moduleAliases": {
     "@app": ".",
     "@components": "components",
-    "@utility": "utility"
+    "@utility": "utility",
+    "@assets": "assets"
   },
   "license": "ISC"
 }

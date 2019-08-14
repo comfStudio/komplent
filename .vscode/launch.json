@@ -11,6 +11,17 @@
             "reAttach": true,
             "url": "http://localhost:3500",
             "webRoot": "${workspaceFolder}",
+            "sourceMaps":"client",
+            "pathMappings": [
+                {
+                    "url": "webpack:///",
+                    "path": "${webRoot}"
+                }
+            ],
+            "skipFiles": [
+                "node_modules/**/*.js",
+                "lib/**/*.js"
+              ],
         },
         {
             "type": "node",

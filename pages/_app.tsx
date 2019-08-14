@@ -7,8 +7,8 @@ import { initializeStore, IStore } from '../stores/store'
 
 import { ConfigProvider } from 'antd';
 
-import '../assets/styles/imports.css'
-import '../assets/styles/style.css'
+import '@assets/styles/imports.css'
+import '@assets/styles/style.css'
 
 interface IOwnProps {
   isServer: boolean
