@@ -6,3 +6,7 @@
 #profile-info > div {
     line-height: 2.3
 }
+
+#profile-info .profile-name {
+    word-wrap: break-word;
+}

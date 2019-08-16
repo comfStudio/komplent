@@ -1,5 +1,5 @@
 import React from 'react'
-import { Layout, Empty } from 'antd';
+import { Layout, Card } from 'antd';
 
 import { MainLayout, Container } from '@components/App/MainLayout'
 import { ProfileHeader } from '@components/Profile/ProfileHeader'
@@ -16,7 +16,8 @@ class ProfilePage extends React.Component {
         </Layout>
         <ProfileMenu/>
         <Container>
-          <ProfileInfo/>
+          <ProfileInfo className="float-right"/>
+          <Card className="flex flex-grow"></Card>
         </Container>
       </MainLayout>
     )

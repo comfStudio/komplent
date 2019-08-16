@@ -1,17 +1,27 @@
 import React, { Component } from 'react';
-import { Card, Tag, Descriptions } from 'antd';
+import { Card, Tag, Typography } from 'antd';
 
 import { t } from '@app/utility/lang'
+
+import { HTMLElementProps } from '@utility/props'
+
+const { Title } = Typography
+
 import './ProfileInfo.css'
 
-export class ProfileInfo extends Component {
+export class ProfileInfo extends Component<HTMLElementProps> {
     render() {
+        let cls = "w-64"
         return (
-            <Card id="profile-info" className="w-64 float-right">
+            <Card id="profile-info" className={this.props.className ? cls + ' ' + this.props.className : cls}>
+                <p>
+                    <Title level={3} className="profile-name text-center">~A little twiddly~</Title>
+                </p>
+                <hr/>
                 <p>
                     <Tag color="blue">Illustration</Tag>
                     <Tag color="green">Cover</Tag>
-                    <Tag color="res">Anime</Tag>
+                    <Tag color="red">Anime</Tag>
                     <Tag color="magenta">Animation</Tag>
                     <Tag color="purple">Comic</Tag>
                     <Tag>Furry</Tag>

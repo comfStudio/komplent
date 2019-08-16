@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { Menu, Icon, Layout, Avatar } from 'antd';
 import Link from 'next/link';
 
+import { Container } from '@components/App/MainLayout'
+
 import { t } from '@app/utility/lang'
 import {ReactProps} from 'utility/props'
 
@@ -14,7 +16,10 @@ const {SubMenu, Item, ItemGroup} = Menu
 class ProfileMenu extends Component<Props> {
     render() {
         return (
-            <Menu selectedKeys={this.props.selectedKeys} id="nav-menu" mode="horizontal" className="flex justify-center">
+            <div className="komplent-menu komplent-menu-light komplent-menu-root komplent-menu-horizontal">
+            <Container>
+
+            <Menu selectedKeys={this.props.selectedKeys} id="nav-menu" mode="horizontal" className="">
             <Item key="info">
                 <Link href="#info">
                     <a>
@@ -44,6 +49,9 @@ class ProfileMenu extends Component<Props> {
                 </Link>
             </Item>
             </Menu>
+            </Container>
+
+            </div>
         );
     }
 }

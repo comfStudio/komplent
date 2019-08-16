@@ -5,6 +5,10 @@ import { Container } from '@components/App/MainLayout'
 import { ReactProps } from '@utility/props'
 import { CommissionButton } from '@components/Profile'
 
+import { Button  } from 'antd'
+
+import { t } from '@app/utility/lang'
+
 export const Avatar = (props) => {
     return (
         <div className="avatar border-r-4 border-l-4 border-t-4 border-white">
@@ -35,6 +39,7 @@ export class ProfileHeader extends Component<HeaderProps> {
                     <Avatar/>
                     <div id="header-container">
                         <CommissionButton className="z-10"/>
+                        <Button type="default" size="large" className="mx-3">{t`Follow`}</Button>
                         {this.props.children}
                     </div>
                 </Container>
