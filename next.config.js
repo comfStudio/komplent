@@ -9,6 +9,7 @@ const withCSS = require('@zeit/next-css');
 const withLess = require('@zeit/next-less');
 const withBundleAnalyzer = require('@zeit/next-bundle-analyzer');
 const nextRuntimeDotenv = require('next-runtime-dotenv');
+const createResolver = require('postcss-import-webpack-resolver');
 
 const lessToJS = require('less-vars-to-js')
 const fs = require('fs')
@@ -30,6 +31,9 @@ if (typeof require !== 'undefined') {
     require.extensions['.less'] = file => {}
   }
 
+let aliases = {}
+Object.entries((packagejson._moduleAliases  || {})).forEach(([k, v]) => {aliases[k] =  path.resolve(__dirname, v)})
+
 
 const withConfig = nextRuntimeDotenv({
     public: ['API_URL', 'API_KEY'],
@@ -44,6 +48,14 @@ module.exports = withConfig(
             postcssLoaderOptions: {
               config: {
                 ctx: {
+                  "postcss-import": {
+                    resolve: createResolver({
+                      // use aliases defined in config
+                      alias: aliases,
+                      // include where to look for modules
+                      modules: ['.', 'node_modules']
+                    })
+                  }
                 //   theme: JSON.stringify(process.env.REACT_APP_THEME)
                 }
               }
@@ -77,7 +89,7 @@ module.exports = withConfig(
         
             //config.plugins.push(new Dotenv({ path: './public.env' }));
             config.plugins.push(new IgnorePlugin(/^\.\/locale$/, /moment$/));
-            Object.entries((packagejson._moduleAliases  || {})).forEach(([k, v]) => {config.resolve.alias[k] =  path.resolve(__dirname, v)})
+            Object.assign(config.resolve.alias, aliases)
         
             // if (dev) {
             //   config.module.rules.push({

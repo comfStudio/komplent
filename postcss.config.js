@@ -1,7 +1,10 @@
-module.exports = ({ file, options, env }) => ({
+module.exports = ({ file, options, env }) =>(
+  {
     syntax: 'postcss-scss',
     plugins: {
-      'postcss-import': {},
+      'postcss-import': {
+        resolve: options['postcss-import'].resolve,
+      },
       'precss': {},
       'tailwindcss': {},
       'autoprefixer': {},
