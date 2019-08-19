@@ -1,11 +1,9 @@
 module.exports = ({ file, options, env }) =>(
   {
-    syntax: 'postcss-scss',
     plugins: {
-      'postcss-import': {
+      'postcss-import': options['postcss-import'] ? {
         resolve: options['postcss-import'].resolve,
-      },
-      'precss': {},
+      } : {},
       'tailwindcss': {},
       'autoprefixer': {},
       'postcss-purgecss': env === 'production' ? {

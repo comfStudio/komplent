@@ -1,12 +1,7 @@
-import Link from 'next/link'
 import React from 'react'
-import { Layout, Menu, Icon, Empty } from 'antd';
+import { Container as Layout, Header, Content, Footer} from 'rsuite';
 import NavMenu from '@components/Header/NavMenu'
 import { ReactProps, HTMLElementProps } from '@utility/props'
-
-const { SubMenu } = Menu;
-
-const { Header, Content, Sider, Footer } = Layout;
 
 interface Props extends ReactProps {
   selectedKeys?: string[]
@@ -22,13 +17,14 @@ export class MainLayout extends React.Component<Props> {
   public render() {
     return (
       <Layout id="main-layout" className="!h-screen">
+        <Header>
           <NavMenu selectedKeys={this.props.selectedKeys}/>
-          <Layout>
-            <Content>
-              {this.props.children}
-            </Content>
-            <Footer className="footer"><Empty image={Empty.PRESENTED_IMAGE_SIMPLE}/></Footer>
-          </Layout>
+        </Header>
+        <Content>
+          {this.props.children}
+        </Content>
+        <Footer className="footer">
+        </Footer>
       </Layout>
     )
   }

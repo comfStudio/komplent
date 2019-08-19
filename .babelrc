@@ -1,14 +1,13 @@
 {
-  "presets": ["next/babel", "@zeit/next-typescript/babel"],
+  "presets": [
+    "next/babel",
+    "@zeit/next-typescript/babel",
+    ["rsuite", { "style": true }]],
   "plugins": [
     ["ttag", {
       "extract":{ "output": "i18n/polyglot_result.pot" },
       "numberedExpressions": true
       }],
-    ["@babel/plugin-proposal-decorators", { "legacy": true }],
-    ["import", {
-      "libraryName": "antd",
-      "style": true,   // or 'css'
-    }]
+    ["@babel/plugin-proposal-decorators", { "legacy": true }]
   ]
 }

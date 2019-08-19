@@ -1,5 +1,5 @@
 import React from 'react'
-import { Layout, Empty } from 'antd';
+import { Layout, Empty } from 'rsuite';
 
 import MainLayout from '@components/App/MainLayout'
 

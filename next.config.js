@@ -7,6 +7,7 @@ const { PHASE_PRODUCTION_BUILD, PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_SERVE
 
 const withCSS = require('@zeit/next-css');
 const withLess = require('@zeit/next-less');
+const withSass = require('@zeit/next-sass');
 const withBundleAnalyzer = require('@zeit/next-bundle-analyzer');
 const nextRuntimeDotenv = require('next-runtime-dotenv');
 const createResolver = require('postcss-import-webpack-resolver');
@@ -17,11 +18,11 @@ const path = require('path')
 
 /* eslint-enable @typescript-eslint/no-var-requires */
 
-let ANTD_THEME = "./assets/styles/antd.less"
+let RSUITE_THEME = "./assets/styles/rsuite.less"
 
 const THEME_VARIABLES = lessToJS(
     fs.readFileSync(
-      path.resolve(__dirname, ANTD_THEME),
+      path.resolve(__dirname, RSUITE_THEME),
       'utf8',
     ),
 );
@@ -43,32 +44,37 @@ const withConfig = nextRuntimeDotenv({
 });
 
 module.exports = withConfig(
-	withPlugins([
-        [withCSS, {
-            postcssLoaderOptions: {
-              config: {
-                ctx: {
-                  "postcss-import": {
-                    resolve: createResolver({
-                      // use aliases defined in config
-                      alias: aliases,
-                      // include where to look for modules
-                      modules: ['.', 'node_modules']
-                    })
+  withPlugins([
+      [withSass, {
+        postcssLoaderOptions: {
+          config: {
+            ctx: {
+              "postcss-import": {
+                resolve: createResolver({
+                  // use aliases defined in config
+                  alias: aliases,
+                  // include where to look for modules
+                        modules: ['.', 'node_modules']
+                      })
+                    }
+                    //   theme: JSON.stringify(process.env.REACT_APP_THEME)
                   }
-                //   theme: JSON.stringify(process.env.REACT_APP_THEME)
                 }
               }
-            }
-          }],
-        [withLess, {
-            lessLoaderOptions: {
-                javascriptEnabled: true,
-                modifyVars: THEME_VARIABLES, // Add modifyVars property
-                localIdentName: '[local]___[hash:base64:5]',
-            }
-        }],
-        [withBundleAnalyzer]
+            }],
+      [withCSS, {
+        cssLoaderOptions: {
+          importLoaders: 1 
+        }
+      }],
+      [withLess, {
+              lessLoaderOptions: {
+                  javascriptEnabled: true,
+                  modifyVars: THEME_VARIABLES, // Add modifyVars property
+                  localIdentName: '[local]___[hash:base64:5]',
+              }
+            }],
+      [withBundleAnalyzer]
     ],
     {
 		analyzeServer: ['server', 'both'].includes(process.env.BUNDLE_ANALYZE),
@@ -90,7 +96,7 @@ module.exports = withConfig(
             //config.plugins.push(new Dotenv({ path: './public.env' }));
             config.plugins.push(new IgnorePlugin(/^\.\/locale$/, /moment$/));
             Object.assign(config.resolve.alias, aliases)
-        
+
             // if (dev) {
             //   config.module.rules.push({
             //     test: /\.(jsx?|gql|graphql)$/,

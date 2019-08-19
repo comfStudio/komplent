@@ -12,8 +12,9 @@
     "@zeit/next-bundle-analyzer": "^0.1.2",
     "@zeit/next-css": "^1.0.1",
     "@zeit/next-less": "^1.0.1",
+    "@zeit/next-sass": "^1.0.1",
     "@zeit/next-typescript": "^1.1.1",
-    "antd": "^3.21.4",
+    "boxicons": "^2.0.2",
     "lodash": "^4.17.15",
     "mobx": "^5.9.0",
     "mobx-react": "^5.4.3",
@@ -22,8 +23,10 @@
     "next": "latest",
     "next-compose-plugins": "^2.2.0",
     "next-runtime-dotenv": "^1.2.0",
+    "node-sass": "^4.12.0",
     "react": "^16.7.0",
     "react-dom": "^16.7.0",
+    "rsuite": "^3.8.8",
     "ttag": "^1.7.17"
   },
   "devDependencies": {
@@ -36,6 +39,7 @@
     "autoprefixer": "^9.6.1",
     "babel-plugin-import": "^1.12.0",
     "babel-plugin-ttag": "^1.7.23",
+    "babel-preset-rsuite": "^0.1.1",
     "cross-env": "^5.2.0",
     "cssnano": "^4.1.10",
     "jest": "^24.8.0",
@@ -43,11 +47,11 @@
     "less-vars-to-js": "^1.3.0",
     "postcss-import": "^12.0.1",
     "postcss-import-webpack-resolver": "^1.0.1",
-    "postcss-scss": "^2.0.0",
     "precss": "^4.0.0",
     "tailwindcss": "^1.1.1",
     "ts-jest": "^24.0.2",
-    "typescript": "^3.5.3"
+    "typescript": "^3.5.3",
+    "url-loader": "^2.1.0"
   },
   "_moduleAliases": {
     "@app": ".",

@@ -1,13 +1,32 @@
 import React from 'react';
 
-import { Button } from 'antd'
+import { Card, Layout } from 'rsuite'
+
+import { MainLayout, Container } from '@components/App/MainLayout'
+import { ProfileHeader } from '@components/Profile/ProfileHeader'
+import { ProfileMenu, Props as MenuProps } from '@components/Profile/ProfileMenu'
+import ProfileInfo from '@components/Profile/ProfileInfo'
 
 import { t } from '@app/utility/lang'
-import { HTMLElementProps } from '@utility/props'
+import { ReactProps } from '@utility/props'
 
-export const CommissionButton = (props: HTMLElementProps) => {
-    let cls = "commission-button"
+interface LayoutProps extends ReactProps, MenuProps {
+
+}
+
+export const ProfileLayout = (props: LayoutProps) => {
     return (
-        <Button type="primary" size="large" className={props.className ? cls + ' ' + props.className : cls}>{t`Request a Commission`}</Button>
-    );
-};
+        <MainLayout selectedKeys={["profile"]}>
+        <Layout>
+          <ProfileHeader></ProfileHeader>
+        </Layout>
+        <ProfileMenu {... props}/>
+        <Container>
+          <ProfileInfo className="float-right"/>
+          <Card className="flex flex-grow">
+            { props.children }
+          </Card>
+        </Container>
+      </MainLayout>
+    )
+}

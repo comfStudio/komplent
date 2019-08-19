@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Card, Tag, Typography } from 'antd';
+import { Card, Tag, Typography, Button } from 'rsuite';
 
 import { t } from '@app/utility/lang'
 
@@ -7,7 +7,7 @@ import { HTMLElementProps } from '@utility/props'
 
 const { Title } = Typography
 
-import './ProfileInfo.css'
+import './ProfileInfo.scss'
 
 export class ProfileInfo extends Component<HTMLElementProps> {
     render() {
@@ -70,6 +70,9 @@ export class ProfileInfo extends Component<HTMLElementProps> {
                         </ul>
                     </p>
                 </p>
+                <div className="text-center">
+                    <Button type="dashed" size="small">{t`Report`}</Button>
+                </div>
             </Card>
         );
     }

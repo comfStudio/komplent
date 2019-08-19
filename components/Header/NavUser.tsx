@@ -1,5 +1,5 @@
 import React from 'react';
-import { Avatar, Badge } from 'antd';
+import { Avatar, Badge } from 'rsuite';
 
 const NavUser = () => {
     return (

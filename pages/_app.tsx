@@ -5,10 +5,7 @@ import App from 'next/app'
 import React from 'react'
 import { initializeStore, IStore } from '../stores/store'
 
-import { ConfigProvider } from 'antd';
-
-import '@assets/styles/imports.css'
-import '@assets/styles/style.css'
+import '@assets/styles/imports.scss'
 
 interface IOwnProps {
   isServer: boolean
@@ -49,9 +46,7 @@ class MyApp extends App {
     const { Component, pageProps } = this.props
     return (
       <Provider store={this.store}>
-        <ConfigProvider prefixCls="komplent">
-          <Component {...pageProps} />
-        </ConfigProvider>
+        <Component {...pageProps} />
       </Provider>
     )
   }

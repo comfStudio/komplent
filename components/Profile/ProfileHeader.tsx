@@ -1,11 +1,11 @@
-import './ProfileHeader.css'
+import './ProfileHeader.scss'
 import React, { Component } from 'react';
 
 import { Container } from '@components/App/MainLayout'
 import { ReactProps } from '@utility/props'
-import { CommissionButton } from '@components/Profile'
+import { CommissionButton } from '@components/Profile/Commission'
 
-import { Button  } from 'antd'
+import { Button  } from 'rsuite'
 
 import { t } from '@app/utility/lang'
 
