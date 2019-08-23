@@ -1,11 +1,13 @@
 import React from 'react'
 
 import { ProfileLayout } from '@components/Profile'
+import { ProfileCommission } from '@components/Profile/ProfileCommission'
 
 export const EditPage = (props) => {
 
     return (
-        <ProfileLayout activeKey="edit">
+        <ProfileLayout activeKey="commission">
+            <ProfileCommission/>
         </ProfileLayout>
     )
 }

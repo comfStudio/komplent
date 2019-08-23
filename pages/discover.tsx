@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
 
 import MainLayout from '@components/App/MainLayout'
+import DiscoverLayout from '@components/Discover/DiscoverLayout'
 
 class DiscoverPage extends Component {
     render() {
         return (
-            <MainLayout selectedKeys={["discover"]}>
+            <MainLayout activeKey="discover">
+                <DiscoverLayout/>
             </MainLayout>
         );
     }

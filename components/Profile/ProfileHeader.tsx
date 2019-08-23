@@ -3,9 +3,9 @@ import React, { Component } from 'react';
 
 import { Container } from '@components/App/MainLayout'
 import { ReactProps } from '@utility/props'
-import { CommissionButton } from '@components/Profile/Commission'
+import { CommissionButton } from '@app/components/Profile/ProfileCommission'
 
-import { Button  } from 'rsuite'
+import { IconButton, Icon } from 'rsuite'
 
 import { t } from '@app/utility/lang'
 
@@ -39,7 +39,7 @@ export class ProfileHeader extends Component<HeaderProps> {
                     <Avatar/>
                     <div id="header-container">
                         <CommissionButton className="z-10"/>
-                        <Button type="default" size="large" className="mx-3">{t`Follow`}</Button>
+                        <IconButton icon={<Icon icon="bell"/>} appearance="default" size="lg" className="mx-3">{t`Follow`}</IconButton>
                         {this.props.children}
                     </div>
                 </Container>

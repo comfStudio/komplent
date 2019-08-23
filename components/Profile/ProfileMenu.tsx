@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Menu, Icon, Layout, Avatar } from 'rsuite';
+import { Navbar, Nav } from 'rsuite';
 import Link from 'next/link';
 
 import { Container } from '@components/App/MainLayout'
@@ -8,57 +8,47 @@ import { t } from '@app/utility/lang'
 import {ReactProps} from 'utility/props'
 
 export interface Props {
-    selectedKeys?: string[]
+    activeKey?: string
 }
-
-const {SubMenu, Item, ItemGroup} = Menu
 
 export class ProfileMenu extends Component<Props> {
     render() {
         return (
-            <div className="komplent-menu komplent-menu-light komplent-menu-root komplent-menu-horizontal">
-            <Container>
+            <Navbar className="">
 
-            <Menu selectedKeys={this.props.selectedKeys} id="nav-menu" mode="horizontal" className="">
-            <Item key="index">
-                <Link href="/profile">
-                    <a>
-                    {t`Information`}
-                    </a>
-                </Link>
-            </Item>
-            <Item key="gallery">
-                <Link href="/profile/gallery">
-                    <a>
-                    {t`Gallery`}
-                    </a>
-                </Link>
-            </Item>
-            <Item key="recommendations">
-                <Link href="/profile/recommendations">
-                    <a>
-                    {t`Recommendations`}
-                    </a>
-                </Link>
-            </Item>
-            <Item key="shop">
-                <Link href="/profile/shop">
-                    <a>
-                    {t`Shop`}
-                    </a>
-                </Link>
-            </Item>
-            <Item key="edit">
-                <Link href="/profile/edit">
-                    <a>
-                    {t`Edit Profile`}
-                    </a>
-                </Link>
-            </Item>
-            </Menu>
-            </Container>
+                <Navbar.Body>
+                    <Container>
+                        <Nav activeKey={this.props.activeKey}>
+                            <Link href="/profile" passHref>
+                                <Nav.Item eventKey="index">
+                                    {t`Information`}
+                                </Nav.Item>
+                            </Link>
+                            <Link href="/profile/gallery" passHref>
+                                <Nav.Item eventKey="gallery">
+                                    {t`Gallery`}
+                                </Nav.Item>
+                            </Link>
+                            <Link href="/profile/recommendations" passHref>
+                                <Nav.Item eventKey="recommendations">
+                                    {t`Recommendations`}
+                                </Nav.Item>
+                            </Link>
+                            <Link href="/profile/shop" passHref>
+                                <Nav.Item eventKey="shop">
+                                    {t`Shop`}
+                                </Nav.Item>
+                            </Link>
+                            <Link href="/profile/edit" passHref>
+                                <Nav.Item eventKey="edit">
+                                    {t`Edit Profile`}
+                                </Nav.Item>
+                            </Link>
+                        </Nav>
+                    </Container>
+                </Navbar.Body>
+            </Navbar>
 
-            </div>
         );
     }
 }

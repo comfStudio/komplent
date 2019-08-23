@@ -6,7 +6,7 @@ import ProfileIndex from '@components/Profile/ProfileIndex'
 export const IndexPage = (props) => {
 
     return (
-      <ProfileLayout selectedKeys={["index"]}>
+      <ProfileLayout activeKey="index">
         <ProfileIndex/>
       </ProfileLayout>
     )

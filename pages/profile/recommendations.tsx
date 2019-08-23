@@ -5,7 +5,7 @@ import { ProfileLayout } from '@components/Profile'
 export const RecommendationsPage = (props) => {
 
     return (
-        <ProfileLayout selectedKeys={["recommendations"]}>
+        <ProfileLayout activeKey="recommendations">
         </ProfileLayout>
     )
 }

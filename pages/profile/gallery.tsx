@@ -5,7 +5,7 @@ import { ProfileLayout } from '@components/Profile'
 export const GalleryPage = (props) => {
 
     return (
-        <ProfileLayout selectedKeys={["gallery"]}>
+        <ProfileLayout activeKey="gallery">
         </ProfileLayout>
     )
 }

@@ -21,17 +21,12 @@
     color: white;
 }
 
-.nav-user-dropdown a {
-    color: unset;
-    text-decoration: unset;
-}
-
 .dropdown-header {
     padding: 0.8rem 1rem;
     color: rgba(0, 0, 0, 0.4);
 }
 
-.dropdown-header ~ li > div {
+.dropdown-header ~ li > a {
     padding-left: 1.2rem !important;
     padding: 0.8rem 2rem !important;
 }

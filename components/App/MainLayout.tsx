@@ -1,10 +1,12 @@
 import React from 'react'
-import { Container as Layout, Header, Content, Footer} from 'rsuite';
+import { Container as Layout, Header, Content, Footer, Panel} from 'rsuite';
 import NavMenu from '@components/Header/NavMenu'
 import { ReactProps, HTMLElementProps } from '@utility/props'
 
+import './MainLayout.scss'
+
 interface Props extends ReactProps {
-  selectedKeys?: string[]
+  activeKey?: string
 }
 
 export class MainLayout extends React.Component<Props> {
@@ -18,7 +20,7 @@ export class MainLayout extends React.Component<Props> {
     return (
       <Layout id="main-layout" className="!h-screen">
         <Header>
-          <NavMenu selectedKeys={this.props.selectedKeys}/>
+          <NavMenu activeKey={this.props.activeKey}/>
         </Header>
         <Content>
           {this.props.children}
@@ -38,6 +40,23 @@ export const Container = (props: ContainerProps) => {
   return (<div className={props.className ? (props.className + " " + cls) : cls}>
     {props.children}
   </div>)
+}
+
+interface PanelContainerProps extends ReactProps, HTMLElementProps {
+  flex?: boolean
+  bordered?: boolean
+  fluid?: boolean
+}
+
+export const PanelContainer = (props: PanelContainerProps) => {
+  let cls = "panel-container"
+  if (props.fluid) {
+    cls += props.flex ? " flex flex-grow" : " w-full"
+  }
+
+  return (<Panel className={props.className ? (props.className + " " + cls) : cls} bordered={props.bordered}>
+    {props.children}
+  </Panel>)
 }
 
 export default MainLayout

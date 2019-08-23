@@ -50,6 +50,10 @@ class MyApp extends App {
       </Provider>
     )
   }
+
+  async componentDidMount() {
+    await import('holderjs')
+  }
 }
 
 export default MyApp

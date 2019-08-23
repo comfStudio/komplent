@@ -1,11 +1,9 @@
 import React, { Component } from 'react';
-import { Card, Tag, Typography, Button } from 'rsuite';
+import { Tag, Button, Panel, TagGroup } from 'rsuite';
 
 import { t } from '@app/utility/lang'
 
 import { HTMLElementProps } from '@utility/props'
-
-const { Title } = Typography
 
 import './ProfileInfo.scss'
 
@@ -13,18 +11,20 @@ export class ProfileInfo extends Component<HTMLElementProps> {
     render() {
         let cls = "w-64"
         return (
-            <Card id="profile-info" className={this.props.className ? cls + ' ' + this.props.className : cls}>
+            <Panel id="profile-info" className={this.props.className ? cls + ' ' + this.props.className : cls} bordered>
                 <p>
-                    <Title level={3} className="profile-name text-center">~A little twiddly~</Title>
+                    <h3 className="profile-name text-center">~A little twiddly~</h3>
                 </p>
                 <hr/>
                 <p>
-                    <Tag color="blue">Illustration</Tag>
-                    <Tag color="green">Cover</Tag>
-                    <Tag color="red">Anime</Tag>
-                    <Tag color="magenta">Animation</Tag>
-                    <Tag color="purple">Comic</Tag>
-                    <Tag>Furry</Tag>
+                    <TagGroup className="tags">
+                        <Tag color="blue">Illustration</Tag>
+                        <Tag color="green">Cover</Tag>
+                        <Tag color="red">Anime</Tag>
+                        <Tag color="orange">Animation</Tag>
+                        <Tag color="violet">Comic</Tag>
+                        <Tag color="yellow">Furry</Tag>
+                    </TagGroup>
                 </p>
                 <p>
                     <strong>{t`Commission details`}:</strong>
@@ -71,9 +71,9 @@ export class ProfileInfo extends Component<HTMLElementProps> {
                     </p>
                 </p>
                 <div className="text-center">
-                    <Button type="dashed" size="small">{t`Report`}</Button>
+                    <Button appearance="subtle" size="sm">{t`Report`}</Button>
                 </div>
-            </Card>
+            </Panel>
         );
     }
 }

@@ -1,0 +1,23 @@
+.commission-card {
+    position: relative;
+}
+
+.commission-card .avatar {
+    width: 4.5em;
+    height: 4.5em;
+    border-radius: 25%;
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin: -2.25em auto;
+    overflow: hidden;
+}
+
+.commission-card .avatar img {
+    border-radius: 25%;
+}
+
+.commission-card .info {
+    padding-top: 2.5em;
+    padding-bottom: 1em;
+}

@@ -2,7 +2,7 @@
 const packagejson = require('./package.json')
 
 const withPlugins = require('next-compose-plugins');
-const { IgnorePlugin } = require('webpack');
+const { IgnorePlugin, ProvidePlugin } = require('webpack');
 const { PHASE_PRODUCTION_BUILD, PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_SERVER } = require('next-server/constants');
 
 const withCSS = require('@zeit/next-css');

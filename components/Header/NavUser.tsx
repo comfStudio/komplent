@@ -1,11 +1,15 @@
 import React from 'react';
-import { Avatar, Badge } from 'rsuite';
+import { Icon, Nav } from 'rsuite';
 
-const NavUser = () => {
+interface Props {
+}
+
+const NavUser = (props: Props) => {
+
     return (
-        <Badge count={1}>
-            <Avatar icon="user" size="large" shape="square"/>
-        </Badge>
+        (<Nav.Item key="login" id="nav-user" {...props}>
+            <Icon icon="user" size="2x" />
+        </Nav.Item>)
     );
 };
 
