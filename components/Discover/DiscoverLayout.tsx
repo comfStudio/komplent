@@ -11,7 +11,7 @@ import RecommendPanel from '@components/Discover/RecommendPanel'
 class DiscoverLayout extends Component {
     render() {
         return (
-            <Container>
+            <Container padded>
                 <Grid fluid>
                     <Row>
                         <Col xs={6}><FiltersPanel/></Col>

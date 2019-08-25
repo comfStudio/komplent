@@ -11,6 +11,7 @@ const withSass = require('@zeit/next-sass');
 const withBundleAnalyzer = require('@zeit/next-bundle-analyzer');
 const nextRuntimeDotenv = require('next-runtime-dotenv');
 const createResolver = require('postcss-import-webpack-resolver');
+const withOptimizedImages = require('next-optimized-images');
 
 const lessToJS = require('less-vars-to-js')
 const fs = require('fs')
@@ -45,6 +46,12 @@ const withConfig = nextRuntimeDotenv({
 
 module.exports = withConfig(
   withPlugins([
+      [withOptimizedImages, {
+        // svgSpriteLoader: {
+        //   spriteModule: require.resolve('svg-sprite-loader/runtime/browser-sprite.build'),                                                                                      
+        //   symbolModule: require.resolve('svg-baker-runtime/browser-symbol'),
+        // }
+      }],
       [withSass, {
         postcssLoaderOptions: {
           config: {
@@ -105,6 +112,7 @@ module.exports = withConfig(
             //     enforce: 'pre'
             //   });
             // }
+
             return config
         },
         [PHASE_PRODUCTION_BUILD]: {},

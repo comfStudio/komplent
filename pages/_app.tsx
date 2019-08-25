@@ -6,6 +6,7 @@ import React from 'react'
 import { initializeStore, IStore } from '../stores/store'
 
 import '@assets/styles/imports.scss'
+import '@assets/styles/common.scss'
 
 interface IOwnProps {
   isServer: boolean
@@ -49,10 +50,6 @@ class MyApp extends App {
         <Component {...pageProps} />
       </Provider>
     )
-  }
-
-  async componentDidMount() {
-    await import('holderjs')
   }
 }
 

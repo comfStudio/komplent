@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Panel, Row, Col, Grid, Input, Form } from 'rsuite'
+import { Button, Panel, Row, Col, Grid, Input, Form, Uploader, Icon } from 'rsuite'
 
 import Link from 'next/link'
 
@@ -7,11 +7,12 @@ import { t } from '@app/utility/lang'
 import { HTMLElementProps, ReactProps } from '@utility/props'
 
 import './ProfileCommission.scss'
+import Placeholder from '../App/Placeholder';
 
 export const CommissionButton = (props: HTMLElementProps) => {
     let cls = "commission-button"
     return (
-        <Link href="profile/commission">
+        <Link href="/profile/commission">
             <Button appearance="primary" size="lg" className={props.className ? cls + ' ' + props.className : cls}>
                 {t`Request a Commission`}
             </Button>
@@ -62,6 +63,31 @@ export const CommissionTiers = (props: any) => {
     </Row>)
 }
 
+const Attachments = (props) => {
+    const fileList = [
+        {
+          name: 'a.png',
+          fileKey: 1,
+          url:
+            'https://user-images.githubusercontent.com/1203827/47638792-92414e00-db9a-11e8-89c2-f8f430a23cd3.png'
+        },
+        {
+          name: 'b.png',
+          fileKey: 2,
+          url:
+            'https://user-images.githubusercontent.com/1203827/47638807-9d947980-db9a-11e8-9ee5-e0cc9cd7e8ad.png'
+        }
+      ];
+
+    return (
+        <Uploader listType="picture" defaultFileList={fileList} action="//jsonplaceholder.typicode.com/posts/">
+            <button>
+                <Icon icon='camera-retro' size="lg" />
+            </button>
+        </Uploader>
+    )
+}
+
 export class ProfileCommission extends Component {
     render() {
         return (
@@ -71,13 +97,22 @@ export class ProfileCommission extends Component {
                     <CommissionTiers/>
                     <hr/>
                     <Row>
+                        <Placeholder type="text" rows={4}/>
+                    </Row>
+                    <hr/>
+                    <Row>
                         <Col xs={24}>
+                        <h3>{`Describe your commission request`}</h3>
                         <Input
                             componentClass="textarea"
                             rows={3}
                             placeholder={t`Describe your request`}
                             />
                         </Col>
+                    </Row>
+                    <Row>
+                        <h3>{`Attachments`}</h3>
+                        <Attachments/>
                     </Row>
                     <hr/>
                     <Row>

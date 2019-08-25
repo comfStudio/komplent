@@ -6,6 +6,8 @@ import NavUser from "./NavUser"
 import MainSearch from '@components/App/MainSearch'
 import { t } from '@app/utility/lang'
 
+import LogoIcon from '@assets/images/logo.svg?sprite'
+
 import "./NavMenu.scss"
 
 interface Props {
@@ -17,7 +19,7 @@ const NavMenu = (props: Props) => {
         <Navbar id="nav-menu">
             <Navbar.Header>
                 <Link href="/">
-                    <a href="#" className="navbar-brand logo">KOMPLENT</a>
+                    <a href="#" className="navbar-brand logo"><Icon icon="" size="lg" /></a>
                 </Link>
             </Navbar.Header>
             <Navbar.Body className="flex flex-1 justify-center">

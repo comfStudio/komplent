@@ -4,3 +4,33 @@
     background: rgb(255,255,255);
     background: linear-gradient(0deg, rgba(255,255,255,0) 0%, rgba(0,0,0,0.5) 100%);  
 }
+
+blockquote {
+    background: rgba(0,0,0,0.03);
+    border-left: 0.3em solid rgba(0,0,0,0.25);
+    margin: 0.8em 0 0 0.1em;
+    padding: 0.5em 0.5em;
+    quotes: "\201C""\201D""\2018""\2019";
+    font-size: 0.95em;
+    color: rgba(0,0,0,0.4);
+  }
+  blockquote:before {
+    content: open-quote;
+    font-size: 4em;
+    line-height: 0.1em;
+    margin-right: 0.25em;
+    vertical-align: -0.4em;
+  }
+  blockquote p {
+    display: inline;
+  }
+
+h1, h2, h3, h4, h5, h6 {
+  margin-bottom: 1.5em;
+  margin-top: 1.2em;
+}
+  
+h1, h2, h3 {
+border-bottom: 1px solid #eaecef;
+padding-bottom: .3em;
+}

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 
 import { Grid, Col, Row, Panel } from 'rsuite'
 
-import CommissionCard from '@components/Commission/CommissionCard'
+import UserCard from '@app/components/User/UserCard'
 
 class ResultLayout extends Component {
     render() {
@@ -10,11 +10,11 @@ class ResultLayout extends Component {
             <Panel bordered>
                 <Grid fluid>
                     <Row>
-                        <Col xs={10}><CommissionCard/></Col>
-                        <Col xs={10}><CommissionCard/></Col>
-                        <Col xs={10}><CommissionCard/></Col>
-                        <Col xs={10}><CommissionCard/></Col>
-                        <Col xs={10}><CommissionCard/></Col>
+                        <Col xs={12}><UserCard/></Col>
+                        <Col xs={12}><UserCard/></Col>
+                        <Col xs={12}><UserCard/></Col>
+                        <Col xs={12}><UserCard/></Col>
+                        <Col xs={12}><UserCard/></Col>
                     </Row>
                 </Grid>
             </Panel>
