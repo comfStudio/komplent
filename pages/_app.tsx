@@ -2,16 +2,23 @@
 import { Provider } from 'mobx-react'
 import { getSnapshot } from 'mobx-state-tree'
 import App from 'next/app'
+import getConfig from 'next/config'
 import React from 'react'
 import { initializeStore, IStore } from '../stores/store'
 
 import '@assets/styles/imports.scss'
 import '@assets/styles/common.scss'
 
+const {
+  publicRuntimeConfig: {},
+  serverRuntimeConfig: {MONGODB_URL}
+} = getConfig()
+
 interface IOwnProps {
   isServer: boolean
   initialState: IStore
 }
+
 
 class MyApp extends App {
   public static async getInitialProps({ Component, router, ctx }) {
@@ -45,6 +52,7 @@ class MyApp extends App {
 
   public render() {
     const { Component, pageProps } = this.props
+    console.log(MONGODB_URL)
     return (
       <Provider store={this.store}>
         <Component {...pageProps} />

@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "next -p 3500",
-    "debug": "cross-env NODE_OPTIONS=\"--inspect\" next dev -p 3500",
+    "debug": "docker-compose up -d && cross-env NODE_OPTIONS=\"--inspect\" next dev -p 3500",
+    "docker": "docker-compose up",
     "build": "next build -p 3500",
     "start": "next start -p 3500",
     "test": "jest"
@@ -21,6 +22,7 @@
     "mobx-react": "^5.4.3",
     "mobx-state-tree": "^3.11.0",
     "module-alias": "^2.2.1",
+    "mongoose": "^5.6.10",
     "next": "latest",
     "next-compose-plugins": "^2.2.0",
     "next-optimized-images": "^2.5.3",
@@ -61,7 +63,9 @@
     "@app": ".",
     "@components": "components",
     "@utility": "utility",
-    "@assets": "assets"
+    "@assets": "assets",
+    "@db": "server/db",
+    "@schema": "server/db/schema"
   },
   "license": "ISC"
 }

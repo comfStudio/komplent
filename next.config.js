@@ -40,7 +40,7 @@ Object.entries((packagejson._moduleAliases  || {})).forEach(([k, v]) => {aliases
 const withConfig = nextRuntimeDotenv({
     public: ['API_URL', 'API_KEY'],
     server: [
-        'GITHUB_TOKEN'
+        'MONGODB_URL'
       ]
 });
 

@@ -19,7 +19,9 @@
       "@app/*": [ "*" ],
       "@components/*": ["components/*"],
       "@utility/*": ["utility/*"],
-      "@assets/*": ["assets/*"]
+      "@assets/*": ["assets/*"],
+      "@db/*": ["server/db/*"],
+      "@schema/*": ["server/db/schema/*"]
     },
   },
   "exclude": ["node_modules"],
