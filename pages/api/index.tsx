@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
 import '@db'
-import { Blog } from '@db/models'
+import { User } from '@db/models'
 
 export default (req: NextApiRequest, res: NextApiResponse) => {
     if (req.method === 'POST') {
@@ -10,8 +10,8 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
     // Handle the rest of your HTTP methods
     }
 
-    const kitty = new Blog({ title: 'Test' });
-    kitty.save().then(() => console.log('meow'));
+    // const kitty = new Blog({ title: 'Test' });
+    // kitty.save().then(() => console.log('meow'));
 
   res.status(200).json({ title: 'Test' })
 }

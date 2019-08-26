@@ -8,8 +8,6 @@ services:
     restart: always
     environment:
       MONGO_INITDB_DATABASE: komplent
-      MONGO_INITDB_ROOT_USERNAME: komplent
-      MONGO_INITDB_ROOT_PASSWORD: root
     volumes:
       - komplent-v-mongodb:/data/db
       - komplent-v-mongodb_config:/data/configdb

@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
-import { Tag, Button, Panel, TagGroup } from 'rsuite';
+import { Tag, Button, Panel, TagGroup, Progress } from 'rsuite';
 
 import { t } from '@app/utility/lang'
 
 import { HTMLElementProps } from '@utility/props'
+
+const { Circle } = Progress
 
 import './ProfileInfo.scss'
 
@@ -25,6 +27,10 @@ export class ProfileInfo extends Component<HTMLElementProps> {
                         <Tag color="violet">Comic</Tag>
                         <Tag color="yellow">Furry</Tag>
                     </TagGroup>
+                </p>
+                <hr/>
+                <p className="text-center">
+                    <Circle percent={100} status="success" className="w-32 inline-block" />
                 </p>
                 <p>
                     <strong>{t`Commission details`}:</strong>
