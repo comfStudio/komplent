@@ -19,8 +19,7 @@ interface IOwnProps {
   initialState: IStore
 }
 
-
-class MyApp extends App {
+class KomplentApp extends App {
   public static async getInitialProps({ Component, router, ctx }) {
     //
     // Use getInitialProps as a step in the lifecycle when
@@ -28,6 +27,7 @@ class MyApp extends App {
     //
     const isServer = typeof window === 'undefined'
     const store = initializeStore(isServer)
+
     //
     // Check whether the page being rendered by the App has a
     // static getInitialProps method and if so call it
@@ -61,4 +61,4 @@ class MyApp extends App {
   }
 }
 
-export default MyApp
+export default KomplentApp

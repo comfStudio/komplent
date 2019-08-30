@@ -18,6 +18,8 @@
     "boxicons": "^2.0.2",
     "imagemin-svgo": "^7.0.0",
     "lodash": "^4.17.15",
+    "micro-cookie": "^1.1.4",
+    "micro-cors": "^0.1.1",
     "mobx": "^5.9.0",
     "mobx-react": "^5.4.3",
     "mobx-state-tree": "^3.11.0",

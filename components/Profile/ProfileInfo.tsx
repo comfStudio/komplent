@@ -30,7 +30,10 @@ export class ProfileInfo extends Component<HTMLElementProps> {
                 </p>
                 <hr/>
                 <p className="text-center">
-                    <Circle percent={100} status="success" className="w-32 inline-block" />
+                    <Circle percent={60} status="active" className="w-12 inline-block" />
+                    <Circle percent={60} status="active" className="w-12 inline-block" />
+                    <Circle percent={60} status="active" className="w-12 inline-block" />
+                    <Circle percent={60} status="active" className="w-12 inline-block" />
                 </p>
                 <p>
                     <strong>{t`Commission details`}:</strong>

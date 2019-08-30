@@ -10,7 +10,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             query: { pid },
           } = req
 
-    const q = await User.findOne({_id: parseInt(pid)}).lean()
+    const q = await User.findOne({username: pid}).lean()
     
     if (q) {
         res.status(200).json(JSON.stringify(q))
@@ -20,9 +20,4 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     
 } else if (req.method === 'POST') {}
  else if (req.method === 'DELETE') {}
-
-// const kitty = new Blog({ title: 'Test' });
-// kitty.save().then(() => console.log('meow'));
-
-res.status(404).json({ error: "error" })
 }

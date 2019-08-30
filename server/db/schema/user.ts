@@ -7,6 +7,7 @@ const { ObjectId } = mongoose.Schema.Types
 export const user_schema = new Schema({
   _id: ObjectId,
   name: String,
+  username: String,
   password: String,
   picture: Buffer,
   origin: String,

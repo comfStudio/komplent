@@ -40,7 +40,7 @@ Object.entries((packagejson._moduleAliases  || {})).forEach(([k, v]) => {aliases
 const withConfig = nextRuntimeDotenv({
     public: ['API_URL', 'API_KEY'],
     server: [
-        'MONGODB_URL'
+        'MONGODB_URL',
       ]
 });
 
@@ -84,6 +84,7 @@ module.exports = withConfig(
       [withBundleAnalyzer]
     ],
     {
+    poweredByHeader: false,
 		analyzeServer: ['server', 'both'].includes(process.env.BUNDLE_ANALYZE),
 		analyzeBrowser: ['browser', 'both'].includes(process.env.BUNDLE_ANALYZE),
 		bundleAnalyzerConfig: {

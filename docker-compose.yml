@@ -5,9 +5,11 @@ services:
   mongo:
     image: mongo
     container_name: komplent-mongodb
-    restart: always
+    restart: unless-stopped
     environment:
-      MONGO_INITDB_DATABASE: komplent
+      MONGO_INITDB_DATABASE: admin
+      MONGO_INITDB_ROOT_USERNAME: komplent
+      MONGO_INITDB_ROOT_PASSWORD: komplent
     volumes:
       - komplent-v-mongodb:/data/db
       - komplent-v-mongodb_config:/data/configdb
