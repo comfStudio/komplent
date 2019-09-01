@@ -5,8 +5,8 @@ import Placeholder from '@components/App/Placeholder'
 
 interface Props extends HTMLElementProps {
     placeholderText?: string
-    w?: number
-    h?: number
+    w?: number | string
+    h?: number | string
     fluid?: boolean
 }
 
