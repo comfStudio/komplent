@@ -1,3 +1,50 @@
 .commission-card {
     width: 12rem;
+    position: relative;
+
+    .header {
+
+        margin: 0;
+        padding: 0.8em;
+
+        .price {
+            font-size: 1.2em;
+            border: 1px solid rgba(0, 0, 0, 0.5);
+            padding: 0.3em;
+            border-radius: 2px;
+            font-weight: 600;
+        }
+
+        .title {
+            margin: auto;
+            width: 100%;
+            text-align: center;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        .extra {
+            color: rgba(0, 0, 0, 0.5);
+            font-style: italic;
+        }
+
+        .extra-row > div:first-child {
+            margin-top: 0.4em;
+        }
+
+    }
+
+    .select-box {
+        position: absolute;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.4);
+        text-align: center;
+        width: 100%;
+        color: skyblue;
+        font-weight: 600;
+    }
+}
+
+.commission-card:hover, .commission-card.selected {
+    border: 1px solid skyblue;
 }

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Panel, Row, Col, Grid, Input, Form, Uploader, Icon } from 'rsuite'
+import { Button, Panel, Row, Col, Grid, Input, Form, Uploader, Icon, Toggle } from 'rsuite'
 
 import Link from 'next/link'
 
@@ -7,7 +7,8 @@ import { t } from '@app/utility/lang'
 import { HTMLElementProps, ReactProps } from '@utility/props'
 
 import './ProfileCommission.scss'
-import Placeholder from '../App/Placeholder';
+import Placeholder from '@components/App/Placeholder';
+import Image from '@components/App/Image'
 
 export const CommissionButton = (props: HTMLElementProps) => {
     let cls = "commission-button"
@@ -31,34 +32,64 @@ export const SendRequestButton = (props: HTMLElementProps) => {
 
 interface CommissionCardProps extends HTMLElementProps {
     title?: string
+    price?: number
+    selected?: boolean
 }
 
 const CommissionCardHeader = (props) => {
-    return <h4>{props.children}</h4>
+    return (<Grid className="header !w-full">
+        <Row>
+            <Col xs={8}>
+                <span className="price">${props.price}</span>
+            </Col>
+            <Col xs={16}>
+                <h4 className="title inline-block">{props.title}</h4>
+            </Col>
+        </Row>
+        <Row className="extra-row">
+            <Col xs={24}>
+                    <small className="extra">+ ${props.price} - Potrait</small>
+            </Col>
+            <Col xs={24}>
+                    <small className="extra">+ ${props.price} - Half body</small>
+            </Col>
+            <Col xs={24}>
+                    <small className="extra">+ ${props.price} - Full body</small>
+            </Col>
+            <Col xs={24}>
+                    <small className="extra">+ ${props.price} - Background</small>
+            </Col>
+        </Row>
+    </Grid>)
 }
 
 export const CommissionCard = (props: CommissionCardProps) => {
     let cls = "commission-card mx-auto"
+    if (props.selected)
+        cls += " selected"
     return (
-        <Panel bodyFill header={<CommissionCardHeader>{props.title}</CommissionCardHeader>} className={props.className ? cls + ' ' + props.className : cls} bordered>
+        <Panel bodyFill className={props.className ? cls + ' ' + props.className : cls} bordered>
+            <CommissionCardHeader title={props.title} price={props.price}/>
+            <Image w="100%" h={250}/>
+            {props.selected && <span className="select-box">Selected</span>}
         </Panel>
     );
 };
 
 export const CommissionTiers = (props: any) => {
     return (
-    <Row gutter={16}>
+        <Row gutter={16}>
         <Col xs={6}>
-            <CommissionCard title="$15"/>
+            <CommissionCard price={15} title="Sketch"/>
         </Col>
         <Col xs={6}>
-            <CommissionCard title="$25"/>
+            <CommissionCard price={25} title="Colored Sketch"/>
         </Col>
         <Col xs={6}>
-            <CommissionCard title="$35"/>
+            <CommissionCard price={30} title="Flat Color" selected/>
         </Col>
         <Col xs={6}>
-            <CommissionCard title="$55"/>
+            <CommissionCard price={45} title="Full color"/>
         </Col>
     </Row>)
 }
@@ -88,6 +119,13 @@ const Attachments = (props) => {
     )
 }
 
+export const ExtraToggle = (props: ReactProps) => {
+    return (
+        <span><Toggle/> {props.children}</span>
+    );
+};
+
+
 export class ProfileCommission extends Component {
     render() {
         return (
@@ -100,6 +138,16 @@ export class ProfileCommission extends Component {
                         <Placeholder type="text" rows={4}/>
                     </Row>
                     <hr/>
+                    <Row>
+                        <Col xs={24}>
+                            <ul className="extra-toggles">
+                                <li><ExtraToggle>Potrait</ExtraToggle></li>
+                                <li><ExtraToggle>Half Body</ExtraToggle></li>
+                                <li><ExtraToggle>Full Body</ExtraToggle></li>
+                                <li><ExtraToggle>Background</ExtraToggle></li>
+                            </ul>
+                        </Col>
+                    </Row>
                     <Row>
                         <Col xs={24}>
                         <h3>{`Describe your commission request`}</h3>
