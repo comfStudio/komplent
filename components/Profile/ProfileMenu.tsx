@@ -34,11 +34,16 @@ export class ProfileMenu extends Component<Props> {
                                     {t`Recommendations`}
                                 </Nav.Item>
                             </Link>
-                            <Link href="/profile/shop" passHref>
+                            <Link href="/profile/reviews" passHref>
+                                <Nav.Item eventKey="reviews">
+                                    {t`Reviews`}
+                                </Nav.Item>
+                            </Link>
+                            {/* <Link href="/profile/shop" passHref>
                                 <Nav.Item eventKey="shop">
                                     {t`Shop`}
                                 </Nav.Item>
-                            </Link>
+                            </Link> */}
                             <Link href="/profile/edit" passHref>
                                 <Nav.Item eventKey="edit">
                                     {t`Edit Profile`}
