@@ -22,19 +22,23 @@
 $avatar-indent: 3em;
 $header-container-indent: 16em;
 
+.avatar {
+    width: 12em;
+    height: 12em;
+    border-radius: 10%;
+}
+
+.avatar img {
+    border-radius: 10%;
+}
+
 #profile-header .container .avatar {
     position: absolute;
     right: $avatar-indent;
     bottom: -6em;
-    width: 11rem;
-    height: 11rem;
     z-index: 3;
-    border-radius: 10%;
 }
 
-#profile-header .container .avatar img {
-    border-radius: 10%;
-}
 
 #profile-header .gradient {
     @extend .inverted-top-gradient;

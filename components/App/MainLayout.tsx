@@ -1,36 +1,34 @@
 import React from 'react'
-import { Container as Layout, Header, Content, Footer, Panel, Grid} from 'rsuite';
+import { Container as Layout, Header, Content, Footer, Panel, Grid, Row, Col} from 'rsuite';
 import NavMenu from '@components/Header/NavMenu'
 import { ReactProps, HTMLElementProps } from '@utility/props'
 
+import UserSidebar from '@app/components/App/UserSidebar'
+
 import './MainLayout.scss'
-import { number } from 'prop-types';
 
 interface Props extends ReactProps {
   activeKey?: string
 }
 
-export class MainLayout extends React.Component<Props> {
-  public componentDidMount() {
-  }
-
-  public componentWillUnmount() {
-  }
-
-  public render() {
+export const MainLayout = (props: Props) => {
     return (
       <Layout id="main-layout" className="!h-screen">
         <Header>
-          <NavMenu activeKey={this.props.activeKey}/>
+          <NavMenu activeKey={props.activeKey}/>
         </Header>
         <Content>
-          {this.props.children}
+          <Grid>
+            <Row>
+              <Col xs={5}><UserSidebar/></Col>
+              <Col xs={19}>{props.children}</Col>
+            </Row>
+          </Grid>
         </Content>
         <Footer className="footer">
         </Footer>
       </Layout>
     )
-  }
 }
 
 interface ContainerProps extends ReactProps, HTMLElementProps {

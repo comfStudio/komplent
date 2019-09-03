@@ -28,3 +28,7 @@ export const ProfileLayout = (props: LayoutProps) => {
       </MainLayout>
     )
 }
+
+export const ProfileNameTag = (props) => {
+  return (<h3 className="profile-name text-center">~A little twiddly~</h3>)
+}

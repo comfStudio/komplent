@@ -131,7 +131,7 @@ export class ProfileCommission extends Component {
         return (
             <Form>
                 <Grid fluid>
-                    <h4>{t`Commission Rates`}</h4>
+                    <h3>{t`Pick your commission`}</h3>
                     <CommissionTiers/>
                     <hr/>
                     <Row>
@@ -150,7 +150,7 @@ export class ProfileCommission extends Component {
                     </Row>
                     <Row>
                         <Col xs={24}>
-                        <h3>{`Describe your commission request`}</h3>
+                        <h3>{t`Describe your commission request`}</h3>
                         <Input
                             componentClass="textarea"
                             rows={3}
@@ -159,7 +159,7 @@ export class ProfileCommission extends Component {
                         </Col>
                     </Row>
                     <Row>
-                        <h3>{`Attachments`}</h3>
+                        <h3>{t`Attachments`}</h3>
                         <Attachments/>
                     </Row>
                     <hr/>

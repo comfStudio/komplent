@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { Tag, Button, Panel, TagGroup, Progress } from 'rsuite';
 
+import { ProfileNameTag } from '@components/Profile'
+
 import { t } from '@app/utility/lang'
 
 import { HTMLElementProps } from '@utility/props'
@@ -15,7 +17,7 @@ export class ProfileInfo extends Component<HTMLElementProps> {
         return (
             <Panel id="profile-info" className={this.props.className ? cls + ' ' + this.props.className : cls} bordered>
                 <p>
-                    <h3 className="profile-name text-center">~A little twiddly~</h3>
+                    <ProfileNameTag/>
                 </p>
                 <hr/>
                 <p>
