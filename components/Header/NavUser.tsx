@@ -28,47 +28,47 @@ interface UserMenuProps {
 export const NavUserMenu = (props: UserMenuProps) => {
     let El = props.element
     return [
+        <Link href="/profile" passHref>
+        <El.Item eventKey="profile" active={props.activeKey=='profile'}>
+            {t`My Profile`}
+        </El.Item>
+        </Link>,
          <Link href="/dashboard" passHref>
-                <El.Item eventKey="dashboard">
+                <El.Item eventKey="dashboard" active={props.activeKey=='dashboard'}>
                     {t`Dashboard`}
                 </El.Item>
          </Link>,
         <Link href="/commissions" passHref>
-            <El.Item eventKey="commissions">
+            <El.Item eventKey="commissions" active={props.activeKey=='commissions'}>
                 {t`Commissions`}
             </El.Item>
         </Link>,
         <Link href="/inbox" passHref>
-            <El.Item eventKey="inbox">
+            <El.Item eventKey="inbox" active={props.activeKey=='inbox'}>
                 {t`Messages`}
             </El.Item>
         </Link>,
         <Link href="/earnings" passHref>
-            <El.Item eventKey="earnings">
+            <El.Item eventKey="earnings" active={props.activeKey=='earnings'}>
                 {t`Earnings`}
             </El.Item>
-        </Link>,
-        <Link href="/profile" passHref>
-        <El.Item eventKey="profile">
-            {t`My Profile`}
-        </El.Item>
         </Link>,
         !!props.dropdown && <li className="header">{t`Community`}</li>,
         !!!props.dropdown && <hr/>,
         <Link href="/hub" passHref>
-            <El.Item eventKey="hub">
+            <El.Item eventKey="hub" active={props.activeKey=='hub'}>
                 {t`Feedback Hub`}
             </El.Item>
         </Link>,
         !!props.dropdown && <li className="header">{t`General`}</li>,
         !!!props.dropdown && <hr/>,
         <Link href="/settings" passHref>
-            <El.Item eventKey="settings">
+            <El.Item eventKey="settings" active={props.activeKey=='settings'}>
                 {t`Settings`}
             </El.Item>
         </Link>,
         <Link href="/logout" passHref>
-            <El.Item eventKey="logout">
+            <El.Item eventKey="logout" active={props.activeKey=='logout'}>
                 {t`Logout`}
             </El.Item>
         </Link>
@@ -83,7 +83,7 @@ export const NavUserDropdown = (props: NavUserProps) => {
     return (
         <Dropdown className="nav-user-dropdown" placement="bottomRight" renderTitle={NavUserAvatar}>
         <li className="header">✦ Twiddly ✦</li>
-        <NavUserMenu element={Dropdown} dropdown />
+        <NavUserMenu element={Dropdown} activeKey={props.activeKey} dropdown />
         </Dropdown>
     )
 }
@@ -91,7 +91,7 @@ export const NavUserDropdown = (props: NavUserProps) => {
 export const NavUserSidebar = (props: NavUserProps) => {
     return (
         <Nav vertical appearance="subtle" activeKey={props.activeKey} className="nav-user-sidebar">
-        <NavUserMenu element={Nav}/>
+        <NavUserMenu element={Nav} activeKey={props.activeKey}/>
         </Nav>
     )
 }

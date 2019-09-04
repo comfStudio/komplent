@@ -1,15 +1,19 @@
-import React, { Component } from 'react';
+import React from 'react';
 
 import { Form, FormGroup, FormControl, ControlLabel, Button, ButtonToolbar, HelpBlock, Input, Panel } from 'rsuite'
 
 import { HTMLElementProps } from '@app/utility/props'
 import { t } from '@app/utility/lang'
 
+import useUserStore from '@store/user'
+
 interface LoginFormProps extends HTMLElementProps {
     panel?: boolean
 }
 
 export const LoginForm = (props: LoginFormProps) => {
+
+    const [user_store, user_actions] = useUserStore()
 
     let cls = "max-w-sm pl-3 p-1"
     cls = props.className ? cls + ' ' + props.className : cls
@@ -26,7 +30,7 @@ export const LoginForm = (props: LoginFormProps) => {
             </FormGroup>
             <FormGroup>
                 <ButtonToolbar>
-                <Button type="submit" block appearance="primary">{t`Login`}</Button>
+                <Button type="submit" block appearance="primary" onClick={() => user_actions.login('twiddly')}>{t`Login`}</Button>
                 </ButtonToolbar>
             </FormGroup>
         </Form>

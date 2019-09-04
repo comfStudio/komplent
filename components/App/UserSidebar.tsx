@@ -9,7 +9,11 @@ import { t } from '@app/utility/lang'
 
 import './UserSidebar.scss'
 
-const UserSidebar = () => {
+interface Props {
+    activeKey?: string
+}
+
+const UserSidebar = (props: Props) => {
     return (
         <Grid fluid className="user-sidebar">
             <Row>
@@ -33,7 +37,7 @@ const UserSidebar = () => {
             <hr/>
             <Row>
                 <Col xs={24}>
-                    <NavUserSidebar/>
+                    <NavUserSidebar activeKey={props.activeKey}/>
                 </Col>
             </Row>
         </Grid>

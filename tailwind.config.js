@@ -86,5 +86,15 @@ module.exports = {
         })
       })
     },
-  ]
+  ],
+  screens: {
+    'xs': '576px',
+    'sm': '736px',
+    'md': '980px',
+    'lg': '1280px',
+    'xl': '1690px',
+    'tablet': '576px',
+    'laptop': '992px',
+    'desktop': '1200px',
+  },
 }

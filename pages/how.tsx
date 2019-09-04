@@ -5,7 +5,7 @@ import MainLayout from '@components/App/MainLayout'
 class HowPage extends Component {
     render() {
         return (
-            <MainLayout selectedKeys={["how"]}>
+            <MainLayout activeKey="how">
             </MainLayout>
         );
     }

@@ -1,23 +1,17 @@
-// import 'module-alias/register'
-import { Provider } from 'mobx-react'
-import { getSnapshot } from 'mobx-state-tree'
 import App from 'next/app'
 import getConfig from 'next/config'
 import React from 'react'
-import { initializeStore, IStore } from '../stores/store'
+
+import { Title } from '@components/App'
 
 import '@assets/styles/imports.scss'
 import '@assets/styles/common.scss'
+import Head from 'next/head';
 
 const {
   publicRuntimeConfig: {},
   serverRuntimeConfig: {MONGODB_URL}
 } = getConfig()
-
-interface IOwnProps {
-  isServer: boolean
-  initialState: IStore
-}
 
 class KomplentApp extends App {
   public static async getInitialProps({ Component, router, ctx }) {
@@ -26,7 +20,6 @@ class KomplentApp extends App {
     // we can initialize our store
     //
     const isServer = typeof window === 'undefined'
-    const store = initializeStore(isServer)
 
     //
     // Check whether the page being rendered by the App has a
@@ -37,26 +30,18 @@ class KomplentApp extends App {
       pageProps = await Component.getInitialProps(ctx)
     }
     return {
-      initialState: getSnapshot(store),
       isServer,
       pageProps,
     }
   }
 
-  private store: IStore
-
-  constructor(props) {
-    super(props)
-    this.store = initializeStore(props.isServer, props.initialState) as IStore
-  }
-
   public render() {
     const { Component, pageProps } = this.props
-    console.log(MONGODB_URL)
     return (
-      <Provider store={this.store}>
+      <React.Fragment>
+        <Title>Komplent</Title>
         <Component {...pageProps} />
-      </Provider>
+      </React.Fragment>
     )
   }
 }

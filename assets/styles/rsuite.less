@@ -1,3 +1,63 @@
-@ant-prefix: "komplent";
+@font-family-base: 'Lucida Grande', 'Avenir Next', 'Helvetica Neue', Helvetica,
+  Arial, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', STXihei,
+  sans-serif;
+@font-size-base: 14px;
 
-// @primary-color: #feb2b2;
+@base-color: #e91e63;
+
+@H050:#fde9ef;
+@H100:#f8bcd0;
+@H200:#f48fb1;
+@H300:#f06997;
+@H400:#ed437d;
+@H500:#e91e63;
+@H600:#cc1a57;
+@H700:#af174a;
+@H800:#92133e;
+@H900:#750f32;
+
+//== Media queries breakpoints
+//
+//## Define the breakpoints at which your layout will change, adapting to different screen sizes.
+
+// Extra small screen / phone
+// @screen-xs
+@screen-phone: 736px;
+
+// Small screen / tablet
+// @screen-sm
+@screen-tablet: 980px;
+
+// Medium screen / desktop
+// @screen-md
+@screen-desktop: 1280px;
+
+// Large screen / wide desktop
+// @screen-lg
+@screen-lg-desktop: 1690px;
+
+// So media queries don't overlap when required, provide a maximum
+@screen-phone-max: (@screen-tablet - 1);
+@screen-tablet-max: (@screen-desktop - 1);
+@screen-desktop-max: (@screen-lg-desktop - 1);
+
+//== Grid system
+
+//== Container sizes
+//
+//## Define the maximum width of `.container` for different screen sizes.
+
+// Small screen / tablet
+@container-tablet: (980px + @grid-gutter-width);
+//** For `@screen-sm-min` and up.
+@container-sm: @container-tablet;
+
+// Medium screen / desktop
+@container-desktop: (1280px + @grid-gutter-width);
+//** For `@screen-md-min` and up.
+@container-md: @container-desktop;
+
+// Large screen / wide desktop
+@container-large-desktop: (1690px + @grid-gutter-width);
+//** For `@screen-lg-min` and up.
+@container-lg: @container-large-desktop;

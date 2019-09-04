@@ -20,8 +20,8 @@ export const MainLayout = (props: Props) => {
         <Content>
           <Grid>
             <Row>
-              <Col xs={5}><UserSidebar/></Col>
-              <Col xs={19}>{props.children}</Col>
+              <Col xs={5} lg={4}><UserSidebar activeKey={props.activeKey}/></Col>
+              <Col xs={19} lg={20}>{props.children}</Col>
             </Row>
           </Grid>
         </Content>
@@ -49,6 +49,8 @@ interface PanelContainerProps extends ReactProps, HTMLElementProps {
   flex?: boolean
   bordered?: boolean
   fluid?: boolean
+  bodyFill?: boolean
+  header?: React.ReactNode
 }
 
 export const PanelContainer = (props: PanelContainerProps) => {
@@ -57,19 +59,24 @@ export const PanelContainer = (props: PanelContainerProps) => {
     cls += props.flex ? " flex flex-grow" : " w-full"
   }
 
-  return (<Panel className={props.className ? (props.className + " " + cls) : cls} bordered={props.bordered}>
+  return (<Panel className={props.className ? (props.className + " " + cls) : cls} bordered={props.bordered} bodyFill={props.bodyFill} header={props.header}>
     {props.children}
   </Panel>)
 }
 
 interface GridContainerProps extends ReactProps, HTMLElementProps {
   fluid?: boolean
+  padded?: boolean | number
 }
 
 export const GridContainer = (props: GridContainerProps) => {
   let cls = "grid-container"
   if (props.fluid) {
     cls += " !w-full"
+  }
+
+  if (props.padded) {
+    cls += ` py-${typeof props.padded == 'number' ? props.padded : 5}`
   }
 
   return (<Grid className={props.className ? (props.className + " " + cls) : cls} {...props}>

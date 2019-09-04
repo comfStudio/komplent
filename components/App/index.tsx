@@ -75,3 +75,11 @@ export const Icon = (props: IconProps) => {
         </i>
     );
 };
+
+export const Title = (props: ReactProps) => {
+    return (
+        <Head key="title">
+            <title>{props.children}</title>
+        </Head>
+    )
+}

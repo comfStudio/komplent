@@ -16,7 +16,7 @@ interface LayoutProps extends ReactProps, MenuProps {
 
 export const ProfileLayout = (props: LayoutProps) => {
     return (
-        <MainLayout activeKey={"profile"}>
+        <MainLayout activeKey="profile">
           <ProfileHeader></ProfileHeader>
         <ProfileMenu {... props}/>
         <Container>

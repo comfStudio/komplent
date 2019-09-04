@@ -17,7 +17,7 @@ class MyDocument extends Document {
   render() {
     return (
       <Html>
-        <Head />
+        <Head/>
         <body>
           <div dangerouslySetInnerHTML={{ __html: this.props.spriteContent }} />
           <Main />

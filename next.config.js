@@ -2,7 +2,7 @@
 const packagejson = require('./package.json')
 
 const withPlugins = require('next-compose-plugins');
-const { IgnorePlugin, ProvidePlugin } = require('webpack');
+const { IgnorePlugin, DefinePlugin } = require('webpack');
 const { PHASE_PRODUCTION_BUILD, PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_SERVER } = require('next-server/constants');
 
 const withCSS = require('@zeit/next-css');
@@ -103,6 +103,9 @@ module.exports = withConfig(
         
             //config.plugins.push(new Dotenv({ path: './public.env' }));
             config.plugins.push(new IgnorePlugin(/^\.\/locale$/, /moment$/));
+            // config.plugins.push(new DefinePlugin({
+            //   __RSUITE_CLASSNAME_PREFIX__: JSON.stringify('komplent-')
+            // }));
             Object.assign(config.resolve.alias, aliases)
 
             // if (dev) {
