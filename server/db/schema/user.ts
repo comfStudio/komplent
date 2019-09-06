@@ -2,26 +2,52 @@ import mongoose from 'mongoose'
 
 const { Schema } = mongoose
 
-const { ObjectId } = mongoose.Schema.Types
+const { ObjectId, Decimal128 } = mongoose.Schema.Types
 
 export const user_schema = new Schema({
   _id: ObjectId,
   name: String,
-  username: String,
-  password: String,
-  picture: Buffer,
+  type: {
+    type: String,
+    enum : ['creator','consumer'],
+    default: 'consumer'
+  },
+  username: { type: String, required: true, unique: true, trim: true, minLength: 3, maxLength: 60 },
+  password: { type: String, required: true, minLength: 8 },
+  avatar: { 
+    type: ObjectId, 
+    ref: 'Image'
+  },
   origin: String,
   description: String,
   socials: [{ url: String, name: String }],
+  display_currency: String,
+  profile_currency: String,
+  average_price: Decimal128,
   private: Boolean,
-  tags: [],
-  rates: [],
+  tags: [{ 
+    type: ObjectId, 
+    ref: 'Tag'
+  }],
+  rates: [{ 
+    type: ObjectId, 
+    ref: 'CommissionRate'
+  }],
   rating: Number,
-  followings: [],
-  followers: [],
+  followings: [{ 
+    type: ObjectId, 
+    ref: 'User'
+  }],
+  followers: [{ 
+    type: ObjectId, 
+    ref: 'User'
+  }],
   commissions_open: Boolean,
   last_commissions_update: Date,
-  last_update: Date,
+  last_update: {
+    type: Date,
+    default: Date.now,
+  },
   created: {
     type: Date,
     default: Date.now,
@@ -34,6 +60,10 @@ export const user_schema = new Schema({
     type: ObjectId, 
     ref: 'CommissionStats'
   },
+  recommendations: [{ 
+    type: ObjectId, 
+    ref: 'UserRecommendation'
+  }],
   options: { 
     type: ObjectId, 
     ref: 'UserOptions'
@@ -54,14 +84,20 @@ export const user_schema = new Schema({
 
 export const gallery_schema = new Schema({
   _id: ObjectId,
-  picture: Buffer,
+  image: { 
+    type: ObjectId, 
+    ref: 'Image'
+  },
   url: String
 })
 
 export const comission_rate_schema = new Schema({
   _id: ObjectId,
-  price: Number,
-  picture: Buffer,
+  price: Decimal128,
+  image: { 
+    type: ObjectId, 
+    ref: 'Image'
+  },
   description: String,
 })
 
@@ -78,14 +114,29 @@ export const profile_schema = new Schema({
   _id: ObjectId,
   reviews: [],
   comments: [{ body: String, date: Date }],
-  cover: Buffer,
+  cover: { 
+    type: ObjectId, 
+    ref: 'Image'
+  },
   body: String,
+  options: { 
+    type: ObjectId, 
+    ref: 'ProfileOptions'
+  },
+})
+
+export const profile_options_schema = new Schema({
+  _id: ObjectId,
+  color: String,
 })
 
 export const user_options_schema = new Schema({
   _id: ObjectId,
-  color: String,
+})
 
+export const user_recommendation_schema = new Schema({
+  _id: ObjectId,
+  description: String,
 })
 
 export default user_schema

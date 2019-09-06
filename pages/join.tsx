@@ -1,19 +1,19 @@
 import React from 'react'
 
 import { MainLayout, Container} from '@app/components/App/MainLayout'
-import LoginForm from '@components/Form/LoginForm'
+import JoinForm from '@components/Form/JoinForm'
 
 
-class LoginPage extends React.Component {
+class JoinPage extends React.Component {
   public render() {
     return (
-      <MainLayout activeKey="login">
+      <MainLayout activeKey="join">
         <Container padded={16}>
-          <LoginForm panel/>
+          <JoinForm panel/>
         </Container>
       </MainLayout>
     )
   }
 }
 
-export default LoginPage
+export default JoinPage

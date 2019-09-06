@@ -35,6 +35,11 @@ export const NavMenu = (props: Props) => {
                             {t`Disover`}
                     </Nav.Item>
                 </Link>
+                <Link href="/join" passHref>
+                    <Nav.Item eventKey="join" active={props.activeKey=='join'}>
+                            {t`Join`}
+                    </Nav.Item>
+                </Link>
                 <Link href="/login" passHref>
                     <Nav.Item eventKey="login" active={props.activeKey=='login'}>
                             {t`Login`}
