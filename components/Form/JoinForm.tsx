@@ -21,6 +21,7 @@ export const JoinForm = (props: Props) => {
 
     let form = (
         <div>
+            <Divider>{t`Join with`}</Divider>
             <ButtonToolbar>
                 <Button color="red" className="m-1" >
                 <Icon icon="google"/> Twitter
@@ -38,7 +39,7 @@ export const JoinForm = (props: Props) => {
                  Pixiv
                 </Button>
             </ButtonToolbar>
-            <Divider>{t`Or join using your email address`}</Divider>
+            <Divider>{t`Or using your email address`}</Divider>
             <Form className={cls} action="/api/join" method="post">
                 <FormGroup>
                     <ControlLabel>{t`Email address`}:</ControlLabel>

@@ -21,6 +21,7 @@ export const LoginForm = (props: LoginFormProps) => {
 
     let form = (
         <div>
+            <Divider>{t`Login with`}</Divider>
             <ButtonToolbar>
                     <Button color="red" className="m-1" >
                     <Icon icon="google"/> Twitter
@@ -38,7 +39,7 @@ export const LoginForm = (props: LoginFormProps) => {
                     Pixiv
                     </Button>
                 </ButtonToolbar>
-            <Divider>{t`Or login using your email address`}</Divider>
+            <Divider>{t`Or using your email address`}</Divider>
             <Form className={cls} action="/api/login" method="post">
                 <FormGroup>
                     <ControlLabel>{t`Username or Email address`}</ControlLabel>
