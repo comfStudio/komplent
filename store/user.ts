@@ -6,8 +6,12 @@ export const useUserStore = defineStore(
       current_user: null
   },
   {
-      login: (store, data) => {
-          console.log(`logging in ${data}`)
+      login: (store, data, redirect = false) => {
+          fetch("/api/login", {
+              credentials: "include",
+              method: redirect ? "get" : "post",
+              body: JSON.stringify(data),
+          }).then(r => console.log(r))
       }
   }
   );

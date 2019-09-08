@@ -22,6 +22,7 @@
       "@store/*": ["store/*"],
       "@schema/*": ["server/db/schema/*"],
       "@db/*": ["server/db/*"],
+      "@server/*": ["server/*"],
       "@app/*": [ "*" ],
     },
   },

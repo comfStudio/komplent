@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { Form, FormGroup, FormControl, ControlLabel, Button, ButtonToolbar, HelpBlock, Input, Panel, Icon, Divider } from 'rsuite'
 
@@ -15,6 +15,7 @@ interface LoginFormProps extends HTMLElementProps {
 export const LoginForm = (props: LoginFormProps) => {
 
     const [user_store, user_actions] = useUserStore()
+    const [form_value, set_form_value] = useState({})
 
     let cls = "max-w-sm pl-3 p-1"
     cls = props.className ? cls + ' ' + props.className : cls
@@ -40,7 +41,7 @@ export const LoginForm = (props: LoginFormProps) => {
                     </Button>
                 </ButtonToolbar>
             <Divider>{t`Or using your email address`}</Divider>
-            <Form className={cls} action="/api/login" method="post">
+            <Form className={cls} action="/api/login" formValue={form_value} onChange={(value => set_form_value(value))}>
                 <FormGroup>
                     <ControlLabel>{t`Username or Email address`}</ControlLabel>
                     <FormControl fluid name="name" accepter={Input} required />
@@ -51,7 +52,7 @@ export const LoginForm = (props: LoginFormProps) => {
                 </FormGroup>
                 <FormGroup>
                     <ButtonToolbar>
-                    <Button type="submit" block appearance="primary" onClick={() => user_actions.login('twiddly')}>{t`Login`}</Button>
+                    <Button type="submit" block appearance="primary" onClick={() => user_actions.login(form_value)}>{t`Login`}</Button>
                     </ButtonToolbar>
                 </FormGroup>
                 <div>{`Don't have an account yet?`}<Link href="/join"><a className="ml-1">{t`Join`}</a></Link></div>
