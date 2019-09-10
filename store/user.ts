@@ -1,18 +1,36 @@
 import fetch from 'isomorphic-unfetch'
 import { defineStore } from '@app/store'
+import qs from 'qs'
 
 export const useUserStore = defineStore(
   {
       current_user: null
   },
   {
-      login: (store, data, redirect = false) => {
-          fetch("/api/login", {
+      login: async (store, data, redirect = false) => {
+          return await fetch("/api/login", {
               credentials: "include",
               method: redirect ? "get" : "post",
               body: JSON.stringify(data),
-          }).then(r => console.log(r))
-      }
+          })
+      },
+      exists: async (store, name) => {
+        const r = await fetch(`/api/user?${qs.stringify({username:name, email:name})}`, {
+            credentials: "include",
+            method: "get",
+        })
+        if (r.status == 200) {
+            return true
+        }
+        return false
+      },
+      join: async (store, data, redirect = false) => {
+        return await fetch("/api/join", {
+            credentials: "include",
+            method: redirect ? "get" : "post",
+            body: JSON.stringify(data),
+        })
+    }
   }
   );
 

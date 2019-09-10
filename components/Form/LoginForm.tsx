@@ -41,7 +41,7 @@ export const LoginForm = (props: LoginFormProps) => {
                     </Button>
                 </ButtonToolbar>
             <Divider>{t`Or using your email address`}</Divider>
-            <Form className={cls} action="/api/login" formValue={form_value} onChange={(value => set_form_value(value))}>
+            <Form fluid className={cls} action="/api/login" formValue={form_value} onChange={(value => set_form_value(value))}>
                 <FormGroup>
                     <ControlLabel>{t`Username or Email address`}</ControlLabel>
                     <FormControl fluid name="name" accepter={Input} required />

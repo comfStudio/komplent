@@ -1,5 +1,5 @@
 import React from 'react';
-import { Icon, Nav, Dropdown } from 'rsuite';
+import { Icon, Nav, Dropdown  } from 'rsuite';
 import Link from 'next/link';
 
 import { t } from '@app/utility/lang'

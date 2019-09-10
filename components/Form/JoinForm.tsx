@@ -1,12 +1,50 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-import { Form, FormGroup, FormControl, ControlLabel, Button, ButtonToolbar, HelpBlock, Input, Panel, Divider, Icon } from 'rsuite'
+import { Form, FormGroup, FormControl, ControlLabel, Button, ButtonToolbar,
+        HelpBlock, Input, Panel, Divider, Icon, Schema } from 'rsuite'
 
 import { HTMLElementProps } from '@app/utility/props'
 import { t } from '@app/utility/lang'
 
 import useUserStore from '@store/user'
 import Link from 'next/link';
+
+const { StringType, NumberType } = Schema.Types;
+
+const join_model = Schema.Model({
+  email: StringType()
+      .isEmail(t`Please enter a valid email address.`)
+      .isRequired(t`This field is required.`),
+  username: StringType()
+    .addRule((value, data) => {
+        if (value.length < 3)
+            return false
+        return true
+    }, t`Username must be longer than 2 characters`)
+    .addRule((value, data) => {
+        let illegal_chars = /\W/
+        if (illegal_chars.test(value))
+            return false
+        return true
+    }, t`Username must only contain letter, numbers and underscores`)
+    .isRequired(t`This field is required.`),
+  password: StringType().isRequired('This field is required.')
+    .addRule((value, data) => {
+        if (value.length < 8) {
+            return false;
+        }
+        return true;
+    }, 'Password must be longer than 7 characters'),
+  repeat_password: StringType()
+    .addRule((value, data) => {
+      if (value !== data.password) {
+        return false;
+      }
+      return true;
+    }, 'The two passwords do not match')
+    .isRequired('This field is required.')
+});
+
 
 interface Props extends HTMLElementProps {
     panel?: boolean
@@ -15,6 +53,10 @@ interface Props extends HTMLElementProps {
 export const JoinForm = (props: Props) => {
 
     const [user_store, user_actions] = useUserStore()
+    const [form_ref, set_form_ref] = useState(null)
+    const [form_value, set_form_value] = useState({})
+    const [form_error, set_form_error] = useState({})
+    const [loading, set_loading] = useState(false)
 
     let cls = "max-w-md pl-3 p-1"
     cls = props.className ? cls + ' ' + props.className : cls
@@ -40,14 +82,14 @@ export const JoinForm = (props: Props) => {
                 </Button>
             </ButtonToolbar>
             <Divider>{t`Or using your email address`}</Divider>
-            <Form className={cls} action="/api/join" method="post">
+            <Form fluid className={cls} action="/api/join" method="post" formValue={form_value} model={join_model} ref={ref => (set_form_ref(ref))} onChange={(value => set_form_value(value))}>
                 <FormGroup>
                     <ControlLabel>{t`Email address`}:</ControlLabel>
                     <FormControl fluid name="email" accepter={Input} type="email" required />
                 </FormGroup>
                 <FormGroup>
                     <ControlLabel>{t`Username`}:</ControlLabel>
-                    <FormControl fluid name="name" accepter={Input} required />
+                    <FormControl fluid name="username" accepter={Input} required />
                 </FormGroup>
                 <FormGroup>
                     <ControlLabel>{t`Password`}:</ControlLabel>
@@ -55,11 +97,16 @@ export const JoinForm = (props: Props) => {
                 </FormGroup>
                 <FormGroup>
                     <ControlLabel>{t`Repeat password`}:</ControlLabel>
-                    <FormControl name="password" type="password" accepter={Input} required />
+                    <FormControl name="repeat_password" type="password" accepter={Input} required />
                 </FormGroup>
                 <FormGroup>
                     <ButtonToolbar>
-                    <Button type="submit" block appearance="primary">{t`Join`}</Button>
+                    <Button loading={loading} type="submit" block appearance="primary" onClick={async (ev) => { ev.preventDefault()
+                        if (form_ref && form_ref.check()) {
+                            set_loading(true)
+                            const r = await user_actions.join(form_value)
+                            set_loading(false)
+                        }}}>{t`Join`}</Button>
                     </ButtonToolbar>
                 </FormGroup>
                 <div>{`Already have an account?`}<Link href="/login"><a className="ml-1">{t`Log in`}</a></Link></div>

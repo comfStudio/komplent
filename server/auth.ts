@@ -1,13 +1,20 @@
+import { NextApiRequest } from 'next'
 
-const is_logged_in = req => {
+export interface UserApiRequest extends NextApiRequest {
+  user: any
 }
 
-export const with_user = (fn: Function, require = true) => (req, res) => {
-    const user = is_logged_in(req)
+export const is_logged_in = req => {
+}
+
+export const with_user = (fn: Function, require = true) => async (req, res) => {
+    const user: any = is_logged_in(req)
     if (user) {
       req.user = user
     } else if (require) {
-      res.status(403 ).json({ error: "invalid user" })
+      return res.status(403 ).json({ error: "invalid user" })
+    } else {
+      req.user = null
     }
-    return fn(req, res)
+    return await fn(req, res)
   }

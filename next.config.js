@@ -13,20 +13,9 @@ const nextRuntimeDotenv = require('next-runtime-dotenv');
 const createResolver = require('postcss-import-webpack-resolver');
 const withOptimizedImages = require('next-optimized-images');
 
-const lessToJS = require('less-vars-to-js')
-const fs = require('fs')
 const path = require('path')
 
 /* eslint-enable @typescript-eslint/no-var-requires */
-
-let RSUITE_THEME = "./assets/styles/rsuite.less"
-
-const THEME_VARIABLES = lessToJS(
-    fs.readFileSync(
-      path.resolve(__dirname, RSUITE_THEME),
-      'utf8',
-    ),
-);
 
 // fix: prevents error when .less files are required by node
 if (typeof require !== 'undefined') {
@@ -77,7 +66,6 @@ module.exports = withConfig(
       [withLess, {
               lessLoaderOptions: {
                   javascriptEnabled: true,
-                  modifyVars: THEME_VARIABLES, // Add modifyVars property
                   localIdentName: '[local]___[hash:base64:5]',
               }
             }],

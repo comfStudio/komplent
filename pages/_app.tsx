@@ -3,9 +3,12 @@ import getConfig from 'next/config'
 import React from 'react'
 
 import { Title } from '@components/App'
+import { connect } from '@server/db'
 
+import '@assets/styles/rsuite.less'
 import '@assets/styles/imports.scss'
 import '@assets/styles/common.scss'
+
 import Head from 'next/head';
 
 const {
@@ -20,6 +23,10 @@ class KomplentApp extends App {
     // we can initialize our store
     //
     const isServer = typeof window === 'undefined'
+
+    if ( isServer) {
+      connect()
+    }
 
     //
     // Check whether the page being rendered by the App has a

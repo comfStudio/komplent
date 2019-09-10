@@ -1,4 +1,4 @@
-import mongoose from 'mongoose'
+import mongoose, { Document } from 'mongoose'
 
 const { Schema } = mongoose
 
@@ -12,6 +12,7 @@ export const user_schema = new Schema({
     enum : ['creator','consumer'],
     default: 'consumer'
   },
+  email: { type: String, required: true, unique: true, trim: true },
   username: { type: String, required: true, unique: true, trim: true, minLength: 3, maxLength: 60 },
   password: { type: String, required: true, minLength: 8 },
   avatar: { 
@@ -81,6 +82,25 @@ export const user_schema = new Schema({
     }
   ]
 })
+
+// user_schema.method({
+//   exists: async function(username: string = undefined, email: string = undefined) {
+//     if (username) {
+//       const r = await this.findOne({username: username})
+//       if (r)
+//         return true
+//     }
+//     if (email) {
+//       const r = await this.findOne({email: email})
+//       if (r)
+//         return true
+//     }
+//     return false
+//   }
+// })
+
+export interface IUser extends Document {
+}
 
 export const gallery_schema = new Schema({
   _id: ObjectId,

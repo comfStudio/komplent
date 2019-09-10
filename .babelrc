@@ -1,8 +1,8 @@
 {
   "presets": [
     "next/babel",
-    "@zeit/next-typescript/babel",
-    ["rsuite", { "style": true }]],
+    "@zeit/next-typescript/babel"
+  ],
   "plugins": [
     ["ttag", {
       "extract":{ "output": "i18n/polyglot_result.pot" },

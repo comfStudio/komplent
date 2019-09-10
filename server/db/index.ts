@@ -14,5 +14,3 @@ export function connect() {
     })
   }
 }
-
-connect()
