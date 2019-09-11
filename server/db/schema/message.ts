@@ -5,7 +5,6 @@ const { Schema } = mongoose
 const { ObjectId } = mongoose.Schema.Types
 
 export const message_schema = new Schema({
-    _id: ObjectId,
     body: String,
     created: {
         type: Date,
@@ -18,7 +17,6 @@ export const message_schema = new Schema({
 })
 
 export const conversation_schema = new Schema({
-    _id: ObjectId,
     subject: String,
     type: {
         type: String,

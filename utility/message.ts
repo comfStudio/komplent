@@ -1,13 +1,13 @@
 export const error_message = (msg: string, json = true) => {
     if (json) {
-        return {error: msg}
+        return {error: `${msg}`}
     }
     return `error: ${msg}`
 }
 
 export const message = (msg: string, json = true) => {
     if (json) {
-        return {msg: msg}
+        return {msg: `${msg}`}
     }
     return `${msg}`
 }

@@ -5,7 +5,6 @@ const { Schema } = mongoose
 const { ObjectId, Mixed } = mongoose.Schema.Types
 
 export const commission_schema = new Schema({
-    _id: ObjectId,
     body: String,
     created: {
         type: Date,
@@ -47,7 +46,6 @@ export const commission_schema = new Schema({
 })
 
 export const commission_options_schema = new Schema({
-    _id: ObjectId,
     type: {
         type: String,
         enum : ['radio','input', 'checkbox'],

@@ -1,0 +1,1 @@
+export const is_server = () => typeof window === 'undefined'

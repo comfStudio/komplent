@@ -1,11 +1,10 @@
-import mongoose, { Document } from 'mongoose'
+import mongoose, { Document, Model } from 'mongoose'
 
 const { Schema } = mongoose
 
 const { ObjectId, Decimal128 } = mongoose.Schema.Types
 
 export const user_schema = new Schema({
-  _id: ObjectId,
   name: String,
   type: {
     type: String,
@@ -84,14 +83,14 @@ export const user_schema = new Schema({
 })
 
 // user_schema.method({
-//   exists: async function(username: string = undefined, email: string = undefined) {
+//   check_exists: async function(username: string = undefined, email: string = undefined) {
 //     if (username) {
-//       const r = await this.findOne({username: username})
+//       const r = await this.exists({username: username})
 //       if (r)
 //         return true
 //     }
 //     if (email) {
-//       const r = await this.findOne({email: email})
+//       const r = await this.exists({email: email})
 //       if (r)
 //         return true
 //     }
@@ -99,11 +98,28 @@ export const user_schema = new Schema({
 //   }
 // })
 
+user_schema.statics.check_exists = async function({username, email}) {
+      if (username) {
+        const r = await this.exists({username: username})
+        if (r)
+          return true
+      }
+      if (email) {
+        const r = await this.exists({email: email})
+        if (r)
+          return true
+      }
+      return false
+  }
+
 export interface IUser extends Document {
 }
 
+export interface IUserModel extends Model<IUser> {
+  check_exists(param: object): boolean
+}
+
 export const gallery_schema = new Schema({
-  _id: ObjectId,
   image: { 
     type: ObjectId, 
     ref: 'Image'
@@ -112,7 +128,6 @@ export const gallery_schema = new Schema({
 })
 
 export const comission_rate_schema = new Schema({
-  _id: ObjectId,
   price: Decimal128,
   image: { 
     type: ObjectId, 
@@ -122,7 +137,6 @@ export const comission_rate_schema = new Schema({
 })
 
 export const commission_stats_schema = new Schema({
-  _id: ObjectId,
   approval_rate: Number,
   approval_time: Number,
   complete_time: Number,
@@ -131,7 +145,6 @@ export const commission_stats_schema = new Schema({
 })
 
 export const profile_schema = new Schema({
-  _id: ObjectId,
   reviews: [],
   comments: [{ body: String, date: Date }],
   cover: { 
@@ -146,16 +159,13 @@ export const profile_schema = new Schema({
 })
 
 export const profile_options_schema = new Schema({
-  _id: ObjectId,
   color: String,
 })
 
 export const user_options_schema = new Schema({
-  _id: ObjectId,
 })
 
 export const user_recommendation_schema = new Schema({
-  _id: ObjectId,
   description: String,
 })
 

@@ -1,6 +1,9 @@
 import mongoose from 'mongoose'
 import getConfig from 'next/config'
 
+import { User } from '@db/models'
+import { IUser } from '@schema/user'
+
 const {
   publicRuntimeConfig: {},
   serverRuntimeConfig: {MONGODB_URL}
@@ -13,4 +16,9 @@ export function connect() {
       auth:{authdb:"admin"}
     })
   }
+}
+
+export const create_user = async (props: IUser) => {
+  let u = new User(props)
+  return await u.save()
 }

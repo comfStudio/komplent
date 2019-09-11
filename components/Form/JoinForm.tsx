@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 import { Form, FormGroup, FormControl, ControlLabel, Button, ButtonToolbar,
-        HelpBlock, Input, Panel, Divider, Icon, Schema } from 'rsuite'
+        HelpBlock, Input, Panel, Divider, Icon, Schema, Message } from 'rsuite'
 
 import { HTMLElementProps } from '@app/utility/props'
 import { t } from '@app/utility/lang'
@@ -55,7 +55,7 @@ export const JoinForm = (props: Props) => {
     const [user_store, user_actions] = useUserStore()
     const [form_ref, set_form_ref] = useState(null)
     const [form_value, set_form_value] = useState({})
-    const [form_error, set_form_error] = useState({})
+    const [join_error, set_join_error] = useState(null)
     const [loading, set_loading] = useState(false)
 
     let cls = "max-w-md pl-3 p-1"
@@ -104,10 +104,19 @@ export const JoinForm = (props: Props) => {
                     <Button loading={loading} type="submit" block appearance="primary" onClick={async (ev) => { ev.preventDefault()
                         if (form_ref && form_ref.check()) {
                             set_loading(true)
-                            const r = await user_actions.join(form_value)
-                            set_loading(false)
+                            set_join_error(null)
+                            const [status, err] = await user_actions.join(form_value, true).then((d) => {
+                                set_loading(false)
+                                return d
+                            })
+                            if (!status) {
+                                set_join_error(err)
+                            }
                         }}}>{t`Join`}</Button>
                     </ButtonToolbar>
+                </FormGroup>
+                <FormGroup>
+                    {!!join_error && <Message type="error" description={join_error} />}
                 </FormGroup>
                 <div>{`Already have an account?`}<Link href="/login"><a className="ml-1">{t`Log in`}</a></Link></div>
             </Form>

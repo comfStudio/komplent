@@ -81,7 +81,7 @@ interface NavUserProps {
 
 export const NavUserDropdown = (props: NavUserProps) => {
     return (
-        <Dropdown className="nav-user-dropdown" placement="bottomRight" renderTitle={NavUserAvatar}>
+        <Dropdown className="nav-user-dropdown" placement="bottomEnd" renderTitle={NavUserAvatar}>
         <li className="header">✦ Twiddly ✦</li>
         <NavUserMenu element={Dropdown} activeKey={props.activeKey} dropdown />
         </Dropdown>

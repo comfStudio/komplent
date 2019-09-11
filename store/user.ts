@@ -1,6 +1,11 @@
-import fetch from 'isomorphic-unfetch'
-import { defineStore } from '@app/store'
 import qs from 'qs'
+import fetch from 'isomorphic-unfetch'
+import { BAD_REQUEST, OK, INTERNAL_SERVER_ERROR } from 'http-status-codes'
+
+import Router from 'next/router'
+import { defineStore } from '@app/store'
+import * as pages from '@utility/pages'
+
 
 export const useUserStore = defineStore(
   {
@@ -11,6 +16,10 @@ export const useUserStore = defineStore(
           return await fetch("/api/login", {
               credentials: "include",
               method: redirect ? "get" : "post",
+              headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+              },
               body: JSON.stringify(data),
           })
       },
@@ -19,17 +28,30 @@ export const useUserStore = defineStore(
             credentials: "include",
             method: "get",
         })
-        if (r.status == 200) {
+        if (r.status == OK) {
             return true
         }
         return false
       },
       join: async (store, data, redirect = false) => {
-        return await fetch("/api/join", {
+        let r = await fetch("/api/join", {
             credentials: "include",
-            method: redirect ? "get" : "post",
+            method: "post",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+              },
             body: JSON.stringify(data),
         })
+
+        if (r.status == OK) {
+            if (redirect) {
+                Router.push(pages.dashboard)
+            }
+            return [true, null]
+        }
+
+        return [false, (await r.json()).error]
     }
   }
   );
