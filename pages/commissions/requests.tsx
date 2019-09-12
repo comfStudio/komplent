@@ -1,12 +1,15 @@
 import React from 'react';
 
+import AuthPage from '@components/App/AuthPage'
 import CommissionsLayout from '@components/Commissions/CommissionsLayout'
 
-const RequestsPage = () => {
-    return (
+class RequestsPage extends AuthPage {
+    render() {
+        return this.renderPage(
         <CommissionsLayout activeKey="requests">
         </CommissionsLayout>
-    );
-};
+        );
+    }
+}
 
 export default RequestsPage;

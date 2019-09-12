@@ -1,11 +1,12 @@
 import React from 'react'
-import MainLayout from '@app/components/App/MainLayout'
+
+import AuthPage from '@components/App/AuthPage'
 import InboxLayout from "@components/Inbox/InboxLayout"
 
 
-class NewInboxPage extends React.Component {
+class NewInboxPage extends AuthPage {
   public render() {
-    return (
+    return this.renderPage(
       <InboxLayout activeKey="new"/>
     )
   }

@@ -1,15 +1,15 @@
 import { NextApiResponse } from 'next'
 import microCors from 'micro-cors'
-import { BAD_REQUEST, OK, INTERNAL_SERVER_ERROR } from 'http-status-codes'
+import { BAD_REQUEST, OK } from 'http-status-codes'
 
-import { with_user, UserApiRequest, JSONApiRequest, with_json } from '@server/middleware'
+import { with_user, ExApiRequest, JSONApiRequest, with_json } from '@server/middleware'
 import { error_message, message } from '@utility/message'
 import { User } from '@db/models'
 import { create_user } from '@server/db'
 
 const cors = microCors({ allowMethods: ['POST'] })
 
-export default cors(with_user(with_json(async (req: UserApiRequest & JSONApiRequest, res: NextApiResponse) => {
+export default cors(with_user(with_json(async (req: ExApiRequest & JSONApiRequest, res: NextApiResponse) => {
     if (!req.user) {
         try {
             const { email, username, password } = req.json

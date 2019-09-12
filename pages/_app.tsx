@@ -4,45 +4,24 @@ import React from 'react'
 
 import { Title } from '@components/App'
 import { connect } from '@server/db'
+import { is_server } from '@utility/misc'
 
 import '@assets/styles/rsuite.less'
 import '@assets/styles/imports.scss'
 import '@assets/styles/common.scss'
-
-import Head from 'next/head';
 
 const {
   publicRuntimeConfig: {},
   serverRuntimeConfig: {MONGODB_URL}
 } = getConfig()
 
+
+const server_initialize = () => {
+  connect()
+}
+
 class KomplentApp extends App {
-  public static async getInitialProps({ Component, router, ctx }) {
-    //
-    // Use getInitialProps as a step in the lifecycle when
-    // we can initialize our store
-    //
-    const isServer = typeof window === 'undefined'
-
-    if ( isServer) {
-      connect()
-    }
-
-    //
-    // Check whether the page being rendered by the App has a
-    // static getInitialProps method and if so call it
-    //
-    let pageProps = {}
-    if (Component.getInitialProps) {
-      pageProps = await Component.getInitialProps(ctx)
-    }
-    return {
-      isServer,
-      pageProps,
-    }
-  }
-
-  public render() {
+  render() {
     const { Component, pageProps } = this.props
     return (
       <React.Fragment>
@@ -51,6 +30,10 @@ class KomplentApp extends App {
       </React.Fragment>
     )
   }
+}
+
+if (is_server()) {
+  server_initialize()
 }
 
 export default KomplentApp

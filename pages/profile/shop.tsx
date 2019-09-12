@@ -1,13 +1,15 @@
 import React from 'react'
 
+import AuthPage from '@components/App/AuthPage'
 import { ProfileLayout } from '@components/Profile'
 
-export const ShopPage = (props) => {
-
-    return (
-        <ProfileLayout selectedKeys={["shop"]}>
+class ShopPage extends AuthPage {
+    public render() {
+      return this.renderPage(
+        <ProfileLayout activeKey="shop">
         </ProfileLayout>
-    )
-}
+      )
+    }
+  }
 
 export default ShopPage

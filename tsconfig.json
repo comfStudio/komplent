@@ -16,6 +16,7 @@
     "experimentalDecorators": true,
     "baseUrl": ".",
     "paths": {
+      "@hooks/*": ["components/hooks/*"],
       "@components/*": ["components/*"],
       "@utility/*": ["utility/*"],
       "@assets/*": ["assets/*"],

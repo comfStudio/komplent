@@ -1,13 +1,13 @@
 import React from 'react'
-import { Layout, Empty } from 'rsuite';
 
+import { AuthPage } from '@components/App/AuthPage'
 import MainLayout from '@app/components/App/MainLayout'
 
 
-class SettingsPage extends React.Component {
+class SettingsPage extends AuthPage {
   public render() {
-    return (
-      <MainLayout selectedKeys={["settings"]}>
+    return this.renderPage(
+      <MainLayout activeKey="settings">
       </MainLayout>
     )
   }

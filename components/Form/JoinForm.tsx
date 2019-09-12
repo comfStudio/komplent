@@ -9,7 +9,7 @@ import { t } from '@app/utility/lang'
 import useUserStore from '@store/user'
 import Link from 'next/link';
 
-const { StringType, NumberType } = Schema.Types;
+const { StringType } = Schema.Types;
 
 const join_model = Schema.Model({
   email: StringType()

@@ -7,12 +7,13 @@ import DashboardMenu from '@components/Dashboard/DashboardMenu';
 import { ReactProps } from '@app/utility/props';
 
 interface Props extends ReactProps {
-    activeKey?: string
+    activeKey?: string,
+    pageProps?: object
 }
 
 const DashboardLayout = (props: Props) => {
     return (
-        <MainLayout activeKey="dashboard">
+        <MainLayout activeKey="dashboard" {...props.pageProps}>
             <GridContainer fluid padded>
                 <Row>
                     <Col xs={17}>

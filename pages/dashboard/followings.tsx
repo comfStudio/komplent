@@ -1,15 +1,17 @@
 import React from 'react';
 
-import MainLayout from '@components/App/MainLayout'
+import AuthPage from '@components/App/AuthPage'
 import DashboardLayout from '@components/Dashboard/DashboardLayout'
 import FollowingsList from '@app/components/Dashboard/FollowingsList';
 
-const FollowingsPage = () => {
-    return (
-        <DashboardLayout activeKey="followings">
+class FollowingsPage extends AuthPage {
+    render() {
+        return this.renderPage(
+            <DashboardLayout activeKey="followings">
             <FollowingsList/>
         </DashboardLayout>
-    );
-};
+        );
+    }
+}
 
 export default FollowingsPage;

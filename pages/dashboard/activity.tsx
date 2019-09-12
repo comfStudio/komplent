@@ -1,15 +1,18 @@
-import React from 'react';
+import React, { Component } from 'react';
 
-import MainLayout from '@components/App/MainLayout'
+import AuthPage from '@components/App/AuthPage'
 import DashboardLayout from '@components/Dashboard/DashboardLayout'
 import DashboardActivity from '@app/components/Dashboard/DashboardActivity';
 
-const ActivityPage = () => {
-    return (
-        <DashboardLayout activeKey="activity">
-            <DashboardActivity/>
-        </DashboardLayout>
-    );
-};
+
+class ActivityPage extends AuthPage {
+    render() {
+        return this.renderPage(
+            <DashboardLayout activeKey="activity">
+                <DashboardActivity/>
+            </DashboardLayout>
+        );
+    }
+}
 
 export default ActivityPage;

@@ -7,12 +7,16 @@ import MainSearch from '@components/App/MainSearch'
 import { t } from '@app/utility/lang'
 
 import LogoIcon from '@assets/images/logo.svg?sprite'
+import { useLoginStatus } from '@hooks/auth';
 
 interface Props {
     activeKey?: string
 }
 
 export const NavMenu = (props: Props) => {
+
+    const logged_in = useLoginStatus()
+
     return (
         <Navbar id="nav-menu">
             <Navbar.Header>
@@ -35,17 +39,23 @@ export const NavMenu = (props: Props) => {
                             {t`Disover`}
                     </Nav.Item>
                 </Link>
+                {!logged_in && 
                 <Link href="/join" passHref>
                     <Nav.Item eventKey="join" active={props.activeKey=='join'}>
                             {t`Join`}
                     </Nav.Item>
                 </Link>
+                }
+                {!logged_in && 
                 <Link href="/login" passHref>
                     <Nav.Item eventKey="login" active={props.activeKey=='login'}>
                             {t`Login`}
                     </Nav.Item>
                 </Link>
+                }
+                {logged_in && 
                 <NavUserDropdown/>
+                }
             </Nav>
             </Navbar.Body>
         </Navbar>

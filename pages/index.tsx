@@ -2,9 +2,7 @@ import React from 'react'
 
 import MainLayout from '@components/App/MainLayout'
 
-
-class IndexPage extends React.Component {
-  public render() {
+const IndexPage = () => {
     return (
       <MainLayout>
         {/* <Layout><Empty image={Empty.PRESENTED_IMAGE_SIMPLE}/></Layout>
@@ -12,6 +10,5 @@ class IndexPage extends React.Component {
       </MainLayout>
     )
   }
-}
 
 export default IndexPage

@@ -4,14 +4,37 @@ import NavMenu from '@components/Header/NavMenu'
 import { ReactProps, HTMLElementProps } from '@utility/props'
 
 import UserSidebar from '@app/components/App/UserSidebar'
+import { useLoginStatus } from '@hooks/auth';
+
 
 import './MainLayout.scss'
 
 interface Props extends ReactProps {
   activeKey?: string
+  pageProps?: object
 }
 
 export const MainLayout = (props: Props) => {
+
+    const logged_in = useLoginStatus()
+
+    let content = null
+
+    if (logged_in) {
+      content = (
+        <Row>
+          <Col xs={5} lg={4}><UserSidebar activeKey={props.activeKey}/></Col>
+          <Col xs={19} lg={20}>{props.children}</Col>
+        </Row>
+      )
+    } else {
+      content = (
+        <Row>
+            <Col xs={24}>{props.children}</Col>
+        </Row>
+      )
+    }
+
     return (
       <Layout id="main-layout" className="!h-screen">
         <Header>
@@ -19,10 +42,7 @@ export const MainLayout = (props: Props) => {
         </Header>
         <Content>
           <Grid>
-            <Row>
-              <Col xs={5} lg={4}><UserSidebar activeKey={props.activeKey}/></Col>
-              <Col xs={19} lg={20}>{props.children}</Col>
-            </Row>
+            {content}
           </Grid>
         </Content>
         <Footer className="footer">
