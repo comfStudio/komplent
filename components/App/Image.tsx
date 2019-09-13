@@ -13,7 +13,9 @@ interface Props extends HTMLElementProps {
 export const Image = (props: Props) => {
     let s = {
         marginRight: 0,
-        content: ''
+        content: '',
+        width: undefined,
+        height: undefined,
     }
     if (props.placeholderText) {
         s.content = props.placeholderText

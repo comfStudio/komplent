@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { AuthPage } from '@components/App/AuthPage'
-import MainLayout from '@app/components/App/MainLayout'
+import MainLayout from '@components/App/MainLayout'
 
 
 class SettingsPage extends AuthPage {

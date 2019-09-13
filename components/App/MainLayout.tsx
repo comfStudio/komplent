@@ -12,6 +12,7 @@ import './MainLayout.scss'
 interface Props extends ReactProps {
   activeKey?: string
   pageProps?: object
+  noSidebar?: boolean
 }
 
 export const MainLayout = (props: Props) => {
@@ -20,7 +21,7 @@ export const MainLayout = (props: Props) => {
 
     let content = null
 
-    if (logged_in) {
+    if (logged_in && !props.noSidebar) {
       content = (
         <Row>
           <Col xs={5} lg={4}><UserSidebar activeKey={props.activeKey}/></Col>

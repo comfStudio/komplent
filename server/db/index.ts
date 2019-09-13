@@ -7,15 +7,11 @@ import { cookie_session } from '@server/middleware'
 import jwt from 'jsonwebtoken'
 import { JWT_KEY, JWT_EXPIRATION } from '@server/constants'
 
-
-const {
-  publicRuntimeConfig: {},
-  serverRuntimeConfig: {MONGODB_URL}
-} = getConfig()
+const { publicRuntimeConfig, serverRuntimeConfig }= getConfig()
 
 export function connect() {
   if (mongoose.connection.readyState == 0) {
-    mongoose.connect(MONGODB_URL, {
+    mongoose.connect(serverRuntimeConfig.MONGODB_URL, {
       useNewUrlParser: true,
       auth:{authdb:"admin"}
     })

@@ -5,7 +5,7 @@
     "dev": "next -p 3500",
     "debug": "docker-compose up -d && cross-env NODE_OPTIONS=\"--inspect\" next dev -p 3500",
     "docker": "docker-compose up",
-    "build": "next build -p 3500",
+    "build": "next build",
     "start": "next start -p 3500",
     "test": "jest"
   },
@@ -34,6 +34,7 @@
     "next-runtime-dotenv": "^1.2.0",
     "node-sass": "^4.12.0",
     "nookies": "^2.0.8",
+    "nprogress": "^0.2.0",
     "qs": "^6.8.0",
     "react": "^16.7.0",
     "react-dom": "^16.7.0",

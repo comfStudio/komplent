@@ -28,7 +28,7 @@ export const fetch_user = async (cookies) => {
 export const useUserStore = defineStore(
   {
       current_user: undefined,
-      logged_in: false
+      logged_in: undefined
   },
   {
       login: async (store, data, redirect = false) => {

@@ -17,9 +17,9 @@ export const defineStore = (initialState: object, actions?: object, initializer?
     return r
 }
 
-export const useInitializeStore = (Store, state, once = true) => {
+export const useInitializeStore = (Store, state, once = true, only_undefined = true) => {
     const effect = () => {
-        initializeStore(Store, state)
+        initializeStore(Store, state, only_undefined)
     }
     if (once) {
         useMount(effect)
@@ -28,9 +28,17 @@ export const useInitializeStore = (Store, state, once = true) => {
     }
 }
 
-export const initializeStore = (Store, state) => {
+export const initializeStore = (Store, state, only_undefined = true) => {
     if (state) {
-        Store.store.setState(state)
+        let s = {...state}
+        if (only_undefined) {
+            for ( let k of Object.keys(s)) {
+                if (Store.store.state[k] !== undefined) {
+                    delete s[k]
+                }
+            }
+        }
+        Store.store.setState(s)
         Store.initialized = true
     }
 }

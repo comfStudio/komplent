@@ -15,6 +15,8 @@ interface Props {
 
 export class AuthPage extends Component<Props> {
 
+    state = {}
+
     static async getInitialProps (ctx: NextPageContext) {
 
         let c = cookies.get(ctx)
@@ -27,7 +29,7 @@ export class AuthPage extends Component<Props> {
         return { useUserState, inverse: false }
       }
 
-    static getDerivedStateFromProps(props, state) {
+    static getDerivedStateFromProps(props) {
         initializeStore(useUserStore, props.useUserState)
         return null
     }

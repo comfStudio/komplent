@@ -2,7 +2,7 @@ import React from 'react'
 
 import AuthPage from '@components/App/AuthPage'
 import { ProfileLayout } from '@components/Profile'
-import ProfileGallery from '@app/components/Profile/ProfileGallery';
+import ProfileGallery from '@components/Profile/ProfileGallery';
 
 class GalleryPage extends AuthPage {
     public render() {

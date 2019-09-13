@@ -4,7 +4,7 @@ import AuthPage from '@components/App/AuthPage'
 import { ProfileLayout } from '@components/Profile'
 import { Grid, Row, Col } from 'rsuite';
 
-import UserCard from '@app/components/User/UserCard';
+import UserCard from '@components/User/UserCard';
 
 class RecommendationsPage extends AuthPage {
     public render() {

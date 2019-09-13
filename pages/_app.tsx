@@ -1,6 +1,8 @@
 import App from 'next/app'
 import getConfig from 'next/config'
 import React from 'react'
+import NProgress from 'nprogress'
+import Router from 'next/router'
 
 import { Title } from '@components/App'
 import { connect } from '@server/db'
@@ -10,11 +12,11 @@ import '@assets/styles/rsuite.less'
 import '@assets/styles/imports.scss'
 import '@assets/styles/common.scss'
 
-const {
-  publicRuntimeConfig: {},
-  serverRuntimeConfig: {MONGODB_URL}
-} = getConfig()
+Router.onRouteChangeStart = () => NProgress.start();
+Router.onRouteChangeComplete = () => NProgress.done();
+Router.onRouteChangeError = () => NProgress.done();
 
+const { publicRuntimeConfig, serverRuntimeConfig }= getConfig()
 
 const server_initialize = () => {
   connect()
@@ -32,7 +34,7 @@ class KomplentApp extends App {
   }
 }
 
-if (is_server()) {
+if (process.env.SERVER_BUILD && is_server()) {
   server_initialize()
 }
 

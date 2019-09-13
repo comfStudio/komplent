@@ -39,8 +39,7 @@ export const Auth = (props: Props) => {
         }
     }, [logged_in])
 
-    return (logged_in && props.children)
-
+    return (((logged_in && !props.inverse) || (!logged_in && props.inverse)) && props.children)
 };
 
 
