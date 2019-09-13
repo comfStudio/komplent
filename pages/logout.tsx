@@ -1,5 +1,4 @@
-import React from 'react'
-import { useMount } from 'react-use'
+import React, {useEffect} from 'react'
 
 import { MainLayout} from '@components/App/MainLayout'
 
@@ -8,9 +7,9 @@ import useUserStore from '@store/user'
 
 const Logout = () => {
   const [user_store, user_actions] = useUserStore()
-  useMount(async () => {
+  useEffect(async () => {
     await user_actions.logout()
-  })
+  }, [])
   return null
 }
 

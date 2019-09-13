@@ -9,7 +9,7 @@ export const user_schema = new Schema({
   type: {
     type: String,
     enum : ['creator','consumer'],
-    default: 'consumer'
+    default: null
   },
   email: { type: String, required: true, unique: true, trim: true },
   username: { type: String, required: true, unique: true, trim: true, minLength: 3, maxLength: 60 },

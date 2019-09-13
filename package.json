@@ -16,6 +16,7 @@
     "@zeit/next-sass": "^1.0.1",
     "@zeit/next-typescript": "^1.1.1",
     "@znemz/use-global-hook": "^1.1.9",
+    "bcryptjs": "^2.4.3",
     "boxicons": "^2.0.2",
     "cookie-session": "^1.3.3",
     "http-status-codes": "^1.3.2",

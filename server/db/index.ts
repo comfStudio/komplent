@@ -1,17 +1,18 @@
 import mongoose from 'mongoose'
 import getConfig from 'next/config'
+import jwt from 'jsonwebtoken'
+import bcrypt from 'bcryptjs';
 
 import { User } from '@db/models'
 import { IUser } from '@schema/user'
 import { cookie_session } from '@server/middleware'
-import jwt from 'jsonwebtoken'
-import { JWT_KEY, JWT_EXPIRATION } from '@server/constants'
+import { JWT_KEY, JWT_EXPIRATION, CRYPTO_COST_FACTOR } from '@server/constants'
 
 const { publicRuntimeConfig, serverRuntimeConfig }= getConfig()
 
-export function connect() {
+export async function connect() {
   if (mongoose.connection.readyState == 0) {
-    mongoose.connect(serverRuntimeConfig.MONGODB_URL, {
+    await mongoose.connect(serverRuntimeConfig.MONGODB_URL, {
       useNewUrlParser: true,
       auth:{authdb:"admin"}
     })
@@ -20,18 +21,25 @@ export function connect() {
 
 export const create_user = async (props: IUser) => {
   let u = new User(props)
+  if (u.password) {
+    u.password = await bcrypt.hash(u.password, CRYPTO_COST_FACTOR)
+  }
+
   return await u.save()
 }
 
-export const login_user = async ( user: IUser, req, res) => {
+export const login_user = async ( user: IUser, password, req, res) => {
   if (user && req && res) {
-    cookie_session(req, res)
-    const token = jwt.sign({ username: user.username, user_id:user._id }, JWT_KEY, {
-      algorithm: 'HS256',
-      expiresIn: JWT_EXPIRATION
-    })
-    return token
+    let r = await bcrypt.compare(password, user.password)
+    if (r) {
+      const token = jwt.sign({ username: user.username, user_id:user._id }, JWT_KEY, {
+        algorithm: 'HS256',
+        expiresIn: JWT_EXPIRATION
+      })
+      return token
+    }
   }
+  return null
 }
 
 export const logout_user = async (req, res) => {

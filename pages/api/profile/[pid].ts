@@ -3,7 +3,9 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import '@db'
 import { User } from '@db/models'
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
+import { with_middleware, ExApiRequest } from '@server/middleware'
+
+export default with_middleware(async (req: ExApiRequest, res: NextApiResponse) => {
     
     if (req.method === 'GET') {
     const {
@@ -20,4 +22,4 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     
 } else if (req.method === 'POST') {}
  else if (req.method === 'DELETE') {}
-}
+})
