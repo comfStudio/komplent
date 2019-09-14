@@ -9,11 +9,11 @@ export const user_schema = new Schema({
   type: {
     type: String,
     enum : ['creator','consumer'],
-    default: null
+    default: 'consumer'
   },
-  email: { type: String, required: true, unique: true, trim: true },
-  username: { type: String, required: true, unique: true, trim: true, minLength: 3, maxLength: 60 },
-  password: { type: String, required: true, minLength: 8 },
+  email: { type: String, unique: true, trim: true },
+  username: { type: String, unique: true, trim: true, minLength: 3, maxLength: 60 },
+  password: { type: String, minLength: 8, select: false },
   avatar: { 
     type: ObjectId, 
     ref: 'Image'
@@ -51,6 +51,7 @@ export const user_schema = new Schema({
   created: {
     type: Date,
     default: Date.now,
+    immutable: true
   },
   profile: { 
     type: ObjectId, 

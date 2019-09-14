@@ -17,10 +17,10 @@ export default cors(with_middleware(async (req: ExApiRequest, res: NextApiRespon
             if (name && password) {
                 let u = null
                 if (name.includes('@')) {
-                    u = await User.findOne({email:name}).lean()
+                    u = await User.findOne({email:name}).select('+password').lean()
                 }
                 if (!u) {
-                    u = await User.findOne({username:name}).lean()
+                    u = await User.findOne({username:name}).select('+password').lean()
                 }
                 let token = null
                 if (u) {

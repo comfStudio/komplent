@@ -1,4 +1,4 @@
-import { NextApiRequest } from 'next'
+import { NextApiRequest, NextApiResponse } from 'next'
 
 import cookieSession from 'cookie-session'
 import Keygrip from 'keygrip'
@@ -15,6 +15,10 @@ export interface ExApiRequest extends NextApiRequest {
   json?: any
   cookie(name: string, value: any, options: object)
 }
+
+export interface ExApiResponse extends NextApiResponse {
+}
+
 export const get_jwt_data = (token) => {
   return jwt.verify(token, JWT_KEY)
 }
@@ -56,7 +60,7 @@ export const with_user = (fn: Function, require = false) => async (req: ExApiReq
   }
 
 export const with_require_user = (fn: Function) => async (req, res) => {
-    return await with_user(fn, true)
+    return await with_user(fn, true)(req, res)
   }
 
 export const with_json = (fn: Function) => async (req, res) => {
