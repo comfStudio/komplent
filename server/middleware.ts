@@ -1,4 +1,4 @@
-import { NextApiRequest } from 'next'
+import { NextApiRequest, NextApiResponse } from 'next'
 
 import cookieSession from 'cookie-session'
 import Keygrip from 'keygrip'
@@ -13,7 +13,12 @@ import { User } from '@db/models'
 export interface ExApiRequest extends NextApiRequest {
   user?: any
   json?: any
+  cookie(name: string, value: any, options: object)
 }
+
+export interface ExApiResponse extends NextApiResponse {
+}
+
 export const get_jwt_data = (token) => {
   return jwt.verify(token, JWT_KEY)
 }
@@ -42,7 +47,7 @@ export const is_logged_in = async (req, res) => {
   return null
 }
 
-export const with_user = (fn: Function, require = true) => async (req, res) => {
+export const with_user = (fn: Function, require = false) => async (req: ExApiRequest, res) => {
     const user: any = await is_logged_in(req, res)
     if (user) {
       req.user = user
@@ -54,11 +59,14 @@ export const with_user = (fn: Function, require = true) => async (req, res) => {
     return await fn(req, res)
   }
 
-export const with_json = (fn: Function, require = true) => async (req, res) => {
+export const with_require_user = (fn: Function) => async (req, res) => {
+    return await with_user(fn, true)(req, res)
+  }
+
+export const with_json = (fn: Function) => async (req, res) => {
   req.json = null
-  const type = req.headers['content-type'] || 'text/plain';
+  const type = (req.headers ? req.headers['content-type'] : null) || 'text/plain';
   const is_json = type.toLowerCase().includes("application/json")
-  const length = req.headers['content-length'];
   if (req.body && is_json) {
     if (typeof req.body == 'string') {
       req.json = get_json(req.body)
@@ -101,3 +109,48 @@ export const with_cookie = handler => async (req, res) => {
   return await handler(req, res)
 }
 
+let first_request = false
+
+export const with_first_request = handler => async (req, res) => {
+  if (!first_request) {
+    first_request = true
+
+  }
+  return await handler(req, res)
+}
+
+const middlewares = (auth = false) => [
+  with_first_request,
+  with_json,
+  with_cookie,
+  auth ? with_require_user : with_user,
+]
+
+const create_middleware = (middlewares) => {
+  let rev_middlewares = middlewares.reverse()
+  let middleware_func = handler =>  {
+    let options = {}
+    let is_func = true
+    if (typeof handler == 'object') {
+      options = handler
+      is_func = false
+    }
+    const f = original_handler => async (req, res) =>  {
+      let h = original_handler
+      rev_middlewares.forEach((v) => {
+        if (options[h]) {
+          h = v(h, ...options[h])
+        } else {
+          h = v(h)
+        }
+      })
+      return await h(req, res)
+    }
+    return is_func ? f(handler) : f
+  }
+  return middleware_func
+}
+
+export const with_middleware = create_middleware(middlewares())
+
+export const with_auth_middleware = create_middleware(middlewares(true))

@@ -1,3 +1,5 @@
+const { colors } = require('tailwindcss/defaultTheme')
+
 let variants = {
   alignContent: ['responsive'],
   alignItems: ['responsive'],
@@ -71,6 +73,37 @@ Object.entries(variants).forEach(([k, v]) => {variants[k] = [...additional_varia
 
 module.exports = {
   theme: {
+    colors: {
+      primary: '#e91e63',
+      secondary: {
+        default:'#575757',
+        light:'#8e8e93'
+      },
+      success: {
+        default: '#4caf50',
+        light: '#edfae1',
+      },
+      info: {
+        default: '#2196f3',
+        light: '#e9f5fe',
+      },
+      warning: {
+        default: '#ffb300',
+        light: '#fff9e6',
+      },
+      error: {
+        default: '#f44336',
+        light: '#fde9ef',
+      },
+      red: '#f44336',
+      orange: '#ff9800',
+      yellow: '#ffca28',
+      green: '#4caf50',
+      cyan: '#00bcd4',
+      blue: '#2196f3',
+      violet: '#673ab7',
+      ...colors,
+    },
     extend: {}
   },
   variants: variants,

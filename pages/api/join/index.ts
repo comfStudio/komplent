@@ -2,14 +2,14 @@ import { NextApiResponse } from 'next'
 import microCors from 'micro-cors'
 import { BAD_REQUEST, OK } from 'http-status-codes'
 
-import { with_user, ExApiRequest, JSONApiRequest, with_json } from '@server/middleware'
+import { with_middleware, ExApiRequest } from '@server/middleware'
 import { error_message, message } from '@utility/message'
 import { User } from '@db/models'
 import { create_user } from '@server/db'
 
 const cors = microCors({ allowMethods: ['POST'] })
 
-export default cors(with_user(with_json(async (req: ExApiRequest & JSONApiRequest, res: NextApiResponse) => {
+export default cors(with_middleware(async (req: ExApiRequest, res: NextApiResponse) => {
     if (!req.user) {
         try {
             const { email, username, password } = req.json
@@ -30,4 +30,4 @@ export default cors(with_user(with_json(async (req: ExApiRequest & JSONApiReques
     } else {
         res.status(BAD_REQUEST).json(error_message("Already logged in"))
     }
-}), false))
+}))

@@ -8,8 +8,8 @@ import { Title } from '@components/App'
 import { connect } from '@server/db'
 import { is_server } from '@utility/misc'
 
-import '@assets/styles/rsuite.less'
 import '@assets/styles/imports.scss'
+import '@assets/styles/rsuite.less'
 import '@assets/styles/common.scss'
 
 Router.onRouteChangeStart = () => NProgress.start();
@@ -18,8 +18,8 @@ Router.onRouteChangeError = () => NProgress.done();
 
 const { publicRuntimeConfig, serverRuntimeConfig }= getConfig()
 
-const server_initialize = () => {
-  connect()
+const server_initialize = async () => {
+  await connect()
 }
 
 class KomplentApp extends App {

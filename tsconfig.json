@@ -24,9 +24,9 @@
       "@schema/*": ["server/db/schema/*"],
       "@db/*": ["server/db/*"],
       "@server/*": ["server/*"],
-      "@app/*": [ "*" ],
-    },
+      "@app/*": [ "*" ]
+    }
   },
   "exclude": ["node_modules"],
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"]
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "tests/setupTests.js", "__mocks__/fileMock.js"]
 }

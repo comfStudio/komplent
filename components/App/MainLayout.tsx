@@ -5,6 +5,7 @@ import { ReactProps, HTMLElementProps } from '@utility/props'
 
 import UserSidebar from '@app/components/App/UserSidebar'
 import { useLoginStatus } from '@hooks/auth';
+import UserTypeModal from '@components/User/UserTypeModal'
 
 
 import './MainLayout.scss'
@@ -43,6 +44,7 @@ export const MainLayout = (props: Props) => {
         </Header>
         <Content>
           <Grid>
+            {!!logged_in && <UserTypeModal show={true}/>}
             {content}
           </Grid>
         </Content>

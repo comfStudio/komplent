@@ -2,8 +2,10 @@ import { NextApiRequest, NextApiResponse } from 'next'
 
 import '@db'
 import { User } from '@db/models'
+import { with_middleware, ExApiRequest } from '@server/middleware'
 
-export default (req: NextApiRequest, res: NextApiResponse) => {
+
+export default with_middleware((req: ExApiRequest, res: NextApiResponse) => {
     if (req.method === 'POST') {
     // Process your POST request
     } else {
@@ -14,4 +16,4 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
     // kitty.save().then(() => console.log('meow'));
 
   res.status(200).json({ title: 'Test' })
-}
+})

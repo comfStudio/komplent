@@ -25,17 +25,53 @@ blockquote {
     display: inline;
   }
 
+h1 {
+    @apply text-3xl;
+    @apply font-bold;
+  }
+  
+  h2 {
+    @apply text-2xl;
+    @apply font-semibold;
+}
+
+h3 {
+  @apply text-xl;
+  @apply font-medium;
+}
+
+h4 {
+  @apply text-lg;
+  @apply font-medium;
+}
+
+h5 {
+  @apply text-base;
+  @apply font-medium;
+}
+
+h6 {
+  @apply text-sm;
+  @apply font-medium;
+}
+
 h1, h2, h3, h4, h5, h6 {
   margin-bottom: 1.5em;
   margin-top: 1.2em;
+  @apply antialiased;
 }
   
 h1, h2, h3 {
-border-bottom: 1px solid #eaecef;
+border-bottom: 1px solid;
+@apply border-secondary-light;
 padding-bottom: .3em;
 }
 
 hr.line {
   overflow: hidden;
   text-align: center;
+}
+
+.subtext {
+  @apply text-secondary-light;
 }

@@ -1,0 +1,28 @@
+.user-type-buttons {
+
+    text-align: center;
+    margin: 1em 0;
+
+    label {
+        @apply w-5/12;
+        display: inline-block;
+        margin: 0 0.5em;
+    }
+    
+    label input {
+    }
+    
+    label span {
+        @apply rounded-sm;
+        @apply border;
+        @apply border-secondary-light;
+        @apply h-20;
+        display: block;
+        width: 100%;
+    }
+    
+    label input:checked + span {  
+        @apply border-primary;
+        @apply border-2;
+    }
+}
