@@ -14,7 +14,7 @@ export async function connect() {
   if (mongoose.connection.readyState == 0) {
     await mongoose.connect(serverRuntimeConfig.MONGODB_URL, {
       useNewUrlParser: true,
-      auth:{authdb:"admin"}
+      auth: { authSource: "admin" }
     })
   }
 }

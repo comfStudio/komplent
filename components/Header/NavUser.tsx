@@ -2,6 +2,8 @@ import React from 'react';
 import { Icon, Nav, Dropdown  } from 'rsuite';
 import Link from 'next/link';
 
+import { useUser } from '@hooks/user'
+import { make_profile_path } from '@utility/pages'
 import { t } from '@app/utility/lang'
 
 import "./NavUser.scss"
@@ -27,52 +29,57 @@ interface UserMenuProps {
 
 export const NavUserMenu = (props: UserMenuProps) => {
     let El = props.element
-    return [
-        <Link href="/profile" passHref>
+
+    const user = useUser()
+
+    return (
+        <React.Fragment>
+        <Link href={make_profile_path(user.username)} passHref>
         <El.Item eventKey="profile" active={props.activeKey=='profile'}>
             {t`My Profile`}
         </El.Item>
-        </Link>,
+        </Link>
          <Link href="/dashboard" passHref>
                 <El.Item eventKey="dashboard" active={props.activeKey=='dashboard'}>
                     {t`Dashboard`}
                 </El.Item>
-         </Link>,
+         </Link>
         <Link href="/commissions" passHref>
             <El.Item eventKey="commissions" active={props.activeKey=='commissions'}>
                 {t`Commissions`}
             </El.Item>
-        </Link>,
+        </Link>
         <Link href="/inbox" passHref>
             <El.Item eventKey="inbox" active={props.activeKey=='inbox'}>
                 {t`Messages`}
             </El.Item>
-        </Link>,
+        </Link>
         <Link href="/earnings" passHref>
             <El.Item eventKey="earnings" active={props.activeKey=='earnings'}>
                 {t`Earnings`}
             </El.Item>
-        </Link>,
-        !!props.dropdown && <li className="header">{t`Community`}</li>,
-        !!!props.dropdown && <hr/>,
+        </Link>
+        {!!props.dropdown && <li className="header">{t`Community`}</li>}
+        {!!!props.dropdown && <hr/>}
         <Link href="/hub" passHref>
             <El.Item eventKey="hub" active={props.activeKey=='hub'}>
                 {t`Feedback Hub`}
             </El.Item>
-        </Link>,
-        !!props.dropdown && <li className="header">{t`General`}</li>,
-        !!!props.dropdown && <hr/>,
+        </Link>
+        {!!props.dropdown && <li className="header">{t`General`}</li>}
+        {!!!props.dropdown && <hr/>}
         <Link href="/settings" passHref>
             <El.Item eventKey="settings" active={props.activeKey=='settings'}>
                 {t`Settings`}
             </El.Item>
-        </Link>,
+        </Link>
         <Link href="/logout" passHref>
             <El.Item eventKey="logout" active={props.activeKey=='logout'}>
                 {t`Logout`}
             </El.Item>
         </Link>
-    ]
+        </React.Fragment>
+    )
 }
 
 interface NavUserProps {
@@ -80,9 +87,11 @@ interface NavUserProps {
 }
 
 export const NavUserDropdown = (props: NavUserProps) => {
+    const user = useUser()
+
     return (
         <Dropdown className="nav-user-dropdown" placement="bottomEnd" renderTitle={NavUserAvatar}>
-        <li className="header">✦ Twiddly ✦</li>
+        <li className="header">✦ {`${user.name || user.username}`} ✦</li>
         <NavUserMenu element={Dropdown} activeKey={props.activeKey} dropdown />
         </Dropdown>
     )

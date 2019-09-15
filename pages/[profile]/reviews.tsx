@@ -1,11 +1,11 @@
 import React from 'react'
 
-import AuthPage from '@components/App/AuthPage'
+import ProfilePage from '@components/App/ProfilePage'
 import { ProfileLayout } from '@components/Profile'
 import { Grid, Row } from 'rsuite';
 
 
-class ReviewsPage extends AuthPage {
+class ReviewsPage extends ProfilePage {
     public render() {
       return this.renderPage(
         <ProfileLayout activeKey="reviews">

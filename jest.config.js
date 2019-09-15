@@ -17,7 +17,7 @@ module.exports = {
     "\\.(css|less|scss)$": "<rootDir>/__mocks__/styleMock.js",
     ...aliases,
   },
-  setupFiles: ['<rootDir>/tests/setupTests.js'],
+  setupFiles: ['<rootDir>/__tests__/setupTests.js'],
   collectCoverage: false,
   collectCoverageFrom: [
     'components/**/*.{ts,tsx}',

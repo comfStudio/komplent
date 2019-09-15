@@ -1,12 +1,11 @@
 import './ProfileHeader.scss'
-import React, { Component } from 'react';
+import React from 'react';
+import { IconButton, Icon } from 'rsuite'
 
 import { Container } from '@components/App/MainLayout'
 import { ReactProps } from '@utility/props'
 import { CommissionButton } from '@app/components/Profile/ProfileCommission'
-
-import { IconButton, Icon } from 'rsuite'
-
+import { useProfileUser } from '@hooks/user'
 import { t } from '@app/utility/lang'
 
 export const Avatar = (props) => {
@@ -29,23 +28,28 @@ interface HeaderProps extends ReactProps {
 
 } 
 
-export class ProfileHeader extends Component<HeaderProps> {
-    render() {
-        return (
-            <div id="profile-header">
-                <div className="gradient"></div>
-                <Container>
-                    <Cover/>
-                    <Avatar/>
-                    <div id="header-container">
-                        <CommissionButton className="z-10"/>
-                        <IconButton icon={<Icon icon="bell"/>} appearance="default" size="lg" className="mx-3">{t`Follow`}</IconButton>
-                        {this.props.children}
-                    </div>
-                </Container>
-            </div>
-        );
-    }
+export const ProfileHeader = (props: HeaderProps) => {
+
+    const { own_profile } = useProfileUser()
+
+    return (
+        <div id="profile-header">
+            <div className="gradient"></div>
+            <Container>
+                <Cover/>
+                <Avatar/>
+                <div id="header-container">
+                    { !own_profile && (
+                        <React.Fragment>
+                            <CommissionButton className="z-10"/>
+                            <IconButton icon={<Icon icon="bell"/>} appearance="default" size="lg" className="mx-3">{t`Follow`}</IconButton>
+                        </React.Fragment>
+                    )}
+                    {props.children}
+                </div>
+            </Container>
+        </div>
+    );
 }
 
 export default ProfileHeader

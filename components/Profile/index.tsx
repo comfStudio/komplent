@@ -1,12 +1,11 @@
-import React from 'react';
-
-import { Panel } from 'rsuite'
+import React, { useEffect } from 'react';
+import Router from 'next/router'
 
 import { MainLayout, Container, PanelContainer } from '@components/App/MainLayout'
 import { ProfileHeader } from '@components/Profile/ProfileHeader'
 import { ProfileMenu, Props as MenuProps } from '@components/Profile/ProfileMenu'
 import ProfileInfo from '@components/Profile/ProfileInfo'
-
+import { useProfileUser, useStore, useUser } from '@hooks/user'
 import { t } from '@app/utility/lang'
 import { ReactProps } from '@utility/props'
 
@@ -30,5 +29,18 @@ export const ProfileLayout = (props: LayoutProps) => {
 }
 
 export const ProfileNameTag = (props) => {
-  return (<h3 className="profile-name text-center">~A little twiddly~</h3>)
+  const user = useUser()
+  return (<h3 className="profile-name text-center">{user.name || user.username}</h3>)
+}
+
+export const RequireOwnProfile = () => {
+  const { own_profile, context : { profile_path } } = useProfileUser()
+
+  useEffect(() => {
+    if (!own_profile) {
+      Router.replace(profile_path)
+    }
+  }, [own_profile])
+
+  return null
 }

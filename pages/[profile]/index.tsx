@@ -1,10 +1,10 @@
 import React from 'react'
 
-import AuthPage from '@components/App/AuthPage'
+import ProfilePage from '@components/App/ProfilePage'
 import { ProfileLayout } from '@components/Profile'
 import ProfileIndex from '@components/Profile/ProfileIndex'
 
-class IndexPage extends AuthPage {
+class IndexPage extends ProfilePage {
   public render() {
     return this.renderPage(
       <ProfileLayout activeKey="index">

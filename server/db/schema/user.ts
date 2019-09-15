@@ -170,4 +170,14 @@ export const user_recommendation_schema = new Schema({
   description: String,
 })
 
+export const store_schema = new Schema({
+  user: { 
+    type: ObjectId, 
+    ref: 'User',
+    select: false
+  },
+  has_selected_usertype: Boolean,
+})
+
+
 export default user_schema

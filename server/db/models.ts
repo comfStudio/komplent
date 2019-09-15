@@ -2,7 +2,7 @@ import mongoose, { Document } from 'mongoose'
 
 import { is_server } from '@utility/misc'
 
-import { user_schema, profile_schema,
+import { user_schema, profile_schema, store_schema,
         commission_stats_schema, gallery_schema,
         user_options_schema, comission_rate_schema,
         IUser, IUserModel } from '@schema/user'
@@ -12,6 +12,7 @@ import { image_schema, attachment_schema } from '@schema/general'
 import { commission_schema, commission_options_schema } from '@schema/commission'
 
 export const User = is_server() ? mongoose.models.User as IUserModel || mongoose.model<IUser, IUserModel>('User', user_schema) : undefined
+export const UserStore = is_server() ? mongoose.models.UserStore || mongoose.model<Document>('UserStore', store_schema) : undefined
 export const Profile = is_server() ? mongoose.models.Profile || mongoose.model<Document>('Profile', profile_schema) : undefined
 export const CommissionStats = is_server() ? mongoose.models.CommissionStats || mongoose.model<Document>('CommissionStats', commission_stats_schema) : undefined
 export const CommissionRate = is_server() ? mongoose.models.CommissionRate || mongoose.model<Document>('CommissionRate', comission_rate_schema) : undefined

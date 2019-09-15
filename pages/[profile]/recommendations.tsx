@@ -1,12 +1,12 @@
 import React from 'react'
 
-import AuthPage from '@components/App/AuthPage'
+import ProfilePage from '@components/App/ProfilePage'
 import { ProfileLayout } from '@components/Profile'
 import { Grid, Row, Col } from 'rsuite';
 
 import UserCard from '@components/User/UserCard';
 
-class RecommendationsPage extends AuthPage {
+class RecommendationsPage extends ProfilePage {
     public render() {
       return this.renderPage(
         <ProfileLayout activeKey="recommendations">

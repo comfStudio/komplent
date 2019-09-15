@@ -1,15 +1,15 @@
 import React from 'react'
 
-import AuthPage from '@components/App/AuthPage'
+import ProfilePage from '@components/App/ProfilePage'
 import { ProfileLayout } from '@components/Profile'
 
-class EditPage extends AuthPage {
+class ShopPage extends ProfilePage {
     public render() {
       return this.renderPage(
-        <ProfileLayout activeKey="edit">
+        <ProfileLayout activeKey="shop">
         </ProfileLayout>
       )
     }
   }
 
-export default EditPage
+export default ShopPage

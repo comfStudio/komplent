@@ -4,7 +4,7 @@ import NavMenu from '@components/Header/NavMenu'
 import { ReactProps, HTMLElementProps } from '@utility/props'
 
 import UserSidebar from '@app/components/App/UserSidebar'
-import { useLoginStatus } from '@hooks/auth';
+import { useLoginStatus } from '@app/client/hooks/auth';
 import UserTypeModal from '@components/User/UserTypeModal'
 
 
@@ -25,14 +25,14 @@ export const MainLayout = (props: Props) => {
     if (logged_in && !props.noSidebar) {
       content = (
         <Row>
-          <Col xs={5} lg={4}><UserSidebar activeKey={props.activeKey}/></Col>
-          <Col xs={19} lg={20}>{props.children}</Col>
+          <Col className="animate-width" xs={4} lg={4}><UserSidebar activeKey={props.activeKey}/></Col>
+          <Col className="animate-width" xs={20} lg={20}>{props.children}</Col>
         </Row>
       )
     } else {
       content = (
         <Row>
-            <Col xs={24}>{props.children}</Col>
+            <Col className="animate-width" xs={24}>{props.children}</Col>
         </Row>
       )
     }
@@ -44,7 +44,7 @@ export const MainLayout = (props: Props) => {
         </Header>
         <Content>
           <Grid>
-            {!!logged_in && <UserTypeModal show={true}/>}
+            {!!logged_in && <UserTypeModal/>}
             {content}
           </Grid>
         </Content>

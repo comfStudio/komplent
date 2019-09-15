@@ -75,3 +75,15 @@ hr.line {
 .subtext {
   @apply text-secondary-light;
 }
+
+.animate-width {
+  transition: width .5s;
+}
+
+.animate-height {
+  transition: height .5s;
+}
+
+.animate-width-height {
+  transition: width .5s, height .5s;
+}

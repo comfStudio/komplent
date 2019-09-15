@@ -3,7 +3,7 @@ import { Navbar, Nav } from 'rsuite';
 import Link from 'next/link';
 
 import { Container } from '@components/App/MainLayout'
-
+import { useProfileUser } from '@hooks/user'
 import { t } from '@app/utility/lang'
 
 export interface Props {
@@ -11,28 +11,30 @@ export interface Props {
 }
 
 export const ProfileMenu = (props: Props) => {
+    const { own_profile, context: { profile_path } } = useProfileUser()
+
     return (
         <Navbar className="">
 
             <Navbar.Body>
                 <Container>
                     <Nav activeKey={props.activeKey}>
-                        <Link href="/profile" passHref>
+                        <Link href={`${profile_path}`} passHref>
                             <Nav.Item eventKey="index" active={props.activeKey=='index'}>
-                                {t`Information`}
+                                {t`About`}
                             </Nav.Item>
                         </Link>
-                        <Link href="/profile/gallery" passHref>
+                        <Link href={`${profile_path}/gallery`} passHref>
                             <Nav.Item eventKey="gallery" active={props.activeKey=='gallery'}>
                                 {t`Gallery`}
                             </Nav.Item>
                         </Link>
-                        <Link href="/profile/recommendations" passHref>
+                        <Link href={`${profile_path}/recommendations`} passHref>
                             <Nav.Item eventKey="recommendations" active={props.activeKey=='recommendations'}>
                                 {t`Recommendations`}
                             </Nav.Item>
                         </Link>
-                        <Link href="/profile/reviews" passHref>
+                        <Link href={`${profile_path}/reviews`} passHref>
                             <Nav.Item eventKey="reviews" active={props.activeKey=='reviews'}>
                                 {t`Reviews`}
                             </Nav.Item>
@@ -42,11 +44,13 @@ export const ProfileMenu = (props: Props) => {
                                 {t`Shop`}
                             </Nav.Item>
                         </Link> */}
-                        <Link href="/profile/edit" passHref>
-                            <Nav.Item eventKey="edit" active={props.activeKey=='edit'}>
-                                {t`Edit Profile`}
-                            </Nav.Item>
-                        </Link>
+                        { own_profile && 
+                            <Link href={`${profile_path}/edit`} passHref>
+                                <Nav.Item eventKey="edit" active={props.activeKey=='edit'}>
+                                    {t`Edit Profile`}
+                                </Nav.Item>
+                            </Link>
+                        }
                     </Nav>
                 </Container>
             </Navbar.Body>

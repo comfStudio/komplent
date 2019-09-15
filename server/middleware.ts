@@ -136,6 +136,7 @@ const create_middleware = (middlewares) => {
       is_func = false
     }
     const f = original_handler => async (req, res) =>  {
+      req.method = req.method.toLowerCase()
       let h = original_handler
       rev_middlewares.forEach((v) => {
         if (options[h]) {

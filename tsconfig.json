@@ -16,17 +16,18 @@
     "experimentalDecorators": true,
     "baseUrl": ".",
     "paths": {
-      "@hooks/*": ["components/hooks/*"],
+      "@hooks/*": ["client/hooks/*"],
       "@components/*": ["components/*"],
       "@utility/*": ["utility/*"],
       "@assets/*": ["assets/*"],
       "@store/*": ["store/*"],
       "@schema/*": ["server/db/schema/*"],
       "@db/*": ["server/db/*"],
+      "@client/*": ["client/*"],
       "@server/*": ["server/*"],
       "@app/*": [ "*" ]
     }
   },
   "exclude": ["node_modules"],
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "tests/setupTests.js", "__mocks__/fileMock.js"]
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "__tests__/setupTests.js", "__mocks__/fileMock.js"]
 }

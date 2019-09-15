@@ -4,8 +4,8 @@ import { useMount } from 'react-use'
 
 export const defineStore = (initialState: object, actions?: object, initializer?) => {
     actions = actions || {}
-    if (actions['updateState'] === undefined) {
-        actions['updateState'] = (prev_state: any, next_state: object) => {
+    if (actions['setState'] === undefined) {
+        actions['setState'] = (prev_state: any, next_state: object) => {
             prev_state.setState(next_state)
         }
     }
@@ -38,7 +38,7 @@ export const initializeStore = (Store, state, only_undefined = true) => {
                 }
             }
         }
-        Store.store.setState(s)
+        Store.store.setState(s, true)
         Store.initialized = true
     }
 }
