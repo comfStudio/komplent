@@ -25,14 +25,14 @@ export const MainLayout = (props: Props) => {
     if (logged_in && !props.noSidebar) {
       content = (
         <Row>
-          <Col className="animate-width" xs={4} lg={4}><UserSidebar activeKey={props.activeKey}/></Col>
-          <Col className="animate-width" xs={20} lg={20}>{props.children}</Col>
+          <Col xs={4} lg={4}><UserSidebar activeKey={props.activeKey}/></Col>
+          <Col xs={20} lg={20}>{props.children}</Col>
         </Row>
       )
     } else {
       content = (
         <Row>
-            <Col className="animate-width" xs={24}>{props.children}</Col>
+            <Col xs={24}>{props.children}</Col>
         </Row>
       )
     }

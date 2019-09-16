@@ -48,7 +48,7 @@ export const useUserStore = defineStore(
       has_selected_usertype: undefined,
   } as UserStoreState,
   {
-    login: async (store, data, redirect = false) => {
+    login: async (store, data, redirect: boolean | string = false) => {
     let r = await fetch("/api/login", {
         method: "post",
         json: true,
@@ -61,12 +61,13 @@ export const useUserStore = defineStore(
 
         if (!is_server()) {
             cookies.set({},COOKIE_AUTH_TOKEN_KEY, data.token, {
+                path: '/',
                 maxAge: 60 * 60 * 24 // 1 day
             })
         }
 
         if (redirect) {
-            Router.replace(pages.dashboard)
+            Router.replace(typeof redirect === 'string'? redirect : pages.dashboard)
         }
         return [true, null]
     }
@@ -81,9 +82,7 @@ export const useUserStore = defineStore(
         if (r.status == OK) {
 
         if (!is_server()) {
-            cookies.destroy({},COOKIE_AUTH_TOKEN_KEY, {
-                maxAge: 60 * 60 * 24 // 1 day
-            })
+            cookies.destroy({}, COOKIE_AUTH_TOKEN_KEY)
         }
 
         store.setState({current_user: null, logged_in: false})

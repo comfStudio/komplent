@@ -38,7 +38,7 @@ export const initializeStore = (Store, state, only_undefined = true) => {
                 }
             }
         }
-        Store.store.setState(s, true)
+        Store.store.setState(s)
         Store.initialized = true
     }
 }

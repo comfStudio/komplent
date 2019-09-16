@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 
 import { Form, FormGroup, FormControl, ControlLabel, Button, ButtonToolbar,
          Input, Panel, Icon, Divider, Schema, Message } from 'rsuite'
 
 import { HTMLElementProps } from '@app/utility/props'
 import { t } from '@app/utility/lang'
-
+import { LoginContext } from '@client/context'
 import useUserStore from '@store/user'
 import Link from 'next/link';
 
@@ -27,6 +27,7 @@ export const LoginForm = (props: LoginFormProps) => {
     const [form_value, set_form_value] = useState({})
     const [login_error, set_login_error] = useState(null)
     const [loading, set_loading] = useState(false)
+    const { next_page } = useContext(LoginContext)
 
     let cls = "max-w-sm pl-3 p-1"
     cls = props.className ? cls + ' ' + props.className : cls
@@ -67,7 +68,7 @@ export const LoginForm = (props: LoginFormProps) => {
                         if (form_ref && form_ref.check()) {
                             set_loading(true)
                             set_login_error(null)
-                            let [status, err] = await user_actions.login(form_value, true).then((d) => {
+                            let [status, err] = await user_actions.login(form_value, next_page).then((d) => {
                                 set_loading(false)
                                 return d
                             })

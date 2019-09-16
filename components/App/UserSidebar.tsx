@@ -4,6 +4,7 @@ import { Grid, Col, Row, Divider } from 'rsuite';
 import {NavUserSidebar} from '@components/Header/NavUser'
 import { Avatar } from '@components/Profile/ProfileHeader'
 import { ProfileNameTag } from '@components/Profile'
+import { useProfileUser, useUser } from '@hooks/user'
 
 import { t } from '@app/utility/lang'
 
@@ -14,14 +15,15 @@ interface Props {
 }
 
 const UserSidebar = (props: Props) => {
+    const user = useUser()
     return (
-        <Grid fluid className="user-sidebar">
+        <Grid fluid className="user-sidebar animate-width">
             <Row>
                 <Col xs={24} className="text-center">
                     <Avatar/>
                 </Col>
                 <Col xs={24} className="text-center">
-                    <ProfileNameTag/>
+                    <ProfileNameTag name={user.name}/>
                 </Col>
             </Row>
             <Row>

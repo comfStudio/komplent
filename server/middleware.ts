@@ -20,7 +20,11 @@ export interface ExApiResponse extends NextApiResponse {
 }
 
 export const get_jwt_data = (token) => {
-  return jwt.verify(token, JWT_KEY)
+  try {
+    return jwt.verify(token, JWT_KEY)
+  } catch(err) {
+  }
+  return {}
 }
 
 export const get_jwt_user = async (jwt_data) => {

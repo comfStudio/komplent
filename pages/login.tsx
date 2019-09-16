@@ -1,18 +1,19 @@
 import React from 'react'
 
-import { MainLayout, Container} from '@components/App/MainLayout'
-import LoginForm from '@components/Form/LoginForm'
-import { NoLoginPage } from '@components/User/Auth'
+import { InverseAuthPage } from '@components/App/AuthPage'
+import LoginPage from '@components/App/LoginPage';
+import { LoginContext } from '@client/context'
 
-const LoginPage = () => {
-  return (
-      <MainLayout noSidebar activeKey="login">
-        <NoLoginPage/>
-        <Container padded={16}>
-          <LoginForm panel/>
-        </Container>
-      </MainLayout>
-  )
+class Page extends InverseAuthPage {
+
+  render() {
+    console.log("login page")
+    return this.renderPage(
+      <LoginContext.Provider value={{next_page: true}}>
+        <LoginPage/>
+      </LoginContext.Provider>
+    )
+  }
 }
 
-export default LoginPage
+export default Page

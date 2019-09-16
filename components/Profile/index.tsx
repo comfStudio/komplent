@@ -5,7 +5,7 @@ import { MainLayout, Container, PanelContainer } from '@components/App/MainLayou
 import { ProfileHeader } from '@components/Profile/ProfileHeader'
 import { ProfileMenu, Props as MenuProps } from '@components/Profile/ProfileMenu'
 import ProfileInfo from '@components/Profile/ProfileInfo'
-import { useProfileUser, useStore, useUser } from '@hooks/user'
+import { useProfileUser, useUser } from '@hooks/user'
 import { t } from '@app/utility/lang'
 import { ReactProps } from '@utility/props'
 
@@ -28,9 +28,12 @@ export const ProfileLayout = (props: LayoutProps) => {
     )
 }
 
-export const ProfileNameTag = (props) => {
-  const user = useUser()
-  return (<h3 className="profile-name text-center">{user.name || user.username}</h3>)
+interface ProfileNameTagProps {
+  name: string
+}
+
+export const ProfileNameTag = (props: ProfileNameTagProps) => {
+  return (<h3 className="profile-name text-center">{props.name}</h3>)
 }
 
 export const RequireOwnProfile = () => {

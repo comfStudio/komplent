@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import Router from 'next/router'
 
 import * as pages from '@utility/pages'
-import { useUserStore } from '@store/user'
 import { ReactProps } from '@app/utility/props'
 import { useLoginStatus } from '@hooks/auth'
 
@@ -21,7 +20,6 @@ export const NoLoginPage = () => {
     return null
   }
   
-
 export const Auth = (props: Props) => {
 
     const logged_in = useLoginStatus()

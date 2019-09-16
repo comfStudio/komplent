@@ -5,7 +5,7 @@ import { ProfileContext } from '@client/context'
 
 export const useUser = () => {
     const [user_store, user_actions] = useUserStore()
-    return user_store.current_user
+    return user_store.current_user || {}
 }
 
 export const useProfileContext = () => {

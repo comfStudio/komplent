@@ -27,7 +27,7 @@ const UserTypeModal = (props: Props) => {
         const [ user, set_user ] = useUpdateDocument({type: current_user.type})
         const update = useUpdate(current_user, user_schema)
 
-        useEffect(() => set_show(user_state.has_selected_usertype === false), [user_state.has_selected_usertype])
+        useEffect(() => set_show(useUserStore.initialized && user_state.has_selected_usertype === false), [user_state.has_selected_usertype])
 
         return (
             <Modal backdrop="static" show={show} size="xs">

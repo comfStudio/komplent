@@ -7,3 +7,9 @@ interface Profile {
 }
 
 export const ProfileContext = React.createContext<Profile>(null)
+
+interface Login {
+    next_page?: string | boolean
+}
+
+export const LoginContext = React.createContext<Login>({})

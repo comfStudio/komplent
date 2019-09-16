@@ -174,7 +174,8 @@ export const store_schema = new Schema({
   user: { 
     type: ObjectId, 
     ref: 'User',
-    select: false
+    select: false,
+    unique: true
   },
   has_selected_usertype: Boolean,
 })
