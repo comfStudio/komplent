@@ -5,7 +5,7 @@ import Error from 'next/error'
 
 import { OptionalAuthPage, Props as AuthProps } from '@components/App/AuthPage'
 import { ProfileContext } from '@client/context'
-import { get_profile_id, get_profile_urlpart } from '@utility/pages'
+import { get_profile_id, make_profile_path } from '@utility/pages'
 import { User } from '@db/models'
 import { IUser } from '@schema/user'
 
@@ -15,6 +15,7 @@ interface Props extends AuthProps {
     profile_id: string
     profile_user: IUser
     profile_path: string
+    profile_owner: boolean
 }
 
 class ProfilePage extends OptionalAuthPage<Props> {
@@ -25,22 +26,29 @@ class ProfilePage extends OptionalAuthPage<Props> {
         let profile_path = ""
         
         if (profile_id) {
-            profile_user = await User.findOne({username: profile_id}).lean()
-            profile_path = `/${get_profile_urlpart(ctx.asPath)}`
-        }
+            profile_user = await User.findOne({username: profile_id, type:"creator"}).lean()
 
+            if (profile_user) {
+                profile_path = make_profile_path(profile_user)
+            }
+            
+        }
+        
         if (!profile_user) {
             error = NOT_FOUND
             ctx.res.statusCode = error
         }
-
+        
         const props = await super.getInitialProps(ctx)
+
+        const profile_owner = props.useUserState.current_user && profile_user && props.useUserState.current_user.username == profile_user.username
 
         return {
             error,
             profile_id,
             profile_user,
             profile_path,
+            profile_owner,
             ...props
         }
     }
@@ -56,6 +64,7 @@ class ProfilePage extends OptionalAuthPage<Props> {
                 profile_id: this.props.profile_id,
                 profile_user: this.props.profile_user,
                 profile_path: this.props.profile_path,
+                profile_owner: this.props.profile_owner,
             }}>
                 {super.renderPage(children)}
             </ProfileContext.Provider>

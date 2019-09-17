@@ -4,6 +4,7 @@ interface Profile {
     profile_id: string
     profile_user: object
     profile_path: string
+    profile_owner: boolean
 }
 
 export const ProfileContext = React.createContext<Profile>(null)

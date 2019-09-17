@@ -2,7 +2,7 @@ import React from 'react';
 import { Icon, Nav, Dropdown  } from 'rsuite';
 import Link from 'next/link';
 
-import { useUser } from '@hooks/user'
+import { useUser, useProfileContext } from '@hooks/user'
 import { make_profile_path } from '@utility/pages'
 import { t } from '@app/utility/lang'
 
@@ -31,11 +31,12 @@ export const NavUserMenu = (props: UserMenuProps) => {
     let El = props.element
 
     const user = useUser()
+    const { profile_owner } = useProfileContext()
 
     return (
         <React.Fragment>
-        <Link href={make_profile_path(user.username)} passHref>
-        <El.Item eventKey="profile" active={props.activeKey=='profile'}>
+        <Link href={make_profile_path(user)} passHref>
+        <El.Item eventKey="profile" active={props.activeKey=='profile' && profile_owner}>
             {t`My Profile`}
         </El.Item>
         </Link>
@@ -90,7 +91,7 @@ export const NavUserDropdown = (props: NavUserProps) => {
     const user = useUser()
 
     return (
-        <Dropdown className="nav-user-dropdown" placement="bottomEnd" renderTitle={NavUserAvatar}>
+        <Dropdown className="nav-user-dropdown lg:!hidden" placement="bottomEnd" renderTitle={NavUserAvatar}>
         <li className="header">✦ {`${user.name || user.username}`} ✦</li>
         <NavUserMenu element={Dropdown} activeKey={props.activeKey} dropdown />
         </Dropdown>

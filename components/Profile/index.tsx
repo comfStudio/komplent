@@ -37,13 +37,13 @@ export const ProfileNameTag = (props: ProfileNameTagProps) => {
 }
 
 export const RequireOwnProfile = () => {
-  const { own_profile, context : { profile_path } } = useProfileUser()
+  const { context : { profile_path, profile_owner } } = useProfileUser()
 
   useEffect(() => {
-    if (!own_profile) {
+    if (!profile_owner) {
       Router.replace(profile_path)
     }
-  }, [own_profile])
+  }, [profile_owner])
 
   return null
 }

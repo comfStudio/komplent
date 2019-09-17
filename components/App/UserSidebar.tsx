@@ -23,7 +23,7 @@ const UserSidebar = (props: Props) => {
                     <Avatar/>
                 </Col>
                 <Col xs={24} className="text-center">
-                    <ProfileNameTag name={user.name}/>
+                    <ProfileNameTag name={user.name || user.username}/>
                 </Col>
             </Row>
             <Row>

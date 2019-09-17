@@ -15,11 +15,9 @@ export const useProfileContext = () => {
 export const useProfileUser = () => {
     const current_user = useUser()
     const { profile_user, ...context } = useProfileContext()
-    const own_profile = current_user && profile_user && current_user._id == profile_user._id
     return {
         current_user,
         profile_user,
         context,
-        own_profile
     }
 }

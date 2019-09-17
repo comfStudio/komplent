@@ -11,7 +11,7 @@ export interface Props {
 }
 
 export const ProfileMenu = (props: Props) => {
-    const { own_profile, context: { profile_path } } = useProfileUser()
+    const { context: { profile_path, profile_owner } } = useProfileUser()
 
     return (
         <Navbar className="">
@@ -44,7 +44,7 @@ export const ProfileMenu = (props: Props) => {
                                 {t`Shop`}
                             </Nav.Item>
                         </Link> */}
-                        { own_profile && 
+                        { profile_owner && 
                             <Link href={`${profile_path}/edit`} passHref>
                                 <Nav.Item eventKey="edit" active={props.activeKey=='edit'}>
                                     {t`Edit Profile`}

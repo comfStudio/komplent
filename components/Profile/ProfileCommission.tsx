@@ -9,11 +9,13 @@ import { HTMLElementProps, ReactProps } from '@utility/props'
 import './ProfileCommission.scss'
 import Placeholder from '@components/App/Placeholder';
 import Image from '@components/App/Image'
+import { useProfileContext } from '@hooks/user';
 
 export const CommissionButton = (props: HTMLElementProps) => {
+    const { profile_path } = useProfileContext()
     let cls = "commission-button"
     return (
-        <Link href="/profile/commission">
+        <Link href={`${profile_path}/commission`}>
             <Button appearance="primary" size="lg" className={props.className ? cls + ' ' + props.className : cls}>
                 {t`Request a Commission`}
             </Button>

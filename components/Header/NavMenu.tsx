@@ -9,6 +9,8 @@ import { t } from '@app/utility/lang'
 import LogoIcon from '@assets/images/logo.svg?sprite'
 import { useLoginStatus } from '@hooks/auth';
 
+import "./NavMenu.scss"
+
 interface Props {
     activeKey?: string
 }
@@ -21,7 +23,7 @@ export const NavMenu = (props: Props) => {
         <Navbar id="nav-menu">
             <Navbar.Header>
                 <Link href="/">
-                    <a href="#" className="navbar-brand logo"><Icon icon="" size="lg" /></a>
+                    <a><LogoIcon className="logo"/></a>
                 </Link>
             </Navbar.Header>
             <Navbar.Body className="flex flex-1 justify-center">

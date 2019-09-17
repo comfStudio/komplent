@@ -30,7 +30,7 @@ interface HeaderProps extends ReactProps {
 
 export const ProfileHeader = (props: HeaderProps) => {
 
-    const { own_profile } = useProfileUser()
+    const { context: { profile_owner } } = useProfileUser()
 
     return (
         <div id="profile-header">
@@ -39,7 +39,7 @@ export const ProfileHeader = (props: HeaderProps) => {
                 <Cover/>
                 <Avatar/>
                 <div id="header-container">
-                    { !own_profile && (
+                    { !profile_owner && (
                         <React.Fragment>
                             <CommissionButton className="z-10"/>
                             <IconButton icon={<Icon icon="bell"/>} appearance="default" size="lg" className="mx-3">{t`Follow`}</IconButton>
