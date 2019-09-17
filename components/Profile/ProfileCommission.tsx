@@ -93,7 +93,8 @@ export const CommissionTiers = (props: any) => {
         <Col xs={6}>
             <CommissionCard price={45} title="Full color"/>
         </Col>
-    </Row>)
+        </Row>
+    )
 }
 
 const Attachments = (props) => {
