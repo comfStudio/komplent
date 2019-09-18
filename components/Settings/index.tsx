@@ -83,7 +83,7 @@ const SettingsLayout = () => {
                 <h4>{t`Account`}</h4>
                 <EditSection>
                     <UserType/>
-                    <Button color="ghost">{t`Delete account`}</Button>
+                    <Button appearance="ghost" color="red">{t`Delete account`}</Button>
                 </EditSection>
             </Grid>
         </MainLayout>
