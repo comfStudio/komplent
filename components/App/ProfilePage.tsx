@@ -8,6 +8,7 @@ import { ProfileContext } from '@client/context'
 import { get_profile_id, make_profile_path } from '@utility/pages'
 import { User } from '@db/models'
 import { IUser } from '@schema/user'
+import { is_server } from '@utility/misc';
 
 
 interface Props extends AuthProps {
@@ -26,7 +27,9 @@ class ProfilePage extends OptionalAuthPage<Props> {
         let profile_path = ""
         
         if (profile_id) {
-            profile_user = await User.findOne({username: profile_id, type:"creator"}).lean()
+            if (is_server()) {
+                profile_user = await User.findOne({username: profile_id, type:"creator"}).lean()
+            }
 
             if (profile_user) {
                 profile_path = make_profile_path(profile_user)

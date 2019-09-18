@@ -8,8 +8,10 @@
         padding: 0.8em;
 
         .price {
+            @apply border-primary;
+            @apply text-primary;
             font-size: 1.2em;
-            border: 1px solid rgba(0, 0, 0, 0.5);
+            border: 1px solid;
             padding: 0.3em;
             border-radius: 2px;
             font-weight: 600;
@@ -35,16 +37,17 @@
     }
 
     .select-box {
+        @apply text-primary;
         position: absolute;
         bottom: 0;
         background-color: rgba(0, 0, 0, 0.4);
         text-align: center;
         width: 100%;
-        color: skyblue;
         font-weight: 600;
     }
 }
 
 .commission-card:hover, .commission-card.selected {
-    border: 1px solid skyblue;
+    border: 0.15em solid;
+    @apply border-primary;
 }

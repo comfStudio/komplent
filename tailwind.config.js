@@ -8,7 +8,7 @@ Object.entries(variants).forEach(([k, v]) => {variants[k] = [...additional_varia
 module.exports = {
   theme: {
     colors: {
-      primary: '#e91e63',
+      primary: '#EE6666',
       secondary: {
         default:'#575757',
         light:'#8e8e93'

@@ -28,11 +28,11 @@ const UserSidebar = (props: Props) => {
             </Row>
             <Row>
                 <Col xs={12} className="text-center stat-info">
-                    <strong>3</strong>
+                    <strong className="text-primary">3</strong>
                     <small>{t`Commissions`}</small>
                 </Col>
                 <Col xs={12} className="text-center stat-info">
-                    <strong>30</strong>
+                    <strong className="text-primary">30</strong>
                     <small>{t`Requests`}</small>
                 </Col>
             </Row>

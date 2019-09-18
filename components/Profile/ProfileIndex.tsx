@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Col, Row, Grid } from 'rsuite'
+import { Col, Row, Grid, Message } from 'rsuite'
 
 import { CommissionCard, CommissionTiers } from '@app/components/Profile/ProfileCommission'
 
@@ -11,6 +11,15 @@ import { ReviewsReel } from '@components/Profile/ProfileReviews';
 export const ProfileIndex = () => {
     return (
         <Grid fluid>
+            <Message type="info" description={
+                <p>
+                    Hello lovely people!
+                    {<br/>}
+                    I just want to inform you that I will be closing up commissions until further notice!
+                    {<br/>}
+                    Thank you everyone for participating this time around &lt;3!
+                </p>
+            }/>
             <ReviewsReel/>
             <h3>{t`Commission Rates`}</h3>
             <CommissionTiers/>

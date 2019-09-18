@@ -31,7 +31,7 @@ export const UserCard = ({fluid = true, ...props}: Props) => {
                     <Button className="float-right mt-1" appearance="primary" size="sm">
                         {t`Commission`}
                     </Button>
-                    <strong className="text-pink-500">Twiddly</strong>
+                    <strong className="text-primary">Twiddly</strong>
                     <p className="font-light text-gray-500">
                         <Link href="#">
                             <a className="text-gray-500 commission-price">5$</a>

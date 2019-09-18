@@ -36,9 +36,11 @@ export const NavUserMenu = (props: UserMenuProps) => {
     return (
         <React.Fragment>
         <Link href={make_profile_path(user)} passHref>
-        <El.Item eventKey="profile" active={props.activeKey=='profile' && profile_owner}>
-            {t`My Profile`}
-        </El.Item>
+        {user.type === 'creator' && 
+            <El.Item eventKey="profile" active={props.activeKey=='profile' && profile_owner}>
+                {t`My Profile`}
+            </El.Item>
+        }
         </Link>
          <Link href="/dashboard" passHref>
                 <El.Item eventKey="dashboard" active={props.activeKey=='dashboard'}>
