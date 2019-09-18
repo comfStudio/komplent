@@ -1,14 +1,13 @@
 import React from 'react'
 
 import { AuthPage } from '@components/App/AuthPage'
-import MainLayout from '@components/App/MainLayout'
+import SettingsLayout from '@components/Settings'
 
 
 class SettingsPage extends AuthPage {
   public render() {
     return this.renderPage(
-      <MainLayout activeKey="settings">
-      </MainLayout>
+      <SettingsLayout/>
     )
   }
 }

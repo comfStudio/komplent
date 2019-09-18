@@ -1,29 +1,13 @@
 import React, { useState } from 'react';
-import { Grid, Row, Col, Checkbox, CheckboxGroup, FormGroup, ControlLabel, Button, RadioGroup, Radio, TagPicker, List, SelectPicker } from 'rsuite';
+import { Grid, Row, Col, Checkbox, CheckboxGroup, FormGroup, ControlLabel, Button, RadioGroup, Radio, TagPicker, List, SelectPicker, InputNumber } from 'rsuite';
 
 import { t } from '@app/utility/lang'
-import { ReactProps } from '@utility/props';
 import { CommissionCard } from '@components/Profile/ProfileCommission';
 import Placeholder from '@components/App/Placeholder';
+import { EditSection, EditGroup } from '@components/Settings'
 
 import './ProfileEdit.scss'
 
-interface EditFroupProps extends ReactProps {
-    title?: string
-}
-
-const EditGroup = (props: EditFroupProps) => {
-    return (
-    <FormGroup className="edit-group">
-        { !!props.title && <ControlLabel>{props.title}</ControlLabel>}
-        {props.children}
-    </FormGroup>
-    )
-}
-
-const EditSection = (props: ReactProps) => {
-    return (<div className="edit-section">{props.children}</div>)
-}
 
 export const Sections = () => {
     return (
@@ -77,6 +61,16 @@ export const Origin = () => {
     return (
     <EditGroup title={t`Origin` + ':'}>
         <SelectPicker data={[]} className="ml-2" style={{ width: 300 }}/>
+    </EditGroup>
+    )
+}
+
+export const ModificationNumber = () => {
+    return (
+    <EditGroup title={t`Number of modifications allowed` + ':'}>
+        <div className="w-32">
+            <InputNumber defaultValue="3"/>
+        </div>
     </EditGroup>
     )
 }
@@ -154,6 +148,28 @@ export const Socials = () => {
     )
 }
 
+export const DrawingList = () => {
+
+    return (
+        <React.Fragment>
+            <EditGroup title={t`Will draw`}>
+                <EditSection>
+                <List className="w-64">
+                <List.Item key="">OCs</List.Item>
+                </List>
+                </EditSection>
+            </EditGroup>
+            <EditGroup title={t`Will not draw`}>
+                <EditSection>
+                <List className="w-64">
+                <List.Item key="">NSFW</List.Item>
+                </List>
+                </EditSection>
+            </EditGroup>
+        </React.Fragment>
+    )
+}
+
 export const Rates = () => {
     return (
         <React.Fragment>
@@ -208,6 +224,12 @@ export const ProfileEdit = () => {
                 <Origin/>
                 <Tags/>
                 <Socials/>
+            </EditSection>
+
+            <h4>{t`Commission`}</h4>
+            <EditSection>
+                <DrawingList/>
+                <ModificationNumber/>
             </EditSection>
 
             <h4>{t`Commission Rates`}</h4>

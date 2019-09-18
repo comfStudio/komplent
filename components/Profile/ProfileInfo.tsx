@@ -23,7 +23,6 @@ export const ProfileInfo = (props: Props) => {
             <p>
                 <ProfileNameTag name={profile_user.name || profile_user.username}/>
             </p>
-            <hr/>
             <p>
                 <TagGroup className="tags">
                     <Tag color="blue">Illustration</Tag>
@@ -35,12 +34,6 @@ export const ProfileInfo = (props: Props) => {
                 </TagGroup>
             </p>
             <hr/>
-            <p className="text-center">
-                <Circle percent={60} status="active" className="w-12 inline-block" />
-                <Circle percent={60} status="active" className="w-12 inline-block" />
-                <Circle percent={60} status="active" className="w-12 inline-block" />
-                <Circle percent={60} status="active" className="w-12 inline-block" />
-            </p>
             <p>
                 <strong>{t`Commission details`}:</strong>
                 <p>

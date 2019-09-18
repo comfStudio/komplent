@@ -10,6 +10,7 @@ import './ProfileCommission.scss'
 import Placeholder from '@components/App/Placeholder';
 import Image from '@components/App/Image'
 import { useProfileContext } from '@hooks/user';
+import { DrawingList } from '@app/components/Profile'
 
 export const CommissionButton = (props: HTMLElementProps) => {
     const { profile_path } = useProfileContext()
@@ -46,6 +47,11 @@ const CommissionCardHeader = (props) => {
             </Col>
             <Col xs={16}>
                 <h4 className="title inline-block">{props.title}</h4>
+            </Col>
+        </Row>
+        <Row>
+            <Col xs={24} className="text-center">
+                <span className="text-primary">{t`Negiotiable`}</span>
             </Col>
         </Row>
         <Row className="extra-row">
@@ -134,12 +140,12 @@ export class ProfileCommission extends Component {
         return (
             <Form>
                 <Grid fluid>
-                    <h3>{t`Pick your commission`}</h3>
-                    <CommissionTiers/>
-                    <hr/>
                     <Row>
                         <Placeholder type="text" rows={4}/>
                     </Row>
+                    <hr/>
+                    <h3>{t`Pick your commission`}</h3>
+                    <CommissionTiers/>
                     <hr/>
                     <Row>
                         <Col xs={24}>
@@ -151,9 +157,14 @@ export class ProfileCommission extends Component {
                             </ul>
                         </Col>
                     </Row>
+                    <hr/>
+                    <Row>
+                        <DrawingList/>
+                    </Row>
+                    <hr/>
                     <Row>
                         <Col xs={24}>
-                        <h3>{t`Describe your commission request`}</h3>
+                        <h3>{t`Describe your request`}</h3>
                         <Input
                             componentClass="textarea"
                             rows={3}
@@ -164,6 +175,10 @@ export class ProfileCommission extends Component {
                     <Row>
                         <h3>{t`Attachments`}</h3>
                         <Attachments/>
+                    </Row>
+                    <Row>
+                        <h3>{t`Terms of Service`}</h3>
+                        <Placeholder type="text" rows={4}/>
                     </Row>
                     <hr/>
                     <Row>
