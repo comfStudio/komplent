@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-import { Grid, Row, Col, Checkbox, CheckboxGroup, FormGroup, ControlLabel, Button, RadioGroup, Radio, TagPicker, List, SelectPicker, InputNumber } from 'rsuite';
+import { Grid, Row, Col, Checkbox, CheckboxGroup, FormGroup, ControlLabel, Button, RadioGroup, Radio, TagPicker, List, SelectPicker, InputNumber, Form } from 'rsuite';
 
 import { t } from '@app/utility/lang'
 import { CommissionCard } from '@components/Profile/ProfileCommission';
 import Placeholder from '@components/App/Placeholder';
 import { EditSection, EditGroup } from '@components/Settings'
+import CommissionRateForm, { RateOptionsForm } from '@components/Form/CommissionRateForm'
 
 import './ProfileEdit.scss'
+import { useSessionStorage } from 'react-use';
 
 
 export const Sections = () => {
@@ -171,9 +173,15 @@ export const DrawingList = () => {
 }
 
 export const Rates = () => {
+
+    const [ new_rate, set_new_rate ] = useSessionStorage("new-commission-rate-form-show", false)
+
     return (
         <React.Fragment>
-            <Button appearance="ghost">{t`Add new rate`}</Button>
+            {!new_rate && <Button appearance="ghost" onClick={(ev) => {ev.preventDefault(); set_new_rate(true);}}>{t`Add new rate`}</Button>}
+            {new_rate && <EditGroup>
+                            <CommissionRateForm panel onDone={() => {set_new_rate(false);}}/>
+                        </EditGroup>}
             <EditGroup>
                 <Grid fluid>
                 <Row gutter={16}>
@@ -226,23 +234,30 @@ export const ProfileEdit = () => {
                 <Socials/>
             </EditSection>
 
-            <h4>{t`Commission`}</h4>
+            <h3>{t`Commission`}</h3>
             <EditSection>
                 <DrawingList/>
                 <ModificationNumber/>
             </EditSection>
 
-            <h4>{t`Commission Rates`}</h4>
+            <h4>{t`Extras`}</h4>
+            <EditSection>
+                <EditGroup>
+                    <RateOptionsForm/>
+                </EditGroup>
+            </EditSection>
+
+            <h4>{t`Rates`}</h4>
             <EditSection>
                 <Rates/>
             </EditSection>
             
-            <h4>{t`Commission Message`}</h4>
+            <h4>{t`Message`}</h4>
             <EditSection>
                 <CommissionMessage/>
             </EditSection>
 
-            <h4>{t`Thank-you Message`}</h4>
+            <h4>{t`Request Accept Message`}</h4>
             <EditSection>
                 <CommissionAcceptMessage/>
             </EditSection>

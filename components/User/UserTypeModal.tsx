@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form } from 'rsuite';
 
 import { useUser } from '@app/client/hooks/user';
-import { useUpdate, useUpdateDocument, useDocument } from '@app/client/hooks/db';
+import { useUpdateDatabase, useUpdateDocument } from '@app/client/hooks/db';
 import { user_schema } from '@schema/user'
 import { t } from '@app/utility/lang'
 import { useUserStore } from '@store/user'
@@ -25,7 +25,7 @@ const UserTypeModal = (props: Props) => {
         const [ show, set_show ] = useState(false)
         const [ loading, set_loading ] = useState(false)
         const [ user, set_user ] = useUpdateDocument({type: current_user.type})
-        const update = useUpdate(current_user, user_schema)
+        const update = useUpdateDatabase(current_user, user_schema)
 
         useEffect(() => set_show(useUserStore.initialized && user_state.has_selected_usertype === false), [user_state.has_selected_usertype])
 

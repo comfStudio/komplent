@@ -39,5 +39,5 @@ export const update_db = async (model: string, document: Document | Object, sche
         body: JSON.stringify(data)
     })
 
-    return (r.status == OK || r.status == CREATED) 
+    return { body: await r.json(), status: (r.status == OK || r.status == CREATED) }
 }

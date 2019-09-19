@@ -2,7 +2,7 @@ import mongoose from 'mongoose'
 
 const { Schema } = mongoose
 
-const { ObjectId, Mixed } = mongoose.Schema.Types
+const { ObjectId, Mixed, Decimal128 } = mongoose.Schema.Types
 
 export const commission_schema = new Schema({
     body: String,
@@ -39,16 +39,38 @@ export const commission_schema = new Schema({
             ref: 'Attachment'
         }
     ],
-    options: { 
-        type: ObjectId, 
-        ref: 'CommissionOptions',
-    },
 })
 
-export const commission_options_schema = new Schema({
+export const commission_extra_option_schema = new Schema({
+    price: Decimal128,
     type: {
         type: String,
-        enum : ['radio','input', 'checkbox'],
+        enum: ['radio','input', 'checkbox'],
+        default: "checkbox"
       },
     data: Mixed,
+    user: { 
+        type: ObjectId, 
+        ref: 'User',
+        select: false,
+      },
+  })
+
+export const comission_rate_schema = new Schema({
+    title: String,
+    description: String,
+    price: Decimal128,
+    image: { 
+      type: ObjectId, 
+      ref: 'Image'
+    },
+    extras: [{ 
+        type: ObjectId, 
+        ref: 'CommissionExtraOption',
+    }],
+    user: { 
+        type: ObjectId, 
+        ref: 'User',
+        select: false,
+      },
   })

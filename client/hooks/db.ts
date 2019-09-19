@@ -3,8 +3,8 @@ import { Document, Schema } from 'mongoose/browser'
 
 import { update_db } from '@app/client/db'
 
-export const useUpdate = (existing_document?: Document | Object, validation_schema?: Schema, always_validate = true, always_create = false) => {
-    const update = async (model: string, document: Document | Object, schema?: Schema, validate?: boolean, create = false) => {
+export const useUpdateDatabase = (existing_document?: Document | Object, validation_schema?: Schema, always_validate = true, always_create = false) => {
+    const update = async (model: string, document: Document | Object, schema?: Schema, validate?: boolean, create?: boolean) => {
 
         const is_object = typeof document === 'object'
 
@@ -14,6 +14,10 @@ export const useUpdate = (existing_document?: Document | Object, validation_sche
 
         if (schema === undefined) {
             schema = validation_schema
+        }
+
+        if (create === undefined) {
+            create = always_create
         }
         
         if (existing_document) {
@@ -31,7 +35,7 @@ export const useDocument = (schema: Schema, initial_data?: object) => {
     const [current_doc, set_current_doc] = useState(new Document(d, schema))
 
     const set_doc = (next_doc: Document) => {
-        set_current_doc( new Document(next_doc.toObject(), schema)) // or maybe use Document.set(object)?
+        set_current_doc( current_doc.set(next_doc.toObject())) // or maybe use Document.set(object)?
     }
 
     return [current_doc, set_doc]

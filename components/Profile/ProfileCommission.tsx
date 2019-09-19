@@ -51,7 +51,7 @@ const CommissionCardHeader = (props) => {
         </Row>
         <Row>
             <Col xs={24} className="text-center">
-                <span className="text-primary">{t`Negiotiable`}</span>
+                <span className="text-primary">{t`Negotiable`}</span>
             </Col>
         </Row>
         <Row className="extra-row">

@@ -8,7 +8,7 @@ import { with_auth_middleware, ExApiRequest, ExApiResponse } from '@server/middl
 
 const cors = microCors({ allowMethods: ['PUT', 'POST'] })
 
-export default with_auth_middleware(async (req: ExApiRequest, res: ExApiResponse) => {
+export default cors(with_auth_middleware(async (req: ExApiRequest, res: ExApiResponse) => {
     try {
         const { data, model } = req.json
 
@@ -43,4 +43,4 @@ export default with_auth_middleware(async (req: ExApiRequest, res: ExApiResponse
     } catch(err) {
         res.status(BAD_REQUEST).json(error_message(err.message))
     }
-})
+}))
