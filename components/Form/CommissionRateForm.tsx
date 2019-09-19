@@ -43,7 +43,7 @@ export const RateOptions = (props: RateOptionsProps) => {
                 }
             })
             }
-            {props.new && <List.Item><Button size="sm" appearance="ghost" className="ml-5 pl-5">{t`Add new option`}</Button></List.Item>}
+            {props.new && <List.Item><Button size="sm" className="ml-5 pl-5">{t`Add new option`}</Button></List.Item>}
             </FormControl>
         </List>
     )

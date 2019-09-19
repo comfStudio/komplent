@@ -178,7 +178,7 @@ export const Rates = () => {
 
     return (
         <React.Fragment>
-            {!new_rate && <Button appearance="ghost" onClick={(ev) => {ev.preventDefault(); set_new_rate(true);}}>{t`Add new rate`}</Button>}
+            {!new_rate && <Button onClick={(ev) => {ev.preventDefault(); set_new_rate(true);}}>{t`Add new rate`}</Button>}
             {new_rate && <EditGroup>
                             <CommissionRateForm panel onDone={() => {set_new_rate(false);}}/>
                         </EditGroup>}
