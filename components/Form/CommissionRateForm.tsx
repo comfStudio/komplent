@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useSessionStorage } from 'react-use'
 import { Form, FormGroup, FormControl, ControlLabel, Button, ButtonToolbar,
-        HelpBlock, Input, Panel, Divider, Icon, Schema, Message, InputNumber, Toggle, Uploader, List, Checkbox, Grid, Col, Row, CheckboxGroup } from 'rsuite'
+        HelpBlock, Input, Panel, Divider, Icon, Schema, Message, InputNumber, Toggle, Uploader, List, Checkbox, Grid, Col, Row, CheckboxGroup, IconButton } from 'rsuite'
 
 import { HTMLElementProps } from '@app/utility/props'
 import { t } from '@app/utility/lang'
@@ -10,6 +10,38 @@ import { useUser } from '@hooks/user';
 import { comission_rate_schema, commission_extra_option_schema } from '@schema/commission'
 
 const { StringType, NumberType, BooleanType, ArrayType, ObjectType } = Schema.Types;
+
+interface RateOptionProps {
+    price: number
+    text: string
+    edit?: boolean
+    editing?: boolean
+}
+
+
+const RateOption = (props: RateOptionProps) => {
+
+    const [editing, set_editing] = useState(props.editing)
+
+    return (
+        <React.Fragment>
+            {(props.edit && !editing) && <IconButton icon={<Icon icon="close" />} circle size="xs" />}
+            {editing &&
+            <Grid fluid>
+                <Row>
+                    <Col xs={5}><span><InputNumber size="xs" defaultValue={props.price} /></span></Col>
+                    <Col xs={12}><span><Input size="xs" defaultValue={props.text} /></span></Col>
+                    <Col xs={3}><Button className="ml-2" size="xs" onClick={(ev) => {ev.preventDefault(); set_editing(false) }}>{t`Ok`}</Button></Col>
+                    <Col xs={4}><Button className="ml-2" size="xs" onClick={(ev) => {ev.preventDefault(); set_editing(false) }}>{t`Cancel`}</Button></Col>
+                </Row>
+            </Grid>
+            }
+            {!editing && <span>{props.price} -</span>}
+            {!editing && <span>{props.text}</span>}
+            {(props.edit && !editing) && <Button className="ml-2" size="xs" onClick={(ev) => {ev.preventDefault(); set_editing(true) }}>{t`Edit`}</Button>}
+        </React.Fragment>
+    )
+}
 
 interface RateOptionsProps {
     edit?: boolean
@@ -21,6 +53,8 @@ interface RateOptionsProps {
 
 export const RateOptions = (props: RateOptionsProps) => {
 
+    const [new_option, set_new_option] = useState(false)
+
     const [data, set_data] = useState([
         {text:'aTwiddly', value: 1},
         {text:'@twiddlyart', value: 2,},
@@ -28,22 +62,24 @@ export const RateOptions = (props: RateOptionsProps) => {
       ])
 
     return (
-        <List className="w-64" bordered={props.bordered}>
+        <List className="" bordered={props.bordered}>
             <FormControl name={props.name || "options"} accepter={CheckboxGroup}>
             {
             data.map(({text, value},index) => {
+                let opt = <RateOption edit={props.edit} price={20} text={text}/>
                 if (props.checkbox) {
-                   return (<Checkbox key={index} value={value} ><span>$20 -</span> {text}</Checkbox>)
+                   return (<Checkbox key={index} value={value} >{opt}</Checkbox>)
                 } else {
                     return (
                         <List.Item key={index} index={index}>
-                            <span>$20 -</span> {text}
+                            {opt}
                         </List.Item>
                     )
                 }
             })
             }
-            {props.new && <List.Item><Button size="sm" className="ml-5 pl-5">{t`Add new option`}</Button></List.Item>}
+            {new_option && <List.Item><RateOption edit={true} editing={true} price={0} text=""/></List.Item>}
+            {(props.new && !new_option) && <List.Item><Button size="sm" className="ml-5 pl-5" onClick={(ev) => {ev.preventDefault(); set_new_option(true) }}>{t`Add new option`}</Button></List.Item>}
             </FormControl>
         </List>
     )
