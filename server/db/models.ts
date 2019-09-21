@@ -4,7 +4,7 @@ import { is_server } from '@utility/misc'
 
 import { user_schema, profile_schema, store_schema,
         commission_stats_schema, gallery_schema,
-        user_options_schema,
+        user_settings_schema,
         IUser, IUserModel } from '@schema/user'
 
 import { message_schema, conversation_schema } from '@schema/message'
@@ -18,7 +18,7 @@ export const CommissionStats = is_server() ? mongoose.models.CommissionStats || 
 export const CommissionRate = is_server() ? mongoose.models.CommissionRate || mongoose.model<Document>('CommissionRate', comission_rate_schema) : undefined
 export const CommissionExtraOption = is_server() ? mongoose.models.CommissionExtraOption || mongoose.model<Document>('CommissionExtraOption', commission_extra_option_schema) : undefined
 export const Gallery = is_server() ? mongoose.models.Gallery || mongoose.model<Document>('Gallery', gallery_schema) : undefined
-export const UserOptions = is_server() ? mongoose.models.UserOptions || mongoose.model<Document>('UserOptions', user_options_schema) : undefined
+export const UserSettings = is_server() ? mongoose.models.UserSettings || mongoose.model<Document>('UserSettings', user_settings_schema) : undefined
 
 export const Message = is_server() ? mongoose.models.Message || mongoose.model('Message', message_schema) : undefined
 export const Conversation = is_server() ? mongoose.models.Conversation || mongoose.model<Document>('Conversation', conversation_schema) : undefined

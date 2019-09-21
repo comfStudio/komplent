@@ -21,10 +21,6 @@ export const user_schema = new Schema({
   origin: String,
   description: String,
   socials: [{ url: String, name: String }],
-  display_currency: String,
-  profile_currency: String,
-  average_price: Decimal128,
-  private: Boolean,
   tags: [{ 
     type: ObjectId, 
     ref: 'Tag'
@@ -33,7 +29,6 @@ export const user_schema = new Schema({
     type: ObjectId, 
     ref: 'CommissionRate'
   }],
-  rating: Number,
   followings: [{ 
     type: ObjectId, 
     ref: 'User'
@@ -42,7 +37,6 @@ export const user_schema = new Schema({
     type: ObjectId, 
     ref: 'User'
   }],
-  commissions_open: Boolean,
   last_commissions_update: Date,
   last_update: {
     type: Date,
@@ -65,9 +59,9 @@ export const user_schema = new Schema({
     type: ObjectId, 
     ref: 'UserRecommendation'
   }],
-  options: { 
+  settings: { 
     type: ObjectId, 
-    ref: 'UserOptions'
+    ref: 'UserSettings'
   },
   commission_rates: [
     { 
@@ -142,7 +136,8 @@ export const commission_stats_schema = new Schema({
   approval_time: Number,
   complete_time: Number,
   complete_rate: Number,
-
+  average_price: Decimal128,
+  rating: Number,
 })
 
 export const profile_schema = new Schema({
@@ -153,17 +148,18 @@ export const profile_schema = new Schema({
     ref: 'Image'
   },
   body: String,
-  options: { 
-    type: ObjectId, 
-    ref: 'ProfileOptions'
-  },
 })
 
-export const profile_options_schema = new Schema({
+export const user_settings_schema = new Schema({
   color: String,
-})
-
-export const user_options_schema = new Schema({
+  display_currency: String,
+  profile_currency: String,
+  commissions_open: Boolean,
+  visibility: {
+    type: String,
+    enum : ['public','private', 'hidden'],
+    default: 'private'
+  },
 })
 
 export const user_recommendation_schema = new Schema({
