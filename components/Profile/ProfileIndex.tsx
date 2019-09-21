@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Col, Row, Grid, Message } from 'rsuite'
 
-import { CommissionCard, CommissionTiers } from '@app/components/Profile/ProfileCommission'
+import { CommissionCard, CommissionTiersRow } from '@app/components/Profile/ProfileCommission'
 import { DrawingList } from '@app/components/Profile'
 
 import { t } from '@app/utility/lang'
@@ -23,7 +23,7 @@ export const ProfileIndex = () => {
             }/>
             <ReviewsReel/>
             <h3>{t`Commission Rates`}</h3>
-            <CommissionTiers/>
+            <CommissionTiersRow/>
             <hr/>
             <DrawingList/>
             <h3>{t`About`}</h3>

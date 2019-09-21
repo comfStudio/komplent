@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useSessionStorage } from 'react-use'
+import { useSessionStorage, useMount } from 'react-use'
 import { Form, FormGroup, FormControl, ControlLabel, Button, ButtonToolbar,
         HelpBlock, Input, Panel, Divider, Icon, Schema, Message, InputNumber, Toggle, Uploader, List, Checkbox, Grid, Col, Row, CheckboxGroup, IconButton } from 'rsuite'
 
@@ -43,7 +43,7 @@ const RateOption = (props: RateOptionProps) => {
                 </Row>
             </Grid>
             }
-            {!editing && <span>$ {props.price}</span>}
+            {!editing && <span>${props.price}</span>}
             {!editing && <span> - {props.title}</span>}
             {(props.edit && !editing) && <Button className="ml-2" size="xs" onClick={(ev) => {ev.preventDefault(); set_dirty(true); set_editing(true) }}>{t`Edit`}</Button>}
         </React.Fragment>
@@ -66,15 +66,15 @@ export const RateOptions = (props: RateOptionsProps) => {
 
     return (
         <List className="" bordered={props.bordered}>
-            <FormControl name={props.name || "options"} accepter={CheckboxGroup}>
+            <FormControl name={props.name || "extras"} accepter={CheckboxGroup}>
             {
             state.options.map(({title, price, _id},index) => {
                 let opt = <RateOption edit={props.edit} price={decimal128ToFloat(price)} title={title} onUpdate={(v) => console.log(v)}/>
                 if (props.checkbox) {
-                   return (<Checkbox key={index} value={_id} >{opt}</Checkbox>)
+                   return (<Checkbox key={_id} value={_id} >{opt}</Checkbox>)
                 } else {
                     return (
-                        <List.Item key={index} index={index}>
+                        <List.Item key={_id} index={index}>
                             {opt}
                         </List.Item>
                     )
@@ -107,23 +107,25 @@ const rate_model = Schema.Model({
     description: StringType(),
     price: NumberType().isRequired('This field is required.'),
     negotiable: BooleanType(),
-    options: ArrayType(),
+    extras: ArrayType(),
     cover: ArrayType(),
   });
 
 const CommissionRateForm = (props: Props) => {
 
     const current_user = useUser()
-    const [document, set_document] = useDocument(comission_rate_schema)
-    const update = useUpdateDatabase(undefined, comission_rate_schema, true, true)
+    const [doc, set_document] = useDocument(comission_rate_schema)
+    const [state, actions] = useCommissionRateStore()
     const [form_ref, set_form_ref] = useState(null)
-    const [form_value, set_form_value] = useState({})
+    const [form_value, set_form_value] = useState({
+        extras: state.options.map((v) => v._id)
+    })
     const [error, set_error] = useState(null)
     const [loading, set_loading] = useState(false)
 
 
     let form = (
-        <Form fluid method="post" action="/api/update" formValue={form_value} model={rate_model} ref={ref => (set_form_ref(ref))} onChange={(value => set_form_value(value))}>
+        <Form fluid method="put" action="/api/update" formValue={form_value} model={rate_model} ref={ref => (set_form_ref(ref))} onChange={(value => set_form_value(value))}>
             <FormGroup>
                     <ControlLabel>{t`Price`}:</ControlLabel>
                     <FormControl fluid name="price" prefix="$" accepter={InputNumber} type="number" required />
@@ -160,14 +162,15 @@ const CommissionRateForm = (props: Props) => {
                         </Col>
                         <Col xs={12} xsPush={4}>
                             <Button loading={loading} type="submit" block appearance="primary" onClick={async (ev) => { ev.preventDefault()
-                            console.log(form_value)
                             if (form_ref && form_ref.check()) {
                                 set_loading(true)
                                 set_error(null)
 
-                                set_document(form_value)
+                                set_document({user:current_user._id, ...form_value})
 
-                                const {body, status} = await update("CommissionRate", document).then((d) => {
+                                console.log(doc)
+
+                                const {body, status} = await actions.create_rate(doc).then((d) => {
                                     set_loading(false)
                                     return d
                                 })

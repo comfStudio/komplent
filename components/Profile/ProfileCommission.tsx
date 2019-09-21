@@ -11,6 +11,8 @@ import Placeholder from '@components/App/Placeholder';
 import Image from '@components/App/Image'
 import { useProfileContext } from '@hooks/user';
 import { DrawingList } from '@app/components/Profile'
+import useCommissionRateStore from '@store/commission';
+import { decimal128ToFloat } from '@utility/misc';
 
 export const CommissionButton = (props: HTMLElementProps) => {
     const { profile_path } = useProfileContext()
@@ -34,39 +36,39 @@ export const SendRequestButton = (props: HTMLElementProps) => {
 };
 
 interface CommissionCardProps extends HTMLElementProps {
-    title?: string
-    price?: number
+    data: object
     selected?: boolean
 }
 
-const CommissionCardHeader = (props) => {
+const CommissionCardHeader = (props: CommissionCardProps) => {
+    let { price, title, extras, negotiable } = props.data
+
+    price = decimal128ToFloat(price)
+
     return (<Grid className="header !w-full">
         <Row>
             <Col xs={8}>
-                <span className="price">${props.price}</span>
+                <span className="price">${price}</span>
             </Col>
             <Col xs={16}>
-                <h4 className="title inline-block">{props.title}</h4>
+                <h4 className="title inline-block">{title}</h4>
             </Col>
         </Row>
+        {negotiable && 
         <Row>
             <Col xs={24} className="text-center">
                 <span className="text-primary">{t`Negotiable`}</span>
             </Col>
         </Row>
+        }
         <Row className="extra-row">
-            <Col xs={24}>
-                    <small className="extra">+ ${props.price} - Potrait</small>
-            </Col>
-            <Col xs={24}>
-                    <small className="extra">+ ${props.price} - Half body</small>
-            </Col>
-            <Col xs={24}>
-                    <small className="extra">+ ${props.price} - Full body</small>
-            </Col>
-            <Col xs={24}>
-                    <small className="extra">+ ${props.price} - Background</small>
-            </Col>
+            {
+            extras.map(({title: extra_title, price: extra_price, _id: extra_id},index) => (
+                <Col key={extra_id} xs={24}>
+                        <small className="extra">+ ${decimal128ToFloat(extra_price)} - {extra_title}</small>
+                </Col>
+    )       )
+            }
         </Row>
     </Grid>)
 }
@@ -77,28 +79,28 @@ export const CommissionCard = (props: CommissionCardProps) => {
         cls += " selected"
     return (
         <Panel bodyFill className={props.className ? cls + ' ' + props.className : cls} bordered>
-            <CommissionCardHeader title={props.title} price={props.price}/>
+            <CommissionCardHeader {...props}/>
             <Image w="100%" h={250}/>
             {props.selected && <span className="select-box">Selected</span>}
         </Panel>
     );
 };
 
-export const CommissionTiers = (props: any) => {
+export const CommissionTiersRow = (props: any) => {
+
+    const [state, actions] = useCommissionRateStore()
     return (
         <Row gutter={16}>
-        <Col xs={6}>
-            <CommissionCard price={15} title="Sketch"/>
-        </Col>
-        <Col xs={6}>
-            <CommissionCard price={25} title="Colored Sketch"/>
-        </Col>
-        <Col xs={6}>
-            <CommissionCard price={30} title="Flat Color" selected/>
-        </Col>
-        <Col xs={6}>
-            <CommissionCard price={45} title="Full color"/>
-        </Col>
+            {
+                state.rates.map((data ,index) => {
+                    let el = (
+                        <Col key={data._id} xs={6}>
+                            <CommissionCard data={data}/>
+                        </Col>
+                    )
+                    return el
+                })
+            }
         </Row>
     )
 }
@@ -145,7 +147,7 @@ export class ProfileCommission extends Component {
                     </Row>
                     <hr/>
                     <h3>{t`Pick your commission`}</h3>
-                    <CommissionTiers/>
+                    <CommissionTiersRow/>
                     <hr/>
                     <Row>
                         <Col xs={24}>

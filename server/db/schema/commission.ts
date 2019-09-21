@@ -59,6 +59,7 @@ export const commission_extra_option_schema = new Schema({
 export const comission_rate_schema = new Schema({
     title: String,
     description: String,
+    negotiable: Boolean,
     price: Decimal128,
     image: { 
       type: ObjectId, 

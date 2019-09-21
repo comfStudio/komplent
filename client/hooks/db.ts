@@ -35,7 +35,9 @@ export const useDocument = (schema: Schema, initial_data?: object) => {
     const [current_doc, set_current_doc] = useState(new Document(d, schema))
 
     const set_doc = (next_doc: Document) => {
-        set_current_doc( current_doc.set(next_doc.toObject())) // or maybe use Document.set(object)?
+        current_doc.set(typeof next_doc === 'object'? next_doc : next_doc.toObject())
+        current_doc.validateSync()
+        set_current_doc( current_doc ) // or maybe use Document.set(object)?
     }
 
     return [current_doc, set_doc]

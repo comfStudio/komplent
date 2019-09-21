@@ -14,6 +14,7 @@ interface UpdateDBParams {
     schema?: Schema
     validate?: boolean
     create?: boolean
+    populate?: any
 }
 
 export const update_db = async (params: UpdateDBParams) => {
@@ -41,7 +42,7 @@ export const update_db = async (params: UpdateDBParams) => {
         }
     }
     
-    let data = { model: params.model, data: is_object ? doc : doc.toJSON() }
+    let data = { model: params.model, data: is_object ? doc : doc.toJSON(), populate: params.populate }
 
     let r = await fetch("/api/update", {
         method: params.create ? 'put' : 'post',

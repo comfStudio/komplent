@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import { Grid, Row, Col, Checkbox, CheckboxGroup, FormGroup, ControlLabel, Button, RadioGroup, Radio, TagPicker, List, SelectPicker, InputNumber, Form } from 'rsuite';
 
 import { t } from '@app/utility/lang'
-import { CommissionCard } from '@components/Profile/ProfileCommission';
+import { CommissionCard, CommissionTiersRow } from '@components/Profile/ProfileCommission';
 import Placeholder from '@components/App/Placeholder';
 import { EditSection, EditGroup } from '@components/Settings'
 import CommissionRateForm, { RateOptionsForm } from '@components/Form/CommissionRateForm'
 
 import './ProfileEdit.scss'
 import { useSessionStorage } from 'react-use';
+import useCommissionRateStore from '@store/commission';
 
 
 export const Sections = () => {
@@ -174,30 +175,17 @@ export const DrawingList = () => {
 
 export const Rates = () => {
 
-    const [ new_rate, set_new_rate ] = useSessionStorage("new-commission-rate-form-show", false)
+    const [ show_new_rate, set_show_new_rate ] = useSessionStorage("new-commission-rate-form-show", false)
 
     return (
         <React.Fragment>
-            {!new_rate && <Button onClick={(ev) => {ev.preventDefault(); set_new_rate(true);}}>{t`Add new rate`}</Button>}
-            {new_rate && <EditGroup>
-                            <CommissionRateForm panel onDone={() => {set_new_rate(false);}}/>
+            {!show_new_rate && <Button onClick={(ev) => {ev.preventDefault(); set_show_new_rate(true);}}>{t`Add new rate`}</Button>}
+            {show_new_rate && <EditGroup>
+                            <CommissionRateForm panel onDone={() => {set_show_new_rate(false);}}/>
                         </EditGroup>}
             <EditGroup>
                 <Grid fluid>
-                <Row gutter={16}>
-                    <Col xs={5}>
-                        <CommissionCard price={15} title="Sketch"/>
-                    </Col>
-                    <Col xs={5}>
-                        <CommissionCard price={25} title="Colored Sketch"/>
-                    </Col>
-                    <Col xs={5}>
-                        <CommissionCard price={30} title="Flat Color" selected/>
-                    </Col>
-                    <Col xs={5}>
-                        <CommissionCard price={45} title="Full color"/>
-                    </Col>
-                </Row>
+                    <CommissionTiersRow/>
                 </Grid>
             </EditGroup>
         </React.Fragment>
