@@ -3,7 +3,7 @@ import cookies from 'nookies'
 import { OK } from 'http-status-codes';
 
 import Router from 'next/router'
-import { defineStore } from '@app/store'
+import { defineStore, bootstrapStoreDev } from '@app/store'
 import * as pages from '@utility/pages'
 import { fetch } from '@utility/request'
 import { is_server } from '@utility/misc'
@@ -122,20 +122,11 @@ export const useUserStore = defineStore(
     save: async (store) => {
         let state = {...store.state, user: store.state.current_user._id}
         delete state.current_user
-        return await update_db('UserStore', state, store_schema, true, true)
+        return await update_db({model:'UserStore', data:state, schema:store_schema, validate:true, create:true})
     }
   },
   async (store) => {
-    if (!is_server()) {
-        if (store.state.current_user === undefined) {
-            let c = cookies.get()
-            let u = await fetch_user(c)
-            store.setState({
-                current_user: u,
-                logged_in: !!u
-            })
-        }
-    }
+    await bootstrapStoreDev({useUserStore: store})
   }
 );
 

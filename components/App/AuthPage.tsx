@@ -37,7 +37,7 @@ export class AuthPage<T extends Props = Props> extends Component<T> {
 
     constructor(props) {
         super(props)
-        initializeStore(useUserStore, props.useUserState)
+        initializeStore({useUserStore}, props.useUserState)
     }
 
     static async getInitialProps (ctx: NextPageContext) {

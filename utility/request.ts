@@ -8,7 +8,8 @@ export const get_json = (msg) => {
     return JSON.parse(msg)
 }
 
-interface FetchInit extends RequestInit {
+interface FetchInit extends Omit<RequestInit, 'body'> {
+    body?: string | object
     json?: boolean
     auth?: boolean
 }
@@ -19,11 +20,12 @@ export const fetch = (url, props: FetchInit = {}) => {
         method: 'get',
     }
 
-    if (props.json) {
+    if (props.json || typeof props.body === 'object') {
         def_props.headers = Object.assign(def_props.headers || {}, props.headers || {}, {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
-            })
+        })
+        
         if (typeof props.body !== 'string') {
             props.body = JSON.stringify(props.body)
         }
@@ -48,7 +50,7 @@ export const fetch = (url, props: FetchInit = {}) => {
     delete props.json
     delete props.auth
     
-    props = Object.assign(def_props, props)
+    let fetch_props = Object.assign(def_props, props)
 
-    return unfecth(url, props)
+    return unfecth(url, fetch_props)
 }

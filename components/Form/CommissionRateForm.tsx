@@ -8,20 +8,27 @@ import { t } from '@app/utility/lang'
 import { useUpdateDatabase, useDocument } from '@app/client/hooks/db';
 import { useUser } from '@hooks/user';
 import { comission_rate_schema, commission_extra_option_schema } from '@schema/commission'
+import useCommissionRateStore from '@store/commission';
+import { decimal128ToFloat } from '@utility/misc';
 
 const { StringType, NumberType, BooleanType, ArrayType, ObjectType } = Schema.Types;
 
 interface RateOptionProps {
     price: number
-    text: string
+    title: string
     edit?: boolean
     editing?: boolean
+    onUpdate?: Function
+    onCancel?: Function
 }
 
 
 const RateOption = (props: RateOptionProps) => {
 
     const [editing, set_editing] = useState(props.editing)
+    const [dirty, set_dirty] = useState(false)
+    const [price, set_price] = useState(props.price)
+    const [title, set_title] = useState(props.title)
 
     return (
         <React.Fragment>
@@ -29,16 +36,16 @@ const RateOption = (props: RateOptionProps) => {
             {editing &&
             <Grid fluid>
                 <Row>
-                    <Col xs={5}><span><InputNumber size="xs" defaultValue={props.price} /></span></Col>
-                    <Col xs={12}><span><Input size="xs" defaultValue={props.text} /></span></Col>
-                    <Col xs={3}><Button className="ml-2" size="xs" onClick={(ev) => {ev.preventDefault(); set_editing(false) }}>{t`Ok`}</Button></Col>
-                    <Col xs={4}><Button className="ml-2" size="xs" onClick={(ev) => {ev.preventDefault(); set_editing(false) }}>{t`Cancel`}</Button></Col>
+                    <Col xs={5}><span><InputNumber size="xs" defaultValue={props.price.toString()} onChange={(v) => set_price(v)} /></span></Col>
+                    <Col xs={12}><span><Input size="xs" defaultValue={props.title} onChange={(v: string) => set_title(v)} /></span></Col>
+                    <Col xs={3}><Button className="ml-2" size="xs" onClick={(ev) => {ev.preventDefault(); if(props.onUpdate && title){ props.onUpdate({title, price})} set_dirty(true); set_editing(false);}}>{t`Update`}</Button></Col>
+                    <Col xs={4}><Button className="ml-2" size="xs" onClick={(ev) => {ev.preventDefault();  if(props.onCancel){ props.onCancel()} set_editing(false) }}>{t`Cancel`}</Button></Col>
                 </Row>
             </Grid>
             }
-            {!editing && <span>{props.price} -</span>}
-            {!editing && <span>{props.text}</span>}
-            {(props.edit && !editing) && <Button className="ml-2" size="xs" onClick={(ev) => {ev.preventDefault(); set_editing(true) }}>{t`Edit`}</Button>}
+            {!editing && <span>$ {props.price}</span>}
+            {!editing && <span> - {props.title}</span>}
+            {(props.edit && !editing) && <Button className="ml-2" size="xs" onClick={(ev) => {ev.preventDefault(); set_dirty(true); set_editing(true) }}>{t`Edit`}</Button>}
         </React.Fragment>
     )
 }
@@ -54,21 +61,17 @@ interface RateOptionsProps {
 export const RateOptions = (props: RateOptionsProps) => {
 
     const [new_option, set_new_option] = useState(false)
-
-    const [data, set_data] = useState([
-        {text:'aTwiddly', value: 1},
-        {text:'@twiddlyart', value: 2,},
-        {text:'Twiddli', value: 3},
-      ])
+    const [state, actions] = useCommissionRateStore()
+    const user = useUser()
 
     return (
         <List className="" bordered={props.bordered}>
             <FormControl name={props.name || "options"} accepter={CheckboxGroup}>
             {
-            data.map(({text, value},index) => {
-                let opt = <RateOption edit={props.edit} price={20} text={text}/>
+            state.options.map(({title, price, _id},index) => {
+                let opt = <RateOption edit={props.edit} price={decimal128ToFloat(price)} title={title} onUpdate={(v) => console.log(v)}/>
                 if (props.checkbox) {
-                   return (<Checkbox key={index} value={value} >{opt}</Checkbox>)
+                   return (<Checkbox key={index} value={_id} >{opt}</Checkbox>)
                 } else {
                     return (
                         <List.Item key={index} index={index}>
@@ -78,7 +81,7 @@ export const RateOptions = (props: RateOptionsProps) => {
                 }
             })
             }
-            {new_option && <List.Item><RateOption edit={true} editing={true} price={0} text=""/></List.Item>}
+            {new_option && <List.Item><RateOption edit={true} editing={true} price={0} title="" onUpdate={(v) => {actions.create_option({user:user._id, ...v}); set_new_option(false)}} onCancel={() => {set_new_option(false) }}/></List.Item>}
             {(props.new && !new_option) && <List.Item><Button size="sm" className="ml-5 pl-5" onClick={(ev) => {ev.preventDefault(); set_new_option(true) }}>{t`Add new option`}</Button></List.Item>}
             </FormControl>
         </List>

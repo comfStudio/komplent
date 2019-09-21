@@ -16,7 +16,7 @@ export const UserStore = is_server() ? mongoose.models.UserStore || mongoose.mod
 export const Profile = is_server() ? mongoose.models.Profile || mongoose.model<Document>('Profile', profile_schema) : undefined
 export const CommissionStats = is_server() ? mongoose.models.CommissionStats || mongoose.model<Document>('CommissionStats', commission_stats_schema) : undefined
 export const CommissionRate = is_server() ? mongoose.models.CommissionRate || mongoose.model<Document>('CommissionRate', comission_rate_schema) : undefined
-export const CommissionExtraOptions = is_server() ? mongoose.models.CommissionExtraOptions || mongoose.model<Document>('CommissionExtraOptions', commission_extra_option_schema) : undefined
+export const CommissionExtraOption = is_server() ? mongoose.models.CommissionExtraOption || mongoose.model<Document>('CommissionExtraOption', commission_extra_option_schema) : undefined
 export const Gallery = is_server() ? mongoose.models.Gallery || mongoose.model<Document>('Gallery', gallery_schema) : undefined
 export const UserOptions = is_server() ? mongoose.models.UserOptions || mongoose.model<Document>('UserOptions', user_options_schema) : undefined
 

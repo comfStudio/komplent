@@ -6,7 +6,7 @@ import { error_message, data_message } from '@utility/message'
 import { with_auth_middleware, ExApiRequest, ExApiResponse } from '@server/middleware'
 
 
-const cors = microCors({ allowMethods: ['PUT', 'POST'] })
+const cors = microCors({ allowMethods: ['PUT', 'POST', 'OPTIONS'] })
 
 export default cors(with_auth_middleware(async (req: ExApiRequest, res: ExApiResponse) => {
     try {
@@ -28,6 +28,7 @@ export default cors(with_auth_middleware(async (req: ExApiRequest, res: ExApiRes
             }
             if (!document) {
                 document = new m(data)
+                code = CREATED
             }
         } else {
             document = await m.findById(data._id)
@@ -36,7 +37,7 @@ export default cors(with_auth_middleware(async (req: ExApiRequest, res: ExApiRes
         if (document) {
             document.set(data)
             await document.save()
-            res.status(code).json(data_message(code == CREATED ? 'created' : 'updated'))
+            res.status(code).json(data_message(document.toJSON()))
         } else {
             res.status(NOT_FOUND).json(error_message("not found"))
         }

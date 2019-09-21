@@ -3,6 +3,7 @@ import getConfig from 'next/config'
 import React from 'react'
 import NProgress from 'nprogress'
 import Router from 'next/router'
+import localForage from 'localforage'
 
 import { Title } from '@components/App'
 import { connect } from '@server/db'
@@ -17,6 +18,15 @@ Router.onRouteChangeComplete = () => NProgress.done();
 Router.onRouteChangeError = () => NProgress.done();
 
 const { publicRuntimeConfig, serverRuntimeConfig }= getConfig()
+
+const client_initialize = async () => {
+  localForage.config({
+    name        : 'komplent',
+    version     : 1.0,
+    storeName   : 'komplent', // Should be alphanumeric, with underscores.
+    description : 'komplent'
+});
+}
 
 const server_initialize = async () => {
   await connect()
@@ -36,6 +46,10 @@ class KomplentApp extends App {
 
 if (process.env.SERVER_BUILD && is_server()) {
   server_initialize()
+}
+
+if (!is_server()) {
+  client_initialize()
 }
 
 export default KomplentApp

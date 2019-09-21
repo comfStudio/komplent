@@ -42,13 +42,13 @@ export const commission_schema = new Schema({
 })
 
 export const commission_extra_option_schema = new Schema({
+    title: String,
     price: Decimal128,
     type: {
         type: String,
         enum: ['radio','input', 'checkbox'],
         default: "checkbox"
       },
-    data: Mixed,
     user: { 
         type: ObjectId, 
         ref: 'User',

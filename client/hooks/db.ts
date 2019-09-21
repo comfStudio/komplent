@@ -4,9 +4,9 @@ import { Document, Schema } from 'mongoose/browser'
 import { update_db } from '@app/client/db'
 
 export const useUpdateDatabase = (existing_document?: Document | Object, validation_schema?: Schema, always_validate = true, always_create = false) => {
-    const update = async (model: string, document: Document | Object, schema?: Schema, validate?: boolean, create?: boolean) => {
+    const update = async (model: string, data: Document | Object, schema?: Schema, validate?: boolean, create?: boolean) => {
 
-        const is_object = typeof document === 'object'
+        const is_object = typeof data === 'object'
 
         if (validate === undefined) {
             validate = always_validate
@@ -21,10 +21,10 @@ export const useUpdateDatabase = (existing_document?: Document | Object, validat
         }
         
         if (existing_document) {
-            document._id = existing_document._id
+            data._id = existing_document._id
         }
 
-        return await update_db(model, document, schema, validate, create)
+        return await update_db({model, data: data, schema, validate, create})
         
     }
     return update

@@ -8,20 +8,30 @@ export const clean = (doc: Document, model?: string) => {
     return doc
 }
 
-export const update_db = async (model: string, document: Document | Object, schema?: Schema, validate?: boolean, create = false) => {
+interface UpdateDBParams {
+    model: string
+    data: Document | object
+    schema?: Schema
+    validate?: boolean
+    create?: boolean
+}
 
-    const is_object = typeof document === 'object'
+export const update_db = async (params: UpdateDBParams) => {
 
-    document = clean(document, model)
+    const is_object = typeof params.data === 'object'
 
-    if (validate) {
+    let doc = clean(params.data, params.model)
+    
+    if (params.validate) {
         try {
-            let validate_d = document
-            if (is_object && schema) {
-                validate_d = new Document(document, schema)
-                Object.keys(document).forEach(v => {if (validate_d[v] !== undefined) document[v] = validate_d[v] })
+            let validate_d = doc
+            if (is_object && params.schema) {
+                validate_d = new Document({...doc}, params.schema)
+                //Object.keys(doc).forEach(v => {if (validate_d[v] !== undefined) doc[v] = validate_d[v] })
             }
-            await validate_d.validate()
+            if (typeof validate_d !== 'object') {
+                await validate_d.validate()
+            }
         } catch (err) {
             let e = Error(err.message)
             e.stack = err.stack
@@ -30,14 +40,14 @@ export const update_db = async (model: string, document: Document | Object, sche
             throw e
         }
     }
+    
+    let data = { model: params.model, data: is_object ? doc : doc.toJSON() }
 
-    let data = { model, data: is_object ? document : document.toJSON() }
-
-    let r = await fetch("api/update", {
-        method: create ? 'put' : 'post',
+    let r = await fetch("/api/update", {
+        method: params.create ? 'put' : 'post',
         json: true,
-        body: JSON.stringify(data)
+        body: data
     })
 
-    return { body: await r.json(), status: (r.status == OK || r.status == CREATED) }
+    return { body: await r.json(), status: (r.status == OK || r.status == CREATED), code: r.status }
 }
