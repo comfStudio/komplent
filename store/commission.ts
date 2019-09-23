@@ -17,7 +17,7 @@ export const useCommissionRateStore = defineStore(
             schema:comission_rate_schema,
             create: true,
             validate: true,
-            populate: "extras",
+            populate: ["extras", "user"],
             ...params})
         if (r.status) {
             store.setState({rates: iupdate(store.state.rates, {$push: [r.body.data]})})
@@ -45,7 +45,7 @@ export const useCommissionRateStore = defineStore(
                 store.setState({options: [...d]})
             })
 
-            let b = CommissionRate.find({user:user._id}).populate("extras").lean().then((d) => {
+            let b = CommissionRate.find({user:user._id}).populate("extras").populate("user", "username").lean().then((d) => {
                 store.setState({rates: [...d]})
             })
 

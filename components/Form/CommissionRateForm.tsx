@@ -9,12 +9,13 @@ import { useUpdateDatabase, useDocument } from '@app/client/hooks/db';
 import { useUser } from '@hooks/user';
 import { comission_rate_schema, commission_extra_option_schema } from '@schema/commission'
 import useCommissionRateStore from '@store/commission';
-import { decimal128ToFloat } from '@utility/misc';
+import { Decimal128 } from 'bson';
+import { decimal128ToFloat, decimal128ToMoneyToString, stringToDecimal128 } from '@utility/misc';
 
 const { StringType, NumberType, BooleanType, ArrayType, ObjectType } = Schema.Types;
 
 interface RateOptionProps {
-    price: number
+    price: Decimal128
     title: string
     edit?: boolean
     editing?: boolean
@@ -36,14 +37,14 @@ const RateOption = (props: RateOptionProps) => {
             {editing &&
             <Grid fluid>
                 <Row>
-                    <Col xs={5}><span><InputNumber size="xs" defaultValue={props.price.toString()} onChange={(v) => set_price(v)} /></span></Col>
+                    <Col xs={5}><span><InputNumber size="xs" defaultValue={decimal128ToFloat(price).toString()} onChange={(v) => set_price(stringToDecimal128(v.toString()))} /></span></Col>
                     <Col xs={12}><span><Input size="xs" defaultValue={props.title} onChange={(v: string) => set_title(v)} /></span></Col>
                     <Col xs={3}><Button className="ml-2" size="xs" onClick={(ev) => {ev.preventDefault(); if(props.onUpdate && title){ props.onUpdate({title, price})} set_dirty(true); set_editing(false);}}>{t`Update`}</Button></Col>
                     <Col xs={4}><Button className="ml-2" size="xs" onClick={(ev) => {ev.preventDefault();  if(props.onCancel){ props.onCancel()} set_editing(false) }}>{t`Cancel`}</Button></Col>
                 </Row>
             </Grid>
             }
-            {!editing && <span>${props.price}</span>}
+            {!editing && <span>{decimal128ToMoneyToString(props.price)}</span>}
             {!editing && <span> - {props.title}</span>}
             {(props.edit && !editing) && <Button className="ml-2" size="xs" onClick={(ev) => {ev.preventDefault(); set_dirty(true); set_editing(true) }}>{t`Edit`}</Button>}
         </React.Fragment>
@@ -69,7 +70,7 @@ export const RateOptions = (props: RateOptionsProps) => {
             <FormControl name={props.name || "extras"} accepter={CheckboxGroup}>
             {
             state.options.map(({title, price, _id},index) => {
-                let opt = <RateOption edit={props.edit} price={decimal128ToFloat(price)} title={title} onUpdate={(v) => console.log(v)}/>
+                let opt = <RateOption edit={props.edit} price={price} title={title} onUpdate={(v) => console.log(v)}/>
                 if (props.checkbox) {
                    return (<Checkbox key={_id} value={_id} >{opt}</Checkbox>)
                 } else {
@@ -127,12 +128,12 @@ const CommissionRateForm = (props: Props) => {
     let form = (
         <Form fluid method="put" action="/api/update" formValue={form_value} model={rate_model} ref={ref => (set_form_ref(ref))} onChange={(value => set_form_value(value))}>
             <FormGroup>
-                    <ControlLabel>{t`Price`}:</ControlLabel>
-                    <FormControl fluid name="price" prefix="$" accepter={InputNumber} type="number" required />
-            </FormGroup>
-            <FormGroup>
                     <ControlLabel>{t`Title`}:</ControlLabel>
                     <FormControl fluid name="title" accepter={Input} type="text" required />
+            </FormGroup>
+            <FormGroup>
+                    <ControlLabel>{t`Price`}:</ControlLabel>
+                    <FormControl fluid name="price" prefix="$" accepter={InputNumber} type="number" required />
             </FormGroup>
             <FormGroup>
                     <ControlLabel>{t`Description`}:</ControlLabel>

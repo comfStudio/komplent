@@ -44,7 +44,6 @@ export const commission_extra_option_schema = new Schema({
     user: { 
         type: ObjectId, 
         ref: 'User',
-        select: false,
       },
   }, { timestamps: { createdAt: 'created', updatedAt: 'updated' } })
 
@@ -64,6 +63,5 @@ export const comission_rate_schema = new Schema({
     user: { 
         type: ObjectId, 
         ref: 'User',
-        select: false,
       },
   }, { timestamps: { createdAt: 'created', updatedAt: 'updated' } })

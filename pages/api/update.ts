@@ -40,7 +40,14 @@ export default cors(with_auth_middleware(async (req: ExApiRequest, res: ExApiRes
             }
             await doc.save()
             if (populate) {
-                await doc.populate(populate).execPopulate()
+                let p_array = populate
+                if (!Array.isArray(populate)) {
+                    p_array = [populate]
+                }
+                for (let p of p_array) {
+                    doc = doc.populate(p)
+                }
+                await doc.execPopulate()
             }
             res.status(code).json(data_message(doc.toJSON()))
         } else {

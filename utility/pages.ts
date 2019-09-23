@@ -7,7 +7,7 @@ export const make_profile_urlpart = (name: string) => {
 }
 
 export const make_profile_path = (user: {username:string}) => {
-    return `/${make_profile_urlpart(user.username)}`
+    return `/${make_profile_urlpart(user ? user.username : '')}`
 }
 
 export const get_profile_urlpart = (path: string) => {
