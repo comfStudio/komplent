@@ -1,4 +1,5 @@
 import mongoose, { Document, Model } from 'mongoose'
+import autopopulate from 'mongoose-autopopulate'
 
 const { Schema } = mongoose
 
@@ -38,15 +39,6 @@ export const user_schema = new Schema({
     ref: 'User'
   }],
   last_commissions_update: Date,
-  last_update: {
-    type: Date,
-    default: Date.now,
-  },
-  created: {
-    type: Date,
-    default: Date.now,
-    immutable: true
-  },
   profile: { 
     type: ObjectId, 
     ref: 'Profile'
@@ -61,7 +53,8 @@ export const user_schema = new Schema({
   }],
   settings: { 
     type: ObjectId, 
-    ref: 'UserSettings'
+    ref: 'UserSettings',
+    autopopulate: true
   },
   commission_rates: [
     { 
@@ -75,7 +68,10 @@ export const user_schema = new Schema({
       ref: 'Gallery'
     }
   ]
-})
+},{ timestamps: { createdAt: 'created', updatedAt: 'updated' } })
+
+user_schema.plugin(autopopulate)
+
 
 // user_schema.method({
 //   check_exists: async function(username: string = undefined, email: string = undefined) {
@@ -120,7 +116,7 @@ export const gallery_schema = new Schema({
     ref: 'Image'
   },
   url: String
-})
+}, { timestamps: { createdAt: 'created', updatedAt: 'updated' } })
 
 export const comission_rate_schema = new Schema({
   price: Decimal128,
@@ -129,7 +125,7 @@ export const comission_rate_schema = new Schema({
     ref: 'Image'
   },
   description: String,
-})
+}, { timestamps: { createdAt: 'created', updatedAt: 'updated' } })
 
 export const commission_stats_schema = new Schema({
   approval_rate: Number,
@@ -148,25 +144,28 @@ export const profile_schema = new Schema({
     ref: 'Image'
   },
   body: String,
-})
+}, { timestamps: { createdAt: 'created', updatedAt: 'updated' } })
 
 export const user_settings_schema = new Schema({
   color: String,
   display_currency: String,
   profile_currency: String,
-  commissions_open: Boolean,
+  commissions_open: {
+    type: Boolean,
+    default: false
+  },
   visibility: {
     type: String,
     enum : ['public','private', 'hidden'],
     default: 'private'
   },
-})
+}, { timestamps: { createdAt: 'created', updatedAt: 'updated' } })
 
 export const user_recommendation_schema = new Schema({
   description: String,
-})
+}, { timestamps: { createdAt: 'created', updatedAt: 'updated' } })
 
-export const store_schema = new Schema({
+export const user_store_schema = new Schema({
   user: { 
     type: ObjectId, 
     ref: 'User',

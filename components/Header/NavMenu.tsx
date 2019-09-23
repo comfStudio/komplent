@@ -31,11 +31,11 @@ export const NavMenu = (props: Props) => {
                 <MainSearch/>
             </Nav>
             <Nav activeKey={props.activeKey}>
-                    <Link href="/how" passHref>
-                        <Nav.Item eventKey="how" active={props.activeKey=='how'}>
-                            {t`How It Works`}
-                        </Nav.Item>
-                    </Link>
+                <Link href="/how" passHref>
+                    <Nav.Item eventKey="how" active={props.activeKey=='how'}>
+                        {t`How It Works`}
+                    </Nav.Item>
+                </Link>
                 <Link href="/discover" passHref>
                     <Nav.Item eventKey="discover" active={props.activeKey=='discover'}>
                             {t`Disover`}

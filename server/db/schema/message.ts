@@ -6,15 +6,11 @@ const { ObjectId } = mongoose.Schema.Types
 
 export const message_schema = new Schema({
     body: String,
-    created: {
-        type: Date,
-        default: Date.now,
-    },
     user: { 
         type: ObjectId, 
         ref: 'User'
     },
-})
+}, { timestamps: { createdAt: 'created', updatedAt: 'updated' } })
 
 export const conversation_schema = new Schema({
     subject: String,
@@ -22,10 +18,6 @@ export const conversation_schema = new Schema({
         type: String,
         enum : ['private','staff'],
         default: 'private'
-      },
-    created: {
-        type: Date,
-        default: Date.now,
       },
     users: [{ 
         type: ObjectId, 
@@ -41,4 +33,4 @@ export const conversation_schema = new Schema({
             ref: 'Attachment'
         }
     ]
-  })
+  }, { timestamps: { createdAt: 'created', updatedAt: 'updated' } })

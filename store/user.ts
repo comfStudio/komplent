@@ -10,7 +10,7 @@ import { is_server } from '@utility/misc'
 import { COOKIE_AUTH_TOKEN_KEY } from '@server/constants'
 import { get_jwt_data, get_jwt_user } from '@server/middleware'
 import { update_db } from '@app/client/db'
-import { store_schema } from '@schema/user'
+import { user_store_schema } from '@schema/user'
 
 export const fetch_user = async (cookies) => {
     if (cookies[COOKIE_AUTH_TOKEN_KEY]) {
@@ -122,7 +122,7 @@ export const useUserStore = defineStore(
     save: async (store) => {
         let state = {...store.state, user: store.state.current_user._id}
         delete state.current_user
-        return await update_db({model:'UserStore', data:state, schema:store_schema, validate:true, create:true})
+        return await update_db({model:'UserStore', data:state, schema:user_store_schema, validate:true, create:true})
     }
   },
   async (store) => {

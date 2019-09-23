@@ -10,6 +10,9 @@ import CommissionRateForm, { RateOptionsForm } from '@components/Form/Commission
 import './ProfileEdit.scss'
 import { useSessionStorage } from 'react-use';
 import useCommissionRateStore from '@store/commission';
+import { useSettings } from '@hooks/user';
+import { useUpdateDatabase } from '@hooks/db';
+import { user_settings_schema } from '@schema/user';
 
 
 export const Sections = () => {
@@ -36,10 +39,20 @@ export const ProfileColor = () => {
 }
 
 export const CommissionStatus = () => {
+
+    const [settings, update_settings] = useSettings()
+    
+    const value = (settings && settings.commissions_open) ? 'open' : 'closed'
+
     return (
         <EditGroup>
             <span className="mr-2">{t`Commission Status`}: </span>
-            <RadioGroup name="commission_status" inline appearance="picker" defaultValue="open">
+            <RadioGroup name="commission_status" inline appearance="picker" defaultValue={value} onChange={(v) => {
+                if (settings) {
+                    settings.commissions_open = v == 'open' ? true : false
+                    update_settings(settings)
+                }
+            }}>
             <Radio value="open">{t`Open`}</Radio>
             <Radio value="closed">{t`Closed`}</Radio>
             </RadioGroup>

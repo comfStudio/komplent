@@ -33,7 +33,7 @@ export default cors(with_auth_middleware(async (req: ExApiRequest, res: ExApiRes
         } else {
             doc = await m.findById(data._id)
         }
-        
+
         if (doc) {
             if (code !== CREATED) {
                 doc.set(data)
