@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Grid, Row, Col, Checkbox, CheckboxGroup, FormGroup, ControlLabel, Button, RadioGroup, Radio, TagPicker, List, SelectPicker, InputNumber, Form } from 'rsuite';
+import { Grid, Row, Col, Checkbox, CheckboxGroup, FormGroup, ControlLabel, Button, RadioGroup, Radio, TagPicker, List, SelectPicker, InputNumber, Form, Toggle } from 'rsuite';
 
 import { t } from '@app/utility/lang'
 import { CommissionCard, CommissionTiersRow } from '@components/Profile/ProfileCommission';
@@ -45,18 +45,25 @@ export const CommissionStatus = () => {
     const value = (settings && settings.commissions_open) ? 'open' : 'closed'
 
     return (
-        <EditGroup>
-            <span className="mr-2">{t`Commission Status`}: </span>
-            <RadioGroup name="commission_status" inline appearance="picker" defaultValue={value} onChange={(v) => {
-                if (settings) {
-                    settings.commissions_open = v == 'open' ? true : false
-                    update_settings(settings)
-                }
-            }}>
-            <Radio value="open">{t`Open`}</Radio>
-            <Radio value="closed">{t`Closed`}</Radio>
-            </RadioGroup>
-        </EditGroup>
+        <React.Fragment>
+            <EditGroup>
+                <span className="mr-2">{t`Commission Status`}: </span>
+                <RadioGroup name="commission_status" inline appearance="picker" defaultValue={value} onChange={(v) => {
+                    if (settings) {
+                        settings.commissions_open = v == 'open' ? true : false
+                        update_settings(settings)
+                    }
+                }}>
+                <Radio value="open">{t`Open`}</Radio>
+                <Radio value="closed">{t`Closed`}</Radio>
+                </RadioGroup>
+            </EditGroup>
+            {value === 'open' &&
+            <EditGroup >
+                <Checkbox name="auto_manage_status">{t`Automatically close or open when above or below the maximum amount of requests`}</Checkbox>
+            </EditGroup>
+            }
+        </React.Fragment>
     )
 }
 
@@ -77,6 +84,26 @@ export const Origin = () => {
     return (
     <EditGroup title={t`Origin` + ':'}>
         <SelectPicker data={[]} className="ml-2" style={{ width: 300 }}/>
+    </EditGroup>
+    )
+}
+
+export const CommissionLimit = () => {
+    return (
+    <EditGroup title={t`Maximum amount of on-going commissions` + ':'}>
+        <div className="w-32">
+            <InputNumber defaultValue="3"/>
+        </div>
+    </EditGroup>
+    )
+}
+
+export const CommissionRequestLimit = () => {
+    return (
+    <EditGroup title={t`Maximum amount of on-going requests` + ':'}>
+        <div className="w-32">
+            <InputNumber defaultValue="10"/>
+        </div>
     </EditGroup>
     )
 }
@@ -237,8 +264,10 @@ export const ProfileEdit = () => {
 
             <h3>{t`Commission`}</h3>
             <EditSection>
-                <DrawingList/>
+                <CommissionLimit/>
+                <CommissionRequestLimit/>
                 <ModificationNumber/>
+                <DrawingList/>
             </EditSection>
 
             <h4>{t`Extras`}</h4>

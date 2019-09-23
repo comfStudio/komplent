@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Panel, Row, Col, Grid, Input, Form, Uploader, Icon, Toggle, Schema, FormControl, RadioGroup, Radio, FormGroup } from 'rsuite'
+import { Button, Panel, Row, Col, Grid, Input, Form, Uploader, Icon, Toggle, Schema, FormControl, RadioGroup, Radio, FormGroup, Checkbox } from 'rsuite'
 import Link from 'next/link'
 import qs from 'qs'
 
@@ -9,7 +9,7 @@ import { HTMLElementProps, ReactProps } from '@utility/props'
 import './ProfileCommission.scss'
 import Placeholder from '@components/App/Placeholder';
 import Image from '@components/App/Image'
-import { useProfileContext } from '@hooks/user';
+import { useProfileContext, useProfileUser, useUser } from '@hooks/user';
 import { DrawingList } from '@app/components/Profile'
 import useCommissionRateStore from '@store/commission';
 import { decimal128ToFloat, moneyToString, stringToMoney, decimal128ToMoney, decimal128ToMoneyToString } from '@utility/misc';
@@ -34,15 +34,6 @@ export const CommissionButton = (props: HTMLElementProps) => {
                 {t`Request a Commission`}
             </Button>
         </Link>
-    );
-};
-
-export const SendRequestButton = (props: HTMLElementProps) => {
-    let cls = "commission-button"
-    return (
-        <Button type="submit" appearance="primary" size="lg" className={props.className ? cls + ' ' + props.className : cls}>
-            {t`Send request`}
-        </Button>
     );
 };
 
@@ -107,9 +98,13 @@ export const CommissionCard = (props: CommissionCardProps) => {
 };
 
 export const CommissionLinkCard = (props: CommissionCardProps) => {
+    const user = useUser()
     let c_user = props.data.user
-    let url = make_profile_path(c_user) + '/commission'
-    url += '?' + qs.stringify({selected:props.data._id})
+    let url = make_profile_path(c_user)
+    if (!user || !c_user || (user._id !== c_user._id)) {
+        url += '/commission'
+        url += '?' + qs.stringify({selected:props.data._id})
+    }
     
     return (
         <Link href={url}>
@@ -193,7 +188,7 @@ const commission_request_model = Schema.Model({
     commission_rate: StringType().isRequired(t`This field is required.`),
     extras: ArrayType(),
     description: StringType().isRequired(t`This field is required.`),
-    tos: BooleanType(),
+    tos: StringType().isRequired(t`This field is required.`),
   });
 
 
@@ -256,7 +251,8 @@ export const ProfileCommission = () => {
                 <Row>
                     <Col xs={24}>
                     <h3>{t`Describe your request`}</h3>
-                    <Input
+                    <FormControl
+                        name="description"
                         componentClass="textarea"
                         rows={3}
                         placeholder={t`Describe your request`}
@@ -270,11 +266,24 @@ export const ProfileCommission = () => {
                 <Row>
                     <h3>{t`Terms of Service`}</h3>
                     <Placeholder type="text" rows={4}/>
+                    <FormControl name="tos" value="true" accepter={Checkbox}>{t`I have read and agree to the terms of service`}</FormControl>
                 </Row>
                 <hr/>
                 <Row>
                     <Col xs={4}><TotalPriceDisplay>{moneyToString(total_price)}</TotalPriceDisplay></Col>
-                    <Col xs={4} xsPush={16}><SendRequestButton/></Col>
+                    <Col xs={4} xsPush={16}>
+                        <Button type="submit" appearance="primary" size="lg" loading={loading} className="commission-button" onClick={(ev) => {
+                            ev.preventDefault()
+                            if (form_ref && form_ref.check()) {
+                                set_loading(true)
+                                set_error(null)
+
+                                console.log(form_value)
+                            }
+                        }}>
+                            {t`Send request`}
+                        </Button>
+                    </Col>
                 </Row>
             </Grid>
         </Form>

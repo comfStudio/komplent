@@ -39,7 +39,7 @@ export const useSettings = () => {
     const update_settings = async (s) => {
         let r = await update("UserSettings", s)
         if (r.status) {
-            set_settings(s)
+            set_settings({...s})
         }
 
     }

@@ -49,6 +49,18 @@ export const RequireOwnProfile = () => {
   return null
 }
 
+export const RequireOwnProfileInverse = () => {
+  const { context : { profile_path, profile_owner } } = useProfileUser()
+
+  useEffect(() => {
+    if (profile_owner) {
+      Router.replace(profile_path)
+    }
+  }, [profile_owner])
+
+  return null
+}
+
 export const DrawingList = () => {
   return (
     <Grid fluid>
