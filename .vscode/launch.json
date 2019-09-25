@@ -13,6 +13,9 @@
             "url": "http://localhost:3500",
             "webRoot": "${workspaceFolder}",
             "sourceMaps":"client",
+            "profile": "Komplent",
+            "keepProfileChanges": true,
+            "showConsoleCallLocation": true,
             "pathMappings": [
                 {
                     "url": "webpack:///",

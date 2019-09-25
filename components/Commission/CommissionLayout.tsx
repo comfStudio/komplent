@@ -23,11 +23,11 @@ const CommissionMenu = (props: MenuProps) => {
             <Link href={pages.commission + `/${commission._id}`} passHref>
                 <Nav.Item eventKey="timeline" active={props.activeKey=='timeline'}>{t`Timeline`}</Nav.Item>
             </Link>
-            <Link href={pages.commission + `/${commission._id}/description`} passHref>
-                <Nav.Item eventKey="description" active={props.activeKey=='description'}>{t`Description`}</Nav.Item>
-            </Link>
             <Link href={pages.commission + `/${commission._id}/inbox`} passHref>
                 <Nav.Item eventKey="inbox" active={props.activeKey=='inbox'}>{t`Messages`}</Nav.Item>
+            </Link>
+            <Link href={pages.commission + `/${commission._id}/description`} passHref>
+                <Nav.Item eventKey="description" active={props.activeKey=='description'}>{t`Description`}</Nav.Item>
             </Link>
             <Link href={pages.commission + `/${commission._id}/products`} passHref>
                 <Nav.Item eventKey="products" active={props.activeKey=='products'}>{t`Products`}</Nav.Item>

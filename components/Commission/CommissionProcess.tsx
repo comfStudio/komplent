@@ -7,7 +7,7 @@ import { useCommissionStore } from '@store/commission';
 import { t } from '@utility/lang'
 import { capitalizeFirstLetter } from '@utility/misc';
 import { useUser } from '@hooks/user';
-import { ButtonToolbar, Button } from 'rsuite';
+import { ButtonToolbar, Button, Grid, Row, Col } from 'rsuite';
 
 interface ProcessProps {
     is_owner: boolean,
@@ -88,14 +88,28 @@ const Cancelled = (props: ProcessProps) => {
 
 const Completed = (props: ProcessProps) => {
 
+    const finished = props.commission ? props.commission.finished : false
+    const completed = props.commission ? props.commission.completed : false
+
+    let end_date = props.commission && props.commission.end_date ? toDate(new Date(commission.end_date)) : null
+
     return (
         <React.Fragment>
-            <TimelineTitle date={new Date()}>
+            <TimelineTitle date={completed && end_date ? end_date : undefined}>
             {t`Complete`}
             </TimelineTitle>
             <TimelinePanel>
-                <p>{t`Commission request was completed`}</p>
-                {props.is_owner && <p>{t`Please check the Products section for your product(s)`}</p>}
+                {completed &&
+                <React.Fragment>
+                    <p>{t`Commission request was completed`}</p>
+                    {props.is_owner && <p>{t`Please check the Products section for your product(s)`}</p>}
+                </React.Fragment>
+                }
+                {!completed &&
+                <React.Fragment>
+                    <p>{t`The commission request has not been completed yet`}</p>
+                </React.Fragment>
+                }
             </TimelinePanel>
         </React.Fragment>
     )
@@ -109,6 +123,10 @@ const CommissionProcess = () => {
     let commission = actions.get_commission()
     let is_owner = user._id === commission.from_user._id
     let start_date = toDate(commission ? new Date(commission.created) : new Date())
+    let end_date = commission && commission.end_date ? toDate(new Date(commission.end_date)) : null
+
+    let first_stage = commission ? commission.phases[0] : null
+    let latest_stage = commission ? commission.stage : null
 
 
     return (
@@ -137,15 +155,29 @@ const CommissionProcess = () => {
                 <CommissionTimelineItem>
                     <Completed is_owner={is_owner} commission={commission}/>
                 </CommissionTimelineItem>
+                {!!end_date &&
                 <CommissionTimelineItem>
-                    {capitalizeFirstLetter(formatDistanceToNow(start_date, {addSuffix: true}))} <span className="muted">({format(start_date, "yyyy-MM-dd - HH:mm:ss")})</span>
+                    <TimelineTitle date={end_date}>
+                        {capitalizeFirstLetter(formatDistanceToNow(end_date, {addSuffix: true}))}
+                    </TimelineTitle>
                 </CommissionTimelineItem>
+                }
             </CommissionTimeline>
-            <ButtonToolbar className="my-5">
-                <Button color="green">{t`Mark as completed`}</Button>
-                <Button color="yellow">{t`Cancel`}</Button>
-                {is_owner && <Button>{t`Nudge`}</Button>}
-            </ButtonToolbar>
+            <Grid fluid className="my-5">
+                <Row>
+                    <Col xs={12}>
+                    <ButtonToolbar>
+                        {is_owner && <Button>{t`Nudge`}</Button>}
+                        <Button disabled color="green">{t`Mark as completed`}</Button>
+                    </ButtonToolbar>
+                    </Col>
+                    <Col xsOffset={10} xs={2}>
+                    <ButtonToolbar>
+                        <Button className="ml-3" color="yellow">{t`Cancel`}</Button>
+                    </ButtonToolbar>
+                    </Col>
+                </Row>
+            </Grid>
         </div>
     );
 };

@@ -1,5 +1,4 @@
 import mongoose, { Document, Model } from 'mongoose'
-import autopopulate from 'mongoose-autopopulate'
 
 const { Schema } = mongoose
 
@@ -69,8 +68,6 @@ export const user_schema = new Schema({
     }
   ]
 },{ timestamps: { createdAt: 'created', updatedAt: 'updated' } })
-
-user_schema.plugin(autopopulate)
 
 
 // user_schema.method({

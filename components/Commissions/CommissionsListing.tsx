@@ -30,18 +30,18 @@ const CommissionsListing = () => {
     return (
         <Grid fluid>
             <Row>
-                <h4>{t`On-going commissions`}</h4>
-                <Col xs={24}>
-                <List hover bordered>
-                    {items(state.commissions.filter(({to_user}) => to_user._id === user._id).map(d => {return {...d, owner:false}}))}
-                </List>
-                </Col>
-            </Row>
-            <Row>
                 <h4>{t`Commissions started by you`}</h4>
                 <Col xs={24}>
                 <List hover bordered>
                     {items(state.commissions.filter(({from_user}) => from_user._id === user._id).map(d => {return {...d, owner:true}}))}
+                </List>
+                </Col>
+            </Row>
+            <Row>
+                <h4>{t`On-going commissions`}</h4>
+                <Col xs={24}>
+                <List hover bordered>
+                    {items(state.commissions.filter(({to_user}) => to_user._id === user._id).map(d => {return {...d, owner:false}}))}
                 </List>
                 </Col>
             </Row>

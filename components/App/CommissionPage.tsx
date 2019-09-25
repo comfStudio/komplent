@@ -34,7 +34,12 @@ class CommissionPage extends AuthPage<Props> {
         if (commission_id) {
             if (is_server()) {
                 try {
-                    commissionStoreState.commission = await Commission.findById(commission_id).populate("from_user").populate("to_user").lean()
+                    commissionStoreState.commission = await Commission.findById(commission_id)
+                        .populate("from_user")
+                        .populate("to_user")
+                        .populate("stage")
+                        .populate("phases")
+                        .lean()
                 } catch (err) {
                     null
                 }

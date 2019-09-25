@@ -8,15 +8,11 @@ export const commission_schema = new Schema({
     from_title: String,
     to_title: String,
     body: String,
-    limit_date: Date,
-    complete_date: Date,
-    completed: { type: Boolean, default: false},
+    expire_date: Date,
+    end_date: Date,
+    finished: { type: Boolean, default: false}, // commission has finished, could be cancelled
+    completed: { type: Boolean, default: false}, // commission was completed successfully
     accepted: { type: Boolean, default: false},
-    stage: {
-        type: String,
-        enum : ['pending','pending_first_payment', 'pending_product', 'pending_last_payment', 'complete'],
-        default: 'pending'
-      },
     from_user: { 
         type: ObjectId, 
         ref: 'User',
@@ -33,7 +29,11 @@ export const commission_schema = new Schema({
             ref: 'Attachment'
         }
     ],
-}, { timestamps: { createdAt: 'created', updatedAt: 'updated' } })
+}, {
+    timestamps: { createdAt: 'created', updatedAt: 'updated' },
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+ })
 
 commission_schema.statics.find_related = async function(user, populate = true) {
     if (user) {
@@ -53,6 +53,40 @@ commission_schema.statics.find_related = async function(user, populate = true) {
     }
     return null
 }
+
+commission_schema.virtual("stage", {
+    ref: "CommissionPhase",
+    localField: "_id",
+    foreignField: "commission",
+    justOne: true,
+    options: { sort: { created: -1 } },
+})
+
+commission_schema.virtual("phases", {
+    ref: "CommissionPhase",
+    localField: "_id",
+    foreignField: "commission",
+    justOne: false,
+    options: { sort: { created: 1 } },
+})
+
+export const commission_phase_schema = new Schema({
+    type:{
+        type: String,
+        enum : ['pending_approval','pending_payment', 'pending_product', 'complete', 'cancel', 'reopen'],
+        required: true,
+      },
+    title: String,
+    done: {
+        type: Boolean,
+        default: true
+    },
+    commission: { 
+        type: ObjectId, 
+        ref: 'Commission',
+      },
+    done_date: Date,
+  }, { timestamps: { createdAt: 'created', updatedAt: 'updated' } })
 
 export const commission_extra_option_schema = new Schema({
     title: String,
