@@ -167,7 +167,7 @@ const CommissionProcess = () => {
                 <Row>
                     <Col xs={12}>
                     <ButtonToolbar>
-                        {is_owner && <Button>{t`Nudge`}</Button>}
+                        {is_owner && <Button appearance="default">{t`Nudge`}</Button>}
                         <Button disabled color="green">{t`Mark as completed`}</Button>
                     </ButtonToolbar>
                     </Col>

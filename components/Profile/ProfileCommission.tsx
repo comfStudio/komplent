@@ -188,7 +188,7 @@ const commission_request_model = Schema.Model({
     from_title: StringType().isRequired(t`This field is required.`),
     commission_rate: StringType().isRequired(t`This field is required.`),
     extras: ArrayType(),
-    description: StringType().isRequired(t`This field is required.`),
+    body: StringType().isRequired(t`This field is required.`),
     tos: StringType().isRequired(t`This field is required.`),
   });
 
@@ -272,7 +272,7 @@ export const ProfileCommission = () => {
                     <FormGroup>
                         <ControlLabel>{t`Please describe your request`}:</ControlLabel>
                         <FormControl
-                            name="description"
+                            name="body"
                             componentClass="textarea"
                             rows={3}
                             placeholder={t`Describe your request`}

@@ -16,8 +16,12 @@ export const conversation_schema = new Schema({
     subject: String,
     type: {
         type: String,
-        enum : ['private','staff'],
+        enum : ['private','staff', 'commission'],
         default: 'private'
+      },
+    commission: { 
+        type: ObjectId, 
+        ref: 'Commission'
       },
     users: [{ 
         type: ObjectId, 
