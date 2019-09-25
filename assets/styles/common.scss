@@ -7,6 +7,11 @@
     background: linear-gradient(0deg, rgba(255,255,255,0) 0%, rgba(0,0,0,0.5) 100%);  
 }
 
+.unstyled, .unstyled:hover {
+  color: unset;
+  text-decoration: unset;
+}
+
 blockquote {
     background: rgba(0,0,0,0.03);
     border-left: 0.3em solid rgba(0,0,0,0.25);
@@ -74,7 +79,7 @@ hr.line {
   text-align: center;
 }
 
-.subtext {
+.subtext, .muted {
   @apply text-secondary-light;
 }
 

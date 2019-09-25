@@ -8,7 +8,7 @@ import { t } from '@app/utility/lang'
 import { useUpdateDatabase, useDocument } from '@app/client/hooks/db';
 import { useUser } from '@hooks/user';
 import { comission_rate_schema, commission_extra_option_schema } from '@schema/commission'
-import useCommissionRateStore from '@store/commission';
+import { useCommissionRateStore } from '@store/commission';
 import { Decimal128 } from 'bson';
 import { decimal128ToFloat, decimal128ToMoneyToString, stringToDecimal128 } from '@utility/misc';
 
@@ -57,6 +57,7 @@ interface RateOptionsProps {
     new?: boolean
     name?: string
     checkbox?: boolean
+    options?: Array<string>
 }
 
 export const RateOptions = (props: RateOptionsProps) => {
@@ -64,12 +65,13 @@ export const RateOptions = (props: RateOptionsProps) => {
     const [new_option, set_new_option] = useState(false)
     const [state, actions] = useCommissionRateStore()
     const user = useUser()
+    const options = props.options ? props.options : state.options.map(({_id}) => _id)
 
     return (
         <List className="" bordered={props.bordered}>
             <FormControl name={props.name || "extras"} accepter={CheckboxGroup}>
             {
-            state.options.map(({title, price, _id},index) => {
+            state.options.filter(({_id}) => options.includes(_id)).map(({title, price, _id},index) => {
                 let opt = <RateOption edit={props.edit} price={price} title={title} onUpdate={(v) => console.log(v)}/>
                 if (props.checkbox) {
                    return (<Checkbox key={_id} value={_id} >{opt}</Checkbox>)
@@ -123,7 +125,6 @@ const CommissionRateForm = (props: Props) => {
     })
     const [error, set_error] = useState(null)
     const [loading, set_loading] = useState(false)
-
 
     let form = (
         <Form fluid method="put" action="/api/update" formValue={form_value} model={rate_model} ref={ref => (set_form_ref(ref))} onChange={(value => set_form_value(value))}>

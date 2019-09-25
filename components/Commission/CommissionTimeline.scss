@@ -1,0 +1,33 @@
+.timeline-panel {
+    @apply border;
+    @apply rounded-sm;
+    position: relative;
+    margin-top: 0.9em;
+    padding: 1em;
+    border-color: rgba(0, 0, 0, 0.2);
+}
+
+.timeline-panel:after,
+.timeline-panel:before {
+    bottom: 100%;
+    border: solid transparent;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+    left: 2em;
+}
+
+.timeline-panel:after {
+    border-bottom-color: #ffffff;
+    border-width: 0.65em;
+    margin-left: -0.64em;
+}
+
+.timeline-panel:before {
+    border-color: rgba(113, 158, 206, 0);
+    border-bottom-color: rgba(0, 0, 0, 0.2);
+    border-width: .75em;
+    margin-left: -.75em;
+  }

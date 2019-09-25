@@ -9,7 +9,7 @@ import { get_profile_id, make_profile_path } from '@utility/pages'
 import { User } from '@db/models'
 import { IUser } from '@schema/user'
 import { is_server } from '@utility/misc';
-import useCommissionRateStore from '@store/commission';
+import { useCommissionRateStore } from '@store/commission';
 import { initializeStore } from '@app/store'
 
 

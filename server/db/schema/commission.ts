@@ -5,6 +5,8 @@ const { Schema } = mongoose
 const { ObjectId, Mixed, Decimal128 } = mongoose.Schema.Types
 
 export const commission_schema = new Schema({
+    from_title: String,
+    to_title: String,
     body: String,
     limit_date: Date,
     complete_date: Date,
@@ -15,12 +17,12 @@ export const commission_schema = new Schema({
         enum : ['pending','pending_first_payment', 'pending_product', 'pending_last_payment', 'complete'],
         default: 'pending'
       },
-    requesting: { 
+    from_user: { 
         type: ObjectId, 
         ref: 'User',
         required: true,
     },
-    requester: { 
+    to_user: { 
         type: ObjectId, 
         ref: 'User',
         required: true,
@@ -32,6 +34,25 @@ export const commission_schema = new Schema({
         }
     ],
 }, { timestamps: { createdAt: 'created', updatedAt: 'updated' } })
+
+commission_schema.statics.find_related = async function(user, populate = true) {
+    if (user) {
+      const search = (q) => {
+          let s = this.find(q)
+          if (populate) {
+              s = s.populate("from_user").populate("to_user")
+          }
+          return s
+      }
+      let r = await search({from_user: user})
+      if (!r || !r.length) {
+        r = await search({to_user: user})
+      }
+      if (r)
+        return r
+    }
+    return null
+}
 
 export const commission_extra_option_schema = new Schema({
     title: String,

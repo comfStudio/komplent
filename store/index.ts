@@ -14,7 +14,7 @@ export const defineStore = (initialState: object, actions?: object, initializer?
     }
 
     let store = null
-    let r = useGlobalHook({ React, initialState, actions, initializer: (s) => {store = s; initializer(s) } });
+    let r = useGlobalHook({ React, initialState, actions, initializer: (s) => {store = s; initializer ? initializer(s) : null } });
     r['store'] = store
     r['actions'] = store.actions
     r['initialized'] = false

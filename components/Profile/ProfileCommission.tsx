@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Panel, Row, Col, Grid, Input, Form, Uploader, Icon, Toggle, Schema, FormControl, RadioGroup, Radio, FormGroup, Checkbox } from 'rsuite'
+import { Button, Panel, Row, Col, Grid, Input, Form, Uploader, Icon, Toggle, Schema, FormControl, RadioGroup, Radio, FormGroup, Checkbox, Message, ControlLabel } from 'rsuite'
 import Link from 'next/link'
 import qs from 'qs'
 
@@ -11,12 +11,12 @@ import Placeholder from '@components/App/Placeholder';
 import Image from '@components/App/Image'
 import { useProfileContext, useProfileUser, useUser } from '@hooks/user';
 import { DrawingList } from '@app/components/Profile'
-import useCommissionRateStore from '@store/commission';
+import { useCommissionRateStore, useCommissionStore } from '@store/commission';
 import { decimal128ToFloat, moneyToString, stringToMoney, decimal128ToMoney, decimal128ToMoneyToString } from '@utility/misc';
+import * as pages from '@utility/pages';
 import { make_profile_path } from '@utility/pages';
 import { useRouter } from 'next/router';
 import { RateOptions } from '@components/Form/CommissionRateForm';
-import { Decimal128 } from 'bson';
 
 const { StringType, NumberType, BooleanType, ArrayType, ObjectType } = Schema.Types;
 
@@ -185,6 +185,7 @@ const Attachments = (props) => {
 }
 
 const commission_request_model = Schema.Model({
+    from_title: StringType().isRequired(t`This field is required.`),
     commission_rate: StringType().isRequired(t`This field is required.`),
     extras: ArrayType(),
     description: StringType().isRequired(t`This field is required.`),
@@ -197,24 +198,37 @@ export const ProfileCommission = () => {
 
     const selected_rate = router.query.selected || ''
 
+    const from_user = useUser()
     const [form_ref, set_form_ref] = useState(null)
     const [form_value, set_form_value] = useState({
         commission_rate: selected_rate || undefined
     })
     const [error, set_error] = useState(null)
     const [loading, set_loading] = useState(false)
-
+    
+    const [commission_state, commission_actions] = useCommissionStore()
     const [state, actions] = useCommissionRateStore()
+
+    let selected_rate_obj = null
 
     let total_price = stringToMoney("0.0")
 
     if (form_value.commission_rate) {
         for (let c of state.rates) {
             if (c._id === form_value.commission_rate) {
+                selected_rate_obj = c
                 total_price = total_price.add(decimal128ToMoney(c.price))
                 break
             }
         }
+    }
+
+    let available_options = []
+    let to_user = null
+
+    if (selected_rate_obj) {
+        available_options = selected_rate_obj.extras.map(({_id}) => _id)
+        to_user = selected_rate_obj.user
     }
 
     if (form_value.extras) {
@@ -240,7 +254,7 @@ export const ProfileCommission = () => {
                 <hr/>
                 <Row>
                     <Col xs={24}>
-                        <RateOptions checkbox/>
+                        <RateOptions options={available_options} checkbox/>
                     </Col>
                 </Row>
                 <hr/>
@@ -251,12 +265,19 @@ export const ProfileCommission = () => {
                 <Row>
                     <Col xs={24}>
                     <h3>{t`Describe your request`}</h3>
-                    <FormControl
-                        name="description"
-                        componentClass="textarea"
-                        rows={3}
-                        placeholder={t`Describe your request`}
-                        />
+                    <FormGroup>
+                        <ControlLabel>{t`Title`}:</ControlLabel>
+                        <FormControl fluid name="from_title" accepter={Input} type="text" required />
+                    </FormGroup>
+                    <FormGroup>
+                        <ControlLabel>{t`Please describe your request`}:</ControlLabel>
+                        <FormControl
+                            name="description"
+                            componentClass="textarea"
+                            rows={3}
+                            placeholder={t`Describe your request`}
+                            />
+                    </FormGroup>
                     </Col>
                 </Row>
                 <Row>
@@ -270,15 +291,36 @@ export const ProfileCommission = () => {
                 </Row>
                 <hr/>
                 <Row>
+                    <Col xs={24}>
+                    {!!error && <Message type="error" description={error} />}
+                    {!!error && <hr/>}
+                    </Col>
+                </Row>
+                <Row>
                     <Col xs={4}><TotalPriceDisplay>{moneyToString(total_price)}</TotalPriceDisplay></Col>
                     <Col xs={4} xsPush={16}>
-                        <Button type="submit" appearance="primary" size="lg" loading={loading} className="commission-button" onClick={(ev) => {
+                        <Button type="submit" appearance="primary" size="lg" loading={loading} className="commission-button" onClick={async (ev) => {
                             ev.preventDefault()
                             if (form_ref && form_ref.check()) {
                                 set_loading(true)
                                 set_error(null)
+                                let data = {
+                                    ...form_value,
+                                    extras: form_value.extras.filter(i => available_options.includes(i)),
+                                    from_user: from_user._id,
+                                    to_user: to_user._id
+                                }
 
-                                console.log(form_value)
+                                let r = await commission_actions.create_commission(data).then(r => {
+                                    set_loading(false)
+                                    return r
+                                })
+
+                                if (r.status) {
+                                    router.push(pages.commission + `/${r.body.data._id}`)
+                                } else {
+                                    set_error(r.body.error)
+                                }
                             }
                         }}>
                             {t`Send request`}

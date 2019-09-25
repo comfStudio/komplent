@@ -1,6 +1,7 @@
 export const dashboard = "/dashboard"
 export const home = "/"
 export const login = "/login"
+export const commission = "/commission"
 
 export const make_profile_urlpart = (name: string) => {
     return `@${name}`

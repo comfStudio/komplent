@@ -1,8 +1,8 @@
 import React from 'react';
 import { Nav } from 'rsuite';
+import Link from 'next/link';
 
 import { t } from '@app/utility/lang'
-import Link from 'next/link';
 
 interface Props {
     activeKey?: string

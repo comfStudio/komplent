@@ -1,8 +1,40 @@
 import { defineStore, bootstrapStoreDev } from '@app/store'
 import { update_db } from '@app/client/db'
-import { comission_rate_schema, commission_extra_option_schema } from '@schema/commission'
+import { comission_rate_schema, commission_extra_option_schema, commission_schema } from '@schema/commission'
 import { iupdate, is_server } from '@utility/misc'
 import { CommissionExtraOption, CommissionRate } from '@db/models';
+
+export const useCommissionStore = defineStore(
+    {
+        commission: undefined,
+    },
+    {
+        get_commission(store) {
+            return store.state.commission || {}
+        },
+        async create_commission(store, data, ...params) {
+            let r = await update_db({
+                model:'Commission',
+                data:data,
+                schema:commission_schema,
+                create: true,
+                validate: true,
+                ...params})
+            if (r.status) {
+                store.setState({commission: r.body.data})
+            }
+            return r
+          },
+    },
+)
+
+export const useCommissionsStore = defineStore(
+    {
+        commissions: undefined,
+    },
+    {
+    }
+)
 
 export const useCommissionRateStore = defineStore(
   {
@@ -62,4 +94,3 @@ export const useCommissionRateStore = defineStore(
   }
   );
 
-export default useCommissionRateStore;

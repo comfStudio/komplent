@@ -48,3 +48,7 @@ export const decimal128ToMoneyToString = (d: Decimal128) => {
 export const moneyToString = (d) => {
     return d.toFormat('$0,0.00')
 }
+
+export const capitalizeFirstLetter = (string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
