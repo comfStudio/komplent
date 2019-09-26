@@ -1,9 +1,9 @@
 import React from 'react';
 
-import AuthPage from '@components/App/AuthPage'
+import CommissionsPage from '@components/App/CommissionsPage'
 import CommissionsLayout from '@components/Commissions/CommissionsLayout'
 
-class RequestsPage extends AuthPage {
+class RequestsPage extends CommissionsPage {
     render() {
         return this.renderPage(
         <CommissionsLayout activeKey="requests">

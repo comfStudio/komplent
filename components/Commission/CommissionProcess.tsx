@@ -127,6 +127,7 @@ const CommissionProcess = () => {
 
     let first_stage = commission ? commission.phases[0] : null
     let latest_stage = commission ? commission.stage : null
+    let phases = commission ? commission.phases : []
 
 
     return (
@@ -137,24 +138,34 @@ const CommissionProcess = () => {
                         {capitalizeFirstLetter(formatDistanceToNow(start_date, {addSuffix: true}))}
                     </TimelineTitle>
                 </CommissionTimelineItem>
-                <CommissionTimelineItem>
-                    <PendingApproval is_owner={is_owner} commission={commission}/>
-                </CommissionTimelineItem>
-                <CommissionTimelineItem>
-                    <PendingPayment is_owner={is_owner} commission={commission}/>
-                </CommissionTimelineItem>
-                <CommissionTimelineItem>
-                    <PendingProduct is_owner={is_owner} commission={commission}/>
-                </CommissionTimelineItem>
-                <CommissionTimelineItem>
-                    <PendingPayment is_owner={is_owner} commission={commission}/>
-                </CommissionTimelineItem>
-                <CommissionTimelineItem>
-                    <Cancelled is_owner={is_owner} commission={commission}/>
-                </CommissionTimelineItem>
-                <CommissionTimelineItem>
-                    <Completed is_owner={is_owner} commission={commission}/>
-                </CommissionTimelineItem>
+                {phases.map((phase) => {
+                    switch(phase.type) {
+                        case 'pending_approval':
+                            return (
+                            <CommissionTimelineItem>
+                                <PendingApproval is_owner={is_owner} commission={commission}/>
+                            </CommissionTimelineItem>
+                            )
+                        default:
+                            null
+                            // <CommissionTimelineItem>
+                            //     <PendingPayment is_owner={is_owner} commission={commission}/>
+                            // </CommissionTimelineItem>
+                            // <CommissionTimelineItem>
+                            //     <PendingProduct is_owner={is_owner} commission={commission}/>
+                            // </CommissionTimelineItem>
+                            // <CommissionTimelineItem>
+                            //     <PendingPayment is_owner={is_owner} commission={commission}/>
+                            // </CommissionTimelineItem>
+                            // <CommissionTimelineItem>
+                            //     <Cancelled is_owner={is_owner} commission={commission}/>
+                            // </CommissionTimelineItem>
+                            // <CommissionTimelineItem>
+                            //     <Completed is_owner={is_owner} commission={commission}/>
+                            // </CommissionTimelineItem>
+                    }
+                })
+                }
                 {!!end_date &&
                 <CommissionTimelineItem>
                     <TimelineTitle date={end_date}>

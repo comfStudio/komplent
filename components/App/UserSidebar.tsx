@@ -4,7 +4,7 @@ import { Grid, Col, Row, Divider } from 'rsuite';
 import {NavUserSidebar} from '@components/Header/NavUser'
 import { Avatar } from '@components/Profile/ProfileHeader'
 import { ProfileNameTag } from '@components/Profile'
-import { useProfileUser, useUser } from '@hooks/user'
+import useUserStore from '@store/user';
 
 import { t } from '@app/utility/lang'
 
@@ -15,7 +15,8 @@ interface Props {
 }
 
 const UserSidebar = (props: Props) => {
-    const user = useUser()
+    const [state, actions] = useUserStore()
+    const user = state.current_user
     return (
         <Grid fluid className="user-sidebar animate-width">
             <Row>
@@ -28,11 +29,11 @@ const UserSidebar = (props: Props) => {
             </Row>
             <Row>
                 <Col xs={12} className="text-center stat-info">
-                    <strong className="text-primary">3</strong>
+                    <strong className="text-primary">{state.active_commissions_count}</strong>
                     <small>{t`Commissions`}</small>
                 </Col>
                 <Col xs={12} className="text-center stat-info">
-                    <strong className="text-primary">30</strong>
+                    <strong className="text-primary">{state.active_requests_count}</strong>
                     <small>{t`Requests`}</small>
                 </Col>
             </Row>

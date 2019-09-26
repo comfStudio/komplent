@@ -5,7 +5,7 @@ import Router from 'next/router'
 import { Types } from 'mongoose'
 
 import { initializeStore } from '@app/store'
-import { UserStore } from '@db/models'
+import { UserStore, Commission } from '@db/models'
 import useUserStore, { fetch_user } from '@store/user'
 import { is_server } from '@utility/misc'
 import { LoginContext } from '@client/context'
@@ -45,6 +45,9 @@ export class AuthPage<T extends Props = Props> extends Component<T> {
         let c = cookies.get(ctx)
         let current_user = await fetch_user(c)
 
+        let active_commissions_count = 0
+        let active_requests_count = 0
+
         let user_store = {}
         if (current_user && is_server()) {
             let r = await UserStore.findOne({user:Types.ObjectId(current_user._id)}).lean()
@@ -52,6 +55,16 @@ export class AuthPage<T extends Props = Props> extends Component<T> {
                 user_store = r
                 delete user_store.user
             }
+
+            let comms = await Commission.find_related(current_user._id, {only_active: true})
+            for (let c of comms) {
+                if (c.accepted) {
+                    active_commissions_count += 1
+                } else {
+                    active_requests_count += 1
+                }
+            }
+
         }
 
         
@@ -59,6 +72,8 @@ export class AuthPage<T extends Props = Props> extends Component<T> {
             current_user,
             logged_in: !!current_user,
             has_selected_usertype: false,
+            active_commissions_count,
+            active_requests_count,
             ...user_store
         }
         

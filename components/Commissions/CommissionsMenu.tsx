@@ -3,12 +3,16 @@ import { Nav } from 'rsuite';
 import Link from 'next/link';
 
 import { t } from '@app/utility/lang'
+import { useCommissionsStore } from '@store/commission';
 
 interface Props {
     activeKey?: string
 }
 
 const CommissionsMenu = (props: Props) => {
+
+    const [state, actions] = useCommissionsStore()
+
     return (
         <Nav appearance="subtle" activeKey={props.activeKey}>
             <Link href="/commissions/" passHref>

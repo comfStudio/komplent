@@ -31,6 +31,8 @@ interface UserStoreState {
     current_user: object,
     logged_in: boolean,
     has_selected_usertype: boolean
+    active_commissions_count: number
+    active_requests_count: number
 }
 
 interface UserStoreActions {
@@ -46,6 +48,8 @@ export const useUserStore = defineStore(
       current_user: undefined,
       logged_in: undefined,
       has_selected_usertype: undefined,
+      active_commissions_count: 0,
+      active_requests_count: 0,
   } as UserStoreState,
   {
     login: async (store, data, redirect: boolean | string = false) => {

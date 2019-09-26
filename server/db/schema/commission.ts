@@ -10,7 +10,7 @@ export const commission_schema = new Schema({
     body: String,
     expire_date: Date,
     end_date: Date,
-    finished: { type: Boolean, default: false}, // commission has finished, could be cancelled
+    finished: { type: Boolean, default: false}, // commission has finished, could be cancelled or expired
     completed: { type: Boolean, default: false}, // commission was completed successfully
     accepted: { type: Boolean, default: false},
     from_user: { 
@@ -35,12 +35,18 @@ export const commission_schema = new Schema({
     toObject: { virtuals: true },
  })
 
-commission_schema.statics.find_related = async function(user, populate = true) {
+commission_schema.statics.find_related = async function(user, {populate = true, only_active = false, lean = true} = {}) {
     if (user) {
       const search = (q) => {
           let s = this.find(q)
           if (populate) {
               s = s.populate("from_user").populate("to_user")
+          }
+          if (only_active) {
+              s = s.where("finished").equals(false)
+          }
+          if (lean) {
+              s = s.lean()
           }
           return s
       }
