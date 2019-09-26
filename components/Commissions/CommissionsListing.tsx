@@ -7,7 +7,39 @@ import { t } from '@utility/lang'
 import { useUser } from '@hooks/user';
 import * as pages from '@utility/pages';
 
-const CommissionsListing = () => {
+export const RequestListing = () => {
+    const user = useUser()
+    const [state, actions] = useCommissionsStore()
+
+    const items = (comms) => comms.map(({_id, owner, from_title, to_title}) => {
+
+        const title = owner ? from_title : to_title ? to_title : from_title
+
+        return (
+            <Link key={_id} href={pages.commission + `/${_id}`}>
+                <a className="unstyled">
+                    <List.Item key={_id}>
+                        {title}
+                    </List.Item>
+                </a>
+            </Link>
+        )
+    })
+
+    return (
+        <Grid fluid className="mt-5">
+            <Row>
+                <Col xs={24}>
+                <List hover bordered>
+                    {items(state.commissions.filter(({to_user, accepted}) => to_user._id === user._id && !accepted).map(d => {return {...d, owner:false}}))}
+                </List>
+                </Col>
+            </Row>
+        </Grid>
+    );
+}
+
+export const CommissionsListing = () => {
 
     const user = useUser()
     const [state, actions] = useCommissionsStore()
@@ -41,7 +73,7 @@ const CommissionsListing = () => {
                 <h4>{t`On-going commissions`}</h4>
                 <Col xs={24}>
                 <List hover bordered>
-                    {items(state.commissions.filter(({to_user}) => to_user._id === user._id).map(d => {return {...d, owner:false}}))}
+                    {items(state.commissions.filter(({to_user, accepted}) => to_user._id === user._id && accepted).map(d => {return {...d, owner:false}}))}
                 </List>
                 </Col>
             </Row>
