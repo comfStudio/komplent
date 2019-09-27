@@ -112,7 +112,7 @@ module.exports = withConfig(
             reportFilename: './bundles/client.html',
           },
         }
-        }, [PHASE_DEVELOPMENT_BUILD]]
+        }]
     ],
     {
     poweredByHeader: false,

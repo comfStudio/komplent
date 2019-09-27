@@ -3,6 +3,7 @@ import { update_db } from '@app/client/db'
 import { comission_rate_schema, commission_extra_option_schema, commission_schema } from '@schema/commission'
 import { iupdate, is_server } from '@utility/misc'
 import { CommissionExtraOption, CommissionRate } from '@db/models';
+import { fetch } from '@utility/request';
 
 export const useCommissionStore = createStore(
     {
@@ -69,27 +70,47 @@ export const useCommissionRateStore = createStore(
     },
     async load(user) {
 
+        let state = {
+            options: [],
+            rates: []
+        }
+
+        let a, b
+
+        let extra_option_q = {user:user._id}
+
+        let rate_q = {user:user._id}
+
         if (is_server()) {
 
-            let state = {
-                options: [],
-                rates: []
-            }
-
-            let a = CommissionExtraOption.find({user:user._id}).lean().then((d) => {
+            a = CommissionExtraOption.find(extra_option_q).lean().then((d) => {
                 state.options = [...d]
             })
 
-            let b = CommissionRate.find({user:user._id}).populate("extras").populate("user", "username").lean().then((d) => {
+            b = CommissionRate.find(rate_q).populate("extras").populate("user", "username").lean().then((d) => {
                 state.rates = [...d]
             })
 
-            await a
-            await b
+        } else {
 
-            return state
+            a = await fetch("/api/fetch", {method:"post", body: {model: "CommissionExtraOption", query: extra_option_q}}).then(async r => {
+                if (r.ok) {
+                    state.options = [...(await r.json()).data]
+                }
+            })
+
+            b = await fetch("/api/fetch", {method:"post", body: {model: "CommissionRate", query: rate_q, populate: [["user", "username"]]}}).then(async r => {
+                if (r.ok) {
+                    state.rates = [...(await r.json()).data]
+                }
+            })
+            
         }
 
+        await a
+        await b
+        
+        return state
     }
   },
 //   async (store) => {

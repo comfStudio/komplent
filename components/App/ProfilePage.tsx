@@ -10,6 +10,7 @@ import { User } from '@db/models'
 import { IUser } from '@schema/user'
 import { is_server } from '@utility/misc';
 import { useCommissionRateStore } from '@client/store/commission';
+import { fetch } from '@utility/request';
 
 
 interface Props extends AuthProps {
@@ -30,8 +31,15 @@ class ProfilePage extends OptionalAuthPage<Props> {
         let profile_path = ""
         
         if (profile_id) {
+            let q = {username: profile_id, type:"creator"}
             if (is_server()) {
-                profile_user = await User.findOne({username: profile_id, type:"creator"}).lean()
+                profile_user = await User.findOne(q).lean()
+            } else {
+                await fetch("/api/fetch", {method:"post", body: {model: "User", method:"findOne", query: q}}).then(async r => {
+                    if (r.ok) {
+                        profile_user = (await r.json()).data
+                    }
+                })
             }
 
             if (profile_user) {
@@ -46,6 +54,8 @@ class ProfilePage extends OptionalAuthPage<Props> {
         }
         
         const props = await super.getInitialProps(ctx)
+
+        console.log(props.useUserState)
 
         const profile_owner = props.useUserState.current_user && profile_user && props.useUserState.current_user.username == profile_user.username
 

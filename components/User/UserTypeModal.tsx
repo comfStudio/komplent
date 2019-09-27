@@ -27,12 +27,7 @@ const UserTypeModal = (props: Props) => {
         const [ user, set_user ] = useUpdateDocument({type: current_user.type})
         const update = useUpdateDatabase(current_user, user_schema)
 
-        console.log(store.state.has_selected_usertype)
-
         useEffect(() => {
-            console.log("effect")
-            console.log(store.state.has_selected_usertype)
-            console.log(store.state.has_selected_usertype === false)
             set_show(store.state.has_selected_usertype === false)
         }, [store.state.has_selected_usertype])
 

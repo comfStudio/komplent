@@ -7,6 +7,7 @@ import { AuthPage, Props as AuthProps } from '@components/App/AuthPage'
 import {  Commission } from '@db/models'
 import { is_server } from '@utility/misc';
 import { useCommissionStore } from '@client/store/commission';
+import { fetch } from '@utility/request';
 
 interface Props extends AuthProps {
     error: number | null
@@ -36,6 +37,12 @@ class CommissionPage extends AuthPage<Props> {
                 } catch (err) {
                     null
                 }
+            } else {
+                await fetch("/api/fetch", {method:"post", body: {model: "Commission", method:"findById", query: commission_id, populate: ["from_user", "to_user", "stage", "phases"] }}).then(async r => {
+                    if (r.ok) {
+                        commissionStoreState.commission = (await r.json()).data
+                    }
+                })
             }
         }
 
