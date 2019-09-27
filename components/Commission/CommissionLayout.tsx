@@ -3,7 +3,7 @@ import { Nav } from 'rsuite';
 import Link from 'next/link';
 
 import MainLayout from '@components/App/MainLayout';
-import { useCommissionStore } from '@store/commission';
+import { useCommissionStore } from '@client/store/commission';
 import { ReactProps } from '@utility/props';
 import { t } from '@app/utility/lang'
 import * as pages from '@utility/pages';
@@ -15,8 +15,8 @@ interface MenuProps {
 
 const CommissionMenu = (props: MenuProps) => {
 
-    const [state, actions] = useCommissionStore()
-    let commission = actions.get_commission()
+    const store = useCommissionStore()
+    let commission = store.get_commission()
 
     return (
         <Nav className="mb-10" appearance="subtle" activeKey={props.activeKey}>
@@ -40,9 +40,9 @@ interface Props extends ReactProps, MenuProps {
 }
 
 export const CommissionLayout = (props: Props) => {
-    const [state, actions] = useCommissionStore()
-
-    let commission = actions.get_commission()
+    const store = useCommissionStore()
+    let commission = store.get_commission()
+    
     return (
         <MainLayout>
             <h3 className="pb-1 mb-2">{commission.from_title}</h3>

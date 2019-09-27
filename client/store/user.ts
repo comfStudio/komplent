@@ -3,7 +3,7 @@ import cookies from 'nookies'
 import { OK } from 'http-status-codes';
 
 import Router from 'next/router'
-import { defineStore, bootstrapStoreDev } from '@app/store'
+import { createStore, bootstrapStoreDev } from '@client/store'
 import * as pages from '@utility/pages'
 import { fetch } from '@utility/request'
 import { is_server } from '@utility/misc'
@@ -27,32 +27,18 @@ export const fetch_user = async (cookies) => {
     }
 }
 
-interface UserStoreState {
-    current_user: object,
-    logged_in: boolean,
-    has_selected_usertype: boolean
-    active_commissions_count: number
-    active_requests_count: number
-}
 
-interface UserStoreActions {
-    login(data: any, redirect?: boolean)
-    logout(redirect?: boolean)
-    exists(name: string)
-    join(data: any, redirect?: boolean)
-    save()
-}
-
-export const useUserStore = defineStore(
+export const useUserStore = createStore(
   {
-      current_user: undefined,
-      logged_in: undefined,
-      has_selected_usertype: undefined,
+      _id: undefined as string,
+      current_user: undefined as any,
+      logged_in: undefined as boolean,
+      has_selected_usertype: true,
       active_commissions_count: 0,
       active_requests_count: 0,
-  } as UserStoreState,
+  },
   {
-    login: async (store, data, redirect: boolean | string = false) => {
+    async login(data, redirect: boolean | string = false) {
     let r = await fetch("/api/login", {
         method: "post",
         json: true,
@@ -61,7 +47,7 @@ export const useUserStore = defineStore(
 
         if (r.status == OK) {
         let data = await r.json()
-        store.setState({current_user: data.user, logged_in: true})
+        this.setState({current_user: data.user, logged_in: true})
 
         if (!is_server()) {
             cookies.set({},COOKIE_AUTH_TOKEN_KEY, data.token, {
@@ -78,7 +64,7 @@ export const useUserStore = defineStore(
 
     return [false, (await r.json()).error]
     },
-    logout: async (store, redirect = true) => {
+    async logout(redirect = true) {
     let r = await fetch("/api/logout", {
         method: "get",
     })
@@ -89,7 +75,7 @@ export const useUserStore = defineStore(
             cookies.destroy({}, COOKIE_AUTH_TOKEN_KEY)
         }
 
-        store.setState({current_user: null, logged_in: false})
+        this.setState({current_user: null, logged_in: false})
 
         if (redirect) {
             Router.replace(pages.home)
@@ -99,7 +85,7 @@ export const useUserStore = defineStore(
 
     return [false, (await r.json()).error]
     },
-    exists: async (store, name) => {
+    async exists(name) {
     const r = await fetch(`/api/user?${qs.stringify({username:name, email:name})}`, {
         method: "get",
     })
@@ -108,7 +94,7 @@ export const useUserStore = defineStore(
     }
     return false
     },
-    join: async (store, data, redirect = false) => {
+    async join(data, redirect = false) {
     let r = await fetch("/api/join", {
         method: "post",
         json: true,
@@ -116,22 +102,21 @@ export const useUserStore = defineStore(
     })
 
     if (r.status == OK) {
-        await store.actions.login({name:data.email, password:data.password}, redirect)
+        await this.actions.login({name:data.email, password:data.password}, redirect)
 
         return [true, null]
     }
 
     return [false, (await r.json()).error]
     },
-    save: async (store) => {
-        let state = {...store.state, user: store.state.current_user._id}
-        delete state.current_user
-        return await update_db({model:'UserStore', data:state, schema:user_store_schema, validate:true, create:true})
+    async save(state?: object) {
+        let s = {_id: this.state._id, has_selected_usertype: this.state.has_selected_usertype, user: this.state.current_user._id, ...state}
+        return await update_db({model:'UserStore', data:s, schema:user_store_schema, validate:true, create:true})
     }
   },
-  async (store) => {
-    await bootstrapStoreDev({useUserStore: store})
-  }
+//   async (store) => {
+//     await bootstrapStoreDev({useUserStore: store})
+//   }
 );
 
 export default useUserStore;

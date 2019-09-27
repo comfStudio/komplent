@@ -6,7 +6,7 @@ import { Form, FormGroup, FormControl, ControlLabel, Button, ButtonToolbar,
 import { HTMLElementProps } from '@app/utility/props'
 import { t } from '@app/utility/lang'
 
-import useUserStore from '@store/user'
+import useUserStore from '@client/store/user'
 import Link from 'next/link';
 
 const { StringType } = Schema.Types;
@@ -52,7 +52,7 @@ interface Props extends HTMLElementProps {
 
 export const JoinForm = (props: Props) => {
 
-    const [user_store, user_actions] = useUserStore()
+    const store = useUserStore()
     const [form_ref, set_form_ref] = useState(null)
     const [form_value, set_form_value] = useState({})
     const [join_error, set_join_error] = useState(null)
@@ -105,7 +105,7 @@ export const JoinForm = (props: Props) => {
                         if (form_ref && form_ref.check()) {
                             set_loading(true)
                             set_join_error(null)
-                            const [status, err] = await user_actions.join(form_value, true).then((d) => {
+                            const [status, err] = await store.join(form_value, true).then((d) => {
                                 set_loading(false)
                                 return d
                             })

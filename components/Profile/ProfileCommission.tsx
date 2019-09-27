@@ -11,7 +11,7 @@ import Placeholder from '@components/App/Placeholder';
 import Image from '@components/App/Image'
 import { useProfileContext, useProfileUser, useUser } from '@hooks/user';
 import { DrawingList } from '@app/components/Profile'
-import { useCommissionRateStore, useCommissionStore } from '@store/commission';
+import { useCommissionRateStore, useCommissionStore } from '@client/store/commission';
 import { decimal128ToFloat, moneyToString, stringToMoney, decimal128ToMoney, decimal128ToMoneyToString } from '@utility/misc';
 import * as pages from '@utility/pages';
 import { make_profile_path } from '@utility/pages';
@@ -49,7 +49,7 @@ export const TotalPriceDisplay = (props: TotalPriceProps) => {
 };
 
 interface CommissionCardProps extends HTMLElementProps {
-    data: object
+    data: any
     selected?: boolean
 }
 
@@ -117,14 +117,14 @@ export const CommissionLinkCard = (props: CommissionCardProps) => {
 
 export const CommissionCardRadioGroup = () => {
     const router = useRouter()
-    const [state, actions] = useCommissionRateStore()
+    const store = useCommissionRateStore()
     
     const selected_rate = router.query.selected || ''
 
     return (
         <Row gutter={16} className="commission-rates-group">
             {
-                sort_rates_by_price(state.rates).map((data ,index) => {
+                sort_rates_by_price(store.state.rates).map((data ,index) => {
                     let el = (
                         <Col key={data._id} xs={6}>
                                 <label title={data.title}>
@@ -142,11 +142,11 @@ export const CommissionCardRadioGroup = () => {
 
 export const CommissionTiersRow = (props: any) => {
 
-    const [state, actions] = useCommissionRateStore()
+    const store = useCommissionRateStore()
     return (
         <Row gutter={16}>
             {
-                sort_rates_by_price(state.rates).map((data ,index) => {
+                sort_rates_by_price(store.state.rates).map((data ,index) => {
                     let el = (
                         <Col key={data._id} xs={6}>
                             <CommissionLinkCard data={data}/>
@@ -206,15 +206,15 @@ export const ProfileCommission = () => {
     const [error, set_error] = useState(null)
     const [loading, set_loading] = useState(false)
     
-    const [commission_state, commission_actions] = useCommissionStore()
-    const [state, actions] = useCommissionRateStore()
+    const commission_store = useCommissionStore()
+    const store = useCommissionRateStore()
 
     let selected_rate_obj = null
 
     let total_price = stringToMoney("0.0")
 
     if (form_value.commission_rate) {
-        for (let c of state.rates) {
+        for (let c of store.state.rates) {
             if (c._id === form_value.commission_rate) {
                 selected_rate_obj = c
                 total_price = total_price.add(decimal128ToMoney(c.price))
@@ -233,7 +233,7 @@ export const ProfileCommission = () => {
 
     if (form_value.extras) {
         for (let o of form_value.extras) {
-            for (let c of state.options) {
+            for (let c of store.state.options) {
                 if (c._id === o) {
                     total_price = total_price.add(decimal128ToMoney(c.price))
                     break
@@ -311,7 +311,7 @@ export const ProfileCommission = () => {
                                     to_user: to_user._id
                                 }
 
-                                let r = await commission_actions.create_commission(data).then(r => {
+                                let r = await commission_store.create_commission(data).then(r => {
                                     set_loading(false)
                                     return r
                                 })

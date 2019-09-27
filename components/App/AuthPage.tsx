@@ -4,9 +4,8 @@ import cookies from 'nookies'
 import Router from 'next/router'
 import { Types } from 'mongoose'
 
-import { initializeStore } from '@app/store'
 import { UserStore, Commission } from '@db/models'
-import useUserStore, { fetch_user } from '@store/user'
+import useUserStore, { fetch_user } from '@client/store/user'
 import { is_server } from '@utility/misc'
 import { LoginContext } from '@client/context'
 import * as pages from '@utility/pages'
@@ -14,6 +13,7 @@ import LoginPage from '@components/App/LoginPage'
 
 export interface Props {
     useUserState?: object
+    useGlobalAppState?: object
     inverse?: boolean
     requested_page?: string
 }
@@ -35,11 +35,6 @@ const AsLoginPage = (props: AsLoginProps) => {
 
 export class AuthPage<T extends Props = Props> extends Component<T> {
 
-    constructor(props) {
-        super(props)
-        initializeStore({useUserStore}, props.useUserState)
-    }
-
     static async getInitialProps (ctx: NextPageContext) {
 
         let c = cookies.get(ctx)
@@ -48,7 +43,7 @@ export class AuthPage<T extends Props = Props> extends Component<T> {
         let active_commissions_count = 0
         let active_requests_count = 0
 
-        let user_store = {}
+        let user_store = {user: null, has_selected_usertype: false}
         if (current_user && is_server()) {
             let r = await UserStore.findOne({user:Types.ObjectId(current_user._id)}).lean()
             if (r) {
@@ -68,14 +63,13 @@ export class AuthPage<T extends Props = Props> extends Component<T> {
         }
 
         
-        let useUserState = {
+        let useUserState = useUserStore.createState({
             current_user,
             logged_in: !!current_user,
-            has_selected_usertype: false,
             active_commissions_count,
             active_requests_count,
             ...user_store
-        }
+        })
         
         let requested_page = ctx.asPath
 
@@ -87,12 +81,18 @@ export class AuthPage<T extends Props = Props> extends Component<T> {
         const logged_in = this.props.useUserState.logged_in
 
         if ((logged_in && !this.props.inverse) || (!logged_in && this.props.inverse)) {
-            return children
+            return (
+                <useUserStore.Provider initialState={this.props.useUserState}>
+                    {children}
+                </useUserStore.Provider>
+                )
         } else {
             return (
-                <LoginContext.Provider value={{next_page:this.props.requested_page}}>
-                    <AsLoginPage requested_page={this.props.requested_page}/>
-                </LoginContext.Provider>
+                <useUserStore.Provider initialState={this.props.useUserState}>
+                    <LoginContext.Provider value={{next_page:this.props.requested_page}}>
+                        <AsLoginPage requested_page={this.props.requested_page}/>
+                    </LoginContext.Provider>
+                </useUserStore.Provider>
             )
         }
 

@@ -3,7 +3,7 @@ import { Nav, Badge } from 'rsuite';
 import Link from 'next/link';
 
 import { t } from '@app/utility/lang'
-import useUserStore from '@store/user';
+import useUserStore from '@client/store/user';
 
 interface Props {
     activeKey?: string
@@ -11,12 +11,12 @@ interface Props {
 
 const CommissionsMenu = (props: Props) => {
 
-    const [state, actions] = useUserStore()
+    const store = useUserStore()
 
-    let active_comm_count = state.active_commissions_count
+    let active_comm_count = store.state.active_commissions_count
 
-    if (state.current_user.type === 'consumer') {
-        active_comm_count += state.active_requests_count
+    if (store.state.current_user.type === 'consumer') {
+        active_comm_count += store.state.active_requests_count
     }
 
     return (
@@ -24,9 +24,9 @@ const CommissionsMenu = (props: Props) => {
             <Link href="/commissions/" passHref>
                 <Nav.Item eventKey="commissions" active={props.activeKey=='commissions'}>{t`Commissions`} <Badge content={active_comm_count}/></Nav.Item>
             </Link>
-            {state.current_user.type === 'creator' &&
+            {store.state.current_user.type === 'creator' &&
             <Link href="/commissions/requests" passHref>
-                <Nav.Item eventKey="requests" active={props.activeKey=='requests'}>{t`Requests`} <Badge content={state.active_requests_count}/></Nav.Item>
+                <Nav.Item eventKey="requests" active={props.activeKey=='requests'}>{t`Requests`} <Badge content={store.state.active_requests_count}/></Nav.Item>
             </Link>
             }
         </Nav>

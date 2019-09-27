@@ -11,6 +11,7 @@ interface TimelineTitleProps extends ReactProps {
     date?: Date
 }
 
+
 export const TimelineTitle = (props: TimelineTitleProps) => {
     return (
         <React.Fragment>

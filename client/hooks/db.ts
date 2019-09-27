@@ -44,7 +44,7 @@ export const useDocument = (schema: Schema, initial_data?: object) => {
 }
 
 export const useUpdateDocument = (initial_data?: object) => {
-    let d: object = initial_data ? initial_data : {}
+    let d: any = initial_data ? initial_data : {}
     const [current_doc, set_current_doc] = useState(d)
 
     const set_doc = (next_doc: object) => {

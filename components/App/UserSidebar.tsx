@@ -4,7 +4,7 @@ import { Grid, Col, Row, Divider } from 'rsuite';
 import {NavUserSidebar} from '@components/Header/NavUser'
 import { Avatar } from '@components/Profile/ProfileHeader'
 import { ProfileNameTag } from '@components/Profile'
-import useUserStore from '@store/user';
+import useUserStore from '@client/store/user';
 import * as pages from '@utility/pages'
 
 import { t } from '@app/utility/lang'
@@ -17,13 +17,13 @@ interface Props {
 }
 
 const UserSidebar = (props: Props) => {
-    const [state, actions] = useUserStore()
-    const user = state.current_user
+    const store = useUserStore()
+    const user = store.state.current_user
 
-    let active_comm_count = state.active_commissions_count
+    let active_comm_count = store.state.active_commissions_count
 
     if (user.type === 'consumer') {
-        active_comm_count += state.active_requests_count
+        active_comm_count += store.state.active_requests_count
     }
 
     return (
@@ -49,7 +49,7 @@ const UserSidebar = (props: Props) => {
                 <Col xs={12} className="text-center stat-info">
                     <Link href={pages.commission_requests}>
                         <a className="unstyled">
-                            <strong className="text-primary">{state.active_requests_count}</strong>
+                            <strong className="text-primary">{store.state.active_requests_count}</strong>
                             <small>{t`Requests`}</small>
                         </a>
                     </Link>

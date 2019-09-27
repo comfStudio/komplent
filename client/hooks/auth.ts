@@ -1,6 +1,6 @@
-import { useUserStore } from '@store/user'
+import { useUserStore } from '@client/store/user'
 
 export const useLoginStatus = () => {
-    const [user_store, user_actions] = useUserStore()
-    return user_store.logged_in
+    const store = useUserStore()
+    return store.state.logged_in
 }

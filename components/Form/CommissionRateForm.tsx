@@ -8,7 +8,7 @@ import { t } from '@app/utility/lang'
 import { useUpdateDatabase, useDocument } from '@app/client/hooks/db';
 import { useUser } from '@hooks/user';
 import { comission_rate_schema, commission_extra_option_schema } from '@schema/commission'
-import { useCommissionRateStore } from '@store/commission';
+import { useCommissionRateStore } from '@client/store/commission';
 import { Decimal128 } from 'bson';
 import { decimal128ToFloat, decimal128ToMoneyToString, stringToDecimal128 } from '@utility/misc';
 
@@ -63,15 +63,15 @@ interface RateOptionsProps {
 export const RateOptions = (props: RateOptionsProps) => {
 
     const [new_option, set_new_option] = useState(false)
-    const [state, actions] = useCommissionRateStore()
+    const store = useCommissionRateStore()
     const user = useUser()
-    const options = props.options ? props.options : state.options.map(({_id}) => _id)
+    const options = props.options ? props.options : store.state.options.map(({_id}) => _id)
 
     return (
         <List className="" bordered={props.bordered}>
             <FormControl name={props.name || "extras"} accepter={CheckboxGroup}>
             {
-            state.options.filter(({_id}) => options.includes(_id)).map(({title, price, _id},index) => {
+            store.state.options.filter(({_id}) => options.includes(_id)).map(({title, price, _id},index) => {
                 let opt = <RateOption edit={props.edit} price={price} title={title} onUpdate={(v) => console.log(v)}/>
                 if (props.checkbox) {
                    return (<Checkbox key={_id} value={_id} >{opt}</Checkbox>)
@@ -84,7 +84,7 @@ export const RateOptions = (props: RateOptionsProps) => {
                 }
             })
             }
-            {new_option && <List.Item><RateOption edit={true} editing={true} price={0} title="" onUpdate={(v) => {actions.create_option({user:user._id, ...v}); set_new_option(false)}} onCancel={() => {set_new_option(false) }}/></List.Item>}
+            {new_option && <List.Item><RateOption edit={true} editing={true} price={stringToDecimal128("0")} title="" onUpdate={(v) => {store.create_option({user:user._id, ...v}); set_new_option(false)}} onCancel={() => {set_new_option(false) }}/></List.Item>}
             {(props.new && !new_option) && <List.Item><Button size="sm" className="ml-5 pl-5" onClick={(ev) => {ev.preventDefault(); set_new_option(true) }}>{t`Add new option`}</Button></List.Item>}
             </FormControl>
         </List>
@@ -118,10 +118,10 @@ const CommissionRateForm = (props: Props) => {
 
     const current_user = useUser()
     const [doc, set_document] = useDocument(comission_rate_schema)
-    const [state, actions] = useCommissionRateStore()
+    const store = useCommissionRateStore()
     const [form_ref, set_form_ref] = useState(null)
     const [form_value, set_form_value] = useState({
-        extras: state.options.map((v) => v._id)
+        extras: store.state.options.map((v) => v._id)
     })
     const [error, set_error] = useState(null)
     const [loading, set_loading] = useState(false)
@@ -172,7 +172,7 @@ const CommissionRateForm = (props: Props) => {
 
                                 console.log(doc)
 
-                                const {body, status} = await actions.create_rate(doc).then((d) => {
+                                const {body, status} = await store.create_rate(doc).then((d) => {
                                     set_loading(false)
                                     return d
                                 })

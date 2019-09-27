@@ -3,23 +3,23 @@ import Router from 'next/router'
 
 import { MainLayout} from '@components/App/MainLayout'
 
-import useUserStore from '@store/user'
+import useUserStore from '@client/store/user'
 import * as pages from '@utility/pages'
 import { OptionalAuthPage } from '@components/App/AuthPage';
 
 
 export const Logout = () => {
 
-  const [ user_state, user_actions ] = useUserStore()
+  const store = useUserStore()
 
   useEffect(() => {
     console.log("logging out")
-    if (user_state.current_user) {
-      user_actions.logout()
+    if (store.state.current_user) {
+      store.logout()
     } else {
       Router.replace(pages.home)
     }
-  }, [user_state.current_user])
+  }, [store.state.current_user])
 
   return null
 }

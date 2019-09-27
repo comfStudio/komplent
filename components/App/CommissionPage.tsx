@@ -6,9 +6,7 @@ import Error from 'next/error'
 import { AuthPage, Props as AuthProps } from '@components/App/AuthPage'
 import {  Commission } from '@db/models'
 import { is_server } from '@utility/misc';
-import { useCommissionStore } from '@store/commission';
-import { initializeStore } from '@app/store'
-
+import { useCommissionStore } from '@client/store/commission';
 
 interface Props extends AuthProps {
     error: number | null
@@ -17,18 +15,13 @@ interface Props extends AuthProps {
 
 class CommissionPage extends AuthPage<Props> {
 
-    constructor(props) {
-        super(props)
-        initializeStore({useCommissionStore}, props.commissionStoreState)
-    }
-
     static async getInitialProps(ctx: NextPageContext) {
         const props = await super.getInitialProps(ctx)
 
         const commission_id = ctx.query.commission_id
-        let commissionStoreState = {
+        let commissionStoreState = useCommissionStore.createState({
             commission: null
-        }
+        })
         let error = null
 
         if (commission_id) {
@@ -64,7 +57,11 @@ class CommissionPage extends AuthPage<Props> {
             return <Error statusCode={this.props.error}/>
         }
 
-        return super.renderPage(children)
+        return (
+            <useCommissionStore.Provider initialState={this.props.commissionStoreState}>
+                {super.renderPage(children)}
+            </useCommissionStore.Provider>
+        ) 
     }
 }
 

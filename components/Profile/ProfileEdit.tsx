@@ -9,7 +9,6 @@ import CommissionRateForm, { RateOptionsForm } from '@components/Form/Commission
 
 import './ProfileEdit.scss'
 import { useSessionStorage } from 'react-use';
-import { useCommissionRateStore } from '@store/commission';
 import { useSettings } from '@hooks/user';
 import { useUpdateDatabase } from '@hooks/db';
 import { user_settings_schema } from '@schema/user';

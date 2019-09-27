@@ -17,10 +17,10 @@
     "baseUrl": ".",
     "paths": {
       "@hooks/*": ["client/hooks/*"],
+      "@store/*": ["client/store/*"],
       "@components/*": ["components/*"],
       "@utility/*": ["utility/*"],
       "@assets/*": ["assets/*"],
-      "@store/*": ["store/*"],
       "@schema/*": ["server/db/schema/*"],
       "@db/*": ["server/db/*"],
       "@client/*": ["client/*"],

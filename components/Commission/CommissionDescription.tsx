@@ -1,14 +1,14 @@
 import React from 'react';
-import { useCommissionStore } from '@store/commission';
+import { useCommissionStore } from '@client/store/commission';
 import { Grid, Row, Col } from 'rsuite';
 import { PanelContainer } from '@components/App/MainLayout';
 import { t } from '@utility/lang'
 
 const CommissionDescription = () => {
 
-    const [state, actions] = useCommissionStore()
+    const store = useCommissionStore()
 
-    let commission = actions.get_commission()
+    let commission = store.get_commission()
 
     return (
         <Grid fluid>

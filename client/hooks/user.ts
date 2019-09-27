@@ -1,13 +1,13 @@
 import { useContext, useState } from 'react'
 
-import { useUserStore } from '@store/user'
+import { useUserStore } from '@client/store/user'
 import { ProfileContext } from '@client/context'
 import { user_settings_schema } from '@schema/user';
 import { useUpdateDatabase } from './db';
 
 export const useUser = () => {
-    const [user_store, user_actions] = useUserStore()
-    return user_store.current_user || {}
+    const store = useUserStore()
+    return store.state.current_user || {}
 }
 
 export const useProfileContext = () => {

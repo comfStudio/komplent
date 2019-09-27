@@ -9,9 +9,13 @@ import { Title } from '@components/App'
 import { connect } from '@server/db'
 import { is_server } from '@utility/misc'
 
+import { useUserStore } from '@client/store/user'
+import { useCommissionRateStore, useCommissionStore, useCommissionsStore } from '@client/store/commission'
+
 import '@assets/styles/imports.scss'
 import '@assets/styles/rsuite.less'
 import '@assets/styles/common.scss'
+import { ReactProps } from '@utility/props'
 
 Router.onRouteChangeStart = () => NProgress.start();
 Router.onRouteChangeComplete = () => NProgress.done();
@@ -32,13 +36,29 @@ const server_initialize = async () => {
   await connect()
 }
 
+const StoreProvider = (props: ReactProps) => {
+  return (
+    <useUserStore.Provider>
+      <useCommissionsStore.Provider>
+        <useCommissionStore.Provider>
+          <useCommissionRateStore.Provider>
+            {props.children}
+          </useCommissionRateStore.Provider>
+        </useCommissionStore.Provider>
+      </useCommissionsStore.Provider>
+    </useUserStore.Provider>
+  )
+}
+
 class KomplentApp extends App {
   render() {
     const { Component, pageProps } = this.props
     return (
       <React.Fragment>
         <Title>Komplent</Title>
-        <Component {...pageProps} />
+        <StoreProvider>
+          <Component {...pageProps} />
+        </StoreProvider>
       </React.Fragment>
     )
   }

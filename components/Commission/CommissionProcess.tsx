@@ -3,7 +3,7 @@ import { formatDistanceToNow, format } from 'date-fns'
 import { toDate } from 'date-fns-tz'
 
 import CommissionTimeline, { CommissionTimelineItem, TimelinePanel, TimelineTitle } from './CommissionTimeline';
-import { useCommissionStore } from '@store/commission';
+import { useCommissionStore } from '@client/store/commission';
 import { t } from '@utility/lang'
 import { capitalizeFirstLetter } from '@utility/misc';
 import { useUser } from '@hooks/user';
@@ -11,7 +11,7 @@ import { ButtonToolbar, Button, Grid, Row, Col } from 'rsuite';
 
 interface ProcessProps {
     is_owner: boolean,
-    commission: object
+    commission: any
 }
 
 const PendingApproval = (props: ProcessProps) => {
@@ -91,7 +91,7 @@ const Completed = (props: ProcessProps) => {
     const finished = props.commission ? props.commission.finished : false
     const completed = props.commission ? props.commission.completed : false
 
-    let end_date = props.commission && props.commission.end_date ? toDate(new Date(commission.end_date)) : null
+    let end_date = props.commission && props.commission.end_date ? toDate(new Date(props.commission.end_date)) : null
 
     return (
         <React.Fragment>
@@ -118,9 +118,9 @@ const Completed = (props: ProcessProps) => {
 
 const CommissionProcess = () => {
     const user = useUser()
-    const [state, actions] = useCommissionStore()
+    const store = useCommissionStore()
 
-    let commission = actions.get_commission()
+    let commission = store.get_commission()
     let is_owner = user._id === commission.from_user._id
     let start_date = toDate(commission ? new Date(commission.created) : new Date())
     let end_date = commission && commission.end_date ? toDate(new Date(commission.end_date)) : null

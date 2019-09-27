@@ -9,8 +9,7 @@ import { get_profile_id, make_profile_path } from '@utility/pages'
 import { User } from '@db/models'
 import { IUser } from '@schema/user'
 import { is_server } from '@utility/misc';
-import { useCommissionRateStore } from '@store/commission';
-import { initializeStore } from '@app/store'
+import { useCommissionRateStore } from '@client/store/commission';
 
 
 interface Props extends AuthProps {
@@ -23,11 +22,6 @@ interface Props extends AuthProps {
 }
 
 class ProfilePage extends OptionalAuthPage<Props> {
-
-    constructor(props) {
-        super(props)
-        initializeStore({useCommissionRateStore}, props.commissionRateStoreState)
-    }
 
     static async getInitialProps(ctx: NextPageContext) {
         let profile_id = get_profile_id(ctx.asPath)
@@ -55,9 +49,9 @@ class ProfilePage extends OptionalAuthPage<Props> {
 
         const profile_owner = props.useUserState.current_user && profile_user && props.useUserState.current_user.username == profile_user.username
 
-        let commissionRateStoreState = {}
+        let commissionRateStoreState = useCommissionRateStore.createState({})
         if (profile_user) {
-            commissionRateStoreState = await useCommissionRateStore.store.actions.load(profile_user)
+            commissionRateStoreState = await useCommissionRateStore.actions.load(profile_user)
         }
         
         return {
@@ -78,14 +72,16 @@ class ProfilePage extends OptionalAuthPage<Props> {
         }
 
         return (
-            <ProfileContext.Provider value={{
-                profile_id: this.props.profile_id,
-                profile_user: this.props.profile_user,
-                profile_path: this.props.profile_path,
-                profile_owner: this.props.profile_owner,
-            }}>
-                {super.renderPage(children)}
-            </ProfileContext.Provider>
+            <useCommissionRateStore.Provider initialState={this.props.commissionRateStoreState}>
+                <ProfileContext.Provider value={{
+                    profile_id: this.props.profile_id,
+                    profile_user: this.props.profile_user,
+                    profile_path: this.props.profile_path,
+                    profile_owner: this.props.profile_owner,
+                }}>
+                    {super.renderPage(children)}
+                </ProfileContext.Provider>
+            </useCommissionRateStore.Provider>
         )
     }
 }

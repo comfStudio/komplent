@@ -6,7 +6,7 @@ import { Form, FormGroup, FormControl, ControlLabel, Button, ButtonToolbar,
 import { HTMLElementProps } from '@app/utility/props'
 import { t } from '@app/utility/lang'
 import { LoginContext } from '@client/context'
-import useUserStore from '@store/user'
+import useUserStore from '@client/store/user'
 import Link from 'next/link';
 
 const { StringType } = Schema.Types;
@@ -22,7 +22,7 @@ interface LoginFormProps extends HTMLElementProps {
 
 export const LoginForm = (props: LoginFormProps) => {
 
-    const [user_store, user_actions] = useUserStore()
+    const store = useUserStore()
     const [form_ref, set_form_ref] = useState(null)
     const [form_value, set_form_value] = useState({})
     const [login_error, set_login_error] = useState(null)
@@ -68,7 +68,7 @@ export const LoginForm = (props: LoginFormProps) => {
                         if (form_ref && form_ref.check()) {
                             set_loading(true)
                             set_login_error(null)
-                            let [status, err] = await user_actions.login(form_value, next_page).then((d) => {
+                            let [status, err] = await store.login(form_value, next_page).then((d) => {
                                 set_loading(false)
                                 return d
                             })
