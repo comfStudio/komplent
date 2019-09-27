@@ -18,13 +18,17 @@ user_schema.pre("save", async function() {
         }
       })
 
+commission_schema.pre("save", async function() {
+  this.wasNew = this.isNew
+})
+
 commission_schema.post("save", async function() {
-        if (!this.stage) {
-          let c = new CommissionPhase({type: "pending_approval", commission: this._id})
-          this.stage = c
-          await c.save()
-        }
-      })
+  if (this.wasNew) {
+    let c = new CommissionPhase({type: "pending_approval", commission: this._id})
+    this.phases = [c]
+    await c.save()
+  }
+})
 
 export const User = is_server() ? mongoose.models.User as IUserModel || mongoose.model<IUser, IUserModel>('User', user_schema) : undefined
 export const UserStore = is_server() ? mongoose.models.UserStore || mongoose.model<Document>('UserStore', user_store_schema) : undefined

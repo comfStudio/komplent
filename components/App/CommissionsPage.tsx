@@ -18,7 +18,7 @@ class CommissionsPage extends AuthPage<Props> {
         const props = await super.getInitialProps(ctx)
 
         let commissionsStoreState = useCommissionsStore.createState({
-            commissions: []
+            commissions: [],
         })
 
         if (props.useUserState.current_user) {

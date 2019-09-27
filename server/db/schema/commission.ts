@@ -60,14 +60,6 @@ commission_schema.statics.find_related = async function(user, {populate = true, 
     return null
 }
 
-commission_schema.virtual("stage", {
-    ref: "CommissionPhase",
-    localField: "_id",
-    foreignField: "commission",
-    justOne: true,
-    options: { sort: { created: -1 } },
-})
-
 commission_schema.virtual("phases", {
     ref: "CommissionPhase",
     localField: "_id",
@@ -85,12 +77,16 @@ export const commission_phase_schema = new Schema({
     title: String,
     done: {
         type: Boolean,
-        default: true
+        default: false
     },
     commission: { 
         type: ObjectId, 
         ref: 'Commission',
       },
+    user: { 
+        type: ObjectId, 
+        ref: 'User',
+    },
     done_date: Date,
   }, { timestamps: { createdAt: 'created', updatedAt: 'updated' } })
 

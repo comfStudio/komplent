@@ -119,8 +119,7 @@
   "browser": {
     "bcryptjs": false,
     "bnjs": false,
-    "mquery": false,
-    "bson": false
+    "mquery": false
   },
   "license": "ISC"
 }
