@@ -1,0 +1,4 @@
+{
+    "browsers": ["firefox"],
+    "src": "/__tests__/**/*.functional.test.+(ts|tsx|js)"
+}
