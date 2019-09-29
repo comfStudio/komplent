@@ -166,8 +166,8 @@ const CommissionProcess = () => {
 
     let first_stage = commission ? commission.phases[0] : null
     let latest_stage = commission ? commission.phases[commission.phases.length-1] : null
-    let phases = commission ? commission.phases : []
-
+    let phases = commission && commission.phases ? commission.phases : []
+    console.log(phases)
 
     return (
         <div>

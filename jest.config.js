@@ -5,15 +5,13 @@ const aliases = pathsToModuleNameMapper(compilerOptions.paths, { prefix: '<rootD
 
 delete aliases['^@assets/(.*)$']
 
-module.exports = {
-  preset: 'ts-jest',
+let jest_config = {
+  preset: 'ts-jest/presets/js-with-babel',
   transform: {
     "^.+\\.(jpg|jpeg|png|gif|eot|otf|webp|svg.+|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)(\\?.+)?$": "<rootDir>/__tests__/fileTransformer.js",
   },
   snapshotSerializers: ['enzyme-to-json/serializer'],
-  testEnvironment: 'node',
   testMatch: null,
-  testRegex: '/__tests__/.*\\.test.(ts|tsx|js)$',
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   moduleNameMapper: {
     "^.+\\.svg\\?(sprite|include)(.+)?$": "<rootDir>/__mocks__/svgMock.js",
@@ -32,8 +30,26 @@ module.exports = {
   ],
   globals: {
     'ts-jest': {
+      diagnostics: false,
       babelConfig: true,
       tsConfig: "tsconfig.test.json"
     }
   }
+}
+
+module.exports = {
+  projects: [
+    {
+      displayName: "server",
+      testRegex: '/__tests__/.*\\.server.test.(ts|tsx|js)$',
+      testEnvironment: 'node',
+      ...jest_config
+    },
+    {
+      displayName: "client",
+      testRegex: '/__tests__/.*\\.client.test.(ts|tsx|js)$',
+      testEnvironment: 'jsdom',
+      ...jest_config
+    }
+  ]
 };

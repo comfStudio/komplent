@@ -36,7 +36,7 @@ const server_initialize = async () => {
   await connect()
 }
 
-const StoreProvider = (props: ReactProps) => {
+export const StoreProvider = (props: ReactProps) => {
   return (
     <useUserStore.Provider>
       <useCommissionsStore.Provider>

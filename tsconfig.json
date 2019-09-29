@@ -25,6 +25,7 @@
       "@db/*": ["server/db/*"],
       "@client/*": ["client/*"],
       "@server/*": ["server/*"],
+      "@pages/*": ["pages/*"],
       "@app/*": [ "*" ]
     }
   },

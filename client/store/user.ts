@@ -102,7 +102,7 @@ export const useUserStore = createStore(
     })
 
     if (r.status == OK) {
-        await this.actions.login({name:data.email, password:data.password}, redirect)
+        await this.login({name:data.email, password:data.password}, redirect)
 
         return [true, null]
     }
