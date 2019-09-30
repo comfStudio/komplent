@@ -10,7 +10,7 @@ const cors = microCors({ allowMethods: ['POST', 'OPTIONS'] })
 
 export default cors(with_middleware(async (req: ExApiRequest, res: ExApiResponse) => {
     try {
-        const { query, model, method, populate } = req.json
+        const { query, model, method, populate, lean } = req.json
 
         let m = mongoose.models[model]
 
@@ -44,7 +44,7 @@ export default cors(with_middleware(async (req: ExApiRequest, res: ExApiResponse
             }
         }
 
-        if (qmethod.lean) {
+        if (qmethod.lean && lean !== false) {
             qmethod = qmethod.lean()
         }
         

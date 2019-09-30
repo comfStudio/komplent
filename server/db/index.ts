@@ -3,21 +3,6 @@ import getConfig from 'next/config'
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs';
 
-import { is_server } from '@utility/misc';
-
-import mongooseAutopopulate from 'mongoose-autopopulate'
-import mongooseVirtuals from 'mongoose-lean-virtuals'
-import mongooseDefaults from 'mongoose-lean-defaults'
-import mongooseGetters from 'mongoose-lean-getters'
-
-if (is_server()) {
-  mongoose.plugin(mongooseAutopopulate)
-  mongoose.plugin(mongooseVirtuals)
-  mongoose.plugin(mongooseDefaults)
-  mongoose.plugin(mongooseGetters)
-}
-
-
 import { User } from '@db/models'
 import { IUser } from '@schema/user'
 import { cookie_session } from '@server/middleware'

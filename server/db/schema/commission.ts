@@ -1,3 +1,4 @@
+import '.'
 import mongoose from 'mongoose'
 
 const { Schema } = mongoose
@@ -10,6 +11,7 @@ export const commission_schema = new Schema({
     body: String,
     expire_date: Date,
     end_date: Date,
+    payment: { type: Boolean, default: false}, // there has been a transaction
     finished: { type: Boolean, default: false}, // commission has finished, could be cancelled or expired
     completed: { type: Boolean, default: false}, // commission was completed successfully
     accepted: { type: Boolean, default: false},
@@ -29,10 +31,16 @@ export const commission_schema = new Schema({
             ref: 'Attachment'
         }
     ],
+    products: [
+        { 
+            type: ObjectId, 
+            ref: 'Attachment'
+        }
+    ],
 }, {
     timestamps: { createdAt: 'created', updatedAt: 'updated' },
-    toJSON: { virtuals: true },
-    toObject: { virtuals: true },
+    toJSON: { virtuals: true, getters: true, },
+    toObject: { virtuals: true, getters: true },
  })
 
 commission_schema.statics.find_related = async function(user, {populate = true, only_active = false, lean = true} = {}) {
@@ -60,6 +68,14 @@ commission_schema.statics.find_related = async function(user, {populate = true, 
     return null
 }
 
+commission_schema.virtual("stage", {
+    ref: "CommissionPhase",
+    localField: "_id",
+    foreignField: "commission",
+    justOne: true,
+    options: { sort: { created: -1 } },
+})
+
 commission_schema.virtual("phases", {
     ref: "CommissionPhase",
     localField: "_id",
@@ -68,10 +84,18 @@ commission_schema.virtual("phases", {
     options: { sort: { created: 1 } },
 })
 
+commission_schema.virtual('phases').get(function (value) {
+    return typeof value === 'object' ? [value] : value
+})
+
+commission_schema.virtual('stage').get(function (value) {
+    return typeof value && Array.isArray(value) ? value[0] : value
+})
+
 export const commission_phase_schema = new Schema({
     type:{
         type: String,
-        enum : ['pending_approval','pending_payment', 'pending_product', 'complete', 'cancel', 'reopen'],
+        enum : ['pending_approval','pending_payment', 'pending_product', 'complete', 'cancel', 'reopen', 'refund'],
         required: true,
       },
     title: String,

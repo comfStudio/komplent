@@ -56,7 +56,7 @@ export const useCommissionStore = createStore(
             return r
         },
 
-        async add_phase(type: 'pending_approval'|'pending_payment'|'pending_product'|'complete'|'cancel'|'reopen', {complete_previous_phase=true, done = false, params = {}} = {}) {
+        async add_phase(type: 'pending_approval'|'pending_payment'|'pending_product'|'complete'|'cancel'|'reopen'|'refund', {complete_previous_phase=true, done = false, params = {}} = {}) {
             if (complete_previous_phase) {
                 this.complete_phase()
             }
@@ -74,6 +74,17 @@ export const useCommissionStore = createStore(
                     this.setState({commission: rc})
                 }
             }
+            return r
+        },
+
+        async pay() {
+            let r
+            if (!this.commission.payment) {
+                r = await this.update({
+                    payment: true,
+                })
+            }
+            r = await this.add_phase("pending_product")
             return r
         },
 
@@ -119,13 +130,14 @@ export const useCommissionStore = createStore(
             const phase_select = "user done done_date type title"
             if (is_server()) {
                 try {
-                    return await Commission.findById(commission_id)
+                    const r = await Commission.findById(commission_id)
                         .populate("from_user")
                         .populate("to_user")
-                        .populate("stage", phase_select)
                         .populate("phases", phase_select)
-                        .lean()
+                        .populate("stage", phase_select)
+                    return r.toJSON()
                 } catch (err) {
+                    console.error(err)
                     return null
                 }
             } else {
@@ -134,7 +146,8 @@ export const useCommissionStore = createStore(
                     body: {model: "Commission",
                     method:"findById",
                     query: commission_id,
-                    populate: ["from_user", "to_user", ["stage", phase_select], ["phases", phase_select]] }
+                    lean: false,
+                    populate: ["from_user", "to_user", ["phases", phase_select], ["stage", phase_select]] }
                 }).then(async r => {
                     if (r.ok) {
                         return (await r.json()).data

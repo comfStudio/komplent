@@ -1,5 +1,4 @@
 import mongoose, { Document } from 'mongoose'
-
 import { is_server } from '@utility/misc'
 
 import { user_schema, profile_schema, user_store_schema,

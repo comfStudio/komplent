@@ -6,7 +6,6 @@ import Router from 'next/router'
 import localForage from 'localforage'
 
 import { Title } from '@components/App'
-import { connect } from '@server/db'
 import { is_server } from '@utility/misc'
 
 import { useUserStore } from '@client/store/user'
@@ -17,9 +16,9 @@ import '@assets/styles/rsuite.less'
 import '@assets/styles/common.scss'
 import { ReactProps } from '@utility/props'
 
-Router.onRouteChangeStart = () => NProgress.start();
-Router.onRouteChangeComplete = () => NProgress.done();
-Router.onRouteChangeError = () => NProgress.done();
+// Router.onRouteChangeStart = () => NProgress.start();
+// Router.onRouteChangeComplete = () => NProgress.done();
+// Router.onRouteChangeError = () => NProgress.done();
 
 const { publicRuntimeConfig, serverRuntimeConfig }= getConfig()
 
@@ -30,10 +29,6 @@ const client_initialize = async () => {
     storeName   : 'komplent', // Should be alphanumeric, with underscores.
     description : 'komplent'
 });
-}
-
-const server_initialize = async () => {
-  await connect()
 }
 
 export const StoreProvider = (props: ReactProps) => {
@@ -62,10 +57,6 @@ class KomplentApp extends App {
       </React.Fragment>
     )
   }
-}
-
-if (process.env.SERVER_BUILD && is_server()) {
-  server_initialize()
 }
 
 if (!is_server()) {

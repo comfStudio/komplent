@@ -1,3 +1,4 @@
+import '.'
 import mongoose, { Document, Model } from 'mongoose'
 
 const { Schema } = mongoose

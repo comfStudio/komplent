@@ -2,10 +2,14 @@
 // Event handlers like onClick can't be added to this file
 
 import Document, { Html, Head, Main, NextScript } from 'next/document'
-import symbol from 'svg-baker-runtime/symbol';
 import sprite from 'svg-sprite-loader/runtime/sprite.build';
+import { connect } from '@server/db'
 
-class MyDocument extends Document {
+const server_initialize = async () => {
+  await connect()
+}
+
+class KomplentDocument extends Document {
   static async getInitialProps(ctx) {
     const spriteContent = sprite.stringify();
     const initialProps = await Document.getInitialProps(ctx)
@@ -28,4 +32,9 @@ class MyDocument extends Document {
   }
 }
 
-export default MyDocument
+if (process.env.SERVER_BUILD) {
+  server_initialize()
+}
+
+
+export default KomplentDocument
