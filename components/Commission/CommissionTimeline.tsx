@@ -1,6 +1,6 @@
 import React from 'react';
 import { Timeline, Icon, Panel } from 'rsuite';
-import { ReactProps } from '@utility/props';
+import { ReactProps, HTMLElementProps } from '@utility/props';
 import { formatDistanceToNow, format, toDate } from 'date-fns'
 
 import { capitalizeFirstLetter } from '@utility/misc';
@@ -31,9 +31,14 @@ export const TimelineTitle = (props: TimelineTitleProps) => {
     )
 }
 
-export const TimelinePanel = (props: ReactProps) => {
+interface TimelinePanel extends ReactProps, HTMLElementProps {
+
+}
+
+export const TimelinePanel = (props: TimelinePanel) => {
+    let cls = "timeline-panel"
     return (
-        <div bordered className="timeline-panel">
+        <div className={props.className ? (props.className + " " + cls) : cls}>
             {props.children}
         </div>
     )

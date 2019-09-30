@@ -99,6 +99,7 @@ export const commission_phase_schema = new Schema({
         required: true,
       },
     title: String,
+    data: Object,
     done: {
         type: Boolean,
         default: false

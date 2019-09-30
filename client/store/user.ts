@@ -12,11 +12,10 @@ import { get_jwt_data, get_jwt_user } from '@server/middleware'
 import { update_db } from '@app/client/db'
 import { user_store_schema } from '@schema/user'
 
-export const fetch_user =  async (cookies) => {
-    if (cookies[COOKIE_AUTH_TOKEN_KEY]) {
-        
+export const fetch_user =  async (cookies_obj) => {
+    if (cookies_obj[COOKIE_AUTH_TOKEN_KEY]) {
         if (is_server()) {
-            return await get_jwt_user(get_jwt_data(cookies[COOKIE_AUTH_TOKEN_KEY]))
+            return await get_jwt_user(get_jwt_data(cookies_obj[COOKIE_AUTH_TOKEN_KEY]))
         } else {
             let r = await fetch('/api/user')
             if (r.status == OK) {
