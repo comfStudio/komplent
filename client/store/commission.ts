@@ -62,7 +62,7 @@ export const useCommissionStore = createStore(
             return r
         },
 
-        async add_phase(type: 'pending_approval'|'pending_payment'|'pending_product'|'complete'|'cancel'|'reopen'|'refund', {complete_previous_phase=true, done = false, params = {}, data = undefined} = {}) {
+        async add_phase(type: 'pending_approval'|'pending_payment'|'pending_product'|'complete'|'cancel'|'reopen'|'refund', {complete_previous_phase=true, refresh = false, done = false, params = {}, data = undefined} = {}) {
             if (complete_previous_phase) {
                 this.complete_phase()
             }
@@ -80,7 +80,7 @@ export const useCommissionStore = createStore(
                 create: true,
                 ...params
             })
-            if (r.status) {
+            if (refresh && r.status) {
                 this.refresh()
             }
             return r
@@ -95,7 +95,8 @@ export const useCommissionStore = createStore(
             }
             const last: boolean = phase_data.data ? phase_data.data.last : false
             if (last) {
-                r = await this.add_phase("complete")
+                this.add_phase("unlock", {done: true, refresh: false})
+                r = await this.add_phase("complete", {complete_previous_phase: false})
             } else {
                 r = await this.add_phase("pending_product")
             }
@@ -108,7 +109,7 @@ export const useCommissionStore = createStore(
                 count += 1
             }
             let r = await this.add_phase("pending_payment", {data: {count: count + 1, last: last}})
-            return
+            return r
         },
 
         async accept() {

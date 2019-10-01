@@ -95,7 +95,7 @@ commission_schema.virtual('stage').get(function (value) {
 export const commission_phase_schema = new Schema({
     type:{
         type: String,
-        enum : ['pending_approval','pending_payment', 'pending_product', 'complete', 'cancel', 'reopen', 'refund'],
+        enum : ['pending_approval','pending_payment', 'pending_product', 'unlock', 'complete', 'cancel', 'reopen', 'refund'],
         required: true,
       },
     title: String,

@@ -13,8 +13,12 @@ import * as pages from '@utility/pages';
 
 interface ProcessProps {
     data: any,
-    is_owner: boolean,
-    is_latest: boolean,
+    is_owner?: boolean,
+    is_latest?: boolean,
+    onClick?: any
+    done_date?: Date
+    hidden?: boolean
+    active?: boolean
 }
 
 const PendingApproval = (props: ProcessProps) => {
@@ -24,13 +28,14 @@ const PendingApproval = (props: ProcessProps) => {
     const to_name = commission ? commission.to_user.username : ''
     const [accept_loading, set_accept_loading] = useState(false)
     const [decline_loading, set_decline_loading] = useState(false)
-    
+    const show_panel = !props.hidden || props.active
 
     return (
         <React.Fragment>
-            <TimelineTitle date={props.data.done ? toDate(new Date(props.data.done_date)) : undefined}>
-             {t`Pending approval`}
+            <TimelineTitle onClick={props.onClick} date={props.done_date}>
+             { commission.accepted ? t`Approved` : t`Pending approval`}
             </TimelineTitle>
+            { show_panel &&
             <TimelinePanel>
                 {props.is_owner && !commission.accepted && <p>{t`Waiting for approval from ${to_name}.`}</p>}
                 {props.is_owner && commission.accepted  && <p>{t`Request was approved by ${to_name}.`}</p>}
@@ -48,29 +53,35 @@ const PendingApproval = (props: ProcessProps) => {
                 </div>
                 }
             </TimelinePanel>
+            }
         </React.Fragment>
     )
 }
 
 const PendingPayment = (props: ProcessProps) => {
 
-    const count = props.data.data && props.data.data.count ? props.data.data.count : 0
-    const last = props.data.data ? props.data.data.last : false
+    const count = props.data && props.data.data && props.data.data.count ? props.data.data.count : 0
+    const last = props.data && props.data.data ? props.data.data.last : false
     const store = useCommissionStore()
     let commission = store.get_commission()
     const from_name = commission ? commission.from_user.username : ''
+    const done = props.data ? props.data.done : false
+    const show_panel = !props.hidden || props.active
+
 
     return (
         <React.Fragment>
-            <TimelineTitle date={props.data.done ? toDate(new Date(props.data.done_date)) : undefined}>
-            {last ? t`Pending last payment` : count === 1 ? t`Pending first payment` : t`Pending payment`}
+            <TimelineTitle onClick={props.onClick} date={props.done_date}>
+            {!props.hidden && !done ? (last ? t`Pending last payment` : count === 1 ? t`Pending first payment` : t`Pending payment`) : null}
+            {props.hidden || done ? (last ? t`Last payment` : count === 1 ? t`First payment` : t`Payment`) : null}
             </TimelineTitle>
+            {show_panel &&
             <TimelinePanel>
-                {commission.finished && !props.data.done && <p>{t`Payment was cancelled.`}</p>}
-                {!props.is_owner && props.data.done && <p>{t`Payment was received from ${from_name}.`}</p>}
-                {!commission.finished && !props.is_owner && !props.data.done && <p>{t`Waiting for payment from ${from_name}.`}</p>}
-                {props.is_owner && props.data.done && <p>{t`You sent your payment.`}</p>}
-                {!commission.finished && props.is_owner && !props.data.done &&
+                {commission.finished && !done && <p>{t`Payment was cancelled.`}</p>}
+                {!props.is_owner && done && <p>{t`Payment was received from ${from_name}.`}</p>}
+                {!commission.finished && !props.is_owner && !done && <p>{t`Waiting for payment from ${from_name}.`}</p>}
+                {props.is_owner && done && <p>{t`You sent your payment.`}</p>}
+                {!commission.finished && props.is_owner && !done &&
                 <div>
                     {count === 1 &&
                     <p>{t`Waiting for your first payment.`}</p>
@@ -81,37 +92,45 @@ const PendingPayment = (props: ProcessProps) => {
                     {last &&
                     <p>{t`Waiting for your last payment.`}</p>
                     }
+                    {!props.hidden &&
                     <p>
                         <ButtonToolbar>
                             <Button color="green" onClick={(ev) => {ev.preventDefault(); store.pay(props.data)}}>{t`Pay`}</Button>
                         </ButtonToolbar>
                     </p>
+                    }
                 </div>
                 }
             </TimelinePanel>
+            }
         </React.Fragment>
     )
 }
 
 const PendingProduct = (props: ProcessProps) => {
 
+    const [accept_loading, set_accept_loading] = useState(false)
     const store = useCommissionStore()
     let commission = store.get_commission()
     const name = commission ? commission.to_user.username : ''
+    const done = props.data ? props.data.done : false
 
     const count = 1
     //const count = commission && commission.products ? commission.products.length : 0
 
+    const show_panel = !props.hidden || props.active
+
     return (
         <React.Fragment>
-            <TimelineTitle date={props.data.done ? toDate(new Date(props.data.done_date)) : undefined}>
-            {t`Pending product`}
+            <TimelineTitle onClick={props.onClick} date={props.done_date}>
+            {props.hidden || done ? t`Product` : t`Pending product`}
             </TimelineTitle>
+            { show_panel &&
             <TimelinePanel>
-                {props.data.done && props.is_owner && <p>{t`There are ${count} product(s) available.`}</p>}
-                {props.data.done && !props.is_owner && <p>{t`You have added ${count} product(s).`}</p>}
-                {!props.data.done && props.is_owner && <p>{t`Waiting on ${name} to finish the commission request.`}</p>}
-                {!props.data.done && !props.is_owner && !commission.finished &&
+                {done && props.is_owner && <p>{t`There are ${count} product(s) available.`}</p>}
+                {done && !props.is_owner && <p>{t`You have added ${count} product(s).`}</p>}
+                {!done && props.is_owner && <p>{t`Waiting on ${name} to finish the commission request.`}</p>}
+                {!done && !props.is_owner && !commission.finished &&
                 <div>
                     <p>{t`Waiting for you to finish the request.`}</p>
                     {!!count &&
@@ -119,7 +138,7 @@ const PendingProduct = (props: ProcessProps) => {
                         <p>{t`You have added ${count} product(s).`}</p>
                         <p>
                             <ButtonToolbar>
-                                <Button color="green" onClick={(ev) => {ev.preventDefault(); store.confirm_products()}}>{t`Confirm`}</Button>
+                                <Button loading={accept_loading} color="green" onClick={(ev) => {ev.preventDefault(); set_accept_loading(true); store.confirm_products().then(() => set_accept_loading(false))}}>{t`Unlock`}</Button>
                             </ButtonToolbar>
                         </p>
                     </React.Fragment>
@@ -130,6 +149,7 @@ const PendingProduct = (props: ProcessProps) => {
                 </div>
                 }
             </TimelinePanel>
+            }
         </React.Fragment>
     )
 }
@@ -140,7 +160,7 @@ const Cancelled = (props: ProcessProps) => {
     let commission = store.get_commission()
     let name = ''
 
-    if (props.data.user) {
+    if (props.data && props.data.user) {
         let user = props.data.user
         if (typeof props.data.user === 'string') {
             if (commission.to_user._id === props.data.user) {
@@ -155,13 +175,32 @@ const Cancelled = (props: ProcessProps) => {
 
     return (
         <React.Fragment>
-            <TimelineTitle date={props.data.done_date}>
+            <TimelineTitle onClick={props.onClick} date={props.done_date}>
             {t`Cancelled`}
             </TimelineTitle>
             <TimelinePanel className="clearfix">
                 <span className="float-right"><Icon className="text-red-300" icon="close" size="4x"/></span>
                 <p>{t`Commission request was cancelled by ${name}.`}</p>
             </TimelinePanel>
+        </React.Fragment>
+    )
+}
+
+const Unlocked = (props: ProcessProps) => {
+    const done = props.data ? props.data.done : false
+    const show_panel = !props.hidden || props.active
+
+    return (
+        <React.Fragment>
+            <TimelineTitle onClick={props.onClick} date={props.done_date}>
+            {t`Unlock`}
+            </TimelineTitle>
+            {show_panel &&
+            <TimelinePanel>
+                {!done && <p>{t`Commission product(s) will get unlocked`}</p>}
+                {done && <p>{t`Commission product(s) is now unlocked!`}</p>}
+            </TimelinePanel>
+            }
         </React.Fragment>
     )
 }
@@ -182,16 +221,19 @@ const Completed = (props: ProcessProps) => {
     let from_confirmed = false
     let to_confirmed = false
 
-    if (props.data.data) {
+    if (props.data && props.data.data) {
         from_confirmed = props.data.data.confirmed.includes(commission.from_user._id)
         to_confirmed = props.data.data.confirmed.includes(commission.to_user._id)
     }
 
+    const show_panel = !props.hidden || props.active
+
     return (
         <React.Fragment>
-            <TimelineTitle date={completed && end_date ? end_date : undefined}>
-            {finished ? t`Complete` : t`Confirm`}
+            <TimelineTitle  onClick={props.onClick} date={completed && end_date ? end_date : undefined}>
+            {finished || props.hidden ? t`Complete` : t`Confirm`}
             </TimelineTitle>
+            { show_panel &&
             <TimelinePanel>
                 {completed &&
                 <React.Fragment>
@@ -214,6 +256,7 @@ const Completed = (props: ProcessProps) => {
                 </React.Fragment>
                 }
             </TimelinePanel>
+            }
         </React.Fragment>
     )
 }
@@ -247,9 +290,10 @@ const CommissionProcess = () => {
 
     const [cancel_loading, set_cancel_loading] = useState(false)
     const [complete_loading, set_complete_loading] = useState(false)
+    const [selected, set_selected] = useState('')
 
     const is_finished = commission.finished
-    const is_complete = commission.compelte
+    const is_complete = commission.completed
     let is_owner = user._id === commission.from_user._id
     let start_date = toDate(commission ? new Date(commission.created) : new Date())
     let end_date = commission && commission.end_date ? toDate(new Date(commission.end_date)) : null
@@ -264,6 +308,50 @@ const CommissionProcess = () => {
         }
     }
 
+    let visited_types = phases.map(v => v.type)
+    let unvisited_phases = []
+
+    if (!is_finished) {
+
+            if (!visited_types.includes("pending_payment")) {
+                unvisited_phases.push(
+                    <CommissionTimelineItem key="1">
+                        <PendingPayment hidden data={{data: {last: false, count: 1}}} is_owner={is_owner}/>
+                    </CommissionTimelineItem>
+                )
+            }
+            if (!visited_types.includes("pending_product")) {
+                unvisited_phases.push(
+                    <CommissionTimelineItem key="1">
+                        <PendingProduct hidden data={null} is_owner={is_owner}/>
+                    </CommissionTimelineItem>
+                )
+            }
+            if (visited_types.filter(v => v === "pending_payment").length < 2) {
+                unvisited_phases.push(
+                    <CommissionTimelineItem key="1">
+                        <PendingPayment hidden data={{data: {last: true}}} is_owner={is_owner}/>
+                    </CommissionTimelineItem>
+                )
+            }
+            if (!visited_types.includes("unlock")) {
+                unvisited_phases.push(
+                    <CommissionTimelineItem key="1">
+                        <Unlocked hidden data={null} is_owner={is_owner}/>
+                    </CommissionTimelineItem>
+                )
+            }
+            if (!visited_types.includes("complete")) {
+                unvisited_phases.push(
+                    <CommissionTimelineItem key="1">
+                        <Completed hidden data={null} is_owner={is_owner}/>
+                    </CommissionTimelineItem>
+                )
+            }
+    }
+
+
+
     return (
         <div>
             <CommissionTimeline>
@@ -277,45 +365,43 @@ const CommissionProcess = () => {
                     if (is_finished) {
                         is_latest = false
                     }
-                    let el = null
+                    let on_select = (ev) => {ev.preventDefault(); set_selected(v => v == phase._id ? '' : phase._id)}
+                    let done_date = phase.done ? toDate(new Date(phase.done_date)) : undefined
+
+                    let El = null
+
                     switch(phase.type) {
                         case 'pending_approval':
-                            el = (
-                            <PendingApproval data={phase} is_latest={is_latest} is_owner={is_owner}/>
-                            )
+                            El = PendingApproval
                             break
                         case 'pending_payment':
-                            el = (
-                            <PendingPayment data={phase} is_latest={is_latest} is_owner={is_owner}/>
-                            )
+                            El = PendingPayment
                             break
                         case 'cancel':
-                            el = (
-                            <Cancelled data={phase} is_latest={is_latest} is_owner={is_owner}/>
-                            )
+                            El = Cancelled
                             break
                         case 'pending_product':
-                            el = (
-                            <PendingProduct data={phase} is_latest={is_latest} is_owner={is_owner}/>
-                            )
+                            El = PendingProduct
+                            break
+                        case 'unlock':
+                            El = Unlocked
                             break
                         case 'complete':
-                            el = (
-                            <Completed data={phase} is_latest={is_latest} is_owner={is_owner}/>
-                            )
+                            El = Completed
                             break
                         default:
                             null
                     }
                     return (
-                        <CommissionTimelineItem key={phase._id}>
-                            {el}
+                        <CommissionTimelineItem key={phase._id}  selected={selected === phase._id} active={is_latest || selected === phase._id}>
+                            <El onClick={on_select} done_date={done_date} data={phase} is_latest={is_latest} is_owner={is_owner}/>
                         </CommissionTimelineItem>
                     )
                 })
                 }
+                {unvisited_phases}
                 {!!end_date &&
-                <CommissionTimelineItem>
+                <CommissionTimelineItem active>
                     <TimelineTitle date={end_date}>
                         {capitalizeFirstLetter(formatDistanceToNow(end_date, {addSuffix: true}))}
                     </TimelineTitle>

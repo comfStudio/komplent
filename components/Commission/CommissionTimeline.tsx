@@ -9,6 +9,7 @@ import './CommissionTimeline.scss'
 
 interface TimelineTitleProps extends ReactProps {
     date?: Date | string
+    onClick?: any
 }
 
 
@@ -25,9 +26,9 @@ export const TimelineTitle = (props: TimelineTitleProps) => {
         }
     }
     return (
-        <React.Fragment>
+        <span onClick={props.onClick} className="title">
             {props.children} {!!date && <span className="muted text-sm">- ({format(date as Date, "yyyy-MM-dd - HH:mm:ss")})</span>}
-        </React.Fragment>
+        </span>
     )
 }
 
@@ -44,9 +45,14 @@ export const TimelinePanel = (props: TimelinePanel) => {
     )
 }
 
-export const CommissionTimelineItem = (props: ReactProps) => {
+interface CommissionTimelineItemProps extends ReactProps {
+    active?: boolean
+    selected?: boolean
+}
+
+export const CommissionTimelineItem = (props: CommissionTimelineItemProps) => {
     return (
-        <Timeline.Item>
+        <Timeline.Item className={"item" + (props.active ? " active" : "") + (props.selected ? " selected" : "")}>
             {props.children}
         </Timeline.Item>
     )
@@ -54,7 +60,7 @@ export const CommissionTimelineItem = (props: ReactProps) => {
 
 const CommissionTimeline = (props: ReactProps) => {
     return (
-        <Timeline>
+        <Timeline className="commission-timeline">
             {props.children}
         </Timeline>
 );

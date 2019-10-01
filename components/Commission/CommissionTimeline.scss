@@ -5,29 +5,79 @@
     margin-top: 0.9em;
     padding: 1em;
     border-color: rgba(0, 0, 0, 0.2);
+
+    &:after,
+    &:before {
+        bottom: 100%;
+        border: solid transparent;
+        content: " ";
+        height: 0;
+        width: 0;
+        position: absolute;
+        pointer-events: none;
+        left: 2em;
+    }
+
+    &:after {
+        border-bottom-color: #ffffff;
+        border-width: 0.65em;
+        margin-left: -0.64em;
+    }
+    
+    &:before {
+        border-color: rgba(113, 158, 206, 0);
+        border-bottom-color: rgba(0, 0, 0, 0.2);
+        border-width: .75em;
+        margin-left: -.75em;
+      }
 }
 
-.timeline-panel:after,
-.timeline-panel:before {
-    bottom: 100%;
-    border: solid transparent;
-    content: " ";
-    height: 0;
-    width: 0;
-    position: absolute;
-    pointer-events: none;
-    left: 2em;
-}
 
-.timeline-panel:after {
-    border-bottom-color: #ffffff;
-    border-width: 0.65em;
-    margin-left: -0.64em;
-}
 
-.timeline-panel:before {
-    border-color: rgba(113, 158, 206, 0);
-    border-bottom-color: rgba(0, 0, 0, 0.2);
-    border-width: .75em;
-    margin-left: -.75em;
-  }
+.commission-timeline {
+
+    .title {
+
+        &:hover {
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+    }
+
+    .item {
+        
+        padding-top: 0;
+        padding-bottom: 0;
+        transition: padding 0.5s ease;
+
+        [class*="-dot"]::before {
+            transition: inherit;
+        }
+
+        &.active {
+    
+            &:not(:first-child):not(:last-child) {
+                padding-top: 2em;
+                [class*="-dot"] {
+                    padding-top: inherit;
+                }
+            }
+    
+            &:not(:last-child) {
+                padding-bottom: 2em;
+            }
+    
+            [class*="-dot"]::before {
+                @apply bg-primary;
+            }
+        }
+
+        &.selected {
+            [class*="-dot"]::before {
+                @apply bg-secondary;
+            }
+        }
+    }
+
+}
