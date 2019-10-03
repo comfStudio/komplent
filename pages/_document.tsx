@@ -1,21 +1,30 @@
 // _document is only rendered on the server side and not on the client side
 // Event handlers like onClick can't be added to this file
-
+import React, { useEffect } from 'react';
 import Document, { Html, Head, Main, NextScript } from 'next/document'
 import sprite from 'svg-sprite-loader/runtime/sprite.build';
+import getConfig from 'next/config'
+
 import { connect } from '@server/db'
+import { Props as AuthProps, AuthPage, getAuthProps } from '@components/App/AuthPage'
+import { useMount } from 'react-use';
+
+const { publicRuntimeConfig, serverRuntimeConfig }= getConfig()
 
 const server_initialize = async () => {
   await connect()
 }
 
-class KomplentDocument extends Document {
+class KomplentDocument extends Document<AuthProps> {
   static async getInitialProps(ctx) {
     const spriteContent = sprite.stringify();
+
     const initialProps = await Document.getInitialProps(ctx)
+
     return {
         spriteContent,
-        ...initialProps }
+        ...initialProps,
+    }
   }
 
   render() {
@@ -32,7 +41,7 @@ class KomplentDocument extends Document {
   }
 }
 
-if (process.env.SERVER_BUILD) {
+if (Object.entries(serverRuntimeConfig).length && typeof window === 'undefined') {
   server_initialize()
 }
 

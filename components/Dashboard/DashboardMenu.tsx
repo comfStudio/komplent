@@ -14,9 +14,6 @@ const DashboardMenu = (props: Props) => {
             <Link href="/dashboard/activity" passHref>
                 <Nav.Item eventKey="activity" active={props.activeKey=='activity'}>{t`Activity`}</Nav.Item>
             </Link>
-            <Link href="/dashboard/followings" passHref>
-                <Nav.Item eventKey="followings" active={props.activeKey=='followings'}>{t`Followings`}</Nav.Item>
-            </Link>
         </Nav>
     );
 };

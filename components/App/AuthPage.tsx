@@ -11,6 +11,7 @@ import { LoginContext } from '@client/context'
 import * as pages from '@utility/pages'
 import LoginPage from '@components/App/LoginPage'
 import { fetch } from '@utility/request';
+import { NoLoginPage } from '@components/User/Auth';
 
 export interface Props {
     useUserState?: object
@@ -109,8 +110,15 @@ export class AuthPage<T extends Props = Props> extends Component<T> {
 
         const logged_in = this.props.useUserState.logged_in
 
+
         if ((logged_in && !this.props.inverse) || (!logged_in && this.props.inverse)) {
             return without_login_context
+        } else if (logged_in && this.props.inverse) {
+            return (
+                <useUserStore.Provider initialState={this.props.useUserState}>
+                    <NoLoginPage/>
+                </useUserStore.Provider>
+            )
         } else {
             return (
                 <useUserStore.Provider initialState={this.props.useUserState}>

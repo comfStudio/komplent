@@ -11,6 +11,7 @@ import { COOKIE_AUTH_TOKEN_KEY } from '@server/constants'
 import { get_jwt_data, get_jwt_user } from '@server/middleware'
 import { update_db } from '@app/client/db'
 import { user_store_schema } from '@schema/user'
+import { Follow } from '@db/models';
 
 export const fetch_user =  async (cookies_obj) => {
     if (cookies_obj[COOKIE_AUTH_TOKEN_KEY]) {
@@ -108,14 +109,82 @@ export const useUserStore = createStore(
 
     return [false, (await r.json()).error]
     },
+    async get_follow(profile_user, current_user?) {
+        let f = null
+        if (!current_user) {
+            current_user = this.state.current_user
+        }
+
+        if (current_user && profile_user) {
+            let q = {follower: current_user._id, followee: profile_user._id, end: null}
+            if (is_server()) {
+                f = await Follow.findOne(q).sort({"created": -1}).lean()
+            } else {
+                await fetch("/api/fetch",{
+                    method:"post",
+                    body: {model: "Follow",
+                    method:"findOne",
+                    query: q,
+                    sort: {"created": -1}
+                 }
+                }).then(async (r) => {
+                    if (r.ok) {
+                        f = (await r.json()).data
+                    }
+                })
+            }
+        }
+
+        return f
+    },
     async save(state?: object) {
         let s = {_id: this.state._id, has_selected_usertype: this.state.has_selected_usertype, user: this.state.current_user._id, ...state}
         return await update_db({model:'UserStore', data:s, schema:user_store_schema, validate:true, create:true})
     }
   },
-//   async (store) => {
-//     await bootstrapStoreDev({useUserStore: store})
-//   }
 );
+
+export const useProfileStore = createStore(
+    {
+        _current_user: undefined as any,
+        profile: undefined as any
+    },
+  );
+
+export const useFollowerStore = createStore(
+    {
+        followers: []
+    },
+    {
+        async get_followers(current_user) {
+            let f = []
+    
+            if (current_user ) {
+                let q = {follower: current_user._id, end: null}
+                let p = "followee"
+                if (is_server()) {
+                    f = await Follow.find(q).populate(p).sort({"created": -1}).lean()
+                } else {
+                    await fetch("/api/fetch",{
+                        method:"post",
+                        body: {model: "Follow",
+                        method:"find",
+                        query: q,
+                        sort: {"created": -1},
+                        populate:p }
+                    }).then(async (r) => {
+                        if (r.ok) {
+                            f = (await r.json()).data
+                        }
+                    })
+                }
+                f = f.map(v => v.followee)
+            }
+    
+            return f
+        },
+    }
+);
+
 
 export default useUserStore;

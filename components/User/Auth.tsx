@@ -13,6 +13,7 @@ interface Props extends ReactProps {
 export const NoLoginPage = () => {
     const logged_in = useLoginStatus()
     useEffect(() => {
+        console.log(logged_in)
       if (logged_in) {
         Router.replace(pages.dashboard)
       }

@@ -53,7 +53,7 @@ export const LoginForm = (props: LoginFormProps) => {
                     </Button>
                 </ButtonToolbar>
             <Divider>{t`Or using your email address`}</Divider>
-            <Form fluid className={cls} action="/api/login" formValue={form_value} model={login_model} ref={ref => (set_form_ref(ref))} onChange={(value => set_form_value(value))}>
+            <Form fluid className={cls} method="post" action="/api/login" formValue={form_value} model={login_model} ref={ref => (set_form_ref(ref))} onSubmit={(e) => e.preventDefault()} onChange={(value => set_form_value(value))}>
                 <FormGroup>
                     <ControlLabel>{t`Email address or Username`}</ControlLabel>
                     <FormControl name="name" accepter={Input} required />

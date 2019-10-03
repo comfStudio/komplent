@@ -3,7 +3,7 @@ import mongoose from 'mongoose'
 
 const { Schema } = mongoose
 
-const { ObjectId, Mixed, Decimal128 } = mongoose.Schema.Types
+const { ObjectId, Mixed, Decimal128, Buffer } = mongoose.Schema.Types
 
 export const commission_schema = new Schema({
     from_title: String,
@@ -99,7 +99,7 @@ export const commission_phase_schema = new Schema({
         required: true,
       },
     title: String,
-    data: Object,
+    data: Mixed,
     done: {
         type: Boolean,
         default: false

@@ -1,5 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Router from 'next/router'
+import { Grid, Row, Col, Icon, IconButton } from 'rsuite';
 
 import { MainLayout, Container, PanelContainer } from '@components/App/MainLayout'
 import { ProfileHeader } from '@components/Profile/ProfileHeader'
@@ -8,7 +9,8 @@ import ProfileInfo from '@components/Profile/ProfileInfo'
 import { useProfileUser, useUser } from '@hooks/user'
 import { t } from '@app/utility/lang'
 import { ReactProps } from '@utility/props'
-import { Grid, Row, Col, Icon } from 'rsuite';
+import { useUpdateDatabase } from '@hooks/db';
+import { follow_schema } from '@schema/user'
 
 interface LayoutProps extends ReactProps, MenuProps {
   activeKey?: string
@@ -61,7 +63,40 @@ export const RequireOwnProfileInverse = () => {
   return null
 }
 
-export const DrawingList = () => {
+export const FollowButton = () => {
+
+  const { current_user, profile_user, context: { follow } } = useProfileUser()
+  const [follow_obj, set_follow_obj] = useState(follow)
+  const [loading, set_loading] = useState(false)
+  const update = useUpdateDatabase()
+
+  return (
+      <IconButton loading={loading} icon={<Icon icon="bell"/>} appearance="default" color={follow_obj ? "blue" : undefined} size="lg" className="mx-3"
+      onClick={(ev) => {
+        ev.preventDefault()
+        set_loading(true)
+        if (follow_obj) {
+          update("Follow", {...follow_obj, end: new Date()}, follow_schema, true).then((r) => {
+            if (r.status) {
+              set_follow_obj(null)
+            }
+            set_loading(false)
+          })
+        } else {
+          update("Follow", {follower: current_user._id, followee: profile_user._id}, follow_schema, true, true).then((r) => {
+            if (r.status) {
+              set_follow_obj(r.body)
+            }
+            set_loading(false)
+          })
+        }
+      }}>
+      {follow_obj ? t`Following` : t`Follow`}
+      </IconButton>
+  )
+}
+
+export const GuidelineList = () => {
   return (
     <Grid fluid>
       <Row>

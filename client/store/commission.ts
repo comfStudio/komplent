@@ -254,6 +254,18 @@ export const useCommissionStore = createStore(
 export const useCommissionsStore = createStore(
     {
         commissions: undefined,
+    },
+    {
+        sent_commissions(user_id) {
+            return this.state.commissions.filter((d) => d.from_user._id === user_id)
+        },
+        received_commissions(user_id) {
+            return this.state.commissions.filter((d) => d.to_user._id === user_id)
+        },
+        get_title(user_id, commission) {
+            const owner = commission.from_user._id === user_id
+            return owner ? commission.from_title : commission.to_title ? commission.to_title : commission.from_title
+        }
     }
 )
 
@@ -290,7 +302,7 @@ export const useCommissionRateStore = createStore(
         }
         return r
     },
-    async load(user) {
+    async load(profile_user) {
 
         let state = {
             options: [],
@@ -299,9 +311,9 @@ export const useCommissionRateStore = createStore(
 
         let a, b
 
-        let extra_option_q = {user:user._id}
+        let extra_option_q = {user:profile_user._id}
 
-        let rate_q = {user:user._id}
+        let rate_q = {user:profile_user._id}
 
         if (is_server()) {
 

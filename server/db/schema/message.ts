@@ -3,7 +3,7 @@ import mongoose from 'mongoose'
 
 const { Schema } = mongoose
 
-const { ObjectId } = mongoose.Schema.Types
+const { ObjectId, Buffer } = mongoose.Schema.Types
 
 export const message_schema = new Schema({
     body: String,

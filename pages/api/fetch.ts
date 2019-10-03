@@ -8,9 +8,9 @@ import { with_middleware, ExApiRequest, ExApiResponse } from '@server/middleware
 
 const cors = microCors({ allowMethods: ['POST', 'OPTIONS'] })
 
-export default cors(with_middleware(async (req: ExApiRequest, res: ExApiResponse) => {
+export default with_middleware(async (req: ExApiRequest, res: ExApiResponse) => {
     try {
-        const { query, model, method, populate, lean } = req.json
+        const { query, model, method, populate, lean, sort } = req.json
 
         let m = mongoose.models[model]
 
@@ -44,6 +44,10 @@ export default cors(with_middleware(async (req: ExApiRequest, res: ExApiResponse
             }
         }
 
+        if (sort) {
+            qmethod = qmethod.sort(sort)
+        }
+
         if (qmethod.lean && lean !== false) {
             qmethod = qmethod.lean()
         }
@@ -55,4 +59,4 @@ export default cors(with_middleware(async (req: ExApiRequest, res: ExApiResponse
     } catch(err) {
         res.status(BAD_REQUEST).json(error_message(err.message))
     }
-}))
+})

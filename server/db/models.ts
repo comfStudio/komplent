@@ -3,7 +3,7 @@ import { is_server } from '@utility/misc'
 
 import { user_schema, profile_schema, user_store_schema,
         commission_stats_schema, gallery_schema,
-        user_settings_schema,
+        user_settings_schema, follow_schema,
         IUser, IUserModel } from '@schema/user'
 
 import { message_schema, conversation_schema } from '@schema/message'
@@ -31,6 +31,7 @@ commission_schema.post("save", async function() {
 
 export const User = is_server() ? mongoose.models.User as IUserModel || mongoose.model<IUser, IUserModel>('User', user_schema) : undefined
 export const UserStore = is_server() ? mongoose.models.UserStore || mongoose.model<Document>('UserStore', user_store_schema) : undefined
+export const Follow = is_server() ? mongoose.models.Follow || mongoose.model<Document>('Follow', follow_schema) : undefined
 export const Profile = is_server() ? mongoose.models.Profile || mongoose.model<Document>('Profile', profile_schema) : undefined
 export const CommissionStats = is_server() ? mongoose.models.CommissionStats || mongoose.model<Document>('CommissionStats', commission_stats_schema) : undefined
 export const Commission = is_server() ? mongoose.models.Commission || mongoose.model<Document>('Commission', commission_schema) : undefined

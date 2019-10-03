@@ -5,7 +5,6 @@ import { ReactProps, HTMLElementProps } from '@utility/props'
 
 import UserSidebar from '@app/components/App/UserSidebar'
 import { useLoginStatus } from '@app/client/hooks/auth';
-import UserTypeModal from '@components/User/UserTypeModal'
 
 
 import './MainLayout.scss'
@@ -44,11 +43,17 @@ export const MainLayout = (props: Props) => {
         </Header>
         <Content>
           <Grid>
-            {!!logged_in && <UserTypeModal/>}
             {content}
           </Grid>
         </Content>
         <Footer className="footer">
+          <GridContainer fluid padded className="bg-secondary h-64">
+            <Container>
+              <Row>
+                <Col xs={12}></Col>
+              </Row>
+            </Container>
+          </GridContainer>
         </Footer>
       </Layout>
     )
@@ -102,7 +107,7 @@ export const GridContainer = (props: GridContainerProps) => {
     cls += ` py-${typeof props.padded == 'number' ? props.padded : 5}`
   }
 
-  return (<Grid className={props.className ? (props.className + " " + cls) : cls} {...props}>
+  return (<Grid className={props.className ? (props.className + " " + cls) : cls} fluid={props.fluid}>
     {props.children}
   </Grid>)
 }

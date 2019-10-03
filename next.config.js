@@ -63,6 +63,12 @@ const webpack_config = (config, { dev, isServer }) => {
   return config
 }
 
+let next_config = {
+  poweredByHeader: false,
+  distDir: 'build',
+  webpack: webpack_config,
+}
+
 module.exports = withConfig(
   withPlugins([
       [withOptimizedImages, {
@@ -115,25 +121,14 @@ module.exports = withConfig(
         }]
     ],
     {
-    poweredByHeader: false,
-    distDir: 'build',
-    env: {
-      SERVER_BUILD: false,
-    },
-    webpack: webpack_config,
-    [PHASE_PRODUCTION_SERVER]: {
-      env: {
-        SERVER_BUILD: true,
+      ...next_config,
+      [PHASE_PRODUCTION_BUILD]: Object.assign({
+
+      }, next_config),
+      [PHASE_PRODUCTION_SERVER]: {
       },
-    },
-    [PHASE_DEVELOPMENT_SERVER]: {
-      env: {
-        SERVER_BUILD: true,
+      [PHASE_DEVELOPMENT_SERVER]: {
       },
-    },
-    [PHASE_PRODUCTION_BUILD]: {
-      webpack: webpack_config,
-    },
-    ['!' + PHASE_DEVELOPMENT_SERVER]: {},
+      ['!' + PHASE_DEVELOPMENT_SERVER]: {},
 	}),
 );

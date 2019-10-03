@@ -7,6 +7,7 @@ import { ReactProps } from '@utility/props'
 import { CommissionButton } from '@app/components/Profile/ProfileCommission'
 import { useProfileUser } from '@hooks/user'
 import { t } from '@app/utility/lang'
+import { FollowButton } from '.';
 
 export const Avatar = (props) => {
     return (
@@ -42,7 +43,7 @@ export const ProfileHeader = (props: HeaderProps) => {
                     { !profile_owner && (
                         <React.Fragment>
                             <CommissionButton className="z-10"/>
-                            <IconButton icon={<Icon icon="bell"/>} appearance="default" size="lg" className="mx-3">{t`Follow`}</IconButton>
+                            <FollowButton/>
                         </React.Fragment>
                     )}
                     {props.children}

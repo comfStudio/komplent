@@ -11,6 +11,7 @@ import { IUser } from '@schema/user'
 import { is_server } from '@utility/misc';
 import { useCommissionRateStore } from '@client/store/commission';
 import { fetch } from '@utility/request';
+import useUserStore from '@store/user';
 
 
 interface Props extends AuthProps {
@@ -19,6 +20,7 @@ interface Props extends AuthProps {
     profile_user: IUser
     profile_path: string
     profile_owner: boolean
+    follow: any
     commissionRateStoreState: object
 }
 
@@ -55,8 +57,6 @@ class ProfilePage extends OptionalAuthPage<Props> {
         
         const props = await super.getInitialProps(ctx)
 
-        console.log(props.useUserState)
-
         const profile_owner = props.useUserState.current_user && profile_user && props.useUserState.current_user.username == profile_user.username
 
         let commissionRateStoreState = useCommissionRateStore.createState({})
@@ -64,6 +64,11 @@ class ProfilePage extends OptionalAuthPage<Props> {
             commissionRateStoreState = await useCommissionRateStore.actions.load(profile_user)
         }
         
+        let follow = null
+        if (props.useUserState.current_user) {
+            follow = await useUserStore.actions.get_follow(profile_user, props.useUserState.current_user)
+        }
+
         return {
             error,
             profile_id,
@@ -71,6 +76,7 @@ class ProfilePage extends OptionalAuthPage<Props> {
             profile_path,
             profile_owner,
             commissionRateStoreState,
+            follow,
             ...props
         }
     }
@@ -88,6 +94,7 @@ class ProfilePage extends OptionalAuthPage<Props> {
                     profile_user: this.props.profile_user,
                     profile_path: this.props.profile_path,
                     profile_owner: this.props.profile_owner,
+                    follow: this.props.follow
                 }}>
                     {super.renderPage(children)}
                 </ProfileContext.Provider>

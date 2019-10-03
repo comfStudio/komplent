@@ -10,6 +10,7 @@ import { JWT_KEY, JWT_EXPIRATION, CRYPTO_COST_FACTOR } from '@server/constants'
 
 const { publicRuntimeConfig, serverRuntimeConfig }= getConfig()
 
+
 export async function connect() {
   if (mongoose.connection.readyState == 0) {
     await mongoose.connect(serverRuntimeConfig.MONGODB_URL, {

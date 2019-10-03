@@ -3,7 +3,7 @@ import mongoose, { Document, Model } from 'mongoose'
 
 const { Schema } = mongoose
 
-const { ObjectId, Decimal128 } = mongoose.Schema.Types
+const { ObjectId, Decimal128, Buffer } = mongoose.Schema.Types
 
 export const user_schema = new Schema({
   name: String,
@@ -30,11 +30,7 @@ export const user_schema = new Schema({
     type: ObjectId, 
     ref: 'CommissionRate'
   }],
-  followings: [{ 
-    type: ObjectId, 
-    ref: 'User'
-  }],
-  followers: [{ 
+  follows: [{ 
     type: ObjectId, 
     ref: 'User'
   }],
@@ -87,6 +83,22 @@ export const user_schema = new Schema({
 //   }
 // })
 
+user_schema.virtual("followers", {
+  ref: "Follow",
+  localField: "_id",
+  foreignField: "followee",
+  justOne: false,
+  options: { sort: { created: -1 } },
+})
+
+user_schema.virtual("followings", {
+  ref: "Follow",
+  localField: "_id",
+  foreignField: "follower",
+  justOne: false,
+  options: { sort: { created: -1 } },
+})
+
 user_schema.statics.check_exists = async function({username, email}) {
       if (username) {
         const r = await this.exists({username: username})
@@ -116,6 +128,18 @@ export const gallery_schema = new Schema({
   url: String
 }, { timestamps: { createdAt: 'created', updatedAt: 'updated' } })
 
+export const follow_schema = new Schema({
+  follower: { 
+    type: ObjectId, 
+    ref: 'User',
+  },
+  followee: { 
+    type: ObjectId, 
+    ref: 'User',
+  },
+  end: Date
+}, { timestamps: { createdAt: 'created', updatedAt: 'updated' } })
+
 export const comission_rate_schema = new Schema({
   price: Decimal128,
   image: { 
@@ -137,6 +161,12 @@ export const commission_stats_schema = new Schema({
 export const profile_schema = new Schema({
   reviews: [],
   comments: [{ body: String, date: Date }],
+  commission_guidelines: [
+    {
+      guideline_type: String,
+      value: String
+    }
+  ],
   cover: { 
     type: ObjectId, 
     ref: 'Image'

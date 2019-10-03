@@ -8,9 +8,9 @@ import { error_message, message } from '@utility/message'
 import { User } from '@db/models'
 import { login_user } from '@server/db'
 
-const cors = microCors({ allowMethods: ['POST'] })
+const cors = microCors({ allowMethods: ['POST', 'OPTIONS'] })
 
-export default cors(with_middleware(async (req: ExApiRequest, res: NextApiResponse) => {
+export default with_middleware(async (req: ExApiRequest, res: NextApiResponse) => {
     if (!req.user) {
         try {
             const { name, password } = req.json
@@ -41,4 +41,4 @@ export default cors(with_middleware(async (req: ExApiRequest, res: NextApiRespon
     } else {
         res.status(OK).json(Object.assign(error_message("Already logged in"), {user:req.user}))
     }
-}))
+})

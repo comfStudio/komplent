@@ -5,6 +5,7 @@ interface Profile {
     profile_user?: object
     profile_path?: string
     profile_owner?: boolean
+    follow?: any
 }
 
 export const ProfileContext = React.createContext<Profile>({})

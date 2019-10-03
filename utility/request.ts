@@ -1,4 +1,4 @@
-import unfecth from 'isomorphic-unfetch'
+import unfetch from 'isomorphic-unfetch'
 import cookies from 'nookies'
 
 import { is_server } from '@utility/misc'
@@ -50,7 +50,7 @@ export const fetch = (url, props: FetchInit = {}) => {
     delete props.json
     delete props.auth
     
-    let fetch_props = Object.assign(def_props, props)
+    let fetch_props: RequestInit = Object.assign(def_props, props)
 
-    return unfecth(url, fetch_props)
+    return unfetch(url, fetch_props)
 }

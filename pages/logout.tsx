@@ -13,7 +13,6 @@ export const Logout = () => {
   const store = useUserStore()
 
   useEffect(() => {
-    console.log("logging out")
     if (store.state.current_user) {
       store.logout()
     } else {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Nav } from 'rsuite';
+import { Nav, Tag } from 'rsuite';
 import Link from 'next/link';
 
 import MainLayout from '@components/App/MainLayout';
@@ -45,7 +45,7 @@ export const CommissionLayout = (props: Props) => {
     
     return (
         <MainLayout>
-            <h3 className="pb-1 mb-2">{commission.from_title}</h3>
+            <h3 className="pb-1 mb-2"><small><Tag>{commission.from_user.username}</Tag> → <Tag>{commission.to_user.username}</Tag></small> {commission.from_title}</h3>
             <CommissionMenu {...props}/>
             {props.children}
         </MainLayout>

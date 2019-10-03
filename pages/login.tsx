@@ -7,7 +7,6 @@ import { LoginContext } from '@client/context'
 class Page extends InverseAuthPage {
 
   render() {
-    console.log("login page")
     return this.renderPage(
       <LoginContext.Provider value={{next_page: true}}>
         <LoginPage/>

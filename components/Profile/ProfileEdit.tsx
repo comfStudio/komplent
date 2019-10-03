@@ -190,7 +190,7 @@ export const Socials = () => {
     )
 }
 
-export const DrawingList = () => {
+export const CommissionGuideline = () => {
 
     return (
         <React.Fragment>
@@ -266,7 +266,13 @@ export const ProfileEdit = () => {
                 <CommissionLimit/>
                 <CommissionRequestLimit/>
                 <ModificationNumber/>
-                <DrawingList/>
+            </EditSection>
+
+            <h4>{t`Guidelines`}</h4>
+            <EditSection>
+                <EditGroup>
+                    <CommissionGuideline/>
+                </EditGroup>
             </EditSection>
 
             <h4>{t`Extras`}</h4>

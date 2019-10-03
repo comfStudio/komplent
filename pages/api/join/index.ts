@@ -9,7 +9,7 @@ import { create_user } from '@server/db'
 
 const cors = microCors({ allowMethods: ['POST'] })
 
-export default cors(with_middleware(async (req: ExApiRequest, res: NextApiResponse) => {
+export default with_middleware(async (req: ExApiRequest, res: NextApiResponse) => {
     if (!req.user) {
         try {
             const { email, username, password } = req.json
@@ -30,4 +30,4 @@ export default cors(with_middleware(async (req: ExApiRequest, res: NextApiRespon
     } else {
         res.status(BAD_REQUEST).json(error_message("Already logged in"))
     }
-}))
+})

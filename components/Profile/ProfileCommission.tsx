@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Button, Panel, Row, Col, Grid, Input, Form, Uploader, Icon, Toggle, Schema, FormControl, RadioGroup, Radio, FormGroup, Checkbox, Message, ControlLabel } from 'rsuite'
 import Link from 'next/link'
 import qs from 'qs'
+import { useRouter } from 'next/router';
 
 import { t } from '@app/utility/lang'
 import { HTMLElementProps, ReactProps } from '@utility/props'
@@ -10,13 +11,13 @@ import './ProfileCommission.scss'
 import Placeholder from '@components/App/Placeholder';
 import Image from '@components/App/Image'
 import { useProfileContext, useProfileUser, useUser } from '@hooks/user';
-import { DrawingList } from '@app/components/Profile'
+import { GuidelineList } from '@app/components/Profile'
 import { useCommissionRateStore, useCommissionStore } from '@client/store/commission';
 import { decimal128ToFloat, moneyToString, stringToMoney, decimal128ToMoney, decimal128ToMoneyToString } from '@utility/misc';
 import * as pages from '@utility/pages';
 import { make_profile_path } from '@utility/pages';
-import { useRouter } from 'next/router';
 import { RateOptions } from '@components/Form/CommissionRateForm';
+import TextEditor from '@components/App/TextEditor';
 
 const { StringType, NumberType, BooleanType, ArrayType, ObjectType } = Schema.Types;
 
@@ -259,7 +260,7 @@ export const ProfileCommission = () => {
                 </Row>
                 <hr/>
                 <Row>
-                    <DrawingList/>
+                    <GuidelineList/>
                 </Row>
                 <hr/>
                 <Row>

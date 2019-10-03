@@ -1,0 +1,15 @@
+.git/
+.vscode/
+.gitignore
+**/.gitkeep
+**/.DS_Store
+build/
+.dockerignore
+Dockerfile
+docker-compose.yml
+node_modules/
+coverage/
+nginx/
+config/
+__*/
+README.md

@@ -1,0 +1,29 @@
+version: '3.1'
+
+services:
+
+  komplent: 
+    build:
+      context: ./
+      dockerfile: ./config/komplent/Dockerfile
+  nginx: 
+    build: ./config/nginx
+    ports:
+      - 80:80
+  mongo:
+    image: mongo
+    container_name: komplent-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_DATABASE: admin
+      MONGO_INITDB_ROOT_USERNAME: komplent
+      MONGO_INITDB_ROOT_PASSWORD: komplent
+    volumes:
+      - komplent-p-mongodb:/data/db
+      - komplent-p-mongodb_config:/data/configdb
+    ports:
+      - 27017:27017
+
+volumes:
+  komplent-p-mongodb:
+  komplent-p-mongodb_config:
