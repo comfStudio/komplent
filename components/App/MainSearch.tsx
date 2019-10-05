@@ -1,25 +1,26 @@
-import React, { Component } from 'react';
-
+import React from 'react';
+import { useRouter } from 'next/router';
 import { Input, InputGroup, Icon } from 'rsuite';
-
-const { Button } = InputGroup
 
 import { t } from '@app/utility/lang'
 
-class MainSearch extends Component {
+const { Button } = InputGroup
 
-    render() {
-        return (
-            <form action="search" method="GET">
-                <InputGroup inside className="text-left !w-5/6 !max-w-6xl m-auto">
-                    <Input name="q" placeholder={t`What are you looking for?`}/>
-                    <Button>
-                        <Icon icon="search"></Icon>
-                    </Button>
-                </InputGroup>
-            </form>
-        );
-    }
+
+export const MainSearch = () => {
+
+    const router = useRouter()
+
+    return (
+        <form action="search" method="GET">
+            <InputGroup inside className="text-left !w-5/6 !max-w-6xl m-auto">
+                <Input name="q" defaultValue={router.query.q as string} placeholder={t`What are you looking for?`}/>
+                <Button>
+                    <Icon icon="search"></Icon>
+                </Button>
+            </InputGroup>
+        </form>
+    );
 }
 
 export default MainSearch;

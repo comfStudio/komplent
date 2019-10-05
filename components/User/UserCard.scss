@@ -3,34 +3,47 @@ $avatar-margin: -2.25em;
 .user-card {
     position: relative;
     margin: 0.8em auto;
-}
 
-.user-card:hover .avatar {
-    margin-top: ($avatar-margin) - 0.3;
-}
+    
+    &:hover .avatar {
+        margin-top: ($avatar-margin) - 0.3;
+    }
 
-.user-card a:not(.commission-price) {
-    color: unset;
-    text-decoration: unset;
-}
+    a:not(.commission-price) {
+        color: unset;
+        text-decoration: unset;
+    }
 
-.user-card .avatar {
-    width: 4.5em;
-    height: 4.5em;
-    border-radius: 25%;
-    position: absolute;
-    left: 0;
-    right: 0;
-    margin: $avatar-margin auto;
-    overflow: hidden;
-    transition: all .25s;
-}
+    .avatar {
+        width: 4.5em;
+        height: 4.5em;
+        border-radius: 25%;
+        position: absolute;
+        left: 0;
+        right: 0;
+        margin: $avatar-margin auto;
+        overflow: hidden;
+        transition: all .25s;
 
-.user-card .avatar img {
-    border-radius: 25%;
-}
+        img {
+            border-radius: 25%;
+        }
+    }
 
-.user-card .info {
-    padding-top: 2.5em;
-    padding-bottom: 1em;
+    .info {
+        padding-top: 2.5em;
+        padding-bottom: 1em;
+    }
+
+    .commission-price {
+        @apply text-primary;
+
+        &+::before {
+            content: '•';
+            @apply text-gray-500;
+            margin: 0 0.5em;
+            text-decoration: none;
+            cursor: unset;
+        }
+    }
 }

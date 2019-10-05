@@ -5,7 +5,7 @@ import Document, { Html, Head, Main, NextScript } from 'next/document'
 import sprite from 'svg-sprite-loader/runtime/sprite.build';
 import getConfig from 'next/config'
 
-import { connect } from '@server/db'
+import { connect, synchronize_indexes } from '@server/db'
 import { Props as AuthProps, AuthPage, getAuthProps } from '@components/App/AuthPage'
 import { useMount } from 'react-use';
 
@@ -13,6 +13,7 @@ const { publicRuntimeConfig, serverRuntimeConfig }= getConfig()
 
 const server_initialize = async () => {
   await connect()
+  await synchronize_indexes()
 }
 
 class KomplentDocument extends Document<AuthProps> {

@@ -52,3 +52,15 @@ export const moneyToString = (d) => {
 export const capitalizeFirstLetter = (string) => {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
+
+export function promisify_es_search(model, ...args) {
+    return new Promise(function (resolve, reject) {
+        model.esSearch(...args, function (err, result) {
+            if (err) {
+                reject(err)
+            } else {
+                resolve(result)
+            }
+        })
+    })
+}

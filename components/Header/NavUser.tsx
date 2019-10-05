@@ -3,7 +3,7 @@ import { Icon, Nav, Dropdown  } from 'rsuite';
 import Link from 'next/link';
 
 import { useUser, useProfileContext } from '@hooks/user'
-import { make_profile_path } from '@utility/pages'
+import { make_profile_urlpath } from '@utility/pages'
 import { t } from '@app/utility/lang'
 
 import "./NavUser.scss"
@@ -36,7 +36,7 @@ export const NavUserMenu = (props: UserMenuProps) => {
     return (
         <React.Fragment>
         {user.type === 'creator' && 
-        <Link href={make_profile_path(user)} passHref>
+        <Link href={make_profile_urlpath(user)} passHref>
             <El.Item eventKey="profile" active={props.activeKey=='profile' && profile_owner}>
                 {t`My Profile`}
             </El.Item>

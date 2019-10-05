@@ -7,15 +7,25 @@ import { t } from '@app/utility/lang'
 import { HTMLElementProps } from '@app/utility/props'
 
 import './UserCard.scss'
+import { make_profile_id, make_profile_urlpath, make_commission_rate_urlpath } from '@utility/pages';
+import { decimal128ToMoneyToString } from '@utility/misc';
+import { CommissionButton } from '@components/Profile/ProfileCommission';
 
 interface Props extends HTMLElementProps {
+    data: any
     fluid?: boolean
 }
 
 export const UserCard = ({fluid = true, ...props}: Props) => {
+
+    let rates = []
+    if (props.data.rates) {
+        rates = props.data.rates
+    }
+
     return (
         <Panel bordered bodyFill className={`user-card ${fluid && 'w-full'}`}>
-            <Link href="#">
+            <Link href={make_profile_urlpath(props.data)}>
                 <a>
                 <Grid fluid className="cover">
                     <Row>
@@ -28,24 +38,22 @@ export const UserCard = ({fluid = true, ...props}: Props) => {
                     <Image placeholderText="3" w={80} h={80}/>
                 </div>
                 <div className="pl-4 pr-3 info">
-                    <Button className="float-right mt-1" appearance="primary" size="sm">
+                    <CommissionButton user={props.data} className="float-right mt-1" appearance="primary" size="sm">
                         {t`Commission`}
-                    </Button>
-                    <strong className="text-primary">Twiddly</strong>
-                    <p className="font-light text-gray-500">
-                        <Link href="#">
-                            <a className="text-gray-500 commission-price">5$</a>
-                        </Link>
-                        <span className="text-pink-400 commission-price"> • </span> 
-                        <Link href="#">
-                            <a className="text-gray-500 commission-price">10$</a>
-                        </Link>
-                        <span className="text-pink-400 commission-price"> • </span> 
-                        <Link href="#">
-                            <a className="text-gray-500 commission-price">25$</a>
-                        </Link>
+                    </CommissionButton>
+                    <strong className="text-primary">{props.data.name}<small className="italic muted ml-1">{make_profile_id(props.data)}</small></strong>
+                    <p className="font-light mt-2">
+                        {!!rates.length &&
+                            rates.map(r => {
+                                return (
+                                    <Link key={r._id} href={make_commission_rate_urlpath(props.data, r)}>
+                                        <a className="commission-price">{decimal128ToMoneyToString(r.price)}</a>
+                                    </Link>
+                                )
+                            })
+                        }
                     </p>
-                    <blockquote>I draw illustrations and comics! I love taking commissions!</blockquote>
+                    {/* <blockquote>I draw illustrations and comics! I love taking commissions!</blockquote> */}
                 </div>
                 </a>
             </Link>

@@ -5,7 +5,7 @@ import Error from 'next/error'
 
 import { OptionalAuthPage, Props as AuthProps } from '@components/App/AuthPage'
 import { ProfileContext } from '@client/context'
-import { get_profile_id, make_profile_path } from '@utility/pages'
+import { parse_profile_id, make_profile_urlpath } from '@utility/pages'
 import { User } from '@db/models'
 import { IUser } from '@schema/user'
 import { is_server } from '@utility/misc';
@@ -27,7 +27,7 @@ interface Props extends AuthProps {
 class ProfilePage extends OptionalAuthPage<Props> {
 
     static async getInitialProps(ctx: NextPageContext) {
-        let profile_id = get_profile_id(ctx.asPath)
+        let profile_id = parse_profile_id(ctx.asPath)
         let error = null
         let profile_user = null
         let profile_path = ""
@@ -45,7 +45,7 @@ class ProfilePage extends OptionalAuthPage<Props> {
             }
 
             if (profile_user) {
-                profile_path = make_profile_path(profile_user)
+                profile_path = make_profile_urlpath(profile_user)
             }
             
         }

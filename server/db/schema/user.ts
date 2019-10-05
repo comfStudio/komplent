@@ -1,34 +1,33 @@
-import '.'
+import { EL_HOSTS } from '.'
 import mongoose, { Document, Model } from 'mongoose'
+import { is_server } from '@utility/misc'
+import mongoosastic from 'mongoosastic'
 
 const { Schema } = mongoose
 
 const { ObjectId, Decimal128, Buffer } = mongoose.Schema.Types
 
 export const user_schema = new Schema({
-  name: String,
+  name: { type: String, es_indexed:true },
   type: {
     type: String,
     enum : ['creator','consumer'],
-    default: 'consumer'
+    default: 'consumer',
+    es_indexed:true
   },
   email: { type: String, unique: true, trim: true },
-  username: { type: String, unique: true, trim: true, minLength: 3, maxLength: 60 },
+  username: { type: String, unique: true, trim: true, minLength: 3, maxLength: 60, es_indexed:true },
   password: { type: String, minLength: 8, select: false },
   avatar: { 
     type: ObjectId, 
     ref: 'Image'
   },
-  origin: String,
+  origin: { type: String, es_indexed:true },
   description: String,
   socials: [{ url: String, name: String }],
   tags: [{ 
     type: ObjectId, 
     ref: 'Tag'
-  }],
-  rates: [{ 
-    type: ObjectId, 
-    ref: 'CommissionRate'
   }],
   follows: [{ 
     type: ObjectId, 
@@ -66,6 +65,13 @@ export const user_schema = new Schema({
   ]
 },{ timestamps: { createdAt: 'created', updatedAt: 'updated' } })
 
+if (is_server()) {
+  user_schema.plugin(mongoosastic, {
+    hosts: EL_HOSTS
+  })
+}
+
+
 
 // user_schema.method({
 //   check_exists: async function(username: string = undefined, email: string = undefined) {
@@ -97,6 +103,14 @@ user_schema.virtual("followings", {
   foreignField: "follower",
   justOne: false,
   options: { sort: { created: -1 } },
+})
+
+user_schema.virtual("rates", {
+  ref: "CommissionRate",
+  localField: "_id",
+  foreignField: "user",
+  justOne: false,
+  options: { sort: { price: 1 } },
 })
 
 user_schema.statics.check_exists = async function({username, email}) {
@@ -138,15 +152,6 @@ export const follow_schema = new Schema({
     ref: 'User',
   },
   end: Date
-}, { timestamps: { createdAt: 'created', updatedAt: 'updated' } })
-
-export const comission_rate_schema = new Schema({
-  price: Decimal128,
-  image: { 
-    type: ObjectId, 
-    ref: 'Image'
-  },
-  description: String,
 }, { timestamps: { createdAt: 'created', updatedAt: 'updated' } })
 
 export const commission_stats_schema = new Schema({

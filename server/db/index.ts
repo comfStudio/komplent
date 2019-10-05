@@ -10,6 +10,9 @@ import { JWT_KEY, JWT_EXPIRATION, CRYPTO_COST_FACTOR } from '@server/constants'
 
 const { publicRuntimeConfig, serverRuntimeConfig }= getConfig()
 
+export const synchronize_indexes = async () => {
+  User.synchronize()
+}
 
 export async function connect() {
   if (mongoose.connection.readyState == 0) {

@@ -2,7 +2,7 @@ import React from 'react';
 import { useFollowerStore } from '@store/user';
 import { Grid, Row, Col, List, PanelGroup } from 'rsuite';
 import Link from 'next/link';
-import { make_profile_path } from '@utility/pages';
+import { make_profile_urlpath } from '@utility/pages';
 import { PanelContainer } from '@components/App/MainLayout';
 import { t } from '@app/utility/lang'
 
@@ -17,7 +17,7 @@ const FollowingsList = () => {
                 {store.state.followers.map((user) => {
 
                     return (
-                        <Link href={make_profile_path(user)} key={user._id}>
+                        <Link href={make_profile_urlpath(user)} key={user._id}>
                             <a className="unstyled">
                             <List.Item componentClass="a">{user.username}</List.Item>
                             </a>

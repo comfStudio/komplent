@@ -14,8 +14,27 @@ services:
       - komplent-v-mongodb:/data/db
       - komplent-v-mongodb_config:/data/configdb
     ports:
-      - 27017:27017
+      - 27954:27017
+
+  elastic-search:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.4.0
+    container_name: komplent-elsatic-search
+    environment:
+      - node.name=es01
+      - cluster.initial_master_nodes=es01
+      - cluster.name=docker-cluster
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - komplent-v-elastic_search:/usr/share/elasticsearch/data
+    ports:
+      - 9245:9200
 
 volumes:
+  komplent-v-elastic_search:
   komplent-v-mongodb:
   komplent-v-mongodb_config:

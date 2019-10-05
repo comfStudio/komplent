@@ -30,6 +30,7 @@ const withConfig = withNextRuntimeDotenv({
     public: ['API_URL', 'API_KEY'],
     server: [
         'MONGODB_URL',
+        'ELASTIC_URL',
       ]
 });
 

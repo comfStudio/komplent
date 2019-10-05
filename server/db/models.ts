@@ -15,6 +15,9 @@ user_schema.pre("save", async function() {
           this.settings = new UserSettings()
           await this.settings.save()
         }
+        if (!this.name) {
+          this.name = this.username
+        }
       })
 
 commission_schema.pre("save", async function() {

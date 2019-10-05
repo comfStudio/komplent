@@ -9,9 +9,9 @@ class RecommendPanel extends Component {
         return (
             <Panel bordered header={<h3>Recommended</h3>}>
                 <PanelGroup>
+                    {/* <UserCard/>
                     <UserCard/>
-                    <UserCard/>
-                    <UserCard/>
+                    <UserCard/> */}
                 </PanelGroup>
             </Panel>
         );

@@ -15,9 +15,10 @@ import { GuidelineList } from '@app/components/Profile'
 import { useCommissionRateStore, useCommissionStore } from '@client/store/commission';
 import { decimal128ToFloat, moneyToString, stringToMoney, decimal128ToMoney, decimal128ToMoneyToString } from '@utility/misc';
 import * as pages from '@utility/pages';
-import { make_profile_path } from '@utility/pages';
+import { make_profile_urlpath } from '@utility/pages';
 import { RateOptions } from '@components/Form/CommissionRateForm';
 import TextEditor from '@components/App/TextEditor';
+import { ButtonProps } from 'rsuite/lib/Button';
 
 const { StringType, NumberType, BooleanType, ArrayType, ObjectType } = Schema.Types;
 
@@ -26,13 +27,23 @@ const sort_rates_by_price = (rates) => {
     return [...rates].sort((a, b) => decimal128ToFloat(a.price) - decimal128ToFloat(b.price))
 }
 
-export const CommissionButton = (props: HTMLElementProps) => {
-    const { profile_path } = useProfileContext()
+interface CommissionButtonProps extends HTMLElementProps, ButtonProps {
+    user?: any
+}
+
+export const CommissionButton = ({user, appearance = "primary", size="lg", children, ...props}: CommissionButtonProps) => {
+    let path
+    if (user) {
+        path = make_profile_urlpath(user)
+    } else {
+        const { profile_path } = useProfileContext()
+        path = profile_path
+    }
     let cls = "commission-button"
     return (
-        <Link href={`${profile_path}/commission`}>
-            <Button appearance="primary" size="lg" className={props.className ? cls + ' ' + props.className : cls}>
-                {t`Request a Commission`}
+        <Link href={`${path}/commission`}>
+            <Button appearance={appearance} size={size} className={props.className ? cls + ' ' + props.className : cls} {...props}>
+                { children ? children : t`Request a Commission`}
             </Button>
         </Link>
     );
@@ -101,10 +112,9 @@ export const CommissionCard = (props: CommissionCardProps) => {
 export const CommissionLinkCard = (props: CommissionCardProps) => {
     const user = useUser()
     let c_user = props.data.user
-    let url = make_profile_path(c_user)
+    let url = make_profile_urlpath(c_user)
     if (!user || !c_user || (user._id !== c_user._id)) {
-        url += '/commission'
-        url += '?' + qs.stringify({selected:props.data._id})
+        url = pages.make_commission_rate_urlpath(c_user, props.data)
     }
     
     return (

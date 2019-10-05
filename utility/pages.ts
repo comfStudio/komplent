@@ -1,3 +1,5 @@
+import qs from 'qs'
+
 export const dashboard = "/dashboard"
 export const home = "/"
 export const login = "/login"
@@ -5,12 +7,12 @@ export const commission = "/commission"
 export const commission_requests = "/commissions/requests"
 export const commissions = "/commissions"
 
-export const make_profile_urlpart = (name: string) => {
-    return `@${name}`
+export const make_profile_id = (user) => {
+    return `@${user.username}`
 }
 
-export const make_profile_path = (user: {username:string}) => {
-    return `/${make_profile_urlpart(user ? user.username : '')}`
+export const make_profile_urlpath = (user: {username:string}) => {
+    return `/${make_profile_id(user || {})}`
 }
 
 export const get_profile_urlpart = (path: string) => {
@@ -21,7 +23,7 @@ export const get_profile_urlpart = (path: string) => {
     return path
 }
 
-export const get_profile_id = (path: string) => {
+export const parse_profile_id = (path: string) => {
     const match = /^@\S+$/u  // @profile_id
     let p_id = ""
     path = get_profile_urlpart(path)
@@ -29,4 +31,11 @@ export const get_profile_id = (path: string) => {
         p_id = path.slice(1)
     }
     return p_id
+}
+
+export const make_commission_rate_urlpath = (user, rate) => {
+    let url = make_profile_urlpath(user)
+    url += '/commission'
+    url += '?' + qs.stringify({selected:rate._id})
+    return url
 }

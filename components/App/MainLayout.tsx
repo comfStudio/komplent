@@ -23,15 +23,15 @@ export const MainLayout = (props: Props) => {
 
     if (logged_in && !props.noSidebar) {
       content = (
-        <Row>
-          <Col className="sm:hidden md:block" xs={4} lg={4}><UserSidebar activeKey={props.activeKey}/></Col>
-          <Col xs={24} md={20} lg={20}>{props.children}</Col>
+        <Row className="h-full">
+          <Col className="sm:hidden md:block h-full" xs={4} lg={4}><UserSidebar activeKey={props.activeKey}/></Col>
+          <Col className="h-full" xs={24} md={20} lg={20}>{props.children}</Col>
         </Row>
       )
     } else {
       content = (
-        <Row>
-            <Col xs={24}>{props.children}</Col>
+        <Row className="h-full">
+            <Col className="h-full" xs={24}>{props.children}</Col>
         </Row>
       )
     }
@@ -42,7 +42,7 @@ export const MainLayout = (props: Props) => {
           <NavMenu activeKey={props.activeKey}/>
         </Header>
         <Content>
-          <Grid>
+          <Grid className="h-full">
             {content}
           </Grid>
         </Content>
