@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button, Panel, Progress } from 'rsuite';
 
 import { ProfileNameTag } from '@components/Profile'
@@ -11,13 +11,17 @@ import { HTMLElementProps } from '@utility/props'
 const { Circle } = Progress
 
 import './ProfileInfo.scss'
+import { useUpdateDatabase } from '@hooks/db';
+import { useTagStore } from '@store/user';
 
 interface Props extends HTMLElementProps {
 
 }
 
 export const ProfileInfo = (props: Props) => {
-    const { profile_user } = useProfileUser()
+    const { current_user, profile_user, context: { profile_owner } } = useProfileUser()
+    const store = useTagStore()
+    const [tags, set_tags] = useState(profile_user.tags)
     let cls = "w-64"
     return (
         <Panel id="profile-info" className={props.className ? cls + ' ' + props.className : cls} bordered>
@@ -25,13 +29,20 @@ export const ProfileInfo = (props: Props) => {
                 <ProfileNameTag name={profile_user.name || profile_user.username}/>
             </p>
             <p>
-                <TagGroup edit>
-                    <Tag color="blue">Illustration</Tag>
-                    <Tag color="green">Cover</Tag>
-                    <Tag color="red">Anime</Tag>
-                    <Tag color="orange">Animation</Tag>
-                    <Tag color="violet">Comic</Tag>
-                    <Tag color="yellow">Furry</Tag>
+                <TagGroup edit={profile_owner} filteredTagIds={tags.map(v => v._id)} onChange={a => {
+                    let t = store.state.tags.filter(v => a.includes(v._id))
+                    store.add_user_tags(profile_user, t)
+                    set_tags([...tags, ...t])
+                    }}>
+                    {tags.map(t => {
+                        return (
+                            <Tag key={t._id} closable={profile_owner} onClose={ev => {
+                                ev.preventDefault()
+                                store.remove_user_tag(profile_user, t._id)
+                                set_tags(tags.filter(ot => t._id !== ot._id))
+                            }} color={t.color}>{t.name}</Tag>
+                        )
+                    })}
                 </TagGroup>
             </p>
             <hr/>

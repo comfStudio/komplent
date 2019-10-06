@@ -34,10 +34,11 @@ class ProfilePage extends OptionalAuthPage<Props> {
         
         if (profile_id) {
             let q = {username: profile_id, type:"creator"}
+            let p= "tags settings"
             if (is_server()) {
-                profile_user = await User.findOne(q).lean()
+                profile_user = await User.findOne(q).populate(p).lean()
             } else {
-                await fetch("/api/fetch", {method:"post", body: {model: "User", method:"findOne", query: q}}).then(async r => {
+                await fetch("/api/fetch", {method:"post", body: {model: "User", method:"findOne", query: q, populate: p}}).then(async r => {
                     if (r.ok) {
                         profile_user = (await r.json()).data
                     }
@@ -94,6 +95,7 @@ class ProfilePage extends OptionalAuthPage<Props> {
                     profile_user: this.props.profile_user,
                     profile_path: this.props.profile_path,
                     profile_owner: this.props.profile_owner,
+                    commissions_open: this.props.profile_user.settings.commissions_open,
                     follow: this.props.follow
                 }}>
                     {super.renderPage(children)}

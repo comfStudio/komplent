@@ -2,6 +2,10 @@
     width: 12rem;
     position: relative;
 
+    &:hover {
+        cursor: pointer;
+    }
+
     .header {
 
         margin: 0;

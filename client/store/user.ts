@@ -10,7 +10,7 @@ import { is_server } from '@utility/misc'
 import { COOKIE_AUTH_TOKEN_KEY } from '@server/constants'
 import { get_jwt_data, get_jwt_user } from '@server/middleware'
 import { update_db } from '@app/client/db'
-import { user_store_schema } from '@schema/user'
+import user_schema, { user_store_schema } from '@schema/user'
 import { Follow, Tag } from '@db/models';
 
 export const fetch_user =  async (cookies_obj) => {
@@ -137,6 +137,9 @@ export const useUserStore = createStore(
 
         return f
     },
+    async update_user(data: object) {
+        return await update_db({model: 'User', data: {_id: this.state.current_user._id, ...data}, schema: user_schema, validate: true})
+    },
     async save(state?: object) {
         let s = {_id: this.state._id, has_selected_usertype: this.state.has_selected_usertype, user: this.state.current_user._id, ...state}
         return await update_db({model:'UserStore', data:s, schema:user_store_schema, validate:true, create:true})
@@ -191,9 +194,39 @@ export const useTagStore = createStore(
         tags: []
     },
     {
+        async remove_user_tag(user, tag_id: string) {
+            if (user) {
+                let tags = user.tags || []
+                let l = tags.length
+                tags = tags.filter(v => v._id != tag_id)
+                if (tags.length === l) {
+                    return true
+                }
+                return await update_db({
+                    model: "User",
+                    data: {_id: user._id, tags: tags},
+                    schema: user_schema,
+                    validate: true
+                }).then(r => r.status)
+            }
+        },
+        async add_user_tags(user, tags: Array<any>) {
+            if (user && tags.length) {
+                let u_tags = user.tags || []
+                let ids = u_tags.map(v => v._id)
+                tags.forEach(v => {if (!ids.includes(v._id)) u_tags.push(v)})
+                if (u_tags.length) {
+                    return await update_db({
+                        model: "User",
+                        data: {_id: user._id, tags: u_tags},
+                        schema: user_schema,
+                        validate: true
+                    }).then(r => r.status)
+                }
+            }
+        },
         async load(user) {
             let r = []
-            await this._create_defaults()
             if (is_server()) {
                 r = await Tag.find()
             } else {
@@ -214,19 +247,21 @@ export const useTagStore = createStore(
         },
         async _create_defaults() {
             const default_tags = [
-                "Illustration",
-                "Furry",
-                "Cover",
-                "Anime",
-                "Concept",
-                "Animation",
+                {name:"Illustration", color:"blue"},
+                {name:"Furry", color: "yellow"},
+                {name:"Cover", color: "green"},
+                {name:"NSFW", color: "red"},
+                {name:"Anime", color: ""},
+                {name:"Comic", color: "violet"},
+                {name:"Concept", color: ""},
+                {name:"Animation", color: "orange"},
             ]
 
             if (is_server()) {
                 for (let t of default_tags) {
-                    await Tag.findOne({name: t}).then(v => {
+                    await Tag.findOne({name: t.name}).then(v => {
                         if (!v) {
-                            let d = new Tag({name: t})
+                            let d = new Tag(t)
                             d.save()
                         }
                     })

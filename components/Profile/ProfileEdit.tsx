@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Grid, Row, Col, Checkbox, CheckboxGroup, FormGroup, ControlLabel, Button, RadioGroup, Radio, TagPicker, List, SelectPicker, InputNumber, Form, Toggle } from 'rsuite';
+import { Grid, Row, Col, Checkbox, CheckboxGroup, FormGroup, ControlLabel, Button, RadioGroup, Radio, TagPicker, List, SelectPicker, InputNumber, Form, Toggle, Input } from 'rsuite';
 
 import { t } from '@app/utility/lang'
 import { CommissionCard, CommissionTiersRow } from '@components/Profile/ProfileCommission';
@@ -9,9 +9,10 @@ import CommissionRateForm, { RateOptionsForm } from '@components/Form/Commission
 
 import './ProfileEdit.scss'
 import { useSessionStorage } from 'react-use';
-import { useSettings } from '@hooks/user';
+import { useSettings, useUser } from '@hooks/user';
 import { useUpdateDatabase } from '@hooks/db';
 import { user_settings_schema } from '@schema/user';
+import useUserStore from '@store/user';
 
 
 export const Sections = () => {
@@ -60,6 +61,39 @@ export const CommissionStatus = () => {
             {value === 'open' &&
             <EditGroup >
                 <Checkbox name="auto_manage_status">{t`Automatically close or open when above or below the maximum amount of requests`}</Checkbox>
+            </EditGroup>
+            }
+        </React.Fragment>
+    )
+}
+
+export const Notice = () => {
+
+    const store = useUserStore()
+    const [settings, update_settings] = useSettings()
+    const [ notice_text, set_notice_text ] = useState(store.state.current_user.notice || "")
+    const [ loading, set_loading ] = useState(false)
+    const [ updated, set_updated ] = useState(false)
+    const value = (settings && settings.notice_visible) ? "visible" : "hidden"
+
+    return (
+        <React.Fragment>
+            <EditGroup>
+                <span className="mr-2">{t`Notice Visibility`}: </span>
+                <RadioGroup name="notice_visible" inline appearance="picker" defaultValue={value} onChange={(v) => {
+                    if (settings) {
+                        settings.notice_visible = v == 'visible'
+                        update_settings(settings) 
+                    }
+                }}>
+                <Radio value="visible">{t`Visible`}</Radio>
+                <Radio value="hidden">{t`Hidden`}</Radio>
+                </RadioGroup>
+            { value === "visible" && <Button loading={loading} disabled={updated} onClick={ev => {ev.preventDefault(); set_loading(true); store.update_user({notice: notice_text}).then(r => {set_loading(false); if (r.status) set_updated(true)})}} className="ml-2" size="sm">{t`Update`}</Button> }
+            </EditGroup>
+            {value === "visible" &&
+            <EditGroup >
+                <Input onChange={v => {set_notice_text(v); set_updated(false)}} defaultValue={notice_text} rows={3} placeholder={t`Maximum of 250 words`} componentClass="textarea"/>
             </EditGroup>
             }
         </React.Fragment>
@@ -254,6 +288,7 @@ export const ProfileEdit = () => {
             <EditSection>
                 <CommissionStatus/>
                 <ProfileVisiblity/>
+                <Notice/>
                 <Sections/>
                 <ProfileColor/>
                 <Origin/>

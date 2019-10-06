@@ -8,12 +8,14 @@ import getConfig from 'next/config'
 import { connect, synchronize_indexes } from '@server/db'
 import { Props as AuthProps } from '@components/App/AuthPage'
 import { useMount } from 'react-use';
+import { useTagStore } from '@store/user';
 
 const { publicRuntimeConfig, serverRuntimeConfig }= getConfig()
 
 const server_initialize = async () => {
   await connect()
   await synchronize_indexes()
+  await useTagStore.actions._create_defaults()
 }
 
 class KomplentDocument extends Document<AuthProps> {

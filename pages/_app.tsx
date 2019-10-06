@@ -66,4 +66,3 @@ if (!is_server()) {
 }
 
 export default KomplentApp
-pop

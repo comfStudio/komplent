@@ -10,6 +10,7 @@ import './UserCard.scss'
 import { make_profile_id, make_profile_urlpath, make_commission_rate_urlpath } from '@utility/pages';
 import { decimal128ToMoneyToString } from '@utility/misc';
 import { CommissionButton } from '@components/Profile/ProfileCommission';
+import Tag from '@components/Profile/Tag';
 
 interface Props extends HTMLElementProps {
     data: any
@@ -52,6 +53,11 @@ export const UserCard = ({fluid = true, ...props}: Props) => {
                                 )
                             })
                         }
+                    </p>
+                    <p>
+                        <span className="tags">
+                            {props.data.tags.map(t => <Tag key={t._id} color={t.color}>{t.name}</Tag>)}
+                        </span>
                     </p>
                     {/* <blockquote>I draw illustrations and comics! I love taking commissions!</blockquote> */}
                 </div>

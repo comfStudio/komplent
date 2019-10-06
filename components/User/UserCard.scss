@@ -46,4 +46,9 @@ $avatar-margin: -2.25em;
             cursor: unset;
         }
     }
+
+    .tags {
+        white-space: nowrap;
+        overflow: hidden;
+    }
 }

@@ -1,7 +1,9 @@
 import { EL_HOSTS } from '.'
 import mongoose, { Document, Model } from 'mongoose'
-import { is_server } from '@utility/misc'
 import mongoosastic from 'mongoosastic'
+
+import { is_server } from '@utility/misc'
+import { tag_schema } from '@schema/general'
 
 const { Schema } = mongoose
 
@@ -23,11 +25,15 @@ export const user_schema = new Schema({
     ref: 'Image'
   },
   origin: { type: String, es_indexed:true },
+  notice: { type: String, maxLength: 250 },
   description: String,
   socials: [{ url: String, name: String }],
   tags: [{ 
     type: ObjectId, 
-    ref: 'Tag'
+    ref: 'Tag',
+    es_schema: tag_schema,
+    es_indexed: true,
+    es_select: "name"
   }],
   follows: [{ 
     type: ObjectId, 
@@ -67,7 +73,10 @@ export const user_schema = new Schema({
 
 if (is_server()) {
   user_schema.plugin(mongoosastic, {
-    hosts: EL_HOSTS
+    hosts: EL_HOSTS,
+    populate: [
+      {path: 'tags', select: 'name color'}
+    ]
   })
 }
 
@@ -180,6 +189,10 @@ export const profile_schema = new Schema({
 }, { timestamps: { createdAt: 'created', updatedAt: 'updated' } })
 
 export const user_settings_schema = new Schema({
+  notice_visible: {
+    type: Boolean,
+    default: false
+  },
   color: String,
   display_currency: String,
   profile_currency: String,

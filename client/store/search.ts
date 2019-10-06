@@ -34,7 +34,7 @@ export const useSearchStore = createStore(
                 hydrate: true,
                 hydrateOptions: {
                     lean: true,
-                    populate: "rates",
+                    populate: "rates tags",
                 }
                 }
             let d: any

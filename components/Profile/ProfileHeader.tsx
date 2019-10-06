@@ -31,7 +31,7 @@ interface HeaderProps extends ReactProps {
 
 export const ProfileHeader = (props: HeaderProps) => {
 
-    const { context: { profile_owner } } = useProfileUser()
+    const { context: { profile_owner, commissions_open } } = useProfileUser()
 
     return (
         <div id="profile-header">
@@ -42,7 +42,7 @@ export const ProfileHeader = (props: HeaderProps) => {
                 <div id="header-container">
                     { !profile_owner && (
                         <React.Fragment>
-                            <CommissionButton className="z-10"/>
+                            {commissions_open && <CommissionButton className="z-10"/>}
                             <FollowButton/>
                         </React.Fragment>
                     )}

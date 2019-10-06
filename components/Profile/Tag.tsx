@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { TagGroup as RTagGroup, Tag as RTag, TagPicker, Icon } from 'rsuite';
+import { TagGroup as RTagGroup, Tag as RTag, TagPicker, Icon, Button, IconButton } from 'rsuite';
 import { TagProps as RTagProps } from 'rsuite/lib/Tag';
 import { TagGroupProps as RTagGroupProps } from 'rsuite/lib/TagGroup';
 
-import './Tag.scss'
+import { t } from '@app/utility/lang'
 import { useTagStore } from '@store/user';
+import './Tag.scss'
 
 interface TagProps extends RTagProps {
 
@@ -20,10 +21,13 @@ export const Tag = (props: TagProps) => {
 
 interface TagGroupProps extends RTagGroupProps {
     edit?: boolean
+    filteredTagIds?: Array<any>
+    onChange?: Function
 }
 
-export const TagGroup = ({edit, children, ...props}: TagGroupProps) => {
+export const TagGroup = ({edit, children, filteredTagIds = [], onChange, ...props}: TagGroupProps) => {
     const [editing, set_editing] = useState(false)
+    const [value, set_value] = useState([])
     const store = useTagStore()
     useEffect(() => {
         if (editing && !store.state.tags.length) {
@@ -38,9 +42,13 @@ export const TagGroup = ({edit, children, ...props}: TagGroupProps) => {
         <RTagGroup className={props.className ? cls + ' ' + props.className : cls} {...props}>
             {children}
             {edit && editing &&
-            <Tag className="w-full">
-                <form className="w-full" onSubmit={ev => {ev.preventDefault(); set_editing(false)}}>
-                    <TagPicker className="w-full" data={store.state.tags} size="sm"/>
+            <Tag className="w-full p-0">
+                <form className="w-full" onSubmit={ev => {ev.preventDefault(); set_editing(false); if (onChange) onChange(value)}}>
+                    <span>
+                    <IconButton icon={<Icon icon="close"/>} onClick={ev => {ev.preventDefault(); set_editing(false)}} className="float-right" type="buttun" size="sm"/>
+                    <IconButton icon={<Icon icon="check"/>} className="float-right" type="submit" size="sm"/>
+                    <TagPicker onChange={v => set_value(v)} className="w-full" data={store.state.tags.filter(v => !filteredTagIds.includes(v._id)).map(v => ({label: v.name, value:v._id}))} size="sm"/>
+                    </span>
                 </form>
             </Tag>
             }

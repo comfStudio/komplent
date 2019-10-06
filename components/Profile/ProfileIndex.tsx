@@ -8,19 +8,17 @@ import { GuidelineList } from '@app/components/Profile'
 import { t } from '@app/utility/lang'
 import Placeholder from '@components/App/Placeholder';
 import { ReviewsReel } from '@components/Profile/ProfileReviews';
+import { useProfileUser } from '@hooks/user';
 
 export const ProfileIndex = () => {
+
+    const { profile_user } = useProfileUser()
+
     return (
         <Grid fluid>
-            <Message type="info" description={
-                <p>
-                    Hello lovely people!
-                    {<br/>}
-                    I just want to inform you that I will be closing up commissions until further notice!
-                    {<br/>}
-                    Thank you everyone for participating this time around &lt;3!
-                </p>
-            }/>
+            {profile_user.settings.notice_visible && profile_user.notice &&
+            <Message type="info" description={profile_user.notice}/>
+            }
             <ReviewsReel/>
             <h3>{t`Commission Rates`}</h3>
             <CommissionTiersRow/>
