@@ -7,7 +7,7 @@ import { user_schema, profile_schema, user_store_schema,
         IUser, IUserModel } from '@schema/user'
 
 import { message_schema, conversation_schema } from '@schema/message'
-import { image_schema, attachment_schema } from '@schema/general'
+import { image_schema, attachment_schema, tag_schema } from '@schema/general'
 import { commission_schema, commission_extra_option_schema, comission_rate_schema, commission_phase_schema } from '@schema/commission'
 
 user_schema.pre("save", async function() {
@@ -47,5 +47,6 @@ export const UserSettings = is_server() ? mongoose.models.UserSettings || mongoo
 export const Message = is_server() ? mongoose.models.Message || mongoose.model('Message', message_schema) : undefined
 export const Conversation = is_server() ? mongoose.models.Conversation || mongoose.model<Document>('Conversation', conversation_schema) : undefined
 
+export const Tag = is_server() ? mongoose.models.Tag || mongoose.model<Document>('Tag', tag_schema) : undefined
 export const Image = is_server() ? mongoose.models.Image || mongoose.model<Document>('Image', image_schema) : undefined
 export const Attachment = is_server() ? mongoose.models.Attachment || mongoose.model<Document>('Attachment', attachment_schema) : undefined

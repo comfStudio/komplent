@@ -38,4 +38,4 @@ export const attachment_schema = new Schema({
 
 export const tag_schema = new Schema({
     name: {type: String, required: true, unique:true},
-})
+}, { timestamps: { createdAt: 'created', updatedAt: 'updated' } })

@@ -11,7 +11,7 @@ import { COOKIE_AUTH_TOKEN_KEY } from '@server/constants'
 import { get_jwt_data, get_jwt_user } from '@server/middleware'
 import { update_db } from '@app/client/db'
 import { user_store_schema } from '@schema/user'
-import { Follow } from '@db/models';
+import { Follow, Tag } from '@db/models';
 
 export const fetch_user =  async (cookies_obj) => {
     if (cookies_obj[COOKIE_AUTH_TOKEN_KEY]) {
@@ -185,6 +185,56 @@ export const useFollowerStore = createStore(
         },
     }
 );
+
+export const useTagStore = createStore(
+    {
+        tags: []
+    },
+    {
+        async load(user) {
+            let r = []
+            await this._create_defaults()
+            if (is_server()) {
+                r = await Tag.find()
+            } else {
+                r = await fetch("/api/fetch",{
+                    method:"post",
+                    body: {
+                        model: "Tag",
+                        method:"find"
+                    }
+                }).then(async (r) => {
+                    if (r.ok) {
+                        return (await r.json()).data
+                    }
+                    return []
+                })
+            }
+            return r
+        },
+        async _create_defaults() {
+            const default_tags = [
+                "Illustration",
+                "Furry",
+                "Cover",
+                "Anime",
+                "Concept",
+                "Animation",
+            ]
+
+            if (is_server()) {
+                for (let t of default_tags) {
+                    await Tag.findOne({name: t}).then(v => {
+                        if (!v) {
+                            let d = new Tag({name: t})
+                            d.save()
+                        }
+                    })
+                }
+            }
+        }
+    }
+    )
 
 
 export default useUserStore;

@@ -1,7 +1,8 @@
 import React from 'react';
-import { Tag, Button, Panel, TagGroup, Progress } from 'rsuite';
+import { Button, Panel, Progress } from 'rsuite';
 
 import { ProfileNameTag } from '@components/Profile'
+import { Tag, TagGroup } from '@components/Profile/Tag'
 import { useProfileUser, useUser } from '@hooks/user'
 import { t } from '@app/utility/lang'
 
@@ -24,7 +25,7 @@ export const ProfileInfo = (props: Props) => {
                 <ProfileNameTag name={profile_user.name || profile_user.username}/>
             </p>
             <p>
-                <TagGroup className="tags">
+                <TagGroup edit>
                     <Tag color="blue">Illustration</Tag>
                     <Tag color="green">Cover</Tag>
                     <Tag color="red">Anime</Tag>

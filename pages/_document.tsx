@@ -6,7 +6,7 @@ import sprite from 'svg-sprite-loader/runtime/sprite.build';
 import getConfig from 'next/config'
 
 import { connect, synchronize_indexes } from '@server/db'
-import { Props as AuthProps, AuthPage, getAuthProps } from '@components/App/AuthPage'
+import { Props as AuthProps } from '@components/App/AuthPage'
 import { useMount } from 'react-use';
 
 const { publicRuntimeConfig, serverRuntimeConfig }= getConfig()
