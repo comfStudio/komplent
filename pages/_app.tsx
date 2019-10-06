@@ -8,7 +8,7 @@ import localForage from 'localforage'
 import { Title } from '@components/App'
 import { is_server } from '@utility/misc'
 
-import { useUserStore } from '@client/store/user'
+import { useUserStore, useTagStore } from '@client/store/user'
 import { useCommissionRateStore, useCommissionStore, useCommissionsStore } from '@client/store/commission'
 
 import '@assets/styles/imports.scss'
@@ -37,7 +37,9 @@ export const StoreProvider = (props: ReactProps) => {
       <useCommissionsStore.Provider>
         <useCommissionStore.Provider>
           <useCommissionRateStore.Provider>
+            <useTagStore.Provider>
             {props.children}
+            </useTagStore.Provider>
           </useCommissionRateStore.Provider>
         </useCommissionStore.Provider>
       </useCommissionsStore.Provider>
@@ -64,3 +66,4 @@ if (!is_server()) {
 }
 
 export default KomplentApp
+pop
