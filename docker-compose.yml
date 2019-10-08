@@ -34,7 +34,17 @@ services:
     ports:
       - 9245:9200
 
+  redis:
+    image: bitnami/redis
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    ports:
+      - 6834:6379
+    volumes:
+      - komplent-v-redis:/bitnami/redis/data
+
 volumes:
+  komplent-v-redis:
   komplent-v-elastic_search:
   komplent-v-mongodb:
   komplent-v-mongodb_config:

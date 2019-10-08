@@ -137,6 +137,8 @@ user_schema.statics.check_exists = async function({username, email}) {
   }
 
 export interface IUser extends Document {
+  username: string
+  password: string
 }
 
 export interface IUserModel extends Model<IUser> {

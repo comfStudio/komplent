@@ -9,6 +9,7 @@ import { HTMLElementProps } from '@app/utility/props'
 import { t } from '@app/utility/lang'
 import { useUser } from '@hooks/user';
 import { useCommissionRateStore } from '@client/store/commission';
+import log from '@utility/log';
 
 const { StringType, NumberType, BooleanType, ArrayType, ObjectType } = Schema.Types;
 
@@ -66,7 +67,7 @@ export const CommissionGuidelineList = (props: CommissionGuidelineList) => {
             <FormControl name={props.name || "extras"} accepter={CheckboxGroup}>
             {
             store.state.options.filter(({_id}) => options.includes(_id)).map(({title, price, _id},index) => {
-                let opt = <CommissionGuidelineText edit={props.edit} title={title} onUpdate={(v) => console.log(v)}/>
+                let opt = <CommissionGuidelineText edit={props.edit} title={title} onUpdate={(v) => log.info(v)}/>
                 return (
                     <List.Item key={_id} index={index}>
                         {opt}

@@ -41,7 +41,7 @@ export const useSettings = () => {
         if (r.status) {
             set_settings({...s})
         }
-
+        return r
     }
 
     return [settings, update_settings]

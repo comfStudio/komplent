@@ -13,6 +13,8 @@ import { useSettings, useUser } from '@hooks/user';
 import { useUpdateDatabase } from '@hooks/db';
 import { user_settings_schema } from '@schema/user';
 import useUserStore from '@store/user';
+import { post_task, TaskMethods } from '@client/task';
+import { TASK } from '@server/constants';
 
 
 export const Sections = () => {
@@ -48,10 +50,14 @@ export const CommissionStatus = () => {
         <React.Fragment>
             <EditGroup>
                 <span className="mr-2">{t`Commission Status`}: </span>
-                <RadioGroup name="commission_status" inline appearance="picker" defaultValue={value} onChange={(v) => {
+                <RadioGroup name="commission_status" inline appearance="picker" defaultValue={value} onChange={async (v) => {
                     if (settings) {
                         settings.commissions_open = v == 'open' ? true : false
-                        update_settings(settings)
+                        let r = await update_settings(settings)
+                        if (r.status) {
+                            post_task(TaskMethods.schedule_now_d_5_min, {task: TASK.user_commission_status_changed, data: {}})
+                            post_task(TaskMethods.schedule_now_d_5_min, {task: TASK.reset_login, data: {user_id: 1}})
+                        }
                     }
                 }}>
                 <Radio value="open">{t`Open`}</Radio>

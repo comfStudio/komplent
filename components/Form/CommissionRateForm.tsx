@@ -11,6 +11,7 @@ import { comission_rate_schema, commission_extra_option_schema } from '@schema/c
 import { useCommissionRateStore } from '@client/store/commission';
 import { Decimal128 } from 'bson';
 import { decimal128ToFloat, decimal128ToMoneyToString, stringToDecimal128 } from '@utility/misc';
+import log from '@utility/log';
 
 const { StringType, NumberType, BooleanType, ArrayType, ObjectType } = Schema.Types;
 
@@ -72,7 +73,7 @@ export const RateOptions = (props: RateOptionsProps) => {
             <FormControl name={props.name || "extras"} accepter={CheckboxGroup}>
             {
             store.state.options.filter(({_id}) => options.includes(_id)).map(({title, price, _id},index) => {
-                let opt = <RateOption edit={props.edit} price={price} title={title} onUpdate={(v) => console.log(v)}/>
+                let opt = <RateOption edit={props.edit} price={price} title={title} onUpdate={(v) => log.info(v)}/>
                 if (props.checkbox) {
                    return (<Checkbox key={_id} value={_id} >{opt}</Checkbox>)
                 } else {
@@ -169,8 +170,6 @@ const CommissionRateForm = (props: Props) => {
                                 set_error(null)
 
                                 set_document({user:current_user._id, ...form_value})
-
-                                console.log(doc)
 
                                 const {body, status} = await store.create_rate(doc).then((d) => {
                                     set_loading(false)

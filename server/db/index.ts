@@ -1,5 +1,4 @@
 import mongoose from 'mongoose'
-import getConfig from 'next/config'
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs';
 
@@ -8,15 +7,13 @@ import { IUser } from '@schema/user'
 import { cookie_session } from '@server/middleware'
 import { JWT_KEY, JWT_EXPIRATION, CRYPTO_COST_FACTOR } from '@server/constants'
 
-const { publicRuntimeConfig, serverRuntimeConfig }= getConfig()
-
 export const synchronize_indexes = async () => {
   User.synchronize()
 }
 
-export async function connect() {
+export async function connect(MONGODB_URL) {
   if (mongoose.connection.readyState == 0) {
-    await mongoose.connect(serverRuntimeConfig.MONGODB_URL, {
+    await mongoose.connect(MONGODB_URL, {
       useNewUrlParser: true,
       auth: { authSource: "admin" }
     })

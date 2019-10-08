@@ -5,6 +5,7 @@ import Document, { Html, Head, Main, NextScript } from 'next/document'
 import sprite from 'svg-sprite-loader/runtime/sprite.build';
 import getConfig from 'next/config'
 
+import { setup_scheduler } from '@server/tasks'
 import { connect, synchronize_indexes } from '@server/db'
 import { Props as AuthProps } from '@components/App/AuthPage'
 import { useMount } from 'react-use';
@@ -13,9 +14,10 @@ import { useTagStore } from '@store/user';
 const { publicRuntimeConfig, serverRuntimeConfig }= getConfig()
 
 const server_initialize = async () => {
-  await connect()
+  await connect(serverRuntimeConfig.MONGODB_URL)
   await synchronize_indexes()
   await useTagStore.actions._create_defaults()
+  await setup_scheduler(serverRuntimeConfig.SCHEDULER_URL)
 }
 
 class KomplentDocument extends Document<AuthProps> {

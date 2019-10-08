@@ -12,8 +12,5 @@ export default with_middleware((req: ExApiRequest, res: NextApiResponse) => {
     // Handle the rest of your HTTP methods
     }
 
-    // const kitty = new Blog({ title: 'Test' });
-    // kitty.save().then(() => console.log('meow'));
-
   res.status(200).json({ title: 'Test' })
 })

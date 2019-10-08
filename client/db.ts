@@ -1,6 +1,8 @@
 import { Document, Schema } from 'mongoose/browser'
 import { OK, CREATED } from 'http-status-codes';
 
+import log from '@utility/log'
+
 import { fetch } from '@utility/request'
 
 export const clean = (doc: Document, model?: string) => {
@@ -37,7 +39,7 @@ export const update_db = async (params: UpdateDBParams) => {
             let e = Error(err.message)
             e.stack = err.stack
             e.name = err.name
-            console.log(e)
+            log.error(e)
             throw e
         }
     }
