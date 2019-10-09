@@ -31,7 +31,7 @@ export type VALUES_TO_TYPE<T> = {
     readonly [P in keyof T]: P;
 }
 
-type PropType<TObj, TProp extends keyof TObj> = TObj[TProp]
+export type PropType<TObj, TProp extends keyof TObj> = TObj[TProp]
 
 export enum TASK {
     activate_email = 'activate_email', 
@@ -45,15 +45,15 @@ export type TaskDataTypeMap<T> =  (
     T extends TASK.user_commission_status_changed ? { user_id: string, status: boolean } :
     T extends TASK.activate_email ? { user_id: string } :
     T extends TASK.reset_login ? { user_id: string } : never
-)
+    )
 
 export const events = tuple(
-    'user_followed', 
-    'product_added', 
-    'message_recieved', 
-    'commission_marked_complete', 
-    'commission_status', 
-    'notice_update', 
+    'followed_user', 
+    'added_product', 
+    'recieved_message', 
+    'marked_commission_complete', 
+    'changed_commission_status', 
+    'updated_notice', 
     );
 
 export type EVENTType = typeof events[number]

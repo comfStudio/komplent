@@ -42,6 +42,7 @@ export const ProfileColor = () => {
 
 export const CommissionStatus = () => {
 
+    const user = useUser()
     const [settings, update_settings] = useSettings()
     
     const value = (settings && settings.commissions_open) ? 'open' : 'closed'
@@ -55,8 +56,8 @@ export const CommissionStatus = () => {
                         settings.commissions_open = v == 'open' ? true : false
                         let r = await update_settings(settings)
                         if (r.status) {
-                            post_task(TaskMethods.schedule_now_d_5_min, {task: TASK.user_commission_status_changed, data: {}})
-                            post_task(TaskMethods.schedule_now_d_5_min, {task: TASK.reset_login, data: {user_id: 1}})
+                            post_task(TaskMethods.schedule_unique, {key:user._id, when: "1 second", task: TASK.user_commission_status_changed, data: {user_id: user._id, status:settings.commissions_open}})
+                            //post_task(TaskMethods.schedule_unique, {key:user._id, when:"3 minutes", task: TASK.user_commission_status_changed, data: {user_id: user._id, status:settings.commissions_open}})
                         }
                     }
                 }}>

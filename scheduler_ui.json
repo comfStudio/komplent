@@ -1,0 +1,9 @@
+{
+    "queues": [
+        {
+          "name": "user",
+          "hostId": "Komplent",
+          "url": "redis://redis:6379"
+        }
+    ]
+  }

@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": false,
@@ -16,19 +20,50 @@
     "experimentalDecorators": true,
     "baseUrl": ".",
     "paths": {
-      "@hooks/*": ["client/hooks/*"],
-      "@store/*": ["client/store/*"],
-      "@components/*": ["components/*"],
-      "@utility/*": ["utility/*"],
-      "@assets/*": ["assets/*"],
-      "@schema/*": ["server/db/schema/*"],
-      "@db/*": ["server/db/*"],
-      "@client/*": ["client/*"],
-      "@server/*": ["server/*"],
-      "@pages/*": ["pages/*"],
-      "@app/*": [ "*" ]
+      "@hooks/*": [
+        "client/hooks/*"
+      ],
+      "@store/*": [
+        "client/store/*"
+      ],
+      "@components/*": [
+        "components/*"
+      ],
+      "@utility/*": [
+        "utility/*"
+      ],
+      "@assets/*": [
+        "assets/*"
+      ],
+      "@schema/*": [
+        "server/db/schema/*"
+      ],
+      "@db/*": [
+        "server/db/*"
+      ],
+      "@client/*": [
+        "client/*"
+      ],
+      "@server/*": [
+        "server/*"
+      ],
+      "@pages/*": [
+        "pages/*"
+      ],
+      "@app/*": [
+        "*"
+      ]
     }
   },
-  "exclude": ["node_modules"],
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "__tests__/setupTests.js", "__mocks__/fileMock.js"]
+  "exclude": [
+    "node_modules"
+  ],
+  "include": [
+    "next-env.d.ts",
+    "utility/global.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "__tests__/setupTests.js",
+    "__mocks__/fileMock.js"
+  ]
 }

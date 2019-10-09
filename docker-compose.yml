@@ -4,17 +4,44 @@ services:
 
   mongo:
     image: mongo
+    command: 'mongo "mongodb://komplent:komplent@mongo1:27017" --eval "rs.initiate( {_id:\"devrs\", members:[{ _id: 0, host: \"host.docker.internal:27954\" },{ _id: 1, host: \"host.docker.internal:27955\"},]});" '
     container_name: komplent-mongodb
+    depends_on:
+      - mongo1
+      - mongo2
+    volumes:
+      - komplent-v-mongo1db:/data/db
+      - komplent-v-mongo1db_config:/data/configdb
+
+  mongo1:
+    build: '.'
+    command: --keyFile /data/mongodb_keyfile --bind_ip_all --replSet devrs
+    container_name: komplent-mongodb-1
     restart: unless-stopped
     environment:
       MONGO_INITDB_DATABASE: admin
       MONGO_INITDB_ROOT_USERNAME: komplent
       MONGO_INITDB_ROOT_PASSWORD: komplent
     volumes:
-      - komplent-v-mongodb:/data/db
-      - komplent-v-mongodb_config:/data/configdb
+      - komplent-v-mongo1db:/data/db
+      - komplent-v-mongo1db_config:/data/configdb
     ports:
       - 27954:27017
+
+  mongo2:
+    build: '.'
+    command: --keyFile /data/mongodb_keyfile --bind_ip_all --replSet devrs
+    container_name: komplent-mongodb-2
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_DATABASE: admin
+      MONGO_INITDB_ROOT_USERNAME: komplent
+      MONGO_INITDB_ROOT_PASSWORD: komplent
+    volumes:
+      - komplent-v-mongo2db:/data/db
+      - komplent-v-mongo2db_config:/data/configdb
+    ports:
+      - 27955:27017
 
   elastic-search:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.4.0
@@ -43,8 +70,18 @@ services:
     volumes:
       - komplent-v-redis:/bitnami/redis/data
 
+  scheduler-ui:
+    image: mixmaxhq/arena
+    container_name: komplent-scheduler-ui
+    ports:
+      - 3501:4567
+    volumes:
+      - ./scheduler_ui.json:/opt/arena/src/server/config/index.json:rw
+
 volumes:
   komplent-v-redis:
   komplent-v-elastic_search:
-  komplent-v-mongodb:
-  komplent-v-mongodb_config:
+  komplent-v-mongo1db:
+  komplent-v-mongo1db_config:
+  komplent-v-mongo2db:
+  komplent-v-mongo2db_config:

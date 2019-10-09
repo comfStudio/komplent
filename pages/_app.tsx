@@ -7,6 +7,9 @@ import localForage from 'localforage'
 
 import { Title } from '@components/App'
 import { is_server } from '@utility/misc'
+import { ReactProps } from '@utility/props'
+import { setup_scheduler } from '@server/tasks'
+import { connect, synchronize_indexes } from '@server/db'
 
 import { useUserStore, useTagStore } from '@client/store/user'
 import { useCommissionRateStore, useCommissionStore, useCommissionsStore } from '@client/store/commission'
@@ -14,7 +17,7 @@ import { useCommissionRateStore, useCommissionStore, useCommissionsStore } from 
 import '@assets/styles/imports.scss'
 import '@assets/styles/rsuite.less'
 import '@assets/styles/common.scss'
-import { ReactProps } from '@utility/props'
+import { setup_streams } from '@db/streams'
 
 // Router.onRouteChangeStart = () => NProgress.start();
 // Router.onRouteChangeComplete = () => NProgress.done();
@@ -23,12 +26,24 @@ import { ReactProps } from '@utility/props'
 const { publicRuntimeConfig, serverRuntimeConfig }= getConfig()
 
 const client_initialize = async () => {
-  localForage.config({
-    name        : 'komplent',
-    version     : 1.0,
-    storeName   : 'komplent', // Should be alphanumeric, with underscores.
-    description : 'komplent'
-});
+    localForage.config({
+      name        : 'komplent',
+      version     : 1.0,
+      storeName   : 'komplent', // Should be alphanumeric, with underscores.
+      description : 'komplent'
+  });
+}
+
+const server_initialize = async () => {
+  if (!global.initialized) {
+    global.store = {}
+    global.initialized = true 
+    await connect(serverRuntimeConfig.MONGODB_URL)
+    await synchronize_indexes()
+    await useTagStore.actions._create_defaults()
+    await setup_scheduler(serverRuntimeConfig.SCHEDULER_URL)
+    await setup_streams()
+  }
 }
 
 export const StoreProvider = (props: ReactProps) => {
@@ -63,6 +78,8 @@ class KomplentApp extends App {
 
 if (!is_server()) {
   client_initialize()
+} else {
+  server_initialize()
 }
 
 export default KomplentApp

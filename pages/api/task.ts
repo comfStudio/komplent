@@ -4,6 +4,7 @@ import { with_middleware, ExApiRequest, ExApiResponse } from '@server/middleware
 import { error_message, data_message } from '@utility/message'
 import * as tasks from '@server/tasks'
 
+
 export default with_middleware(async (req: ExApiRequest, res: ExApiResponse) => {
 
   try {
@@ -13,7 +14,6 @@ export default with_middleware(async (req: ExApiRequest, res: ExApiResponse) => 
     if (!fn) {
         throw Error(`Invalid method ${method}`)
     }
-
     let d
 
     if (req.method === 'post') {
