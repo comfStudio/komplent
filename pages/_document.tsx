@@ -19,7 +19,9 @@ class KomplentDocument extends Document {
   render() {
     return (
       <Html>
-        <Head/>
+        <Head>
+          <script src="/primus/primus.js"></script>
+        </Head>
         <body>
           <div dangerouslySetInnerHTML={{ __html: this.props.spriteContent }} />
           <Main />

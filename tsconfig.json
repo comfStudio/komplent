@@ -64,6 +64,6 @@
     "**/*.ts",
     "**/*.tsx",
     "__tests__/setupTests.js",
-    "__mocks__/fileMock.js"
+    "__mocks__/fileMock.js", "server/http.js"
   ]
 }

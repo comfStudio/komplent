@@ -26,6 +26,8 @@ import { setup_streams } from '@db/streams'
 const { publicRuntimeConfig, serverRuntimeConfig }= getConfig()
 
 const client_initialize = async () => {
+    global.primus = new global.Primus()
+    global.primus.write("yes")
     localForage.config({
       name        : 'komplent',
       version     : 1.0,
@@ -41,7 +43,7 @@ const server_initialize = async () => {
     await connect(serverRuntimeConfig.MONGODB_URL)
     await synchronize_indexes()
     await useTagStore.actions._create_defaults()
-    await setup_scheduler(serverRuntimeConfig.SCHEDULER_URL)
+    await setup_scheduler(serverRuntimeConfig.REDIS_URL)
     await setup_streams()
   }
 }

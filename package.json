@@ -2,6 +2,7 @@
   "name": "komplent",
   "version": "1.0.0",
   "scripts": {
+    "postinstall": "cp ./utility/start-server.js ./node_modules/next/dist/server/lib/start-server.js",
     "dev": "next -p 3500",
     "debug": "docker-compose up -d && cross-env NODE_OPTIONS=\"--inspect\" next dev -p 3500",
     "docker": "docker-compose up",
@@ -70,7 +71,7 @@
     "mongoose-lean-defaults": "^0.3.1",
     "mongoose-lean-getters": "^0.1.1",
     "mongoose-lean-virtuals": "^0.4.4",
-    "next": "^9.0.7",
+    "next": "latest",
     "next-compose-plugins": "^2.2.0",
     "next-optimized-images": "^2.5.3",
     "next-runtime-dotenv": "^1.2.0",
@@ -80,6 +81,9 @@
     "postcss-import": "^12.0.1",
     "postcss-import-webpack-resolver": "^1.0.1",
     "precss": "^4.0.0",
+    "primus": "^7.3.3",
+    "primus-redis-rooms": "^0.3.2",
+    "primus-rooms": "^3.4.1",
     "qs": "^6.8.0",
     "react": "^16.10.1",
     "react-dom": "^16.10.1",
@@ -95,7 +99,9 @@
     "ttag": "^1.7.20",
     "typescript": "^3.6.3",
     "unstated-next": "^1.1.0",
-    "url-loader": "^2.1.0"
+    "url-loader": "^2.1.0",
+    "uws": "^100.0.1",
+    "ws": "^7.1.2"
   },
   "devDependencies": {
     "@types/enzyme": "^3.10.3",
