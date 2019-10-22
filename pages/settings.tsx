@@ -5,6 +5,9 @@ import SettingsLayout from '@components/Settings'
 
 
 class SettingsPage extends AuthPage {
+
+  static activeKey = "settings"
+
   public render() {
     return this.renderPage(
       <SettingsLayout/>

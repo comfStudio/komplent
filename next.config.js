@@ -32,6 +32,8 @@ const withConfig = withNextRuntimeDotenv({
         'MONGODB_URL',
         'REDIS_URL',
         'ELASTIC_URL',
+        'PRIMUS_1_PORT',
+        'PRIMUS_1_HOST',
       ]
 });
 

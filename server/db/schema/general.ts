@@ -54,3 +54,19 @@ export const event_schema = new Schema({
     },
     data: Mixed,
 }, { timestamps: { createdAt: 'created', updatedAt: 'updated' } })
+
+export const notification = new Schema({
+    type:{
+        type: String,
+        enum : events,
+      },
+    from_user: { 
+        type: ObjectId, 
+        ref: 'User',
+    },
+    to_user: { 
+        type: ObjectId, 
+        ref: 'User',
+    },
+    data: Mixed,
+}, { timestamps: { createdAt: 'created', updatedAt: 'updated' } })

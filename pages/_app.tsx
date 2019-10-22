@@ -18,6 +18,7 @@ import '@assets/styles/imports.scss'
 import '@assets/styles/rsuite.less'
 import '@assets/styles/common.scss'
 import { setup_streams } from '@db/streams'
+import { Page } from '@components/App/Page'
 
 // Router.onRouteChangeStart = () => NProgress.start();
 // Router.onRouteChangeComplete = () => NProgress.done();
@@ -67,11 +68,15 @@ export const StoreProvider = (props: ReactProps) => {
 class KomplentApp extends App {
   render() {
     const { Component, pageProps } = this.props
+
+    //const getLayout = Component.prototype instanceof Page ? Component.getLayout : (page => page)
+    const getLayout =(page => page)
+
     return (
       <React.Fragment>
         <Title>Komplent</Title>
         <StoreProvider>
-          <Component {...pageProps} />
+          {getLayout(<Component {...pageProps} />)}
         </StoreProvider>
       </React.Fragment>
     )

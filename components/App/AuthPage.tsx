@@ -1,4 +1,4 @@
-import React, { Component, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { NextPageContext } from 'next'
 import cookies from 'nookies'
 import Router from 'next/router'
@@ -12,6 +12,7 @@ import * as pages from '@utility/pages'
 import LoginPage from '@components/App/LoginPage'
 import { fetch } from '@utility/request';
 import { NoLoginPage } from '@components/User/Auth';
+import { Page } from '@components/App/Page';
 
 export interface Props {
     useUserState?: object
@@ -36,7 +37,7 @@ const AsLoginPage = (props: AsLoginProps) => {
     )
 }
 
-export class AuthPage<T extends Props = Props> extends Component<T> {
+export class AuthPage<T extends Props = Props> extends Page<T> {
 
     static async getInitialProps (ctx: NextPageContext) {
 
