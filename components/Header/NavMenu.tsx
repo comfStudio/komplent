@@ -6,7 +6,6 @@ import {NavUserDropdown} from "./NavUser"
 import MainSearch from '@components/App/MainSearch'
 import { t } from '@app/utility/lang'
 
-import LogoIcon from '@assets/images/logo.svg?sprite'
 import { useLoginStatus } from '@hooks/auth';
 
 import "./NavMenu.scss"
@@ -22,9 +21,6 @@ export const NavMenu = (props: Props) => {
     return (
         <Navbar id="nav-menu">
             <Navbar.Header>
-                <Link href="/">
-                    <a><LogoIcon className="logo"/></a>
-                </Link>
             </Navbar.Header>
             <Navbar.Body className="flex flex-1 justify-center">
             <Nav className="self-center flex-grow text-center">

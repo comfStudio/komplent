@@ -28,7 +28,6 @@ const { publicRuntimeConfig, serverRuntimeConfig }= getConfig()
 
 const client_initialize = async () => {
     global.primus = new global.Primus()
-    global.primus.write("yes")
     localForage.config({
       name        : 'komplent',
       version     : 1.0,

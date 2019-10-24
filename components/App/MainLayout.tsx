@@ -8,6 +8,10 @@ import { useLoginStatus } from '@app/client/hooks/auth';
 
 
 import './MainLayout.scss'
+import { useMount } from 'react-use';
+import { is_server } from '@utility/misc';
+import { useUser } from '@hooks/user';
+import { get_user_room_id } from '@utility/request';
 
 interface Props extends ReactProps {
   activeKey?: string
@@ -16,8 +20,17 @@ interface Props extends ReactProps {
 }
 
 export const MainLayout = (props: Props) => {
-
+  
     const logged_in = useLoginStatus()
+    const user = useUser()
+
+    useMount(() => {
+      if (!is_server()) {
+        // if (user) {
+        //   global.user_room = global.primus.room(get_user_room_id(user))
+        // }
+      }
+    })
 
     let content = null
 

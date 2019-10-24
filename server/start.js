@@ -14,41 +14,39 @@ async function start(serverOptions, port, hostname) {
     const primus = new Primus(srv, {
         transformer: 'websockets',
         redis: {
-            sentinel: true,
-            endpoints: [
-                { host: PRIMUS_1_HOST, port: PRIMUS_1_PORT },
-              ],
+          host: PRIMUS_1_HOST,
+          port: parseInt(PRIMUS_1_PORT)
         }
     })
-    //primus.use('redis', PrimusRedisRooms)
+    primus.plugin('redis-rooms', PrimusRedisRooms)
 
     primus.on('connection', function connection(spark) {
-        // spark.on('data', function received(data) {
-        //   data = data || {};
-        //   var action = data.action;
-        //   var room = data.room;
+        spark.on('data', function received(data) {
+          data = data || {};
+          var action = data.action;
+          var room = data.room;
 
-        //   // join a room
-        //   if ('join' === action) {
-        //     spark.join(room, function () {
+          // join a room
+          if ('join' === action) {
+            spark.join(room, function () {
 
-        //       // send message to this client
-        //       spark.write('you joined room ' + room);
+              // send message to this client
+              spark.write('you joined room ' + room);
 
-        //       // send message to all clients except this one
-        //       spark.room(room).except(spark.id).write(spark.id + ' joined room ' + room);
-        //     });
-        //   }
+              // send message to all clients except this one
+              spark.room(room).except(spark.id).write(spark.id + ' joined room ' + room);
+            });
+          }
 
-        //   // leave a room
-        //   if ('leave' === action) {
-        //     spark.leave(room, function () {
+          // leave a room
+          if ('leave' === action) {
+            spark.leave(room, function () {
 
-        //       // send message to this client
-        //       spark.write('you left room ' + room);
-        //     });
-        //   }
-        // });
+              // send message to this client
+              spark.write('you left room ' + room);
+            });
+          }
+        });
       });
     await new Promise((resolve, reject) => { // This code catches EADDRINUSE error if the port is already in use
         srv.on('error', reject);

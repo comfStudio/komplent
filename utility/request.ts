@@ -54,3 +54,7 @@ export const fetch = (url, props: FetchInit = {}) => {
 
     return unfetch(url, fetch_props)
 }
+
+export const get_user_room_id = ({_id}) => {
+    return `user::${_id}`
+}
