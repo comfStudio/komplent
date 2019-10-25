@@ -27,7 +27,7 @@ Object.entries((packagejson._moduleAliases  || {})).forEach(([k, v]) => {aliases
 
 
 const withConfig = withNextRuntimeDotenv({
-    public: ['API_URL', 'API_KEY'],
+    public: ['API_URL', 'API_KEY', 'RUNNING'],
     server: [
         'MONGODB_URL',
         'REDIS_URL',
@@ -126,12 +126,14 @@ module.exports = withConfig(
     ],
     {
       ...next_config,
-      [PHASE_PRODUCTION_BUILD]: Object.assign({
+      [PHASE_PRODUCTION_BUILD]: {
 
-      }, next_config),
+      },
       [PHASE_PRODUCTION_SERVER]: {
+
       },
       [PHASE_DEVELOPMENT_SERVER]: {
+
       },
       ['!' + PHASE_DEVELOPMENT_SERVER]: {},
 	}),

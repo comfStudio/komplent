@@ -71,7 +71,7 @@ export const user_schema = new Schema({
   ]
 },{ timestamps: { createdAt: 'created', updatedAt: 'updated' } })
 
-if (is_server()) {
+if (is_server() && EL_HOSTS.length) {
   user_schema.plugin(mongoosastic, {
     hosts: EL_HOSTS,
     populate: [

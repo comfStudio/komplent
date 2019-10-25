@@ -14,7 +14,9 @@ services:
       - komplent-v-mongo1db_config:/data/configdb
 
   mongo1:
-    build: '.'
+    build:
+      context: '.'
+      dockerfile: dev/Dockerfile
     command: --keyFile /data/mongodb_keyfile --bind_ip_all --replSet devrs
     container_name: komplent-mongodb-1
     restart: unless-stopped
@@ -29,7 +31,9 @@ services:
       - 27954:27017
 
   mongo2:
-    build: '.'
+    build:
+      context: '.'
+      dockerfile: dev/Dockerfile
     command: --keyFile /data/mongodb_keyfile --bind_ip_all --replSet devrs
     container_name: komplent-mongodb-2
     restart: unless-stopped

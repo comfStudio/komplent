@@ -12,11 +12,11 @@ class RecommendationsPage extends ProfilePage {
         <ProfileLayout activeKey="recommendations">
              <Grid fluid>
                     <Row>
+                        {/* <Col xs={12}><UserCard/></Col>
                         <Col xs={12}><UserCard/></Col>
                         <Col xs={12}><UserCard/></Col>
                         <Col xs={12}><UserCard/></Col>
-                        <Col xs={12}><UserCard/></Col>
-                        <Col xs={12}><UserCard/></Col>
+                        <Col xs={12}><UserCard/></Col> */}
                     </Row>
                 </Grid>
         </ProfileLayout>

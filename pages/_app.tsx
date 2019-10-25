@@ -84,10 +84,14 @@ class KomplentApp extends App {
   }
 }
 
-if (!is_server()) {
-  client_initialize()
-} else {
-  server_initialize()
+if (publicRuntimeConfig && publicRuntimeConfig.RUNNING) {
+  
+  if (is_server()) {
+    server_initialize()
+  } else {
+    client_initialize()
+  }
+
 }
 
 export default KomplentApp
