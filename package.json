@@ -8,7 +8,7 @@
     "deploy": "git push dokku master",
     "docker": "docker-compose up",
     "build": "next build",
-    "start": "next build && next start -p 3000",
+    "start": "next start -p 3000",
     "test-e2e": "testcafe",
     "test": "jest",
     "test:watch": "jest --watch",
