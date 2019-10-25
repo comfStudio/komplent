@@ -87,9 +87,13 @@ class KomplentApp extends App {
 if (publicRuntimeConfig && publicRuntimeConfig.RUNNING) {
   
   if (is_server()) {
+
     server_initialize()
+
   } else {
+
     client_initialize()
+    
   }
 
 }
