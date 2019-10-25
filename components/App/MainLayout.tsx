@@ -17,6 +17,10 @@ interface Props extends ReactProps {
   activeKey?: string
   pageProps?: object
   noSidebar?: boolean
+  header?: React.ReactNode
+  paddedTop?: boolean
+  noContentMarginTop?: boolean
+  noContentPadded?: boolean
 }
 
 export const MainLayout = (props: Props) => {
@@ -33,13 +37,25 @@ export const MainLayout = (props: Props) => {
     })
 
     let layout_content = null
-    let content = <Panel bodyFill className="body-content" bordered>{props.children}</Panel>
+    let content
+    if (props.header) {
+      content = <>
+      {props.header}
+      <Panel bodyFill className={"body-content header" + (props.noContentMarginTop ? " connected" : "")  + (props.noContentPadded ? " no-padding" : "")} bordered>
+        {props.children}
+      </Panel>
+      </>
+    } else {
+      content = <Panel bodyFill className="body-content" bordered>{props.children}</Panel>
+    }
 
     if (logged_in && !props.noSidebar) {
       layout_content = (
         <Row className="h-full">
           <Col className="sm:hidden md:block h-full" xs={4} lg={4}><UserSidebar activeKey={props.activeKey}/></Col>
-          <Col className="h-full" xs={24} md={20} lg={20}>{content}</Col>
+          <Col className={"h-full" + (props.paddedTop ? " pt-4" : "")} xs={24} md={20} lg={20}>
+          {content}
+          </Col>
         </Row>
       )
     } else {
@@ -56,7 +72,7 @@ export const MainLayout = (props: Props) => {
           <NavMenu activeKey={props.activeKey}/>
         </Header>
         <Content>
-          <Grid className="h-full">
+          <Grid className={"h-full"}>
             {layout_content}
           </Grid>
         </Content>

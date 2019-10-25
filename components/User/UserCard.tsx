@@ -20,7 +20,7 @@ interface Props extends HTMLElementProps {
 export const UserCard = ({fluid = true, ...props}: Props) => {
 
     let rates = []
-    if (props.data.rates) {
+    if (props.data && props.data.rates) {
         rates = props.data.rates
     }
 

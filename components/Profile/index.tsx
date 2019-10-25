@@ -20,15 +20,16 @@ interface LayoutProps extends ReactProps, MenuProps {
 
 export const ProfileLayout = (props: LayoutProps) => {
     return (
-        <MainLayout activeKey="profile">
+        <MainLayout activeKey="profile" noContentMarginTop noContentPadded header={
+          <>
           <ProfileHeader></ProfileHeader>
-        <ProfileMenu {... props}/>
-        <Container>
-          <ProfileInfo className="float-right"/>
-          <PanelContainer bordered fluid flex>
-            { props.children }
-          </PanelContainer>
-        </Container>
+          <ProfileMenu {... props}/>
+          </>
+        }>
+        <ProfileInfo className="float-right"/>
+        <PanelContainer fluid flex>
+          { props.children }
+        </PanelContainer>
       </MainLayout>
     )
 }

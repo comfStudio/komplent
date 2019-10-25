@@ -32,11 +32,11 @@ export const TimelineTitle = (props: TimelineTitleProps) => {
     )
 }
 
-interface TimelinePanel extends ReactProps, HTMLElementProps {
+interface TimelinePanelProps extends ReactProps, HTMLElementProps {
 
 }
 
-export const TimelinePanel = (props: TimelinePanel) => {
+export const TimelinePanel = (props: TimelinePanelProps) => {
     let cls = "timeline-panel"
     return (
         <div className={props.className ? (props.className + " " + cls) : cls}>
@@ -58,9 +58,14 @@ export const CommissionTimelineItem = (props: CommissionTimelineItemProps) => {
     )
 }
 
-const CommissionTimeline = (props: ReactProps) => {
+interface CommissionTimelineProps extends ReactProps, HTMLElementProps {
+
+}
+
+const CommissionTimeline = (props: CommissionTimelineProps) => {
+    let cls = "commission-timeline"
     return (
-        <Timeline className="commission-timeline">
+        <Timeline className={props.className ? (props.className + " " + cls) : cls}>
             {props.children}
         </Timeline>
 );

@@ -18,11 +18,10 @@ const DashboardLayout = (props: Props) => {
     const logged_in = useLoginStatus()
 
     return (
-        <MainLayout activeKey="dashboard" {...props.pageProps}>
-            <GridContainer fluid padded>
+        <MainLayout paddedTop activeKey="dashboard" {...props.pageProps} header={<DashboardMenu activeKey={props.activeKey}/>}>
+            <GridContainer fluid>
                 <Row>
                     <Col xs={17}>
-                        <DashboardMenu activeKey={props.activeKey}/>
                         {!!logged_in && <UserTypeModal/>}
                         {props.children}
                     </Col>

@@ -354,7 +354,7 @@ const CommissionProcess = () => {
 
     return (
         <div>
-            <CommissionTimeline>
+            <CommissionTimeline className="ml-5">
                 <CommissionTimelineItem>
                     <TimelineTitle date={start_date}>
                         {capitalizeFirstLetter(formatDistanceToNow(start_date, {addSuffix: true}))}
@@ -408,7 +408,7 @@ const CommissionProcess = () => {
                 </CommissionTimelineItem>
                 }
             </CommissionTimeline>
-            <Grid fluid className="my-5">
+            <Grid fluid className="mt-3">
                 <Row>
                     <Col xs={12}>
                     <ButtonToolbar>

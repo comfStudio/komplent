@@ -11,11 +11,10 @@ interface Props extends ReactProps {
 
 const CommissionsLayout = (props: Props) => {
     return (
-        <MainLayout activeKey="commissions">
-            <GridContainer fluid padded>
+        <MainLayout activeKey="commissions" paddedTop header={<CommissionsMenu activeKey={props.activeKey}/>}>
+            <GridContainer fluid>
                 <Row>
                     <Col xs={24}>
-                        <CommissionsMenu activeKey={props.activeKey}/>
                         {props.children}
                     </Col>
                 </Row>

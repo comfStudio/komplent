@@ -9,8 +9,21 @@
 .body-content {
     margin-top: 1em;
     margin-bottom: 1em;
-    padding: 0.2em;
-    padding-bottom: 2em;
+    padding: 0.5em;
+    padding-bottom: 1.8em;
     box-shadow: 0 7px 14px 0 rgba(60,66,87, 0.12) , 0 3px 6px 0 rgba(0,0,0, 0.12);
     background: #fff;
+    
+    &.header {
+        padding: 1.8em 0.5em;
+    }
+    
+    &.connected {
+        margin-top: 0;
+    }
+    
+    &.no-padding {
+        padding: 0;
+        padding-bottom: 1.8em;
+    }
 }

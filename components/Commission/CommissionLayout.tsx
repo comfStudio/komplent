@@ -19,7 +19,7 @@ const CommissionMenu = (props: MenuProps) => {
     let commission = store.get_commission()
 
     return (
-        <Nav className="mb-10" appearance="subtle" activeKey={props.activeKey}>
+        <Nav className="mb-5" appearance="subtle" activeKey={props.activeKey}>
             <Link href={pages.commission + `/${commission._id}/description`} passHref>
                 <Nav.Item eventKey="description" active={props.activeKey=='description'}>{t`Description`}</Nav.Item>
             </Link>
@@ -44,9 +44,11 @@ export const CommissionLayout = (props: Props) => {
     let commission = store.get_commission()
     
     return (
-        <MainLayout>
-            <h3 className="pb-1 mb-2"><small><Tag>{commission.from_user.username}</Tag> → <Tag>{commission.to_user.username}</Tag></small> {commission.from_title}</h3>
-            <CommissionMenu {...props}/>
+        <MainLayout header={
+        <>
+        <h3 className="pb-1 mb-2"><small><Tag>{commission.from_user.username}</Tag> → <Tag>{commission.to_user.username}</Tag></small> {commission.from_title}</h3>
+        <CommissionMenu {...props}/>
+        </>}>
             {props.children}
         </MainLayout>
     )
