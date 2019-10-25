@@ -19,6 +19,7 @@ import '@assets/styles/rsuite.less'
 import '@assets/styles/common.scss'
 import { setup_streams } from '@db/streams'
 import { Page } from '@components/App/Page'
+import { STATES } from '@server/constants'
 
 // Router.onRouteChangeStart = () => NProgress.start();
 // Router.onRouteChangeComplete = () => NProgress.done();
@@ -42,9 +43,11 @@ const server_initialize = async () => {
     global.initialized = true 
     await connect(serverRuntimeConfig.MONGODB_URL)
     await synchronize_indexes()
-    await useTagStore.actions._create_defaults()
+    if (STATES.MONGODB_CONNECTED) {
+      await useTagStore.actions._create_defaults()
+      await setup_streams()
+    }
     await setup_scheduler(serverRuntimeConfig.REDIS_URL)
-    await setup_streams()
   }
 }
 
@@ -93,7 +96,7 @@ if (publicRuntimeConfig && publicRuntimeConfig.RUNNING) {
   } else {
 
     client_initialize()
-    
+
   }
 
 }

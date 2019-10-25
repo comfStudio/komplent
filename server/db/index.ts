@@ -5,17 +5,24 @@ import bcrypt from 'bcryptjs';
 import { User } from '@db/models'
 import { IUser } from '@schema/user'
 import { cookie_session } from '@server/middleware'
-import { JWT_KEY, JWT_EXPIRATION, CRYPTO_COST_FACTOR } from '@server/constants'
+import { JWT_KEY, JWT_EXPIRATION, CRYPTO_COST_FACTOR, STATES } from '@server/constants'
 
 export const synchronize_indexes = async () => {
-  User.synchronize()
+  if (STATES.ES_SETUP) {
+    User.synchronize()
+  }
 }
 
 export async function connect(MONGODB_URL) {
-  if (mongoose.connection.readyState == 0) {
-    await mongoose.connect(MONGODB_URL, {
-      useNewUrlParser: true,
-    })
+  if (MONGODB_URL) {
+    if (mongoose.connection.readyState == 0) {
+      await mongoose.connect(MONGODB_URL, {
+        useNewUrlParser: true,
+      })
+      STATES.MONGODB_CONNECTED = true
+    } else {
+      STATES.MONGODB_CONNECTED = true
+    }
   }
 }
 

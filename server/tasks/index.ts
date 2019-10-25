@@ -1,10 +1,8 @@
 import human_interval from 'human-interval'
 import Bull, { Queue } from 'bull'
 
-import debounce from 'lodash/debounce'
-
 import user from './user'
-import { TASK, TaskPriority, TaskDataTypeMap } from '@server/constants';
+import { TASK, TaskPriority, TaskDataTypeMap, STATES } from '@server/constants';
 import log from '@utility/log';
 
 type Scheduler = {
@@ -14,8 +12,11 @@ type Scheduler = {
 export let scheduler: Scheduler = global.store ? global.store.scheduler : undefined
 
 export const setup_scheduler = async (SCHEDULER_URL) => {
-    if (!scheduler) {
+    if (!scheduler && SCHEDULER_URL) {
         scheduler = global.store.scheduler = {...user(new Bull("user", SCHEDULER_URL))}
+    }
+    if (scheduler) {
+        STATES.SCHEDULER_SETUP = true
     }
 }
 
@@ -38,6 +39,7 @@ export interface ScheduleArgs<T extends TASK> {
 export const get_id = (task: TASK, key) => key ? task + '_' + key : key
 
 export async function schedule<T extends TASK>({when, task, data, opts: {priority = TaskPriority.MEDIUM, key} = {} }: ScheduleArgs<T>) {
+    if (!STATES.SCHEDULER_SETUP) return
     let delay = when ? get_milli_secs(when) : undefined
     log.debug(`Adding task ${task} with delay ${delay} (${when}) and data ${JSON.stringify(data, null, 4)}`)
     return await scheduler[task].add(task, data, {
@@ -60,7 +62,7 @@ export interface ScheduleUniqueArgs<T extends TASK> extends Omit<ScheduleArgs<T>
 }
 
 export async function  schedule_unique<T extends TASK>({key, task, opts, ...args}: ScheduleUniqueArgs<T>) {
-    if (key) {
+    if (key && STATES.SCHEDULER_SETUP) {
         let prev_job = await scheduler[task].getJob(get_id(task, key))
         if (prev_job) {
             await prev_job.discard()

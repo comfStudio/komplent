@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
 import getConfig from 'next/config'
+import { STATES } from '@server/constants'
 
 const mongooseAutopopulate = require('mongoose-autopopulate')
 const mongooseVirtuals = require('mongoose-lean-virtuals')
@@ -15,6 +16,7 @@ mongoose.plugin ? mongoose.plugin(mongooseGetters) : null
 
 export let EL_HOSTS = []
 
-if (Object.entries(serverRuntimeConfig).length) {
+if (Object.entries(serverRuntimeConfig).length && serverRuntimeConfig.ELASTIC_URL) {
     EL_HOSTS.push(serverRuntimeConfig.ELASTIC_URL)
+    STATES.ES_SETUP = true
 }

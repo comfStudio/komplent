@@ -1,6 +1,12 @@
 import { tuple, array_to_enum } from '@utility/misc'
 import { string } from 'prop-types'
 
+export let STATES = {
+    MONGODB_CONNECTED: false,
+    ES_SETUP: false,
+    SCHEDULER_SETUP: false
+}
+
 export const KEYS = [
     "key1",
     "key2",
