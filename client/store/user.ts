@@ -11,7 +11,7 @@ import { COOKIE_AUTH_TOKEN_KEY } from '@server/constants'
 import { get_jwt_data, get_jwt_user } from '@server/middleware'
 import { update_db } from '@app/client/db'
 import user_schema, { user_store_schema } from '@schema/user'
-import { Follow, Tag } from '@db/models';
+import { Follow, Tag, Notification } from '@db/models';
 
 export const fetch_user =  async (cookies_obj) => {
     if (cookies_obj[COOKIE_AUTH_TOKEN_KEY]) {
@@ -165,8 +165,9 @@ export const useFollowerStore = createStore(
             if (current_user ) {
                 let q = {follower: current_user._id, end: null}
                 let p = "followee"
+                let l = 100
                 if (is_server()) {
-                    f = await Follow.find(q).populate(p).sort({"created": -1}).lean()
+                    f = await Follow.find(q).populate(p).sort({"created": -1}).limit(l).lean()
                 } else {
                     await fetch("/api/fetch",{
                         method:"post",
@@ -174,6 +175,7 @@ export const useFollowerStore = createStore(
                         method:"find",
                         query: q,
                         sort: {"created": -1},
+                        limit: l,
                         populate:p }
                     }).then(async (r) => {
                         if (r.ok) {
@@ -184,6 +186,68 @@ export const useFollowerStore = createStore(
                 f = f.map(v => v.followee)
             }
     
+            return f
+        },
+    }
+);
+
+export const useNotificationStore = createStore(
+    {
+        notifications: []
+    },
+    {
+        async get_notifications(current_user) {
+            let f = []
+    
+            if (current_user ) {
+                let q = {to_user: current_user._id}
+                let p = "from_user"
+                let l = 30
+                if (is_server()) {
+                    f = await Notification.find(q).populate(p).sort({"created": -1}).limit(l).lean()
+                } else {
+                    await fetch("/api/fetch",{
+                        method:"post",
+                        body: {model: "Notification",
+                        method:"find",
+                        query: q,
+                        limit: l,
+                        sort: {"created": -1},
+                        populate:p }
+                    }).then(async (r) => {
+                        if (r.ok) {
+                            f = (await r.json()).data
+                        }
+                    })
+                }
+            }
+
+            return f
+        },
+
+        async get_notifications_count(current_user) {
+            let f = 0
+    
+            if (current_user ) {
+                let q = {to_user: current_user._id, read: null}
+                if (is_server()) {
+                    f = await Notification.find(q).countDocuments()
+                } else {
+                    await fetch("/api/fetch",{
+                        method:"post",
+                        body: {model: "Notification",
+                        method:"find",
+                        query: q,
+                        count: true,
+                     }
+                    }).then(async (r) => {
+                        if (r.ok) {
+                            f = (await r.json()).data
+                        }
+                    })
+                }
+            }
+
             return f
         },
     }

@@ -13,7 +13,7 @@ import { useSettings, useUser } from '@hooks/user';
 import { useUpdateDatabase } from '@hooks/db';
 import { user_settings_schema } from '@schema/user';
 import useUserStore from '@store/user';
-import { post_task, TaskMethods } from '@client/task';
+import { post_task, TaskMethods, post_task_debounce } from '@client/task';
 import { TASK } from '@server/constants';
 
 
@@ -56,8 +56,7 @@ export const CommissionStatus = () => {
                         settings.commissions_open = v == 'open' ? true : false
                         let r = await update_settings(settings)
                         if (r.status) {
-                            post_task(TaskMethods.schedule_unique, {key:user._id, when: "1 second", task: TASK.user_commission_status_changed, data: {user_id: user._id, status:settings.commissions_open}})
-                            //post_task(TaskMethods.schedule_unique, {key:user._id, when:"3 minutes", task: TASK.user_commission_status_changed, data: {user_id: user._id, status:settings.commissions_open}})
+                            post_task(TaskMethods.schedule_unique, {key:user._id, when: "2 minutes", task: TASK.user_commission_status_changed, data: {user_id: user._id, status:settings.commissions_open}})
                         }
                     }
                 }}>
@@ -86,11 +85,15 @@ export const Notice = () => {
     return (
         <React.Fragment>
             <EditGroup>
-                <span className="mr-2">{t`Notice Visibility`}: </span>
+                <span className="mr-2">{t`Public Message Visibility`}: </span>
                 <RadioGroup name="notice_visible" inline appearance="picker" defaultValue={value} onChange={(v) => {
                     if (settings) {
                         settings.notice_visible = v == 'visible'
-                        update_settings(settings) 
+                        update_settings(settings).then(r => {
+                            if (r.status && settings.notice_visible) {
+                                //post_task(TaskMethods.schedule_unique, {key:store.state.current_user._id, when:"1 minute", task: TASK.user_commission_status_changed, data: {user_id: user._id, status:settings.commissions_open}})
+                            }
+                        })
                     }
                 }}>
                 <Radio value="visible">{t`Visible`}</Radio>

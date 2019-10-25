@@ -32,19 +32,20 @@ export const MainLayout = (props: Props) => {
       }
     })
 
-    let content = null
+    let layout_content = null
+    let content = <Panel bodyFill className="body-content" bordered>{props.children}</Panel>
 
     if (logged_in && !props.noSidebar) {
-      content = (
+      layout_content = (
         <Row className="h-full">
           <Col className="sm:hidden md:block h-full" xs={4} lg={4}><UserSidebar activeKey={props.activeKey}/></Col>
-          <Col className="h-full" xs={24} md={20} lg={20}>{props.children}</Col>
+          <Col className="h-full" xs={24} md={20} lg={20}>{content}</Col>
         </Row>
       )
     } else {
-      content = (
+      layout_content = (
         <Row className="h-full">
-            <Col className="h-full" xs={24}>{props.children}</Col>
+            <Col className="h-full" xs={24}>{content}</Col>
         </Row>
       )
     }
@@ -56,7 +57,7 @@ export const MainLayout = (props: Props) => {
         </Header>
         <Content>
           <Grid className="h-full">
-            {content}
+            {layout_content}
           </Grid>
         </Content>
         <Footer className="footer">

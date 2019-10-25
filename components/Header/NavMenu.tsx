@@ -34,7 +34,7 @@ export const NavMenu = (props: Props) => {
                 </Link>
                 <Link href="/discover" passHref>
                     <Nav.Item eventKey="discover" active={props.activeKey=='discover'}>
-                            {t`Disover`}
+                            {t`Explore`}
                     </Nav.Item>
                 </Link>
                 {!logged_in && 

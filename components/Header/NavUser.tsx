@@ -1,5 +1,5 @@
-import React from 'react';
-import { Icon, Nav, Dropdown  } from 'rsuite';
+import React, { useState } from 'react';
+import { Icon, Nav, Dropdown, Badge  } from 'rsuite';
 import Link from 'next/link';
 
 import { useUser, useProfileContext } from '@hooks/user'
@@ -7,6 +7,8 @@ import { make_profile_urlpath } from '@utility/pages'
 import { t } from '@app/utility/lang'
 
 import "./NavUser.scss"
+import { useMount } from 'react-use';
+import { useNotificationStore } from '@store/user';
 
 interface Props {
 }
@@ -33,6 +35,12 @@ export const NavUserMenu = (props: UserMenuProps) => {
     const user = useUser()
     const { profile_owner } = useProfileContext()
 
+    const [dashboard_count, set_dashboard_count] = useState(0)
+
+    useMount(() => {
+        useNotificationStore.actions.get_notifications_count(user).then(r => {set_dashboard_count(r)})
+    })
+
     return (
         <React.Fragment>
         {user.type === 'creator' && 
@@ -44,7 +52,10 @@ export const NavUserMenu = (props: UserMenuProps) => {
         }
          <Link href="/dashboard" passHref>
                 <El.Item eventKey="dashboard" active={props.activeKey=='dashboard'}>
-                    {t`Dashboard`}
+                    <span>
+                        {t`Dashboard`}
+                    { dashboard_count ? <Badge className="ml-2" content={dashboard_count}/> : null}
+                    </span>
                 </El.Item>
          </Link>
         <Link href="/commissions" passHref>

@@ -13,6 +13,7 @@ const { Circle } = Progress
 import './ProfileInfo.scss'
 import { useUpdateDatabase } from '@hooks/db';
 import { useTagStore } from '@store/user';
+import { get_profile_name } from '@utility/misc';
 
 interface Props extends HTMLElementProps {
 
@@ -26,7 +27,7 @@ export const ProfileInfo = (props: Props) => {
     return (
         <Panel id="profile-info" className={props.className ? cls + ' ' + props.className : cls} bordered>
             <p>
-                <ProfileNameTag name={profile_user.name || profile_user.username}/>
+                <ProfileNameTag name={get_profile_name(profile_user)}/>
             </p>
             <p>
                 <TagGroup edit={profile_owner} filteredTagIds={tags.map(v => v._id)} onChange={a => {

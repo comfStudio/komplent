@@ -11,7 +11,7 @@ const FollowingsList = () => {
     const store = useFollowerStore()
 
     return (
-        <PanelContainer bordered bodyFill header={(<h5 className="inline-block w-full">{t`Followings`}</h5>)}>
+        <PanelContainer bordered bodyFill header={(<h5 className="inline-block w-full">{t`People you follow`}</h5>)}>
             <PanelGroup>
             <List bordered hover>
                 {store.state.followers.map((user) => {

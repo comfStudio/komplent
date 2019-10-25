@@ -73,3 +73,7 @@ export function array_to_enum<T extends string>(o: Array<T>): {[K in T]: K} {
       return res;
     }, Object.create(null));
   }
+
+  export const get_profile_name = ({ name = undefined, username = undefined } = {}) => {
+      return name || username
+  }

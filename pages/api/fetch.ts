@@ -10,7 +10,7 @@ const cors = microCors({ allowMethods: ['POST', 'OPTIONS'] })
 
 export default with_middleware(async (req: ExApiRequest, res: ExApiResponse) => {
     try {
-        const { query, model, method, populate, lean, sort } = req.json
+        const { query, model, method, populate, lean, sort, limit, count } = req.json
 
         let m = mongoose.models[model]
 
@@ -30,26 +30,35 @@ export default with_middleware(async (req: ExApiRequest, res: ExApiResponse) => 
             qmethod = m.find(...q)
         }
 
-        
-        if (populate) {
-            let p_array = populate
-            if (!Array.isArray(populate)) {
-                p_array = [populate]
-            }
-            for (let p of p_array) {
-                if (!Array.isArray(p)) {
-                    p = [p]
+        if (count) {
+            qmethod = qmethod.countDocuments()
+        } else {
+            
+            if (populate) {
+                let p_array = populate
+                if (!Array.isArray(populate)) {
+                    p_array = [populate]
                 }
-                qmethod = qmethod.populate(...p)
+                for (let p of p_array) {
+                    if (!Array.isArray(p)) {
+                        p = [p]
+                    }
+                    qmethod = qmethod.populate(...p)
+                }
             }
-        }
+    
+            if (sort) {
+                qmethod = qmethod.sort(sort)
+            }
+    
+            if (limit) {
+                qmethod = qmethod.limit(limit)
+            }
+    
+            if (qmethod.lean && lean !== false) {
+                qmethod = qmethod.lean()
+            }
 
-        if (sort) {
-            qmethod = qmethod.sort(sort)
-        }
-
-        if (qmethod.lean && lean !== false) {
-            qmethod = qmethod.lean()
         }
         
         let data = await qmethod

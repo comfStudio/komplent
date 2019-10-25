@@ -11,6 +11,8 @@ import { t } from '@app/utility/lang'
 import { ReactProps } from '@utility/props'
 import { useUpdateDatabase } from '@hooks/db';
 import { follow_schema } from '@schema/user'
+import { post_task, TaskMethods, post_task_debounce } from '@client/task';
+import { TASK } from '@server/constants';
 
 interface LayoutProps extends ReactProps, MenuProps {
   activeKey?: string
@@ -86,6 +88,7 @@ export const FollowButton = () => {
           update("Follow", {follower: current_user._id, followee: profile_user._id}, follow_schema, true, true).then((r) => {
             if (r.status) {
               set_follow_obj(r.body)
+              post_task(TaskMethods.schedule_unique, {key:current_user._id, when: "30 seconds", task: TASK.followed_user, data: {user_id: current_user._id, followee:profile_user._id}})
             }
             set_loading(false)
           })

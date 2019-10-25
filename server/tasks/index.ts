@@ -19,7 +19,7 @@ export const setup_scheduler = async (SCHEDULER_URL) => {
     }
 }
 
-const get_milli_secs = (when: string) => {
+export const get_milli_secs = (when: string) => {
     return human_interval(when)
 }
 
@@ -69,30 +69,3 @@ export async function  schedule_unique<T extends TASK>({key, task, opts, ...args
         return await schedule({task, ...args, opts:{key, ...opts}})
     }
 }
-
-export const schedule_now_debounce = debounce(schedule_now, get_milli_secs("30 seconds"))
-export const schedule_now_d_1_min = debounce(schedule_now, get_milli_secs("1 minute"))
-export const schedule_now_d_3_min = debounce(schedule_now, get_milli_secs("3 minutes"))
-export const schedule_now_d_5_min = debounce(schedule_now, get_milli_secs("5 minutes"))
-export const schedule_now_d_10_min = debounce(schedule_now, get_milli_secs("10 minutes"))
-export const schedule_now_d_15_min = debounce(schedule_now, get_milli_secs("15 minutes"))
-export const schedule_now_d_30_min = debounce(schedule_now, get_milli_secs("30 minutes"))
-export const schedule_now_d_60_min = debounce(schedule_now, get_milli_secs("60 minutes"))
-
-export const schedule_debounce = debounce(schedule, get_milli_secs("30 seconds"))
-export const schedule_d_1_min = debounce(schedule, get_milli_secs("1 minute"))
-export const schedule_d_3_min = debounce(schedule, get_milli_secs("3 minutes"))
-export const schedule_d_5_min = debounce(schedule, get_milli_secs("5 minutes"))
-export const schedule_d_10_min = debounce(schedule, get_milli_secs("10 minutes"))
-export const schedule_d_15_min = debounce(schedule, get_milli_secs("15 minutes"))
-export const schedule_d_30_min = debounce(schedule, get_milli_secs("30 minutes"))
-export const schedule_d_60_min = debounce(schedule, get_milli_secs("60 minutes"))
-
-export const schedule_unique_debounced = debounce(schedule_unique, get_milli_secs("30 seconds"))
-export const schedule_unique_d_1_min = debounce(schedule_unique, get_milli_secs("1 minute"))
-export const schedule_unique_d_3_min = debounce(schedule_unique, get_milli_secs("3 minutes"))
-export const schedule_unique_d_5_min = debounce(schedule_unique, get_milli_secs("5 minutes"))
-export const schedule_unique_d_10_min = debounce(schedule_unique, get_milli_secs("10 minutes"))
-export const schedule_unique_d_15_min = debounce(schedule_unique, get_milli_secs("15 minutes"))
-export const schedule_unique_d_30_min = debounce(schedule_unique, get_milli_secs("30 minutes"))
-export const schedule_unique_d_60_min = debounce(schedule_unique, get_milli_secs("60 minutes"))

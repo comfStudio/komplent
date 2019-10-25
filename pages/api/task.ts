@@ -3,6 +3,7 @@ import { BAD_REQUEST, OK, CREATED, NOT_FOUND } from 'http-status-codes';
 import { with_middleware, ExApiRequest, ExApiResponse } from '@server/middleware'
 import { error_message, data_message } from '@utility/message'
 import * as tasks from '@server/tasks'
+import log from '@utility/log';
 
 
 export default with_middleware(async (req: ExApiRequest, res: ExApiResponse) => {
@@ -17,6 +18,7 @@ export default with_middleware(async (req: ExApiRequest, res: ExApiResponse) => 
     let d
 
     if (req.method === 'post') {
+        log.debug(`Posting task ${args.task}`)
         d = await fn(args)
         if (d) {
             d = d.id

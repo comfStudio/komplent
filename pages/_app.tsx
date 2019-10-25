@@ -11,7 +11,7 @@ import { ReactProps } from '@utility/props'
 import { setup_scheduler } from '@server/tasks'
 import { connect, synchronize_indexes } from '@server/db'
 
-import { useUserStore, useTagStore } from '@client/store/user'
+import { useUserStore, useTagStore, useNotificationStore } from '@client/store/user'
 import { useCommissionRateStore, useCommissionStore, useCommissionsStore } from '@client/store/commission'
 
 import '@assets/styles/imports.scss'
@@ -55,7 +55,9 @@ export const StoreProvider = (props: ReactProps) => {
         <useCommissionStore.Provider>
           <useCommissionRateStore.Provider>
             <useTagStore.Provider>
-            {props.children}
+              <useNotificationStore.Provider>
+                {props.children}
+              </useNotificationStore.Provider>
             </useTagStore.Provider>
           </useCommissionRateStore.Provider>
         </useCommissionStore.Provider>
