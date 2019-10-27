@@ -13,7 +13,7 @@ export const useSearchStore = createStore(
         parse_search_query(search_query, build=true) {
             let q = bodybuilder()
             q = q.notQuery("match", "type", "consumer")
-            q = q.query("match", "settings.visibility", "public")
+            q = q.query("match", "visibility", "public")
 
             if (search_query) {
                 if (search_query.q) {

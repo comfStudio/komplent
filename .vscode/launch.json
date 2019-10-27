@@ -42,7 +42,8 @@
               ],
             "port": 9229,
             "console": "integratedTerminal",
-            "restart": true
+            "restart": true,
+            "timeout": 250000
         }
     ],
     "compounds": [

@@ -34,7 +34,7 @@ class ProfilePage extends OptionalAuthPage<Props> {
         let profile_path = ""
         
         if (profile_id) {
-            let q = {username: profile_id, type: "creator", $or: [{visibility: "visible"}, {visibility: "private"} ]}
+            let q = {username: profile_id, type: "creator", $or: [{visibility: "public"}, {visibility: "private"} ]}
             if (props.useUserState && props.useUserState.current_user && profile_id === props.useUserState.current_user.username) {
                 q['$or'].push({visibility: "hidden"})
             }
@@ -48,7 +48,7 @@ class ProfilePage extends OptionalAuthPage<Props> {
                     }
                 })
             }
-
+            
             if (profile_user) {
                 profile_path = make_profile_urlpath(profile_user)
             }

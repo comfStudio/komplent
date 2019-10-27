@@ -15,6 +15,20 @@ export const commission_schema = new Schema({
     finished: { type: Boolean, default: false}, // commission has finished, could be cancelled or expired
     completed: { type: Boolean, default: false}, // commission was completed successfully
     accepted: { type: Boolean, default: false},
+    rate: {
+        type: Mixed,
+        required: true
+    },
+    extras: [Mixed],
+    payment_count: { // how many times customer should pay
+        type: Number,
+        default: 1,
+    },
+    payment_position: {
+        type: String,
+        enum : ['first','last'],
+        default: 'first',
+    },
     from_user: { 
         type: ObjectId, 
         ref: 'User',

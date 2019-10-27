@@ -21,13 +21,24 @@ interface ProcessProps {
     active?: boolean
 }
 
+export const ApprovalButtons = () => {
+    const store = useCommissionStore()
+    const [accept_loading, set_accept_loading] = useState(false)
+    const [decline_loading, set_decline_loading] = useState(false)
+
+    return (
+        <ButtonToolbar>
+            <Button color="green" loading={accept_loading} onClick={(ev) => {ev.preventDefault(); set_accept_loading(true); store.accept().then(() => set_accept_loading(false))}}>{t`Accept`}</Button>
+            <Button color="red" loading={decline_loading} onClick={(ev) => {ev.preventDefault(); set_decline_loading(true); store.decline().then(() => set_decline_loading(false))}}>{t`Decline`}</Button>
+        </ButtonToolbar>
+    )
+}
+
 const PendingApproval = (props: ProcessProps) => {
 
     const store = useCommissionStore()
     let commission = store.get_commission()
     const to_name = commission ? commission.to_user.username : ''
-    const [accept_loading, set_accept_loading] = useState(false)
-    const [decline_loading, set_decline_loading] = useState(false)
     const show_panel = !props.hidden || props.active
 
     return (
@@ -45,10 +56,7 @@ const PendingApproval = (props: ProcessProps) => {
                 <div>
                     <p>{t`Waiting for your approval.`}</p>
                     <p>
-                        <ButtonToolbar>
-                            <Button color="green" loading={accept_loading} onClick={(ev) => {ev.preventDefault(); set_accept_loading(true); store.accept().then(() => set_accept_loading(false))}}>{t`Accept`}</Button>
-                            <Button color="red" loading={decline_loading} onClick={(ev) => {ev.preventDefault(); set_decline_loading(true); store.decline().then(() => set_decline_loading(false))}}>{t`Decline`}</Button>
-                        </ButtonToolbar>
+                        <ApprovalButtons/>
                     </p>
                 </div>
                 }
@@ -72,8 +80,10 @@ const PendingPayment = (props: ProcessProps) => {
     return (
         <React.Fragment>
             <TimelineTitle onClick={props.onClick} date={props.done_date}>
-            {!props.hidden && !done ? (last ? t`Pending last payment` : count === 1 ? t`Pending first payment` : t`Pending payment`) : null}
-            {props.hidden || done ? (last ? t`Last payment` : count === 1 ? t`First payment` : t`Payment`) : null}
+            {/* {!props.hidden && !done ? (last ? t`Pending last payment` : count === 1 ? t`Pending first payment` : t`Pending payment`) : null} */}
+            {!props.hidden && !done ? t`Pending payment` : null}
+            {/* {props.hidden || done ? (last ? t`Last payment` : count === 1 ? t`First payment` : t`Payment`) : null} */}
+            {props.hidden || done ? t`Payment` : null}
             </TimelineTitle>
             {show_panel &&
             <TimelinePanel>
@@ -83,13 +93,13 @@ const PendingPayment = (props: ProcessProps) => {
                 {props.is_owner && done && <p>{t`You sent your payment.`}</p>}
                 {!commission.finished && props.is_owner && !done &&
                 <div>
-                    {count === 1 &&
+                    {false && count === 1 &&
                     <p>{t`Waiting for your first payment.`}</p>
                     }
-                    {count > 1 && !last &&
+                    {true && //count > 1 && !last &&
                     <p>{t`Waiting for your payment.`}</p>
                     }
-                    {last &&
+                    {false && last &&
                     <p>{t`Waiting for your last payment.`}</p>
                     }
                     {!props.hidden &&
@@ -138,7 +148,7 @@ const PendingProduct = (props: ProcessProps) => {
                         <p>{t`You have added ${count} product(s).`}</p>
                         <p>
                             <ButtonToolbar>
-                                <Button loading={accept_loading} color="green" onClick={(ev) => {ev.preventDefault(); set_accept_loading(true); store.confirm_products().then(() => set_accept_loading(false))}}>{t`Unlock`}</Button>
+                                <Button loading={accept_loading} color="green" onClick={(ev) => {ev.preventDefault(); set_accept_loading(true); store.confirm_products().then(() => set_accept_loading(false))}}>{t`Next step`}</Button>
                             </ButtonToolbar>
                         </p>
                     </React.Fragment>
@@ -244,7 +254,7 @@ const Completed = (props: ProcessProps) => {
                 }
                 {!completed &&
                 <React.Fragment>
-                    <p>{t`The commission request has not been completed yet.`}</p>
+                    <p>{t`The commission request is almost done.`}</p>
                 </React.Fragment>
                 }
                 {!finished && !completed &&
@@ -313,37 +323,43 @@ const CommissionProcess = () => {
 
     if (!is_finished) {
 
-            if (!visited_types.includes("pending_payment")) {
-                unvisited_phases.push(
-                    <CommissionTimelineItem key="1">
-                        <PendingPayment hidden data={{data: {last: false, count: 1}}} is_owner={is_owner}/>
-                    </CommissionTimelineItem>
-                )
+            if (commission.payment_position === 'first') {
+                if (!visited_types.includes("pending_payment")) {
+                    unvisited_phases.push(
+                        <CommissionTimelineItem key="1">
+                            <PendingPayment hidden data={{data: {last: false, count: 1}}} is_owner={is_owner}/>
+                        </CommissionTimelineItem>
+                    )
+                }
             }
+
             if (!visited_types.includes("pending_product")) {
                 unvisited_phases.push(
-                    <CommissionTimelineItem key="1">
+                    <CommissionTimelineItem key="2">
                         <PendingProduct hidden data={null} is_owner={is_owner}/>
                     </CommissionTimelineItem>
                 )
             }
-            if (visited_types.filter(v => v === "pending_payment").length < 2) {
-                unvisited_phases.push(
-                    <CommissionTimelineItem key="1">
-                        <PendingPayment hidden data={{data: {last: true}}} is_owner={is_owner}/>
-                    </CommissionTimelineItem>
-                )
+
+            if (commission.payment_position === 'last') {
+                if (!visited_types.includes("pending_payment")) {
+                    unvisited_phases.push(
+                        <CommissionTimelineItem key="3">
+                            <PendingPayment hidden data={{data: {last: true}}} is_owner={is_owner}/>
+                        </CommissionTimelineItem>
+                    )
+                }
             }
             if (!visited_types.includes("unlock")) {
                 unvisited_phases.push(
-                    <CommissionTimelineItem key="1">
+                    <CommissionTimelineItem key="4">
                         <Unlocked hidden data={null} is_owner={is_owner}/>
                     </CommissionTimelineItem>
                 )
             }
             if (!visited_types.includes("complete")) {
                 unvisited_phases.push(
-                    <CommissionTimelineItem key="1">
+                    <CommissionTimelineItem key="5">
                         <Completed hidden data={null} is_owner={is_owner}/>
                     </CommissionTimelineItem>
                 )

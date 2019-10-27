@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Grid, Col, Row, Panel, Pagination } from 'rsuite'
 
-import UserCard from '@app/components/User/UserCard'
+import CreatorCard from '@components/User/CreatorCard'
 import useSearchStore from '@store/search';
 
 export const ResultLayout = () => {
@@ -17,7 +17,7 @@ export const ResultLayout = () => {
                     {
                         store.state.results.map(u => {
                             return (
-                                <Col key={u._id} xs={12}><UserCard data={u}/></Col>
+                                <Col key={u._id} xs={12}><CreatorCard data={u}/></Col>
                             )
                         })
                     }

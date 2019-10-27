@@ -12,12 +12,46 @@ export const useCommissionStore = createStore(
     },
     {
         get_commission() {
-            return this.state.commission || {}
+            let c
+            if (this.state.commission) {
+                c = {
+                    ...this.state.commission,
+                    rate: {...this.state.commission.rate, price: {$numberDecimal: this.state.commission.rate.price}},
+                    extras: this.state.commission.extras ? this.state.commission.extras.map(v => ({...v, price: {$numberDecimal: v.price}})) : this.state.commission.extras
+                }
+
+            }
+            return c || {}
         },
         async create_commission(data, ...params) {
+
+            let d = {...data}
+            
+            if (typeof d.rate === 'string') {
+                d.rate = await useCommissionRateStore.actions.get_rate(d.rate)
+            }
+
+            if (!d.rate) {
+                throw Error("A valid commission rate is required")
+            }
+
+            if ( typeof d.rate === 'object') {
+                d.rate.price = d.rate.price['$numberDecimal']
+            }
+
+            if (d.extras && typeof d.extras[0] === 'string') {
+                d.extras = await useCommissionRateStore.actions.get_extraoptions(d.extras)
+            }
+
+            if (d.extras) {
+                d.extras = d.extras.map(v => ({...v, price: v.price['$numberDecimal']}))
+            }
+
+            console.log(d)
+
             let r = await update_db({
                 model:'Commission',
-                data:data,
+                data:d,
                 schema:commission_schema,
                 create: true,
                 validate: true,
@@ -95,11 +129,16 @@ export const useCommissionStore = createStore(
             }
             const last: boolean = phase_data.data ? phase_data.data.last : false
             if (last) {
-                this.add_phase("unlock", {done: true, refresh: false})
-                r = await this.add_phase("complete", {complete_previous_phase: false})
+                this.unlock()
             } else {
                 r = await this.add_phase("pending_product")
             }
+            return r
+        },
+
+        async unlock() {
+            let r = await this.add_phase("unlock", {done: true, refresh: false})
+            r = await this.add_phase("complete", {complete_previous_phase: false})
             return r
         },
 
@@ -117,13 +156,22 @@ export const useCommissionStore = createStore(
                 accepted: true,
             })
             if (r.status) {
-                r = await this.add_payment_phase()
+                if (this.state.commission.payment_position === 'first') {
+                    r = await this.add_payment_phase(false)
+                } else {
+                    r = await this.add_phase("pending_product")
+                }
             }
             return r
         },
 
         async confirm_products() {
-            let r = await this.add_payment_phase(true)
+            let r
+            if (this.state.commission.payment_position === 'last') {
+                r = await this.add_payment_phase(true)
+            } else {
+                r = await this.unlock()
+            }
             return r
         },
 
@@ -299,6 +347,48 @@ export const useCommissionRateStore = createStore(
             ...params})
         if (r.status) {
             this.setState({options: iupdate(this.state.options, {$push: [r.body.data]})})
+        }
+        return r
+    },
+    async get_rate(rate_id) {
+        let r
+        let rate_q = {_id:rate_id}
+
+        if (is_server()) {
+
+            r = CommissionRate.findOne(rate_q).populate("extras").populate("user", "username").lean()
+
+        } else {
+
+            r = await fetch("/api/fetch", {method:"post", body: {model: "CommissionRate", query: rate_q, method: "findOne"}}).then(async r => {
+                    if (r.ok) {
+                        return (await r.json()).data
+                    } else {
+                        return null
+                    }
+                })
+
+        }
+        return r
+    },
+    async get_extraoptions(ids: string[]) {
+        let r
+        let extra_option_q = {_id: {$in: ids}}
+
+        if (is_server()) {
+
+            r = CommissionExtraOption.find(extra_option_q).lean()
+
+        } else {
+
+            r = await fetch("/api/fetch", {method:"post", body: {model: "CommissionExtraOption", query: extra_option_q}}).then(async r => {
+                    if (r.ok) {
+                        return (await r.json()).data
+                    } else {
+                        return null
+                    }
+                })
+
         }
         return r
     },

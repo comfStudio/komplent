@@ -12,7 +12,7 @@ export const MainSearch = () => {
     const router = useRouter()
 
     return (
-        <form action="search" method="GET">
+        <form action="/search" method="GET">
             <InputGroup inside className="text-left !w-5/6 !max-w-6xl m-auto">
                 <Input name="q" defaultValue={router.query.q as string} placeholder={t`What are you looking for?`}/>
                 <Button>

@@ -2,10 +2,6 @@
     width: 12rem;
     position: relative;
 
-    &:hover {
-        cursor: pointer;
-    }
-
     .header {
 
         margin: 0;
@@ -51,7 +47,11 @@
     }
 }
 
-.commission-card:hover, .commission-card.selected, .commission-rates-group label input:checked + .commission-card {
+a > .commission-card:hover {
+    cursor: pointer;
+}
+
+a > .commission-card:hover, .commission-card.selected, .commission-rates-group label input:checked + .commission-card {
     border: 0.15em solid;
     @apply border-primary;
 }

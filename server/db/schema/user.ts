@@ -4,6 +4,7 @@ import mongoosastic from 'mongoosastic'
 
 import { is_server } from '@utility/misc'
 import { tag_schema } from '@schema/general'
+import { comission_rate_schema } from './commission'
 
 const { Schema } = mongoose
 
@@ -37,7 +38,8 @@ export const user_schema = new Schema({
   profile_currency: String,
   commissions_open: {
     type: Boolean,
-    default: false
+    default: false,
+    es_indexed:true
   },
   visibility: {
     type: String,
@@ -75,7 +77,9 @@ export const user_schema = new Schema({
   commission_rates: [
     { 
       type: ObjectId, 
-      ref: 'CommissionRate'
+      ref: 'CommissionRate',
+      es_schema: comission_rate_schema,
+      es_indexed: true,
     }
   ],
   galleries: [
@@ -91,7 +95,6 @@ if (is_server() && EL_HOSTS.length) {
     hosts: EL_HOSTS,
     populate: [
       {path: 'tags', select: 'name color'},
-      {path: 'settings'},
     ]
   })
 }

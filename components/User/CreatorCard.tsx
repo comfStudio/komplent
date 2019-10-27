@@ -6,7 +6,7 @@ import Image from '@components/App/Image'
 import { t } from '@app/utility/lang'
 import { HTMLElementProps } from '@app/utility/props'
 
-import './UserCard.scss'
+import './CreatorCard.scss'
 import { make_profile_id, make_profile_urlpath, make_commission_rate_urlpath } from '@utility/pages';
 import { decimal128ToMoneyToString } from '@utility/misc';
 import { CommissionButton } from '@components/Profile/ProfileCommission';
@@ -17,7 +17,7 @@ interface Props extends HTMLElementProps {
     fluid?: boolean
 }
 
-export const UserCard = ({fluid = true, ...props}: Props) => {
+export const CreatorCard = ({fluid = true, ...props}: Props) => {
 
     let rates = []
     if (props.data && props.data.rates) {
@@ -67,4 +67,4 @@ export const UserCard = ({fluid = true, ...props}: Props) => {
     );
 }
 
-export default UserCard;
+export default CreatorCard;

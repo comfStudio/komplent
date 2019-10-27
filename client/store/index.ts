@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useLayoutEffect } from 'react';
 import useGlobalHook, { Store as HookStore } from '@znemz/use-global-hook';
 import { useMount } from 'react-use'
 import { createContainer } from "unstated-next"

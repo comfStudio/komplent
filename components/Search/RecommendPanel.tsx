@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 
 import { Grid, Col, Row, Panel, PanelGroup } from 'rsuite'
 
-import UserCard from '@app/components/User/UserCard'
+import CreatorCard from '@components/User/CreatorCard'
 
 class RecommendPanel extends Component {
     render() {

@@ -62,11 +62,14 @@ export const TotalPriceDisplay = (props: TotalPriceProps) => {
 
 interface CommissionCardProps extends HTMLElementProps {
     data: any
+    extras?: any
     selected?: boolean
+    noCover?: boolean
 }
 
 const CommissionCardHeader = (props: CommissionCardProps) => {
     let { price, title, extras, negotiable } = props.data
+    extras = props.extras || extras
 
     return (<Grid className="header !w-full">
         <Row>
@@ -103,7 +106,7 @@ export const CommissionCard = (props: CommissionCardProps) => {
     return (
         <Panel bodyFill className={props.className ? cls + ' ' + props.className : cls} bordered>
             <CommissionCardHeader {...props}/>
-            <Image w="100%" h={250}/>
+            {!props.noCover && <Image w="100%" h={250}/>}
             {props.selected && <span className="select-box">Selected</span>}
         </Panel>
     );
@@ -317,20 +320,25 @@ export const ProfileCommission = () => {
                                 set_error(null)
                                 let data = {
                                     ...form_value,
-                                    extras: form_value.extras.filter(i => available_options.includes(i)),
+                                    extras: form_value.extras ? form_value.extras.filter(i => available_options.includes(i)) : [],
                                     from_user: from_user._id,
-                                    to_user: to_user._id
+                                    to_user: to_user._id,
+                                    rate: form_value.commission_rate
                                 }
 
-                                let r = await commission_store.create_commission(data).then(r => {
-                                    set_loading(false)
-                                    return r
-                                })
-
-                                if (r.status) {
-                                    router.push(pages.commission + `/${r.body.data._id}`)
-                                } else {
-                                    set_error(r.body.error)
+                                try {
+                                    let r = await commission_store.create_commission(data).then(r => {
+                                        set_loading(false)
+                                        return r
+                                    })
+    
+                                    if (r.status) {
+                                        router.push(pages.commission + `/${r.body.data._id}`)
+                                    } else {
+                                        set_error(r.body.error)
+                                    }
+                                } catch(err) {
+                                    set_error(err.message)
                                 }
                             }
                         }}>

@@ -13,25 +13,42 @@ interface Props extends AuthProps {
 
 class CommissionPage extends AuthPage<Props> {
 
+    static allow_owner = true
+
     static async getInitialProps(ctx: NextPageContext) {
         const props = await super.getInitialProps(ctx)
-
-        const commission_id = ctx.query.commission_id as string
-        let commissionStoreState = useCommissionStore.createState({
-            commission: null,
-            _current_user: props.useUserState.current_user,
-        })
         let error = null
+        let commissionStoreState
 
-        if (commission_id) {
-            commissionStoreState.commission = await useCommissionStore.actions.load(commission_id)
+        if (props.useUserState.logged_in) {
+            const commission_id = ctx.query.commission_id as string
+            commissionStoreState = useCommissionStore.createState({
+                commission: null,
+                _current_user: props.useUserState.current_user,
+            })
+    
+            if (commission_id) {
+                commissionStoreState.commission = await useCommissionStore.actions.load(commission_id)
+            }
+
+            
+            if (!commissionStoreState.commission) {
+                error = NOT_FOUND
+                ctx.res.statusCode = error
+            } else {
+                let is_owner
+                if (typeof props.useUserState.current_user._id === 'string') {
+                    is_owner = props.useUserState.current_user._id === commissionStoreState.commission.from_user._id
+                } else {
+                    is_owner = commissionStoreState.commission.from_user._id.equals(props.useUserState.current_user._id)
+                }
+                if (!this.allow_owner && is_owner) {
+                    error = NOT_FOUND
+                    ctx.res.statusCode = error
+                }
+            }
         }
 
-        if (!commissionStoreState.commission) {
-            error = NOT_FOUND
-            ctx.res.statusCode = error
-        }
-        
         return {
             error,
             commissionStoreState,

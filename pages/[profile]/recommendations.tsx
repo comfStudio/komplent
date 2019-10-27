@@ -4,7 +4,7 @@ import ProfilePage from '@components/App/ProfilePage'
 import { ProfileLayout } from '@components/Profile'
 import { Grid, Row, Col } from 'rsuite';
 
-import UserCard from '@components/User/UserCard';
+import CreatorCard from '@components/User/CreatorCard';
 
 class RecommendationsPage extends ProfilePage {
     public render() {

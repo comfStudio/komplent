@@ -27,7 +27,8 @@ export const TimelineTitle = (props: TimelineTitleProps) => {
     }
     return (
         <span onClick={props.onClick} className="title">
-            {props.children} {!!date && <span className="muted text-sm">- ({format(date as Date, "yyyy-MM-dd - HH:mm:ss")})</span>}
+            <h4 className="inline">{props.children}</h4>
+            {!!date && <span className="muted ml-1 text-sm">- ({format(date as Date, "yyyy-MM-dd - HH:mm:ss")})</span>}
         </span>
     )
 }
