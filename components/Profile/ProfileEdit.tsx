@@ -9,9 +9,8 @@ import CommissionRateForm, { RateOptionsForm } from '@components/Form/Commission
 
 import './ProfileEdit.scss'
 import { useSessionStorage } from 'react-use';
-import { useSettings, useUser } from '@hooks/user';
+import { useUser } from '@hooks/user';
 import { useUpdateDatabase } from '@hooks/db';
-import { user_settings_schema } from '@schema/user';
 import useUserStore from '@store/user';
 import { post_task, TaskMethods, post_task_debounce } from '@client/task';
 import { TASK } from '@server/constants';
@@ -42,22 +41,20 @@ export const ProfileColor = () => {
 
 export const CommissionStatus = () => {
 
-    const user = useUser()
-    const [settings, update_settings] = useSettings()
+    const store = useUserStore()
+    const user = store.state.current_user
     
-    const value = (settings && settings.commissions_open) ? 'open' : 'closed'
+    const value = (user.commissions_open) ? 'open' : 'closed'
 
     return (
         <React.Fragment>
             <EditGroup>
                 <span className="mr-2">{t`Commission Status`}: </span>
                 <RadioGroup name="commission_status" inline appearance="picker" defaultValue={value} onChange={async (v) => {
-                    if (settings) {
-                        settings.commissions_open = v == 'open' ? true : false
-                        let r = await update_settings(settings)
-                        if (r.status) {
-                            post_task(TaskMethods.schedule_unique, {key:user._id, when: "2 minutes", task: TASK.user_commission_status_changed, data: {user_id: user._id, status:settings.commissions_open}})
-                        }
+                    let status = v == 'open' ? true : false
+                    let r = await store.update_user({commissions_open: status})
+                    if (r.status) {
+                        post_task(TaskMethods.schedule_unique, {key:user._id, when: "2 minutes", task: TASK.user_commission_status_changed, data: {user_id: user._id, status}})
                     }
                 }}>
                 <Radio value="open">{t`Open`}</Radio>
@@ -73,28 +70,43 @@ export const CommissionStatus = () => {
     )
 }
 
+export const ProfileVisiblity = () => {
+
+    const store = useUserStore()
+
+    return (
+        <EditGroup>
+            <span className="mr-2">{t`Profile Visiblity`}: </span>
+            <RadioGroup name="profile_visiblity" inline appearance="picker" defaultValue={store.state.current_user.visibility||"private"} onChange={async (v) => {
+                    let r = await store.update_user({visibility: v})
+                }}>
+            <Radio value="public">{t`Public`}</Radio>
+            <Radio value="private">{t`Private`}</Radio>
+            <Radio value="hidden">{t`Hidden`}</Radio>
+            </RadioGroup>
+        </EditGroup>
+    )
+}
+
 export const Notice = () => {
 
     const store = useUserStore()
-    const [settings, update_settings] = useSettings()
     const [ notice_text, set_notice_text ] = useState(store.state.current_user.notice || "")
     const [ loading, set_loading ] = useState(false)
     const [ updated, set_updated ] = useState(false)
-    const value = (settings && settings.notice_visible) ? "visible" : "hidden"
+    const value = (store.state.current_user.notice_visible) ? "visible" : "hidden"
 
     return (
         <React.Fragment>
             <EditGroup>
                 <span className="mr-2">{t`Public Message Visibility`}: </span>
                 <RadioGroup name="notice_visible" inline appearance="picker" defaultValue={value} onChange={(v) => {
-                    if (settings) {
-                        settings.notice_visible = v == 'visible'
-                        update_settings(settings).then(r => {
-                            if (r.status && settings.notice_visible) {
-                                //post_task(TaskMethods.schedule_unique, {key:store.state.current_user._id, when:"1 minute", task: TASK.user_commission_status_changed, data: {user_id: user._id, status:settings.commissions_open}})
-                            }
-                        })
-                    }
+                    let status = v == 'visible'
+                    store.update_user({notice_visible: status}).then(r => {
+                        if (r.status && status) {
+                            //post_task(TaskMethods.schedule_unique, {key:store.state.current_user._id, when:"1 minute", task: TASK.user_commission_status_changed, data: {user_id: user._id, status:settings.commissions_open}})
+                        }
+                    })
                 }}>
                 <Radio value="visible">{t`Visible`}</Radio>
                 <Radio value="hidden">{t`Hidden`}</Radio>
@@ -183,19 +195,6 @@ export const Tags = () => {
         className="ml-2"
       />
     </EditGroup>
-    )
-}
-  
-export const ProfileVisiblity = () => {
-    return (
-        <EditGroup>
-            <span className="mr-2">{t`Profile Visiblity`}: </span>
-            <RadioGroup name="profile_visiblity" inline appearance="picker" defaultValue="public">
-            <Radio value="public">{t`Public`}</Radio>
-            <Radio value="private">{t`Private`}</Radio>
-            <Radio value="hidden">{t`Hidden`}</Radio>
-            </RadioGroup>
-        </EditGroup>
     )
 }
 

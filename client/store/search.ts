@@ -13,6 +13,7 @@ export const useSearchStore = createStore(
         parse_search_query(search_query, build=true) {
             let q = bodybuilder()
             q = q.notQuery("match", "type", "consumer")
+            q = q.query("match", "settings.visibility", "public")
 
             if (search_query) {
                 if (search_query.q) {
@@ -34,7 +35,7 @@ export const useSearchStore = createStore(
                 hydrate: true,
                 hydrateOptions: {
                     lean: true,
-                    populate: "rates tags",
+                    populate: "rates tags settings",
                 }
                 }
             let d: any

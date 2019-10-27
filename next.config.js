@@ -32,6 +32,9 @@ const withConfig = withNextRuntimeDotenv({
         'MONGODB_URL',
         'REDIS_URL',
         'ELASTIC_URL',
+        'AWS_ACCESS_KEY_ID',
+        'AWS_SECRET_KEY',
+        'AWS_BUCKET_NAME',
         'PRIMUS_1_PORT',
         'PRIMUS_1_HOST',
       ]

@@ -16,7 +16,7 @@ export const ProfileIndex = () => {
 
     return (
         <Grid fluid>
-            {profile_user.settings.notice_visible && profile_user.notice &&
+            {profile_user.notice_visible && profile_user.notice &&
             <Message type="info" description={profile_user.notice}/>
             }
             <ReviewsReel/>

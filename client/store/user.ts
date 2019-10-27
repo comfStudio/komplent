@@ -138,7 +138,11 @@ export const useUserStore = createStore(
         return f
     },
     async update_user(data: object) {
-        return await update_db({model: 'User', data: {_id: this.state.current_user._id, ...data}, schema: user_schema, validate: true})
+        let r = await update_db({model: 'User', data: {_id: this.state.current_user._id, ...data}, schema: user_schema, validate: true})
+        if (r.status) {
+            this.setState({current_user: {...this.state.current_user, ...data}})
+        }
+        return r
     },
     async save(state?: object) {
         let s = {_id: this.state._id, has_selected_usertype: this.state.has_selected_usertype, user: this.state.current_user._id, ...state}

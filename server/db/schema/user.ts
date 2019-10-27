@@ -25,9 +25,37 @@ export const user_schema = new Schema({
     ref: 'Image'
   },
   origin: { type: String, es_indexed:true },
-  notice: { type: String, maxLength: 250 },
   description: String,
   socials: [{ url: String, name: String }],
+  notice_visible: {
+    type: Boolean,
+    default: false
+  },
+  notice: { type: String, maxLength: 250 },
+  profile_color: String,
+  display_currency: String,
+  profile_currency: String,
+  commissions_open: {
+    type: Boolean,
+    default: false
+  },
+  visibility: {
+    type: String,
+    enum : ['public','private', 'hidden'],
+    default: 'private',
+    es_indexed:true
+  },
+  commission_guidelines: [
+    {
+      guideline_type: String,
+      value: String
+    }
+  ],
+  profile_cover: { 
+    type: ObjectId, 
+    ref: 'Image'
+  },
+  profile_body: String,
   tags: [{ 
     type: ObjectId, 
     ref: 'Tag',
@@ -35,15 +63,7 @@ export const user_schema = new Schema({
     es_indexed: true,
     es_select: "name"
   }],
-  follows: [{ 
-    type: ObjectId, 
-    ref: 'User'
-  }],
   last_commissions_update: Date,
-  profile: { 
-    type: ObjectId, 
-    ref: 'Profile'
-  },
   commission_info: { 
     type: ObjectId, 
     ref: 'CommissionStats'
@@ -52,11 +72,6 @@ export const user_schema = new Schema({
     type: ObjectId, 
     ref: 'UserRecommendation'
   }],
-  settings: { 
-    type: ObjectId, 
-    ref: 'UserSettings',
-    autopopulate: true
-  },
   commission_rates: [
     { 
       type: ObjectId, 
@@ -75,7 +90,8 @@ if (is_server() && EL_HOSTS.length) {
   user_schema.plugin(mongoosastic, {
     hosts: EL_HOSTS,
     populate: [
-      {path: 'tags', select: 'name color'}
+      {path: 'tags', select: 'name color'},
+      {path: 'settings'},
     ]
   })
 }
@@ -173,41 +189,6 @@ export const commission_stats_schema = new Schema({
   average_price: Decimal128,
   rating: Number,
 })
-
-export const profile_schema = new Schema({
-  reviews: [],
-  comments: [{ body: String, date: Date }],
-  commission_guidelines: [
-    {
-      guideline_type: String,
-      value: String
-    }
-  ],
-  cover: { 
-    type: ObjectId, 
-    ref: 'Image'
-  },
-  body: String,
-}, { timestamps: { createdAt: 'created', updatedAt: 'updated' } })
-
-export const user_settings_schema = new Schema({
-  notice_visible: {
-    type: Boolean,
-    default: false
-  },
-  color: String,
-  display_currency: String,
-  profile_currency: String,
-  commissions_open: {
-    type: Boolean,
-    default: false
-  },
-  visibility: {
-    type: String,
-    enum : ['public','private', 'hidden'],
-    default: 'private'
-  },
-}, { timestamps: { createdAt: 'created', updatedAt: 'updated' } })
 
 export const user_recommendation_schema = new Schema({
   description: String,

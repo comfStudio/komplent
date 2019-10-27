@@ -27,14 +27,18 @@ interface Props extends AuthProps {
 class ProfilePage extends OptionalAuthPage<Props> {
 
     static async getInitialProps(ctx: NextPageContext) {
+        const props = await super.getInitialProps(ctx)
         let profile_id = parse_profile_id(ctx.asPath)
         let error = null
         let profile_user = null
         let profile_path = ""
         
         if (profile_id) {
-            let q = {username: profile_id, type:"creator"}
-            let p= "tags settings"
+            let q = {username: profile_id, type: "creator", $or: [{visibility: "visible"}, {visibility: "private"} ]}
+            if (props.useUserState && props.useUserState.current_user && profile_id === props.useUserState.current_user.username) {
+                q['$or'].push({visibility: "hidden"})
+            }
+            let p= "tags"
             if (is_server()) {
                 profile_user = await User.findOne(q).populate(p).lean()
             } else {
@@ -56,8 +60,6 @@ class ProfilePage extends OptionalAuthPage<Props> {
             ctx.res.statusCode = error
         }
         
-        const props = await super.getInitialProps(ctx)
-
         const profile_owner = props.useUserState.current_user && profile_user && props.useUserState.current_user.username == profile_user.username
 
         let commissionRateStoreState = useCommissionRateStore.createState({})
@@ -95,7 +97,7 @@ class ProfilePage extends OptionalAuthPage<Props> {
                     profile_user: this.props.profile_user,
                     profile_path: this.props.profile_path,
                     profile_owner: this.props.profile_owner,
-                    commissions_open: this.props.profile_user.settings.commissions_open,
+                    commissions_open: this.props.profile_user.commissions_open,
                     follow: this.props.follow
                 }}>
                     {super.renderPage(children)}

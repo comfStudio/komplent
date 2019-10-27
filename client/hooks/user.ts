@@ -23,26 +23,3 @@ export const useProfileUser = () => {
         context,
     }
 }
-
-export const useSettings = () => {
-    const current_user = useUser()
-    
-    let isettings = null
-
-    if (current_user) {
-        isettings = current_user.settings
-    }
-
-    const [settings, set_settings] = useState(isettings)
-    const update = useUpdateDatabase(null, user_settings_schema, true)
-
-    const update_settings = async (s) => {
-        let r = await update("UserSettings", s)
-        if (r.status) {
-            set_settings({...s})
-        }
-        return r
-    }
-
-    return [settings, update_settings]
-}

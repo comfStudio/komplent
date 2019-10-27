@@ -6,7 +6,7 @@ module.exports = ({ file, options, env }) =>(
       } : {},
       'tailwindcss': {},
       'autoprefixer': {},
-      '@fullhuman/postcss-purgecss': env === 'production' ? {
+      '@fullhuman/postcss-purgecss': env === 'false' ? {
         content: [
           './build/**/*.html',
           './pages/**/*.tsx',
