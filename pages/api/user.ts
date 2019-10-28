@@ -4,13 +4,14 @@ import { NOT_FOUND, OK } from 'http-status-codes';
 import { error_message, data_message } from '@utility/message'
 import { User } from '@db/models'
 import { with_middleware, ExApiRequest } from '@server/middleware'
+import { RESERVED_USERNAMES } from '@server/constants';
 
 
 
 export default with_middleware(async (req: ExApiRequest, res: NextApiResponse) => {
     let q = {username:req.query.username, email:req.query.email}
     if (q.username || q.email) {
-        if (await User.check_exists(q)) {
+        if (RESERVED_USERNAMES.includes(q.username as string) || await User.check_exists(q)) {
             return res.status(OK).json(Object.assign(data_message("User found")))
         }
     } else if (req.user) {

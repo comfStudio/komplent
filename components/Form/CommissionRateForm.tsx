@@ -121,14 +121,13 @@ const CommissionRateForm = (props: Props) => {
     const [doc, set_document] = useDocument(comission_rate_schema)
     const store = useCommissionRateStore()
     const [form_ref, set_form_ref] = useState(null)
-    const [form_value, set_form_value] = useState({
-        extras: store.state.options.map((v) => v._id)
-    })
+    const [form_value, set_form_value] = useState()
     const [error, set_error] = useState(null)
     const [loading, set_loading] = useState(false)
 
+
     let form = (
-        <Form fluid method="put" action="/api/update" formValue={form_value} model={rate_model} ref={ref => (set_form_ref(ref))} onChange={(value => set_form_value(value))}>
+        <Form fluid method="put" action="/api/update" formDefaultValue={{extras: store.state.options.map((v) => v._id)}} formValue={form_value} model={rate_model} ref={ref => (set_form_ref(ref))} onChange={(value => set_form_value(value))}>
             <FormGroup>
                     <ControlLabel>{t`Title`}:</ControlLabel>
                     <FormControl fluid name="title" accepter={Input} type="text" required />

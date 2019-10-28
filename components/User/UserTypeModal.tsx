@@ -32,7 +32,7 @@ const UserTypeModal = (props: Props) => {
             <Modal backdrop="static" show={show} size="xs">
                 <Modal.Body>
                     <h3>{t`What type of user are you?`}</h3>
-                    <form onSubmit={ async ev => { ev.preventDefault(); set_loading(true); store.setState({has_selected_usertype: true}); store.save({has_selected_usertype: true}); await store.update_user({type: user_type}); set_loading(false) }}>
+                    <form onSubmit={ async ev => { ev.preventDefault(); set_loading(true); store.setState({has_selected_usertype: true}); await store.save({has_selected_usertype: true}); await store.update_user({type: user_type}); set_loading(false) }}>
                         <div className="user-type-buttons">
                             <label title={t`Buyer`}>
                                 <input type="radio" name="usertype" value="consumer" onChange={ev => { set_user_type(ev.target.value) }} /> 

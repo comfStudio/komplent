@@ -1,3 +1,3 @@
-import NewInboxPage from './new'
+import ActiveInboxPage from './active'
 
-export default NewInboxPage
+export default ActiveInboxPage

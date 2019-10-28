@@ -68,3 +68,16 @@ export const events = tuple(
 
 export type EVENTType = typeof events[number]
 export const EVENT = array_to_enum(events)
+
+export const STAFF_NAMES = [
+    "staff",
+    "Staff",
+    "STAFF",
+]
+
+export const RESERVED_USERNAMES = [
+    ...STAFF_NAMES,
+    // "twiddly",
+    // "Twiddly",
+    // "TWIDDLY"
+]

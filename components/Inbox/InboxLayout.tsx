@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, useState } from 'react';
 
 import { Grid, Col, Row, InputGroup, Button, Icon} from 'rsuite'
 
@@ -9,28 +9,34 @@ import InboxList from '@components/Inbox/InboxList'
 import InboxConversation from '@components/Inbox/InboxConversation'
 
 import { t } from '@app/utility/lang'
+import { InboxContext } from '@client/context';
+import NewConvoModal from './NewConvoModal';
 
 interface Props {
-    activeKey?: string
+    activeKey?: "active" | "archive" | "staff" | "trash"
 }
 
 const InboxLayout = (props: Props) => {
+
+    const [ show, set_show ] = useState(false)
+
     return (
         <MainLayout activeKey="inbox">
-            <Container padded>
-                <Grid fluid>
-                    <Row>
-                        <Col xs={4}><Button><Icon icon="plus"/> {t`New conversation`}</Button></Col>
-                        <Col xs={20}><InboxSearch/></Col>
-                    </Row>
-                    <hr/>
-                    <Row>
-                        <Col xs={2}><InboxSidebar activeKey={props.activeKey}/></Col>
-                        <Col xs={6}><InboxList/></Col>
-                        <Col xs={16}><InboxConversation/></Col>
-                    </Row>
-                </Grid>
-            </Container>
+            <InboxContext.Provider value={{activeKey: props.activeKey}}>
+            {show && <NewConvoModal show={show} onClose={() => {set_show(false)}}/>}
+            <Grid fluid className="mt-2">
+                <Row>
+                    <Col xs={4}><Button appearance="primary" onClick={ev => {ev.preventDefault(); set_show(true)}}><Icon icon="plus"/> {t`New conversation`}</Button></Col>
+                    <Col xs={20}><InboxSearch/></Col>
+                </Row>
+                <hr/>
+                <Row>
+                    <Col xs={3}><InboxSidebar activeKey={props.activeKey}/></Col>
+                    <Col xs={6}><InboxList/></Col>
+                    <Col xs={15}><InboxConversation/></Col>
+                </Row>
+            </Grid>
+            </InboxContext.Provider>
         </MainLayout>
     );
 }

@@ -4,12 +4,12 @@ import AuthPage from '@components/App/AuthPage'
 import InboxLayout from "@components/Inbox/InboxLayout"
 
 
-class PrivateInboxPage extends AuthPage {
+class TrashInboxPage extends AuthPage {
   public render() {
     return this.renderPage(
-      <InboxLayout activeKey="private"/>
+      <InboxLayout activeKey="trash"/>
     )
   }
 }
 
-export default PrivateInboxPage
+export default TrashInboxPage

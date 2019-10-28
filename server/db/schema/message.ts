@@ -1,5 +1,9 @@
 import '.'
 import mongoose from 'mongoose'
+import mongoosastic from 'mongoosastic'
+import { is_server } from '@utility/misc'
+import { EL_HOSTS } from '.'
+import { commission_schema } from './commission'
 
 const { Schema } = mongoose
 
@@ -14,23 +18,44 @@ export const message_schema = new Schema({
 }, { timestamps: { createdAt: 'created', updatedAt: 'updated' } })
 
 export const conversation_schema = new Schema({
-    subject: String,
+    subject: {
+      type: String,
+      es_indexed:true
+    },
     type: {
         type: String,
         enum : ['private','staff', 'commission'],
-        default: 'private'
+        default: 'private',
+        es_indexed:true
       },
+    active: {
+        type: Boolean,
+        default: true,
+        es_indexed:true
+      },
+    trashed: {
+      type: Boolean,
+      default: false,
+      es_indexed:true
+    },
     commission: { 
         type: ObjectId, 
-        ref: 'Commission'
+        ref: 'Commission',
+        es_schema: commission_schema,
+        es_indexed: true,
       },
+    last_message: Date,
     users: [{ 
-        type: ObjectId, 
-        ref: 'User'
+        type: ObjectId,
+        ref: 'User',
+        es_indexed:true
       }],
     messages: [{ 
         type: ObjectId, 
-        ref: 'Message'
+        ref: 'Message',
+        es_schema: message_schema,
+        es_indexed: true,
+        es_select: "body"
       }],
     attachments: [
         { 
@@ -39,3 +64,14 @@ export const conversation_schema = new Schema({
         }
     ]
   }, { timestamps: { createdAt: 'created', updatedAt: 'updated' } })
+
+if (is_server() && EL_HOSTS.length) {
+  conversation_schema.plugin(mongoosastic, {
+    hosts: EL_HOSTS,
+    populate: [
+      {path: 'commission', select: 'from_title to_title finished completed'},
+      {path: 'comments', select: 'body'},
+    ]
+  })
+}
+
