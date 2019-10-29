@@ -103,6 +103,7 @@
     "unstated-next": "^1.1.0",
     "url-loader": "^2.1.0",
     "uws": "^100.0.1",
+    "why-did-you-update": "^1.0.6",
     "ws": "^7.1.2"
   },
   "devDependencies": {

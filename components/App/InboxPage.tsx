@@ -2,7 +2,7 @@ import React from 'react';
 import { NextPageContext } from 'next'
 
 import { AuthPage, Props as AuthProps } from '@components/App/AuthPage'
-import useInboxStore from '@store/inbox';
+import useInboxStore, { InboxType, Inbox } from '@store/inbox';
 import log from '@utility/log'
 
 interface Props extends AuthProps {
@@ -11,21 +11,27 @@ interface Props extends AuthProps {
 
 class InboxPage extends AuthPage<Props> {
 
+    static activeKey: Inbox
+
     static async getInitialProps(ctx: NextPageContext) {
         const props = await super.getInitialProps(ctx)
 
-        let inboxStoreeState = useInboxStore.createState({})
-        inboxStoreeState.conversations = await useInboxStore.actions.search_conversations(ctx.query)
-        if (ctx.query.conv_id) {
-            try {
-                inboxStoreeState.messages = await useInboxStore.actions.get_messages(ctx.query.conv_id)
-                inboxStoreeState.active_conversation = ctx.query.conv_id as string
-            } catch (err) {
-                log.error(err)
-                inboxStoreeState.active_conversation = ""
+        let inboxStoreeState = useInboxStore.createState({
+            activeKey: this.activeKey
+        })
+        if (props.useUserState.logged_in) {
+            inboxStoreeState.conversations = await useInboxStore.actions.search_conversations(props.useUserState.current_user, InboxType.private, ctx.query)
+            if (ctx.query.convo_id) {
+                try {
+                    inboxStoreeState.messages = await useInboxStore.actions.get_messages(ctx.query.convo_id)
+                    inboxStoreeState.active_conversation = await useInboxStore.actions.get_conversation(ctx.query.convo_id as string)
+                } catch (err) {
+                    log.error(err)
+                    inboxStoreeState.active_conversation = undefined
+                }
+            } else {
+                inboxStoreeState.active_conversation = undefined
             }
-        } else {
-            inboxStoreeState.active_conversation = ""
         }
 
         return {

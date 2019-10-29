@@ -1,21 +1,11 @@
 import '.'
 import mongoose from 'mongoose'
-import mongoosastic from 'mongoosastic'
-import { is_server } from '@utility/misc'
-import { EL_HOSTS } from '.'
+import { es_index } from '.'
 import { commission_schema } from './commission'
 
 const { Schema } = mongoose
 
 const { ObjectId, Buffer } = mongoose.Schema.Types
-
-export const message_schema = new Schema({
-    body: String,
-    user: { 
-        type: ObjectId, 
-        ref: 'User'
-    },
-}, { timestamps: { createdAt: 'created', updatedAt: 'updated' } })
 
 export const conversation_schema = new Schema({
     subject: {
@@ -26,11 +16,6 @@ export const conversation_schema = new Schema({
         type: String,
         enum : ['private','staff', 'commission'],
         default: 'private',
-        es_indexed:true
-      },
-    active: {
-        type: Boolean,
-        default: true,
         es_indexed:true
       },
     trashed: {
@@ -44,34 +29,80 @@ export const conversation_schema = new Schema({
         es_schema: commission_schema,
         es_indexed: true,
       },
-    last_message: Date,
+    last_message: {
+      type: Date,
+      es_indexed: true,
+      default: Date.now
+    },
     users: [{ 
         type: ObjectId,
         ref: 'User',
         es_indexed:true
-      }],
-    messages: [{ 
-        type: ObjectId, 
-        ref: 'Message',
-        es_schema: message_schema,
-        es_indexed: true,
-        es_select: "body"
       }],
     attachments: [
         { 
             type: ObjectId, 
             ref: 'Attachment'
         }
-    ]
+    ],
+    created: {
+      type: Date,
+      es_indexed: true,
+      default: Date.now
+    },
+    updated: {
+      type: Date,
+      es_indexed: true,
+      default: Date.now
+    },
   }, { timestamps: { createdAt: 'created', updatedAt: 'updated' } })
 
-if (is_server() && EL_HOSTS.length) {
-  conversation_schema.plugin(mongoosastic, {
-    hosts: EL_HOSTS,
-    populate: [
-      {path: 'commission', select: 'from_title to_title finished completed'},
-      {path: 'comments', select: 'body'},
-    ]
-  })
-}
+es_index(conversation_schema, {
+  populate: [
+    {path: 'commission', select: 'from_title to_title finished completed'},
+  ]
+})
 
+conversation_schema.virtual("messages", {
+  ref: "Message",
+  localField: "_id",
+  foreignField: "conversation",
+  justOne: false,
+  options: { sort: { created: -1 } },
+})
+
+export const message_schema = new Schema({
+  conversation: { 
+    type: ObjectId, 
+    ref: 'Conversation',
+    es_indexed: true,
+    required: true
+  },
+  body: {
+    type: String,
+    es_indexed: true
+  },
+  user: { 
+      type: ObjectId, 
+      ref: 'User',
+      es_indexed: true,
+      required: true
+  },
+  users_read: [{ 
+    type: ObjectId, 
+    ref: 'User'
+  }],
+  created: {
+    type: Date,
+    es_indexed: true,
+    default: Date.now
+  },
+  updated: {
+    type: Date,
+    es_indexed: true,
+    default: Date.now
+  },
+}, { timestamps: { createdAt: 'created', updatedAt: 'updated' } })
+
+es_index(message_schema, {
+})

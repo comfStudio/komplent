@@ -2,6 +2,7 @@ import qs from 'qs'
 
 export const dashboard = "/dashboard"
 export const home = "/"
+export const inbox = "/inbox"
 export const login = "/login"
 export const commission = "/commission"
 export const commission_requests = "/commissions/requests"
@@ -37,5 +38,12 @@ export const make_commission_rate_urlpath = (user, rate) => {
     let url = make_profile_urlpath(user)
     url += '/commission'
     url += '?' + qs.stringify({selected:rate._id})
+    return url
+}
+
+export const make_conversation_urlpath = (activeKey: string, conversation: {_id:string}) => {
+    let url = inbox
+    url += `/${activeKey}`
+    url += '?' + qs.stringify({convo_id:conversation._id})
     return url
 }

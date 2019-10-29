@@ -9,20 +9,18 @@ import InboxList from '@components/Inbox/InboxList'
 import InboxConversation from '@components/Inbox/InboxConversation'
 
 import { t } from '@app/utility/lang'
-import { InboxContext } from '@client/context';
 import NewConvoModal from './NewConvoModal';
+import { Inbox } from '@store/inbox';
 
 interface Props {
-    activeKey?: "active" | "archive" | "staff" | "trash"
+    activeKey?: Inbox
 }
 
 const InboxLayout = (props: Props) => {
-
     const [ show, set_show ] = useState(false)
-
+    
     return (
         <MainLayout activeKey="inbox">
-            <InboxContext.Provider value={{activeKey: props.activeKey}}>
             {show && <NewConvoModal show={show} onClose={() => {set_show(false)}}/>}
             <Grid fluid className="mt-2">
                 <Row>
@@ -36,7 +34,6 @@ const InboxLayout = (props: Props) => {
                     <Col xs={15}><InboxConversation/></Col>
                 </Row>
             </Grid>
-            </InboxContext.Provider>
         </MainLayout>
     );
 }

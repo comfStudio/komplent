@@ -2,8 +2,14 @@ import React from 'react';
 
 import Placeholder from '@components/App/Placeholder'
 import './InboxConversation.scss'
+import useInboxStore from '@store/inbox';
+import { Panel } from 'rsuite';
 
-const Message = () => {
+interface MessageProps {
+    data: any
+}
+
+const Message = (props: MessageProps) => {
     return (
         <li className="message">
             <span className="header">
@@ -18,14 +24,35 @@ const Message = () => {
     );
 };
 
-const InboxConversation = () => {
+interface HeaderProps {
+    data: any
+}
+
+const Header = (props: HeaderProps) => {
+    const subject = props.data ? props.data.subject : ""
     return (
-        <ul className="messages">
-            <Message/>
-            <Message/>
-            <Message/>
-            <Message/>
-        </ul>
+        <span>{subject}</span>
+    );
+};
+
+interface InboxConversationProps {
+}
+
+const InboxConversation = (props: InboxConversationProps) => {
+
+    const store = useInboxStore()
+    const active = store.state.active_conversation
+
+    return (
+        <Panel bordered header={<Header data={active}/>}>
+            <ul className="messages">
+                {store.state.messages.map(d => <Message key={d._id} data={d}/>)}
+                <Message/>
+                <Message/>
+                <Message/>
+            </ul>
+
+        </Panel>
     );
 };
 

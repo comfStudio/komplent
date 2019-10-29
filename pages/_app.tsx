@@ -20,6 +20,7 @@ import '@assets/styles/common.scss'
 import { setup_streams } from '@db/streams'
 import { Page } from '@components/App/Page'
 import { STATES } from '@server/constants'
+import useInboxStore from '@store/inbox'
 
 // Router.onRouteChangeStart = () => NProgress.start();
 // Router.onRouteChangeComplete = () => NProgress.done();
@@ -45,6 +46,7 @@ const server_initialize = async () => {
     await synchronize_indexes()
     if (STATES.MONGODB_CONNECTED) {
       await useTagStore.actions._create_defaults()
+      await useUserStore.actions._create_defaults()
       await setup_streams()
     }
     await setup_scheduler(serverRuntimeConfig.REDIS_URL)
@@ -59,7 +61,9 @@ export const StoreProvider = (props: ReactProps) => {
           <useCommissionRateStore.Provider>
             <useTagStore.Provider>
               <useNotificationStore.Provider>
-                {props.children}
+                <useInboxStore.Provider>
+                  {props.children}
+                </useInboxStore.Provider>
               </useNotificationStore.Provider>
             </useTagStore.Provider>
           </useCommissionRateStore.Provider>

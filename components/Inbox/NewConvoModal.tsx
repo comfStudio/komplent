@@ -2,13 +2,21 @@ import React, { useState } from 'react';
 import { Modal, Button, Schema, Form, FormGroup, ControlLabel, FormControl, Input, InputGroup, Message, HelpBlock } from 'rsuite';
 import { t } from '@app/utility/lang'
 import useUserStore from '@store/user';
+import useInboxStore from '@store/inbox';
+import { useUser } from '@hooks/user';
 
 const { StringType, NumberType, BooleanType, ArrayType, ObjectType } = Schema.Types;
 
 
 const new_convo_model = Schema.Model({
     reciepient: StringType().isRequired(t`This field is required.`),
-    subject: StringType().isRequired(t`This field is required.`),
+    subject: StringType()
+    .addRule((value, data) => {
+        if (value.length > 250)
+            return false
+        return true
+    }, t`Subject must not exceed 250 characters`)
+    .isRequired(t`This field is required.`),
   });
 
 interface NewConvoModalProps {
@@ -17,6 +25,9 @@ interface NewConvoModalProps {
 }
 
 const NewConvoModal = (props: NewConvoModalProps) => {
+
+    const store = useInboxStore()
+    const user = useUser()
 
     const [ loading, set_loading ] = useState(false)
     const [form_ref, set_form_ref] = useState(null)
@@ -51,8 +62,14 @@ const NewConvoModal = (props: NewConvoModalProps) => {
                             
                             if (await useUserStore.actions.exists(form_value.reciepient)) {
                                 
-                                if (props.onClose) {
-                                    props.onClose()
+                                try {
+                                    await store.new_conversation(user, form_value.subject, {to: form_value.reciepient})
+    
+                                    if (props.onClose) {
+                                        props.onClose()
+                                    }
+                                } catch(err) {
+                                    set_error(err.message)
                                 }
                             } else {
                                 set_error(t`User does not exists`)

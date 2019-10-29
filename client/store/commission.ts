@@ -47,8 +47,6 @@ export const useCommissionStore = createStore(
                 d.extras = d.extras.map(v => ({...v, price: v.price['$numberDecimal']}))
             }
 
-            console.log(d)
-
             let r = await update_db({
                 model:'Commission',
                 data:d,

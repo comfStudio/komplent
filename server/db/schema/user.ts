@@ -1,8 +1,5 @@
-import { EL_HOSTS } from '.'
+import { es_index } from '.'
 import mongoose, { Document, Model } from 'mongoose'
-import mongoosastic from 'mongoosastic'
-
-import { is_server } from '@utility/misc'
 import { tag_schema } from '@schema/general'
 import { comission_rate_schema } from './commission'
 
@@ -14,7 +11,7 @@ export const user_schema = new Schema({
   name: { type: String, es_indexed:true },
   type: {
     type: String,
-    enum : ['creator','consumer'],
+    enum : ['creator','consumer', 'staff'],
     default: 'consumer',
     es_indexed:true
   },
@@ -87,19 +84,24 @@ export const user_schema = new Schema({
       type: ObjectId, 
       ref: 'Gallery'
     }
-  ]
+  ],
+  created: {
+    type: Date,
+    es_indexed: true,
+    default: Date.now
+  },
+  updated: {
+    type: Date,
+    es_indexed: true,
+    default: Date.now
+  },
 },{ timestamps: { createdAt: 'created', updatedAt: 'updated' } })
 
-if (is_server() && EL_HOSTS.length) {
-  user_schema.plugin(mongoosastic, {
-    hosts: EL_HOSTS,
-    populate: [
-      {path: 'tags', select: 'name color'},
-    ]
-  })
-}
-
-
+es_index(user_schema, {
+  populate: [
+    {path: 'tags', select: 'name color'},
+  ]
+})
 
 // user_schema.method({
 //   check_exists: async function(username: string = undefined, email: string = undefined) {

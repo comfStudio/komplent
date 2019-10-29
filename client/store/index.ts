@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useLayoutEffect } from 'react';
 import useGlobalHook, { Store as HookStore } from '@znemz/use-global-hook';
 import { useMount } from 'react-use'
-import { createContainer } from "unstated-next"
+import { createContainer, ContainerProviderProps } from "unstated-next"
 
 import { storage } from '@app/client'
 import { is_server } from '@utility/misc';
@@ -86,9 +86,19 @@ interface StoreActions<S> {
 
 export function createStore <S, A extends StoreActions<Partial<S>>> (base_state: S, actions?: A, on_init: Function = null) {
     let inited = false
+    let old_initial_state = undefined
+
     
     const useStoreHook = (initial_state?: Partial<S>) => {
-        let [state, setState] = useState({...base_state, ...initial_state})
+        let i_state = {...base_state, ...initial_state}
+        let [state, setState] = useState(i_state)
+        if (initial_state) {
+            let initial_state_s = JSON.stringify(initial_state)
+            if (old_initial_state && old_initial_state !== initial_state_s) {
+                setState(i_state)
+            }
+            old_initial_state = initial_state_s
+        }
         return { state, setState }
     }
 
@@ -110,6 +120,7 @@ export function createStore <S, A extends StoreActions<Partial<S>>> (base_state:
         }
         return store
     }
+
     StoreFn.Provider = container.Provider
     StoreFn.createState = (state: Partial<S>) => state
     StoreFn.actions = actions

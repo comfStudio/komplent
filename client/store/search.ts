@@ -4,6 +4,7 @@ import { createStore } from '@client/store'
 import { User } from '@db/models'
 import { is_server, promisify_es_search } from '@utility/misc';
 import { fetch } from '@utility/request';
+import log from '@utility/log'
 
 export const useSearchStore = createStore(
     {
@@ -41,7 +42,11 @@ export const useSearchStore = createStore(
             let d: any
 
             if (is_server()) {
-                d = await promisify_es_search(User, q.build(), opt)
+                try {
+                    d = await promisify_es_search(User, q.build(), opt)
+                } catch(err) {
+                    log.error(err)
+                }
             } else {
                 d = await fetch("/api/esearch",{
                     method:"post",

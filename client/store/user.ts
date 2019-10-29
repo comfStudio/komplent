@@ -11,7 +11,7 @@ import { COOKIE_AUTH_TOKEN_KEY } from '@server/constants'
 import { get_jwt_data, get_jwt_user } from '@server/middleware'
 import { update_db } from '@app/client/db'
 import user_schema, { user_store_schema } from '@schema/user'
-import { Follow, Tag, Notification } from '@db/models';
+import { Follow, Tag, Notification, User } from '@db/models';
 
 export const fetch_user =  async (cookies_obj) => {
     if (cookies_obj[COOKIE_AUTH_TOKEN_KEY]) {
@@ -147,6 +147,22 @@ export const useUserStore = createStore(
     async save(state?: object) {
         let s = {_id: this.state._id, has_selected_usertype: this.state.has_selected_usertype, user: this.state.current_user._id, ...state}
         return await update_db({model:'UserStore', data:s, schema:user_store_schema, validate:true, create:true})
+    },
+    async _create_defaults() {
+        const default_users = [
+            {name: "staff", username:"staff", visibility:"hidden", type:"staff", email:"staff@komplent.com", password: "staff@komplent.com"},
+        ]
+
+        if (is_server()) {
+            for (let t of default_users) {
+                await User.findOne({username: t.username}).then(v => {
+                    if (!v) {
+                        let d = new User(t)
+                        d.save()
+                    }
+                })
+            }
+        }
     }
   },
 );

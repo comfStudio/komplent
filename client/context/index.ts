@@ -16,9 +16,3 @@ interface Login {
 }
 
 export const LoginContext = React.createContext<Login>({})
-
-interface Inbox {
-    activeKey?: "active" | "archive" | "staff" | "trash"
-}
-
-export const InboxContext = React.createContext<Inbox>({})
