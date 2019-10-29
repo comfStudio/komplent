@@ -5,7 +5,7 @@ import { User, Conversation, Message } from '@db/models'
 import { is_server, promisify_es_search } from '@utility/misc';
 import { fetch } from '@utility/request';
 import { update_db } from '@client/db';
-import { conversation_schema } from '@schema/message'
+import { conversation_schema, message_schema } from '@schema/message'
 import log from '@utility/log'
 
 export type Inbox = "active" | "archive" | "staff" | "trash"
@@ -151,29 +151,53 @@ export const useInboxStore = createStore(
             return u
         },
         async get_messages(conversation_id) {
-            let r = []
+            let mdata = []
             let q = {conversation: conversation_id}
             let s = {created: -1}
-            let l = 50
+            let p = "user"
+            let l = 10
             if (is_server()) {
-                r = await Message.find(q).sort(s).limit(l).lean()
+                mdata = await Message.find(q).populate(p).sort(s).limit(l).lean()
             } else {
                 await fetch("/api/fetch",{
                     method:"post",
                     body: {model: "Message",
-                    method:"find",
                     query: q,
+                    populate: p,
                     sort: s,
                     limit: l
                 }
                 }).then(async (r) => {
                     if (r.ok) {
-                        r = (await r.json()).data
+                        mdata = (await r.json()).data
                     }
                 })
             }
+            return mdata
+        },
+        async new_message(user: any, conversation: any, body: string, { params = undefined } = {}) {
+            
+            let d = {
+                body,
+                users_read: [user._id],
+                user: user,
+                conversation
+            }
+            
+            let r = await update_db({
+                model:'Message',
+                data:d,
+                schema:message_schema,
+                create: true,
+                validate: true,
+                populate: "user",
+                ...params})
+            if (r.status) {
+                this.setState({message: [r.body.data, ...this.state.messages]})
+            }
+
             return r
-        }
+        },
     }
   );
   

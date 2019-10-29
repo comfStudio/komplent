@@ -87,7 +87,6 @@ interface StoreActions<S> {
 export function createStore <S, A extends StoreActions<Partial<S>>> (base_state: S, actions?: A, on_init: Function = null) {
     let inited = false
     let old_initial_state = undefined
-
     
     const useStoreHook = (initial_state?: Partial<S>) => {
         let i_state = {...base_state, ...initial_state}

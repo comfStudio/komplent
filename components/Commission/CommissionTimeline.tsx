@@ -15,7 +15,6 @@ interface TimelineTitleProps extends ReactProps {
 
 export const TimelineTitle = (props: TimelineTitleProps) => {
 
-    toDate
     let date = props.date
     if (date) {
         if (typeof date === 'string') {
