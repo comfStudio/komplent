@@ -2,12 +2,12 @@ import React from 'react'
 
 import InboxPage from '@components/App/InboxPage'
 import InboxLayout from "@components/Inbox/InboxLayout"
-import { Inbox } from '@store/inbox'
+import { InboxKey } from '@store/inbox'
 
 
 class TrashInboxPage extends InboxPage {
 
-  static activeKey: Inbox = "trash"
+  static activeKey: InboxKey = "trash"
 
   public render() {
     return this.renderPage(

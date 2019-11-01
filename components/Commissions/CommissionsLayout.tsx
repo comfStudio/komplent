@@ -4,6 +4,7 @@ import { Grid, Col, Row} from 'rsuite'
 import MainLayout, { GridContainer } from '@components/App/MainLayout'
 import CommissionsMenu from '@components/Commissions/CommissionsMenu';
 import { ReactProps } from '@app/utility/props';
+import { RequireOwnProfile, RequireCreator } from '@components/Profile';
 
 interface Props extends ReactProps {
     activeKey?: string

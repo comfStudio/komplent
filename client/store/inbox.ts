@@ -8,7 +8,7 @@ import { update_db } from '@client/db';
 import { conversation_schema, message_schema } from '@schema/message'
 import log from '@utility/log'
 
-export type Inbox = "active" | "archive" | "staff" | "trash"
+export type InboxKey = "active" | "archive" | "staff" | "trash"
 
 export enum InboxType {
     private,
@@ -18,7 +18,7 @@ export enum InboxType {
 
 export const useInboxStore = createStore(
     {
-        activeKey: undefined as Inbox,
+        activeKey: undefined as InboxKey,
         page: 0,
         conversations: [],
         active_conversation: undefined as any,
@@ -75,11 +75,19 @@ export const useInboxStore = createStore(
             }
             return r
         },
-        parse_search_query(user, type: InboxType, search_query, build=true) {
+        parse_search_query(user, type: InboxType, search_query, build=true, {active = false, trashed = false} = {}) {
             let q = bodybuilder()
             q = q.query("match", "users", user._id.toString())
+            if (active) {
+                q = q.query("match", "active", true)
+            }
+            if (trashed) {
+                q = q.query("match", "trashed", true)
+            }
+            if (type) {
+                q = q.query("match", "type", type.toString())
+            }
             // q = q.notQuery("match", "type", "consumer")
-            // q = q.query("match", "visibility", "public")
 
             if (search_query) {
                 if (search_query.q) {
@@ -94,9 +102,9 @@ export const useInboxStore = createStore(
 
             return build ? q.build() : q
         },
-        async search_conversations(user, type: InboxType, search_query) {
+        async search_conversations(user, type: InboxType, search_query, {active = false, trashed = false} = {}) {
             let r = []
-            let q = this.parse_search_query(user, type, search_query, false)
+            let q = this.parse_search_query(user, type, search_query, false, {active, trashed})
 
             let opt = {
                 hydrate: true,

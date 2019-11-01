@@ -2,7 +2,7 @@ import React from 'react';
 import { NextPageContext } from 'next'
 
 import { AuthPage, Props as AuthProps } from '@components/App/AuthPage'
-import useInboxStore, { InboxType, Inbox } from '@store/inbox';
+import useInboxStore, { InboxType, InboxKey } from '@store/inbox';
 import log from '@utility/log'
 
 interface Props extends AuthProps {
@@ -11,7 +11,7 @@ interface Props extends AuthProps {
 
 class InboxPage extends AuthPage<Props> {
 
-    static activeKey: Inbox
+    static activeKey: InboxKey
 
     static async getInitialProps(ctx: NextPageContext) {
         const props = await super.getInitialProps(ctx)
@@ -20,7 +20,16 @@ class InboxPage extends AuthPage<Props> {
             activeKey: this.activeKey
         })
         if (props.useUserState.logged_in) {
-            inboxStoreeState.conversations = await useInboxStore.actions.search_conversations(props.useUserState.current_user, InboxType.private, ctx.query)
+
+            let type
+
+            if (this.activeKey === 'staff') {
+                type = InboxType.staff
+            }
+
+            inboxStoreeState.conversations = await useInboxStore.actions.search_conversations(
+                props.useUserState.current_user, type, ctx.query,
+                {active: this.activeKey === 'active', trashed: this.activeKey === 'trash'})
             if (ctx.query.convo_id) {
                 try {
                     inboxStoreeState.messages = await useInboxStore.actions.get_messages(ctx.query.convo_id)

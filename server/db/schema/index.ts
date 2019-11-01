@@ -29,3 +29,20 @@ export const es_index = (schema, params) => {
         schema.plugin(mongoosastic, {hosts: EL_HOSTS, ...params})
     }
 }
+
+export const configure = (schema, {autopopulate = true, virtuals = true, defaults = true, getters = true} = {}) => {
+    if (is_server()) {
+        if (autopopulate) {
+            schema.plugin(mongooseAutopopulate)
+        }
+        if (virtuals) {
+            schema.plugin(mongooseVirtuals)
+        }
+        if (defaults) {
+            schema.plugin(mongooseDefaults)
+        }
+        if (getters) {
+            schema.plugin(mongooseGetters)
+        }
+    }
+}

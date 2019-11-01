@@ -12,7 +12,7 @@ const DashboardMenu = (props: Props) => {
     return (
         <Nav appearance="subtle" activeKey={props.activeKey}>
             <Link href="/dashboard/activity" passHref>
-                <Nav.Item eventKey="activity" active={props.activeKey=='activity'}>{t`Activity`}</Nav.Item>
+                <Nav.Item eventKey="activity" active={props.activeKey=='activity'}>{t`Notifications`}</Nav.Item>
             </Link>
         </Nav>
     );

@@ -8,9 +8,11 @@ import { t } from '@app/utility/lang'
 import { get_profile_name } from '@utility/misc';
 import { formatDistanceToNow, toDate, format } from 'date-fns';
 import { useUser } from '@hooks/user';
+import { Avatar } from '@components/Profile/ProfileHeader';
 
 interface MessageProps {
     data: any
+    user: any
 }
 
 const Message = (props: MessageProps) => {
@@ -18,17 +20,21 @@ const Message = (props: MessageProps) => {
     const [loading, set_loading] = useState(false)
     let u_name = props.data ? get_profile_name(props.data.user) : ''
     let date = toDate(props.data ? new Date(props.data.created) : new Date())
+    let owner = props.data ? props.data.user._id === props.user._id : false
 
     return (
-        <li className="message">
-            <span className="header">
-                <h4>{u_name}</h4>
-                <small>{format(date as Date, "yyyy-MM-dd - HH:mm:ss")}</small>
-                <small>{formatDistanceToNow(date, {addSuffix: true})}</small>
-            </span>
-            <div className="content">
-                {loading && <Placeholder type="text" rows={3}/>}
-                {!loading && props.data.body}
+        <li className={`message${!owner ? ' right' : ''}`}>
+            <Avatar/>
+            <div className="body">
+                <span className="header">
+                    <h4>{u_name}</h4>
+                    <small>{format(date as Date, "yyyy-MM-dd - HH:mm:ss")}</small>
+                    <small>{formatDistanceToNow(date, {addSuffix: true})}</small>
+                </span>
+                <div className="content">
+                    {loading && <Placeholder type="text" rows={3}/>}
+                    {!loading && props.data.body}
+                </div>
             </div>
         </li>
     );
@@ -96,7 +102,7 @@ const InboxConversation = (props: InboxConversationProps) => {
     const [messages, set_messages] = useState([])
 
     useEffect(() => {
-        set_messages(store.state.messages.reverse())
+        set_messages(store.state.messages.slice().reverse())
     }, [store.state.messages])
 
     const onMessage = async (message) => {
@@ -110,7 +116,7 @@ const InboxConversation = (props: InboxConversationProps) => {
     return (
         <Panel bordered header={<Header data={active}/>}>
             <ul className="messages">
-                {messages.slice(1).slice(-5).map(d => <Message key={d._id} data={d}/>)}
+                {messages.slice(1).slice(-5).map(d => <Message key={d._id} user={user} data={d}/>)}
             </ul>
             <MessageInput onMessage={onMessage}/>
         </Panel>

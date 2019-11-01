@@ -21,6 +21,7 @@ import { setup_streams } from '@db/streams'
 import { Page } from '@components/App/Page'
 import { STATES } from '@server/constants'
 import useInboxStore from '@store/inbox'
+import useEarningsStore from '@store/earnings'
 
 // Router.onRouteChangeStart = () => NProgress.start();
 // Router.onRouteChangeComplete = () => NProgress.done();
@@ -62,7 +63,9 @@ export const StoreProvider = (props: ReactProps) => {
             <useTagStore.Provider>
               <useNotificationStore.Provider>
                 <useInboxStore.Provider>
-                  {props.children}
+                  <useEarningsStore.Provider>
+                    {props.children}
+                  </useEarningsStore.Provider>
                 </useInboxStore.Provider>
               </useNotificationStore.Provider>
             </useTagStore.Provider>

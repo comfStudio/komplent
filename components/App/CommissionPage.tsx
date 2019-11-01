@@ -45,6 +45,13 @@ class CommissionPage extends AuthPage<Props> {
                 if (!this.allow_owner && is_owner) {
                     error = NOT_FOUND
                     ctx.res.statusCode = error
+                } else {
+                    const c = commissionStoreState.commission
+                    if (c.commission_process && c.commission_process.length) {
+                        commissionStoreState.stages = c.commission_process
+                    } else if (c.to_user.commission_process) {
+                        commissionStoreState.stages = c.to_user.commission_process
+                    }
                 }
             }
         }

@@ -6,6 +6,7 @@ export default function(queue) {
 
     let r = [
       TASK.user_commission_status_changed,
+      TASK.user_notice_changed,
       TASK.activate_email,
       TASK.reset_login,
       TASK.followed_user,
@@ -21,7 +22,18 @@ export default function(queue) {
       let e = new Event({
           type: EVENT.changed_commission_status,
           from_user: user_id,
-          data: { 'status': status }
+          data: { status }
+      })
+      await e.save()
+    });
+
+    queue.process(TASK.user_notice_changed, async job => {
+      log.debug(`processing ${TASK.user_notice_changed}`)
+      const { user_id, message } = job.data as TaskDataTypeMap<TASK.user_notice_changed>
+      let e = new Event({
+          type: EVENT.notice_changed,
+          from_user: user_id,
+          data: { message }
       })
       await e.save()
     });
@@ -32,7 +44,7 @@ export default function(queue) {
       let e = new Event({
           type: EVENT.followed_user,
           from_user: user_id,
-          data: { 'followee': followee }
+          data: { followee }
       })
       await e.save()
     });

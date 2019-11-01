@@ -2,9 +2,11 @@ import React, { useEffect, useState, useLayoutEffect } from 'react';
 import useGlobalHook, { Store as HookStore } from '@znemz/use-global-hook';
 import { useMount } from 'react-use'
 import { createContainer, ContainerProviderProps } from "unstated-next"
+import { useImmer } from "use-immer";
 
 import { storage } from '@app/client'
 import { is_server } from '@utility/misc';
+import produce, { Draft } from 'immer';
 
 export const defineGlobalStore = (initialState: object, actions?: object, initializer?) => {
     actions = actions || {}
@@ -82,6 +84,7 @@ export const bootstrapStoreDev = async (s: object) => {
 interface StoreActions<S> {
     [x: string]: Function
     setState?(S)
+    useUpdater?(S)
 }
 
 export function createStore <S, A extends StoreActions<Partial<S>>> (base_state: S, actions?: A, on_init: Function = null) {
@@ -90,7 +93,15 @@ export function createStore <S, A extends StoreActions<Partial<S>>> (base_state:
     
     const useStoreHook = (initial_state?: Partial<S>) => {
         let i_state = {...base_state, ...initial_state}
-        let [state, setState] = useState(i_state)
+
+        let [state, set_state] = useImmer(i_state)
+
+        const setState = (next_state: Partial<S>) => {
+            set_state(draft => {
+                Object.assign(draft, next_state)
+            })
+        }
+
         if (initial_state) {
             let initial_state_s = JSON.stringify(initial_state)
             if (old_initial_state && old_initial_state !== initial_state_s) {
@@ -98,6 +109,7 @@ export function createStore <S, A extends StoreActions<Partial<S>>> (base_state:
             }
             old_initial_state = initial_state_s
         }
+        
         return { state, setState }
     }
 
@@ -105,18 +117,26 @@ export function createStore <S, A extends StoreActions<Partial<S>>> (base_state:
     
     function StoreFn() {
         const store_state = container.useContainer()
-        const setState = (next_state: Partial<S>) => store_state.setState({...store_state.state, ...next_state})
-        let store_actions = {setState, ...actions as A }
+
+        let store_actions = {
+            setState: store_state.setState,
+            useUpdater: (updater: (draft: Draft<S>, ...args: any[]) => void) => produce(updater),
+            ...actions as A
+        }
+            
         let store = {state:store_state.state, ...store_actions}
+
         for (let a in actions) {
             if (typeof store_actions[a] === 'function') {
                 store_actions[a] = (store_actions[a] as Function).bind(store)
             }
         }
+
         if (!inited && on_init) {
             inited = true
             on_init.bind(store)()
         }
+
         return store
     }
 

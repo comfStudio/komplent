@@ -2,6 +2,7 @@ import human_interval from 'human-interval'
 import Bull, { Queue } from 'bull'
 
 import user from './user'
+import commission from './commission'
 import { TASK, TaskPriority, TaskDataTypeMap, STATES } from '@server/constants';
 import log from '@utility/log';
 
@@ -13,7 +14,10 @@ export let scheduler: Scheduler = global.store ? global.store.scheduler : undefi
 
 export const setup_scheduler = async (SCHEDULER_URL) => {
     if (!scheduler && SCHEDULER_URL) {
-        scheduler = global.store.scheduler = {...user(new Bull("user", SCHEDULER_URL))}
+        scheduler = global.store.scheduler = {
+            ...user(new Bull("user", SCHEDULER_URL)),
+            ...commission(new Bull("commission", SCHEDULER_URL)),
+        }
     }
     if (scheduler) {
         STATES.SCHEDULER_SETUP = true

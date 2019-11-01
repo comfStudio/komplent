@@ -2,12 +2,12 @@ import React from 'react'
 
 import InboxPage from '@components/App/InboxPage'
 import InboxLayout from "@components/Inbox/InboxLayout"
-import { Inbox } from '@store/inbox'
+import { InboxKey } from '@store/inbox'
 
 
 class ArchiveInboxPage extends InboxPage {
 
-  static activeKey: Inbox = "archive"
+  static activeKey: InboxKey = "archive"
 
   public render() {
     return this.renderPage(

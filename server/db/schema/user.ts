@@ -1,7 +1,8 @@
-import { es_index } from '.'
+import { es_index, configure } from '.'
 import mongoose, { Document, Model } from 'mongoose'
 import { tag_schema } from '@schema/general'
 import { comission_rate_schema } from './commission'
+import { nsfw_levels, NSFW_LEVEL, CommissionPhase } from '@server/constants'
 
 const { Schema } = mongoose
 
@@ -13,6 +14,12 @@ export const user_schema = new Schema({
     type: String,
     enum : ['creator','consumer', 'staff'],
     default: 'consumer',
+    es_indexed:true
+  },
+  nsfw: {
+    type: String,
+    enum : nsfw_levels,
+    default: NSFW_LEVEL.level_0,
     es_indexed:true
   },
   email: { type: String, unique: true, trim: true },
@@ -33,6 +40,21 @@ export const user_schema = new Schema({
   profile_color: String,
   display_currency: String,
   profile_currency: String,
+  ongoing_commissions_limit: Number,
+  ongoing_requests_limit: Number,
+  revisions_limit: Number,
+  commission_deadline: Date,
+  commission_process: {
+    type: [String],
+    default: [
+      CommissionPhase.pending_approval,
+      CommissionPhase.pending_sketch,
+      CommissionPhase.pending_payment,
+      CommissionPhase.pending_product,
+      CommissionPhase.unlock,
+      CommissionPhase.complete,
+    ]
+  },
   commissions_open: {
     type: Boolean,
     default: false,
@@ -96,6 +118,8 @@ export const user_schema = new Schema({
     default: Date.now
   },
 },{ timestamps: { createdAt: 'created', updatedAt: 'updated' } })
+
+configure(user_schema)
 
 es_index(user_schema, {
   populate: [
@@ -174,6 +198,8 @@ export const gallery_schema = new Schema({
   url: String
 }, { timestamps: { createdAt: 'created', updatedAt: 'updated' } })
 
+configure(gallery_schema)
+
 export const follow_schema = new Schema({
   follower: { 
     type: ObjectId, 
@@ -186,6 +212,9 @@ export const follow_schema = new Schema({
   end: Date
 }, { timestamps: { createdAt: 'created', updatedAt: 'updated' } })
 
+configure(follow_schema)
+
+
 export const commission_stats_schema = new Schema({
   approval_rate: Number,
   approval_time: Number,
@@ -195,9 +224,15 @@ export const commission_stats_schema = new Schema({
   rating: Number,
 })
 
+configure(commission_stats_schema)
+
+
 export const user_recommendation_schema = new Schema({
   description: String,
 }, { timestamps: { createdAt: 'created', updatedAt: 'updated' } })
+
+configure(user_recommendation_schema)
+
 
 export const user_store_schema = new Schema({
   user: { 
@@ -209,5 +244,6 @@ export const user_store_schema = new Schema({
   has_selected_usertype: Boolean,
 })
 
+configure(user_store_schema)
 
 export default user_schema

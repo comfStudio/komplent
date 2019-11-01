@@ -21,7 +21,7 @@ export const ProfileMenu = (props: Props) => {
                     <Nav activeKey={props.activeKey}>
                         <Link href={`${profile_path}`} passHref>
                             <Nav.Item eventKey="index" active={props.activeKey=='index'}>
-                                {t`About`}
+                                {t`Summary`}
                             </Nav.Item>
                         </Link>
                         <Link href={`${profile_path}/gallery`} passHref>
@@ -29,16 +29,16 @@ export const ProfileMenu = (props: Props) => {
                                 {t`Gallery`}
                             </Nav.Item>
                         </Link>
-                        <Link href={`${profile_path}/recommendations`} passHref>
+                        {/* <Link href={`${profile_path}/recommendations`} passHref>
                             <Nav.Item eventKey="recommendations" active={props.activeKey=='recommendations'}>
                                 {t`Recommendations`}
                             </Nav.Item>
-                        </Link>
-                        <Link href={`${profile_path}/reviews`} passHref>
+                        </Link> */}
+                        {/* <Link href={`${profile_path}/reviews`} passHref>
                             <Nav.Item eventKey="reviews" active={props.activeKey=='reviews'}>
                                 {t`Reviews`}
                             </Nav.Item>
-                        </Link>
+                        </Link> */}
                         {/* <Link href="/profile/shop" passHref>
                             <Nav.Item eventKey="shop">
                                 {t`Shop`}

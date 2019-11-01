@@ -19,7 +19,6 @@ export const ProfileIndex = () => {
             {profile_user.notice_visible && profile_user.notice &&
             <Message type="info" description={profile_user.notice}/>
             }
-            <ReviewsReel/>
             <h3>{t`Commission Rates`}</h3>
             <CommissionTiersRow/>
             <hr/>

@@ -1,6 +1,6 @@
 import '.'
 import mongoose from 'mongoose'
-import { es_index } from '.'
+import { es_index, configure } from '.'
 import { commission_schema } from './commission'
 
 const { Schema } = mongoose
@@ -57,6 +57,9 @@ export const conversation_schema = new Schema({
     },
   }, { timestamps: { createdAt: 'created', updatedAt: 'updated' } })
 
+
+configure(conversation_schema)
+
 es_index(conversation_schema, {
   populate: [
     {path: 'commission', select: 'from_title to_title finished completed'},
@@ -106,3 +109,6 @@ export const message_schema = new Schema({
 
 es_index(message_schema, {
 })
+
+configure(message_schema)
+

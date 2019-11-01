@@ -21,7 +21,10 @@ export async function post_task<M extends TaskMethodsType, T extends TASK>(metho
     return r
 }
 
-export const post_task_debounce = debounce(post_task, get_milli_secs("5 seconds"))
+export const post_task_debounce = debounce(post_task, get_milli_secs("3 seconds"))
+export const post_task_d_1_secs = debounce(post_task, get_milli_secs("1 seconds"))
+export const post_task_d_5_secs = debounce(post_task, get_milli_secs("5 seconds"))
+export const post_task_d_10_secs = debounce(post_task, get_milli_secs("10 seconds"))
 export const post_task_d_15_secs = debounce(post_task, get_milli_secs("15 seconds"))
 export const post_task_d_30_secs = debounce(post_task, get_milli_secs("30 seconds"))
 export const post_task_d_1_min = debounce(post_task, get_milli_secs("1 minute"))

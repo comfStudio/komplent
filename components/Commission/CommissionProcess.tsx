@@ -10,6 +10,7 @@ import { capitalizeFirstLetter } from '@utility/misc';
 import { useUser } from '@hooks/user';
 import { ButtonToolbar, Button, Grid, Row, Col, Icon } from 'rsuite';
 import * as pages from '@utility/pages';
+import { CommissionPhaseType } from '@server/constants';
 
 interface ProcessProps {
     data: any,
@@ -108,6 +109,61 @@ const PendingPayment = (props: ProcessProps) => {
                             <Button color="green" onClick={(ev) => {ev.preventDefault(); store.pay(props.data)}}>{t`Pay`}</Button>
                         </ButtonToolbar>
                     </p>
+                    }
+                </div>
+                }
+            </TimelinePanel>
+            }
+        </React.Fragment>
+    )
+}
+
+const PendingSketch = (props: ProcessProps) => {
+
+    const [accept_loading, set_accept_loading] = useState(false)
+    const store = useCommissionStore()
+    let commission = store.get_commission()
+    const name = commission ? commission.from_user.username : ''
+    const done = props.data ? props.data.done : false
+
+    const count = 1
+    //const count = commission && commission.products ? commission.products.length : 0
+
+    const show_panel = !props.hidden || props.active
+
+    return (
+        <React.Fragment>
+            <TimelineTitle onClick={props.onClick} date={props.done_date}>
+            {props.hidden || done ? t`Initial sketch` : t`Pending sketch`}
+            </TimelineTitle>
+            { show_panel &&
+            <TimelinePanel>
+                {done && props.is_owner && <p>{t`There are ${count} sketches available.`}</p>}
+                {done && !props.is_owner && <p>{t`You have added ${count} sketches.`}</p>}
+                {!done && !props.is_owner && <p>{t`Waiting on ${name} to confirm.`}</p>}
+                {!done && !props.is_owner && !commission.finished &&
+                <div>
+                    {!!count &&
+                    <React.Fragment>
+                        <p>{t`You have added ${count} sketches.`}</p>
+                    </React.Fragment>
+                    }
+                    {!!!count &&
+                    <p>{t`Please upload the sketches in the Drafts tab.`}</p>
+                    }
+                </div>
+                }
+                {!done && props.is_owner && !commission.finished &&
+                <div>
+                    <p>{t`Waiting for you to confirm the sketches.`}</p>
+                    {!!count &&
+                    <React.Fragment>
+                        <p>
+                            <ButtonToolbar>
+                                <Button loading={accept_loading} color="green" onClick={(ev) => {ev.preventDefault(); set_accept_loading(true); store.confirm_sketches().then(() => set_accept_loading(false))}}>{t`Confirm`}</Button>
+                            </ButtonToolbar>
+                        </p>
+                    </React.Fragment>
                     }
                 </div>
                 }
@@ -318,52 +374,81 @@ const CommissionProcess = () => {
         }
     }
 
-    let visited_types = phases.map(v => v.type)
     let unvisited_phases = []
 
     if (!is_finished) {
+        let d_stages = []
+        let curr_stages_values = commission.phases.map(v => v.type)
+        store.state.stages.forEach((v, idx) => {
+            let d_stages_temp = d_stages.slice()
+            let curr_stages: any[] = curr_stages_values.filter(pv => {
+                if (d_stages.includes(pv)) {
+                    let i = d_stages.indexOf(pv)
+                    if(i != -1){
+                        d_stages_temp.splice(i, 1);
+                    }
+                    return true
+                }
+                return false
+            })
 
-            if (commission.payment_position === 'first') {
-                if (!visited_types.includes("pending_payment")) {
-                    unvisited_phases.push(
-                        <CommissionTimelineItem key="1">
-                            <PendingPayment hidden data={{data: {last: false, count: 1}}} is_owner={is_owner}/>
-                        </CommissionTimelineItem>
-                    )
+            console.log(curr_stages)
+            console.log(d_stages_temp)
+            console.log(d_stages)
+
+            if (!curr_stages.includes(v)) {
+            
+                d_stages.push(v)
+                switch(v) {
+                    case 'pending_payment':
+                        {
+                            unvisited_phases.push(
+                                <CommissionTimelineItem key={idx}>
+                                    <PendingPayment hidden data={{data: {last: false, count: 1}}} is_owner={is_owner}/>
+                                </CommissionTimelineItem>
+                            )
+                            break
+                        }
+                    case 'pending_sketch':
+                        {
+                            unvisited_phases.push(
+                                <CommissionTimelineItem key={idx}>
+                                    <PendingSketch hidden data={null} is_owner={is_owner}/>
+                                </CommissionTimelineItem>
+                            )
+                            break
+                        }
+                    case 'pending_product':
+                        {
+                            unvisited_phases.push(
+                                <CommissionTimelineItem key={idx}>
+                                    <PendingProduct hidden data={null} is_owner={is_owner}/>
+                                </CommissionTimelineItem>
+                            )
+                            break
+                        }
+                    case 'unlock':
+                        {
+                            unvisited_phases.push(
+                                <CommissionTimelineItem key={idx}>
+                                    <Unlocked hidden data={null} is_owner={is_owner}/>
+                                </CommissionTimelineItem>
+                            )
+                            break
+                        }
+                    case 'complete':
+                        {
+                            unvisited_phases.push(
+                                <CommissionTimelineItem key={idx}>
+                                <Completed hidden data={null} is_owner={is_owner}/>
+                            </CommissionTimelineItem>
+                            )
+                            break
+                        }
                 }
             }
+        })
 
-            if (!visited_types.includes("pending_product")) {
-                unvisited_phases.push(
-                    <CommissionTimelineItem key="2">
-                        <PendingProduct hidden data={null} is_owner={is_owner}/>
-                    </CommissionTimelineItem>
-                )
-            }
-
-            if (commission.payment_position === 'last') {
-                if (!visited_types.includes("pending_payment")) {
-                    unvisited_phases.push(
-                        <CommissionTimelineItem key="3">
-                            <PendingPayment hidden data={{data: {last: true}}} is_owner={is_owner}/>
-                        </CommissionTimelineItem>
-                    )
-                }
-            }
-            if (!visited_types.includes("unlock")) {
-                unvisited_phases.push(
-                    <CommissionTimelineItem key="4">
-                        <Unlocked hidden data={null} is_owner={is_owner}/>
-                    </CommissionTimelineItem>
-                )
-            }
-            if (!visited_types.includes("complete")) {
-                unvisited_phases.push(
-                    <CommissionTimelineItem key="5">
-                        <Completed hidden data={null} is_owner={is_owner}/>
-                    </CommissionTimelineItem>
-                )
-            }
     }
 
 
@@ -390,6 +475,9 @@ const CommissionProcess = () => {
                         case 'pending_approval':
                             El = PendingApproval
                             break
+                        case 'pending_sketch':
+                                El = PendingSketch
+                                break
                         case 'pending_payment':
                             El = PendingPayment
                             break

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useLayoutEffect } from 'react';
 import Router from 'next/router'
 import { Grid, Row, Col, Icon, IconButton } from 'rsuite';
 
@@ -13,6 +13,7 @@ import { useUpdateDatabase } from '@hooks/db';
 import { follow_schema } from '@schema/user'
 import { post_task, TaskMethods, post_task_debounce } from '@client/task';
 import { TASK } from '@server/constants';
+import { dashboard } from '@utility/pages';
 
 interface LayoutProps extends ReactProps, MenuProps {
   activeKey?: string
@@ -45,7 +46,7 @@ export const ProfileNameTag = (props: ProfileNameTagProps) => {
 export const RequireOwnProfile = () => {
   const { context : { profile_path, profile_owner } } = useProfileUser()
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!profile_owner) {
       Router.replace(profile_path)
     }
@@ -54,10 +55,22 @@ export const RequireOwnProfile = () => {
   return null
 }
 
+export const RequireCreator = () => {
+  const user = useUser()
+
+  useLayoutEffect(() => {
+    if (user && user.type !== 'creator') {
+      Router.replace(dashboard)
+    }
+  }, [user])
+
+  return null
+}
+
 export const RequireOwnProfileInverse = () => {
   const { context : { profile_path, profile_owner } } = useProfileUser()
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (profile_owner) {
       Router.replace(profile_path)
     }

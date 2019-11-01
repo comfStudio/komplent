@@ -2,15 +2,16 @@ import React from 'react'
 
 import { AuthPage } from '@components/App/AuthPage'
 import SettingsLayout from '@components/Settings'
+import UserSettings from '@components/Settings/UserSettings'
 
 
 class SettingsPage extends AuthPage {
 
-  static activeKey = "settings"
-
   public render() {
     return this.renderPage(
-      <SettingsLayout/>
+      <SettingsLayout activeKey="user">
+        <UserSettings/>
+      </SettingsLayout>
     )
   }
 }

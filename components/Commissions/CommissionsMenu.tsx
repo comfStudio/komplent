@@ -21,13 +21,18 @@ const CommissionsMenu = (props: Props) => {
 
     return (
         <Nav appearance="subtle" activeKey={props.activeKey}>
-            <Link href="/commissions/" passHref>
+            <Link href="/commissions" passHref>
                 <Nav.Item eventKey="commissions" active={props.activeKey=='commissions'}>{t`Commissions`} <Badge content={active_comm_count}/></Nav.Item>
             </Link>
             {store.state.current_user.type === 'creator' &&
+            <>
             <Link href="/commissions/requests" passHref>
                 <Nav.Item eventKey="requests" active={props.activeKey=='requests'}>{t`Requests`} <Badge content={store.state.active_requests_count}/></Nav.Item>
             </Link>
+            <Link href="/commissions/settings" passHref>
+              <Nav.Item eventKey="settings" active={props.activeKey=='settings'}>{t`Settings`}</Nav.Item>
+            </Link>
+            </>
             }
         </Nav>
     );

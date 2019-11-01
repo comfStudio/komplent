@@ -16,7 +16,7 @@ export const RequestListing = () => {
         const title = owner ? from_title : to_title ? to_title : from_title
 
         return (
-            <Link key={_id} href={pages.commission + `/${_id}`}>
+            <Link key={_id} href={pages.make_commission_urlpath({_id})}>
                 <a className="unstyled">
                     <List.Item key={_id}>
                         {title}

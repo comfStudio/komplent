@@ -4,10 +4,13 @@ import { comission_rate_schema, commission_extra_option_schema, commission_schem
 import { iupdate, is_server } from '@utility/misc'
 import { CommissionExtraOption, CommissionRate, Commission } from '@db/models';
 import { fetch } from '@utility/request';
+import { post_task, TaskMethods, post_task_d_15_secs, post_task_d_1_secs } from '@client/task';
+import { TASK, CommissionPhaseType } from '@server/constants';
 
 export const useCommissionStore = createStore(
     {
         commission: undefined,
+        stages: [] as CommissionPhaseType[],
         _current_user: {} as any,
     },
     {
@@ -112,6 +115,19 @@ export const useCommissionStore = createStore(
                 create: true,
                 ...params
             })
+            if (r.status) {
+                post_task_d_1_secs(TaskMethods.schedule_now,
+                    {
+                        task:TASK.commission_phase_updated,
+                        data: {
+                            user_id: this.state._current_user._id,
+                            from_user_id: this.state.commission.from_user._id,
+                            to_user_id: this.state.commission.to_user._id,
+                            commission_id: this.state.commission._id,
+                            phase: r.body.data
+                        }
+                    })
+            }
             if (refresh && r.status) {
                 this.refresh()
             }
@@ -125,12 +141,7 @@ export const useCommissionStore = createStore(
                     payment: true,
                 })
             }
-            const last: boolean = phase_data.data ? phase_data.data.last : false
-            if (last) {
-                this.unlock()
-            } else {
-                r = await this.add_phase("pending_product")
-            }
+            r = await this.next_phase()
             return r
         },
 
@@ -154,22 +165,18 @@ export const useCommissionStore = createStore(
                 accepted: true,
             })
             if (r.status) {
-                if (this.state.commission.payment_position === 'first') {
-                    r = await this.add_payment_phase(false)
-                } else {
-                    r = await this.add_phase("pending_product")
-                }
+                r = await this.next_phase()
             }
             return r
         },
 
         async confirm_products() {
-            let r
-            if (this.state.commission.payment_position === 'last') {
-                r = await this.add_payment_phase(true)
-            } else {
-                r = await this.unlock()
-            }
+            let r = await this.next_phase()
+            return r
+        },
+
+        async confirm_sketches() {
+            let r = await this.next_phase()
             return r
         },
 
@@ -205,6 +212,22 @@ export const useCommissionStore = createStore(
 
             await this.refresh()
             return r
+        },
+
+        async next_phase(){
+            let d_stages: CommissionPhaseType[] = this.state.stages.slice()
+            let curr_stages: any[] = this.state.commission.phases.slice()
+            while (curr_stages.length) {
+                let s = curr_stages.shift()
+                if (d_stages.length) {
+                    if (s.type === d_stages[0]) {
+                        d_stages.shift()
+                    }
+                }
+            }
+            if (d_stages.length) {
+                return await this.add_phase(d_stages[0], {done: false, complete_previous_phase: true})
+            }
         },
 
         async complete() {

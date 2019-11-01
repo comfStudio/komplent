@@ -34,7 +34,7 @@ export const parse_profile_id = (path: string) => {
     return p_id
 }
 
-export const make_commission_rate_urlpath = (user, rate) => {
+export const make_commission_rate_urlpath = (user, rate: {_id:string}) => {
     let url = make_profile_urlpath(user)
     url += '/commission'
     url += '?' + qs.stringify({selected:rate._id})
@@ -45,5 +45,11 @@ export const make_conversation_urlpath = (activeKey: string, conversation: {_id:
     let url = inbox
     url += `/${activeKey}`
     url += '?' + qs.stringify({convo_id:conversation._id})
+    return url
+}
+
+export const make_commission_urlpath = (commission_object: {_id:string}) => {
+    let url = commission
+    url += '/' + commission_object._id
     return url
 }

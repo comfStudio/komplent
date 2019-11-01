@@ -1,5 +1,7 @@
 import '.'
 import mongoose from 'mongoose'
+import { commission_phases } from '@server/constants'
+import { configure } from '.'
 
 const { Schema } = mongoose
 
@@ -15,6 +17,9 @@ export const commission_schema = new Schema({
     finished: { type: Boolean, default: false}, // commission has finished, could be cancelled or expired
     completed: { type: Boolean, default: false}, // commission was completed successfully
     accepted: { type: Boolean, default: false},
+    commission_process: [String],
+    commission_deadline: Date,
+    revisions_limit: Number,
     rate: {
         type: Mixed,
         required: true
@@ -23,11 +28,6 @@ export const commission_schema = new Schema({
     payment_count: { // how many times customer should pay
         type: Number,
         default: 1,
-    },
-    payment_position: {
-        type: String,
-        enum : ['first','last'],
-        default: 'first',
     },
     from_user: { 
         type: ObjectId, 
@@ -56,6 +56,8 @@ export const commission_schema = new Schema({
     toJSON: { virtuals: true, getters: true, },
     toObject: { virtuals: true, getters: true },
  })
+
+ configure(commission_schema)
 
 commission_schema.statics.find_related = async function(user, {populate = true, only_active = false, lean = true} = {}) {
     if (user) {
@@ -109,7 +111,7 @@ commission_schema.virtual('stage').get(function (value) {
 export const commission_phase_schema = new Schema({
     type:{
         type: String,
-        enum : ['pending_approval','pending_payment', 'pending_product', 'unlock', 'complete', 'cancel', 'reopen', 'refund'],
+        enum : commission_phases,
         required: true,
       },
     title: String,
@@ -129,6 +131,8 @@ export const commission_phase_schema = new Schema({
     done_date: Date,
   }, { timestamps: { createdAt: 'created', updatedAt: 'updated' } })
 
+configure(commission_phase_schema)
+
 export const commission_extra_option_schema = new Schema({
     title: String,
     price: Decimal128,
@@ -142,6 +146,8 @@ export const commission_extra_option_schema = new Schema({
         ref: 'User',
       },
   }, { timestamps: { createdAt: 'created', updatedAt: 'updated' } })
+
+configure(commission_extra_option_schema)
 
 export const comission_rate_schema = new Schema({
     title: String,
@@ -161,3 +167,5 @@ export const comission_rate_schema = new Schema({
         ref: 'User',
       },
   }, { timestamps: { createdAt: 'created', updatedAt: 'updated' } })
+
+configure(comission_rate_schema)

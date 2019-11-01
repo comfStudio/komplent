@@ -1,7 +1,7 @@
 import { tuple, array_to_enum } from '@utility/misc'
 import { string } from 'prop-types'
 
-export let STATES = {
+export let STATES = global.STATES = global.STATES ? global.STATES : {
     MONGODB_CONNECTED: false,
     ES_SETUP: false,
     SCHEDULER_SETUP: false
@@ -42,7 +42,9 @@ export type PropType<TObj, TProp extends keyof TObj> = TObj[TProp]
 export enum TASK {
     activate_email = 'activate_email', 
     reset_login = 'reset_login', 
+    commission_phase_updated = 'commission_phase_updated', 
     user_commission_status_changed = 'user_commission_status_changed', 
+    user_notice_changed = 'user_notice_changed',
     followed_user = 'followed_user', 
     cdn_upload = 'cdn_upload'
 }
@@ -51,19 +53,30 @@ export type TASK_T = KEYS_TO_TYPE<typeof tasks>
 
 export type TaskDataTypeMap<T> =  (
     T extends TASK.followed_user ? { user_id: string, followee: any } :
+    T extends TASK.commission_phase_updated ? { user_id: string, commission_id: string, phase: any, from_user_id: string, to_user_id: string } :
     T extends TASK.user_commission_status_changed ? { user_id: string, status: boolean } :
+    T extends TASK.user_notice_changed ? { user_id: string, message: string } :
     T extends TASK.activate_email ? { user_id: string } :
     T extends TASK.reset_login ? { user_id: string } :
     T extends TASK.cdn_upload ? { image_id: string } : never
     )
 
-export const events = tuple(
+export const user_events = tuple(
     'followed_user', 
-    'added_product', 
     'recieved_message', 
-    'marked_commission_complete', 
     'changed_commission_status', 
-    'updated_notice', 
+    'notice_changed', 
+    );
+
+export const commission_events = tuple(
+    'added_product', 
+    'commission_phase_updated', 
+    'marked_commission_complete', 
+    );
+
+export const events = tuple(
+    ...user_events,
+    ...commission_events
     );
 
 export type EVENTType = typeof events[number]
@@ -81,3 +94,28 @@ export const RESERVED_USERNAMES = [
     // "Twiddly",
     // "TWIDDLY"
 ]
+
+export const nsfw_levels = tuple(
+    'level_0',  // public
+    'level_1', 
+    'level_3', 
+    );
+
+export type NSFWType = typeof nsfw_levels[number]
+export const NSFW_LEVEL = array_to_enum(nsfw_levels)
+
+export const commission_phases = tuple(
+    'pending_approval',
+    'pending_sketch',
+    'revision',
+    'pending_payment',
+    'pending_product',
+    'unlock',
+    'complete',
+    'cancel',
+    'reopen',
+    'refund'
+    );
+
+export type CommissionPhaseType = typeof commission_phases[number]
+export const CommissionPhase = array_to_enum(commission_phases)

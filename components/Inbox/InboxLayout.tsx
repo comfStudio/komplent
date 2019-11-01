@@ -10,10 +10,10 @@ import InboxConversation from '@components/Inbox/InboxConversation'
 
 import { t } from '@app/utility/lang'
 import NewConvoModal from './NewConvoModal';
-import { Inbox } from '@store/inbox';
+import { InboxKey } from '@store/inbox';
 
 interface Props {
-    activeKey?: Inbox
+    activeKey?: InboxKey
 }
 
 const InboxLayout = (props: Props) => {

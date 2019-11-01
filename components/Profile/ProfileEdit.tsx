@@ -14,6 +14,7 @@ import { useUpdateDatabase } from '@hooks/db';
 import useUserStore from '@store/user';
 import { post_task, TaskMethods, post_task_debounce } from '@client/task';
 import { TASK } from '@server/constants';
+import TextEditor from '@components/App/TextEditor';
 
 
 export const Sections = () => {
@@ -22,11 +23,11 @@ export const Sections = () => {
             <CheckboxGroup inline name="sections">
             <Checkbox checked disabled>{t`About`}</Checkbox>
             <Checkbox checked disabled>{t`Rates`}</Checkbox>
-            <Checkbox>{t`Reviews`}</Checkbox>
+            <Checkbox>{t`Gallery`}</Checkbox>
+            {/* <Checkbox>{t`Reviews`}</Checkbox>
             <Checkbox>{t`Recommendations`}</Checkbox>
             <Checkbox>{t`Qoutes`}</Checkbox>
-            <Checkbox>{t`Gallery`}</Checkbox>
-            <Checkbox>{t`Shop`}</Checkbox>
+            <Checkbox>{t`Shop`}</Checkbox> */}
             </CheckboxGroup>
         </EditGroup>
     )
@@ -104,7 +105,7 @@ export const Notice = () => {
                     let status = v == 'visible'
                     store.update_user({notice_visible: status}).then(r => {
                         if (r.status && status) {
-                            //post_task(TaskMethods.schedule_unique, {key:store.state.current_user._id, when:"1 minute", task: TASK.user_commission_status_changed, data: {user_id: user._id, status:settings.commissions_open}})
+                            post_task(TaskMethods.schedule_unique, {key:store.state.current_user._id, when:"1 minute", task: TASK.user_notice_changed, data: {user_id: store.state.current_user._id, message:notice_text}})
                         }
                     })
                 }}>
@@ -139,36 +140,6 @@ export const Origin = () => {
     return (
     <EditGroup title={t`Origin` + ':'}>
         <SelectPicker data={[]} className="ml-2" style={{ width: 300 }}/>
-    </EditGroup>
-    )
-}
-
-export const CommissionLimit = () => {
-    return (
-    <EditGroup title={t`Maximum amount of on-going commissions` + ':'}>
-        <div className="w-32">
-            <InputNumber defaultValue="3"/>
-        </div>
-    </EditGroup>
-    )
-}
-
-export const CommissionRequestLimit = () => {
-    return (
-    <EditGroup title={t`Maximum amount of on-going requests` + ':'}>
-        <div className="w-32">
-            <InputNumber defaultValue="10"/>
-        </div>
-    </EditGroup>
-    )
-}
-
-export const ModificationNumber = () => {
-    return (
-    <EditGroup title={t`Number of modifications allowed` + ':'}>
-        <div className="w-32">
-            <InputNumber defaultValue="3"/>
-        </div>
     </EditGroup>
     )
 }
@@ -233,63 +204,6 @@ export const Socials = () => {
     )
 }
 
-export const CommissionGuideline = () => {
-
-    return (
-        <React.Fragment>
-            <EditGroup title={t`Will draw`}>
-                <EditSection>
-                <List className="w-64">
-                <List.Item key="">OCs</List.Item>
-                </List>
-                </EditSection>
-            </EditGroup>
-            <EditGroup title={t`Will not draw`}>
-                <EditSection>
-                <List className="w-64">
-                <List.Item key="">NSFW</List.Item>
-                </List>
-                </EditSection>
-            </EditGroup>
-        </React.Fragment>
-    )
-}
-
-export const Rates = () => {
-
-    const [ show_new_rate, set_show_new_rate ] = useSessionStorage("new-commission-rate-form-show", false)
-
-    return (
-        <React.Fragment>
-            {!show_new_rate && <Button onClick={(ev) => {ev.preventDefault(); set_show_new_rate(true);}}>{t`Add new rate`}</Button>}
-            {show_new_rate && <EditGroup>
-                            <CommissionRateForm panel onDone={() => {set_show_new_rate(false);}}/>
-                        </EditGroup>}
-            <EditGroup>
-                <Grid fluid>
-                    <CommissionTiersRow/>
-                </Grid>
-            </EditGroup>
-        </React.Fragment>
-    )
-}
-
-export const CommissionMessage = () => {
-    return (
-        <EditGroup>
-            <Placeholder type="text" rows={8}/>
-        </EditGroup>
-    )
-}
-
-export const CommissionAcceptMessage = () => {
-    return (
-        <EditGroup>
-            <Placeholder type="text" rows={5}/>
-        </EditGroup>
-    )
-}
-
 export const ProfileEdit = () => {
     return (
         <Grid fluid>
@@ -303,42 +217,6 @@ export const ProfileEdit = () => {
                 <Origin/>
                 <Tags/>
                 <Socials/>
-            </EditSection>
-
-            <h3>{t`Commission`}</h3>
-            <EditSection>
-                <CommissionLimit/>
-                <CommissionRequestLimit/>
-                <ModificationNumber/>
-            </EditSection>
-
-            <h4>{t`Guidelines`}</h4>
-            <EditSection>
-                <EditGroup>
-                    <CommissionGuideline/>
-                </EditGroup>
-            </EditSection>
-
-            <h4>{t`Extras`}</h4>
-            <EditSection>
-                <EditGroup>
-                    <RateOptionsForm/>
-                </EditGroup>
-            </EditSection>
-
-            <h4>{t`Rates`}</h4>
-            <EditSection>
-                <Rates/>
-            </EditSection>
-            
-            <h4>{t`Message`}</h4>
-            <EditSection>
-                <CommissionMessage/>
-            </EditSection>
-
-            <h4>{t`Request Accept Message`}</h4>
-            <EditSection>
-                <CommissionAcceptMessage/>
             </EditSection>
         </Grid>
     );
