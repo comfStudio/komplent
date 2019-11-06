@@ -1,24 +1,24 @@
 import React from 'react';
-import { Grid, Row, Col, Uploader, Icon, Button, RadioGroup, Radio, DatePicker } from 'rsuite';
+import { Grid, Row, Col, Uploader, Icon, Button, RadioGroup, Radio, DatePicker, InputNumber } from 'rsuite';
 
 import { EditSection, EditGroup } from '@components/Settings';
 import { t } from '@utility/lang'
 import { useCommissionStore } from '@store/commission';
-import { useUser } from '@hooks/user';
+import { CommissionProcess } from '@components/Settings/CommissionsSettings';
 
 const Deadline = () => {
 
     const store = useCommissionStore()
-    let commission = store.get_commission()
 
     return (
         <EditGroup>
             <span className="mr-2">{t`Deadline`}: </span>
-            <DatePicker className="w-64"/>
+            <div className="w-32">
+                <InputNumber defaultValue="14" postfix={t`days`}/>
+            </div>
         </EditGroup>
     )
 }
-
 
 const CommissionOptions = () => {
     return (
@@ -27,8 +27,9 @@ const CommissionOptions = () => {
             <EditSection>
                 <Deadline/>
             </EditSection>
-            <h4>{t`Payment`}</h4>
+            <h4>{t`Process`}</h4>
             <EditSection>
+                <CommissionProcess commission/>
             </EditSection>
         </Grid>
     );

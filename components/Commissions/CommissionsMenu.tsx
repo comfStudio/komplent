@@ -29,9 +29,6 @@ const CommissionsMenu = (props: Props) => {
             <Link href="/commissions/requests" passHref>
                 <Nav.Item eventKey="requests" active={props.activeKey=='requests'}>{t`Requests`} <Badge content={store.state.active_requests_count}/></Nav.Item>
             </Link>
-            <Link href="/commissions/settings" passHref>
-              <Nav.Item eventKey="settings" active={props.activeKey=='settings'}>{t`Settings`}</Nav.Item>
-            </Link>
             </>
             }
         </Nav>

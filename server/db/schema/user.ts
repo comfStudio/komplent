@@ -2,11 +2,13 @@ import { es_index, configure } from '.'
 import mongoose, { Document, Model } from 'mongoose'
 import { tag_schema } from '@schema/general'
 import { comission_rate_schema } from './commission'
-import { nsfw_levels, NSFW_LEVEL, CommissionPhase } from '@server/constants'
+import { nsfw_levels, NSFW_LEVEL, CommissionPhaseT, CommissionPhaseType } from '@server/constants'
 
 const { Schema } = mongoose
 
-const { ObjectId, Decimal128, Buffer } = mongoose.Schema.Types
+const { ObjectId, Decimal128, Mixed } = mongoose.Schema.Types
+
+export type CommissionProcessType = {type: CommissionPhaseType, done: boolean }
 
 export const user_schema = new Schema({
   name: { type: String, es_indexed:true },
@@ -43,16 +45,17 @@ export const user_schema = new Schema({
   ongoing_commissions_limit: Number,
   ongoing_requests_limit: Number,
   revisions_limit: Number,
-  commission_deadline: Date,
   commission_process: {
-    type: [String],
+    type: [Mixed],
     default: [
-      CommissionPhase.pending_approval,
-      CommissionPhase.pending_sketch,
-      CommissionPhase.pending_payment,
-      CommissionPhase.pending_product,
-      CommissionPhase.unlock,
-      CommissionPhase.complete,
+      {type: CommissionPhaseT.pending_approval, done: true},
+      {type: CommissionPhaseT.pending_sketch, done: false},
+      {type: CommissionPhaseT.revision, done: false, count: 3},
+      {type: CommissionPhaseT.pending_product, done: false},
+      {type: CommissionPhaseT.revision, done: false, count: 3},
+      {type: CommissionPhaseT.pending_payment, done: false},
+      {type: CommissionPhaseT.unlock, done: false},
+      {type: CommissionPhaseT.complete, done: false},
     ]
   },
   commissions_open: {

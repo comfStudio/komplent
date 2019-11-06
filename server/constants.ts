@@ -118,4 +118,4 @@ export const commission_phases = tuple(
     );
 
 export type CommissionPhaseType = typeof commission_phases[number]
-export const CommissionPhase = array_to_enum(commission_phases)
+export const CommissionPhaseT = array_to_enum(commission_phases)

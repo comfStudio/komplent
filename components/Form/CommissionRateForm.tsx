@@ -110,6 +110,7 @@ const rate_model = Schema.Model({
     title: StringType().isRequired(t`This field is required.`),
     description: StringType(),
     price: NumberType().isRequired('This field is required.'),
+    commission_deadline: NumberType(),
     negotiable: BooleanType(),
     extras: ArrayType(),
     cover: ArrayType(),
@@ -135,6 +136,10 @@ const CommissionRateForm = (props: Props) => {
             <FormGroup>
                     <ControlLabel>{t`Price`}:</ControlLabel>
                     <FormControl fluid name="price" prefix="$" accepter={InputNumber} type="number" required />
+            </FormGroup>
+            <FormGroup>
+                    <ControlLabel>{t`Deadline`}:</ControlLabel>
+                    <FormControl fluid name="commission_deadline" placeholder="14" postfix={t`days`} accepter={InputNumber} type="number" />
             </FormGroup>
             <FormGroup>
                     <ControlLabel>{t`Description`}:</ControlLabel>
@@ -167,6 +172,10 @@ const CommissionRateForm = (props: Props) => {
                             if (form_ref && form_ref.check()) {
                                 set_loading(true)
                                 set_error(null)
+
+                                if (!form_value.deadline) {
+                                    form_value.deadline = undefined
+                                }
 
                                 set_document({user:current_user._id, ...form_value})
 

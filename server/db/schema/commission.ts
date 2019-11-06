@@ -17,8 +17,8 @@ export const commission_schema = new Schema({
     finished: { type: Boolean, default: false}, // commission has finished, could be cancelled or expired
     completed: { type: Boolean, default: false}, // commission was completed successfully
     accepted: { type: Boolean, default: false},
-    commission_process: [String],
-    commission_deadline: Date,
+    commission_process: [Mixed],
+    commission_deadline: Number,
     revisions_limit: Number,
     rate: {
         type: Mixed,
@@ -153,6 +153,11 @@ export const comission_rate_schema = new Schema({
     title: String,
     description: String,
     negotiable: Boolean,
+    commission_deadline: { // in days
+        type: Number,
+        default: 14,
+        es_indexed:true
+      },
     price: Decimal128,
     image: { 
       type: ObjectId, 

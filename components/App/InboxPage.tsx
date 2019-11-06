@@ -30,6 +30,7 @@ class InboxPage extends AuthPage<Props> {
             inboxStoreeState.conversations = await useInboxStore.actions.search_conversations(
                 props.useUserState.current_user, type, ctx.query,
                 {active: this.activeKey === 'active', trashed: this.activeKey === 'trash'})
+                
             if (ctx.query.convo_id) {
                 try {
                     inboxStoreeState.messages = await useInboxStore.actions.get_messages(ctx.query.convo_id)

@@ -68,7 +68,7 @@ interface CommissionCardProps extends HTMLElementProps {
 }
 
 const CommissionCardHeader = (props: CommissionCardProps) => {
-    let { price, title, extras, negotiable } = props.data
+    let { price, title, extras, negotiable, commission_deadline } = props.data
     extras = props.extras || extras
 
     return (<Grid className="header !w-full">
@@ -87,6 +87,11 @@ const CommissionCardHeader = (props: CommissionCardProps) => {
             </Col>
         </Row>
         }
+        <Row>
+            <Col xs={24} className="text-center">
+                <span className="muted">{t`Delivery ~ ${commission_deadline} days`}</span>
+            </Col>
+        </Row>
         <Row className="extra-row">
             {
             extras.map(({title: extra_title, price: extra_price, _id: extra_id},index) => (
@@ -154,7 +159,11 @@ export const CommissionCardRadioGroup = () => {
 )
 }
 
-export const CommissionTiersRow = (props: any) => {
+interface CommissionTiersRowProps {
+    link?: boolean
+}
+
+export const CommissionTiersRow = (props: CommissionTiersRowProps) => {
 
     const store = useCommissionRateStore()
     return (
@@ -163,7 +172,8 @@ export const CommissionTiersRow = (props: any) => {
                 sort_rates_by_price(store.state.rates).map((data ,index) => {
                     let el = (
                         <Col key={data._id} xs={6}>
-                            <CommissionLinkCard data={data}/>
+                            {props.link && <CommissionLinkCard data={data}/>}
+                            {!props.link && <CommissionCard data={data}/>}
                         </Col>
                     )
                     return el

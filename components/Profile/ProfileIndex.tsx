@@ -12,7 +12,7 @@ import { useProfileUser } from '@hooks/user';
 
 export const ProfileIndex = () => {
 
-    const { profile_user } = useProfileUser()
+    const { profile_user, context: { commissions_open, profile_owner } } = useProfileUser()
 
     return (
         <Grid fluid>
@@ -20,7 +20,7 @@ export const ProfileIndex = () => {
             <Message type="info" description={profile_user.notice}/>
             }
             <h3>{t`Commission Rates`}</h3>
-            <CommissionTiersRow/>
+            <CommissionTiersRow link={commissions_open && !profile_owner}/>
             <hr/>
             <GuidelineList/>
             <h3>{t`About`}</h3>

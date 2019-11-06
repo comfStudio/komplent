@@ -5,12 +5,14 @@ import { iupdate, is_server } from '@utility/misc'
 import { CommissionExtraOption, CommissionRate, Commission } from '@db/models';
 import { fetch } from '@utility/request';
 import { post_task, TaskMethods, post_task_d_15_secs, post_task_d_1_secs } from '@client/task';
-import { TASK, CommissionPhaseType } from '@server/constants';
+import { TASK, CommissionPhaseType, CommissionPhaseT, commission_phases } from '@server/constants';
+import { CommissionProcessType } from '@schema/user';
+import update from 'immutability-helper'
 
 export const useCommissionStore = createStore(
     {
         commission: undefined,
-        stages: [] as CommissionPhaseType[],
+        stages: [] as CommissionProcessType[],
         _current_user: {} as any,
     },
     {
@@ -81,7 +83,7 @@ export const useCommissionStore = createStore(
         async refresh() {
             let rc = await this.load(this.state.commission._id)
             if (rc) {
-                this.setState({commission: rc})
+                this.setState({commission: rc, stages: rc.commission_process})
             }
             return rc
         },
@@ -97,10 +99,36 @@ export const useCommissionStore = createStore(
             return r
         },
 
-        async add_phase(type: 'pending_approval'|'pending_payment'|'pending_product'|'complete'|'cancel'|'reopen'|'refund', {complete_previous_phase=true, refresh = false, done = false, params = {}, data = undefined} = {}) {
-            if (complete_previous_phase) {
-                this.complete_phase()
+        async complete_default_stage(on_stage: CommissionPhaseType | CommissionProcessType = undefined) {
+            if (typeof on_stage === 'object') {
+                on_stage = on_stage.type
             }
+            let d_stages = []
+            let set = false
+            this.state.stages.forEach(v => {
+                if ((!v.done && !set) && (!on_stage || on_stage === v.type)) {
+                    set = true
+                    v.done = true
+                    d_stages.push({...v})
+                } else {
+                    d_stages.push({...v})
+                }
+            })
+            this.setState({stages: d_stages})
+            return await this.update({commission_process: d_stages})
+        },
+
+        async add_phase(type: CommissionPhaseType | CommissionProcessType, {complete_previous_phase=true, refresh = false, done = false, params = {}, data = undefined} = {}) {
+            if (complete_previous_phase) {
+                await this.complete_phase()
+            }
+
+            await this.complete_default_stage()
+
+            if (typeof type === 'object') {
+                type = type.type
+            }
+
             let r = await update_db({
                 model: "CommissionPhase",
                 data: {
@@ -170,13 +198,89 @@ export const useCommissionStore = createStore(
             return r
         },
 
+        async exhaust_revisions() {
+            let d_stages: CommissionProcessType[] = this.get_next_stages()
+            if (d_stages.length) {
+                let n = d_stages.shift()
+                while (n.type === 'revision') {
+                    n = null
+                    this.complete_default_stage()
+                    if (d_stages) {
+                        n = d_stages.shift()
+                    }
+                }
+            }
+        },
+
         async confirm_products() {
+            await this.exhaust_revisions()
+            let r = await this.next_phase()
+            return r
+        },
+        
+        async confirm_sketches() {
+            await this.exhaust_revisions()
             let r = await this.next_phase()
             return r
         },
 
-        async confirm_sketches() {
-            let r = await this.next_phase()
+        async add_revision_phase(visible = true) {
+            let r = await this.add_phase("revision", {data: {confirmed: [], visible}})
+            return r
+        },
+
+        get_stage_count(stage_type: CommissionPhaseType, next = true) {
+            let count = 0
+            let stages = []
+            if (next) {
+                stages = this.get_next_stages()
+            }
+            let idx = 0
+            while (stages.length < idx && stages[idx]) {
+                if (stages[idx] === stage_type) {
+                    count++
+                }
+                idx++
+            }
+            return count
+        },
+
+        async confirm_revision(new_revision = false) {
+
+            const user_id = this.state._current_user._id
+            const stage = this.state.commission.stage
+            if (stage.type !== "revision") {
+                throw Error("Revision can only be done in the revision phase")
+            }
+            let stage_data = {
+                confirmed: []
+            }
+            if (stage.data) {
+                stage_data = {...stage.data}
+            }
+            
+            stage_data.confirmed = [user_id, ...stage_data.confirmed].reduce(
+                (unique, item) => unique.includes(item) ? unique :  [...unique, item], [])
+            
+            let r = await update_db({
+                model: "CommissionPhase",
+                data: {_id: stage._id, data: stage_data},
+                schema: commission_schema,
+                validate: true,
+            })
+            if (r.status) {
+                let participants = [
+                    this.state.commission.from_user._id,
+                    this.state.commission.to_user._id,
+                ]
+                if (participants.every((v) => stage_data.confirmed.includes(v))) {
+                    if (new_revision) {
+                        r = this.add_revision_phase()
+                    } else {
+                        r = this.next_phase()
+                    }
+                }
+            }
             return r
         },
 
@@ -214,19 +318,35 @@ export const useCommissionStore = createStore(
             return r
         },
 
+        get_next_stages(){
+            let d_stages: CommissionProcessType[] = this.state.stages.filter(v => !v.done)
+            return d_stages
+        },
+
         async next_phase(){
-            let d_stages: CommissionPhaseType[] = this.state.stages.slice()
-            let curr_stages: any[] = this.state.commission.phases.slice()
-            while (curr_stages.length) {
-                let s = curr_stages.shift()
-                if (d_stages.length) {
-                    if (s.type === d_stages[0]) {
-                        d_stages.shift()
+            let d_stages: CommissionProcessType[] = this.get_next_stages()
+
+            if (d_stages.length) {
+                const skippable: CommissionPhaseType[] = [
+                    CommissionPhaseT.refund,
+                    CommissionPhaseT.reopen,
+                    CommissionPhaseT.revision,
+                    CommissionPhaseT.cancel
+                ]
+
+                while (d_stages.length) {
+                    let next_v = d_stages.shift()
+                    if (skippable.includes(next_v.type)) {
+                        await this.complete_default_stage(next_v)
+                    } else {
+                        if (next_v.type === 'unlock') {
+                            this.unlock()
+                        } else {
+                            return await this.add_phase(next_v, {done: false, complete_previous_phase: true})
+                        }
+                        break
                     }
                 }
-            }
-            if (d_stages.length) {
-                return await this.add_phase(d_stages[0], {done: false, complete_previous_phase: true})
             }
         },
 
@@ -236,19 +356,19 @@ export const useCommissionStore = createStore(
             if (stage.type !== "complete") {
                 throw Error("Complete can only be done in the complete phase")
             }
-            let complete_data = {
+            let stage_data = {
                 confirmed: []
             }
             if (stage.data) {
-                complete_data = {...stage.data}
+                stage_data = {...stage.data}
             }
             
-            complete_data.confirmed = [user_id, ...complete_data.confirmed].reduce(
+            stage_data.confirmed = [user_id, ...stage_data.confirmed].reduce(
                 (unique, item) => unique.includes(item) ? unique :  [...unique, item], [])
             
             let r = await update_db({
                 model: "CommissionPhase",
-                data: {_id: stage._id, data: complete_data},
+                data: {_id: stage._id, data: stage_data},
                 schema: commission_schema,
                 validate: true,
             })
@@ -257,7 +377,7 @@ export const useCommissionStore = createStore(
                     this.state.commission.from_user._id,
                     this.state.commission.to_user._id,
                 ]
-                if (participants.every((v) => complete_data.confirmed.includes(v))) {
+                if (participants.every((v) => stage_data.confirmed.includes(v))) {
                     this.complete_phase()
                     r = await this.end(true)
                 }
@@ -315,6 +435,75 @@ export const useCommissionStore = createStore(
                     return null
                 })
             }
+        },
+
+        get_stages_limits() {
+            let limit = {}
+            limit[CommissionPhaseT.pending_approval] = 1
+            limit[CommissionPhaseT.pending_sketch] = Number.POSITIVE_INFINITY
+            limit[CommissionPhaseT.revision] = Number.POSITIVE_INFINITY
+            limit[CommissionPhaseT.pending_payment] = 1
+            limit[CommissionPhaseT.pending_product] = Number.POSITIVE_INFINITY
+            limit[CommissionPhaseT.unlock] = 1
+            limit[CommissionPhaseT.complete] = 1
+            return limit
+        },
+
+        get_stages_collections() {
+            let cols = {}
+            commission_phases.forEach(v => {
+                switch (v) {
+                    case 'pending_approval':
+                        cols[v] = 1
+                        break
+                    case 'unlock':
+                        cols[v] = 3
+                        break
+                    case 'complete':
+                        cols[v] = 4
+                        break
+                    default:
+                        cols[v] = 2
+                }
+            })
+            return cols
+        },
+
+        process_stages(stages: CommissionProcessType[]) {
+            const limit = useCommissionStore.actions.get_stages_limits()
+            
+            let p_stages: CommissionProcessType[] = []
+            
+            let c_limit = {}
+            stages.forEach(v => {
+                if (c_limit[v.type]) {
+                    if (c_limit[v.type] >= limit[v.type]) {
+                        return
+                    }
+                }
+                
+                if (c_limit[v.type]) {
+                    c_limit[v.type]++
+                } else {
+                    c_limit[v.type] = 1
+                }
+                p_stages.push(v)
+            })
+
+            const cols = useCommissionStore.actions.get_stages_collections()
+
+            p_stages.sort((a, b) => {
+                if (cols[a.type] > cols[b.type]) {
+                    return 1
+                }
+                else if (cols[a.type] < cols[b.type]) {
+                    return -1
+                } else {
+                    return 0
+                }
+            })
+
+            return p_stages
         }
 
     },
@@ -326,10 +515,10 @@ export const useCommissionsStore = createStore(
     },
     {
         sent_commissions(user_id) {
-            return this.state.commissions.filter((d) => d.from_user._id === user_id)
+            return this.state.commissions.filter((d) => d.from_user._id === user_id && d.accepted)
         },
         received_commissions(user_id) {
-            return this.state.commissions.filter((d) => d.to_user._id === user_id)
+            return this.state.commissions.filter((d) => d.to_user._id === user_id && d.accepted)
         },
         get_title(user_id, commission) {
             const owner = commission.from_user._id === user_id

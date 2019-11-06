@@ -11,6 +11,7 @@ import { useUser } from '@hooks/user';
 import { ButtonToolbar, Button, Grid, Row, Col, Icon } from 'rsuite';
 import * as pages from '@utility/pages';
 import { CommissionPhaseType } from '@server/constants';
+import { CommissionProcessType } from '@schema/user';
 
 interface ProcessProps {
     data: any,
@@ -118,16 +119,46 @@ const PendingPayment = (props: ProcessProps) => {
     )
 }
 
+const RevisionButton = () => {
+    const store = useCommissionStore()
+    const [revision_loading, set_revisions_loading] = useState(false)
+
+    let revisions_count = 0
+    let d_stages = store.get_next_stages()
+    while (d_stages[0].type === 'revision') {
+        let v = d_stages.shift()
+        revisions_count += v.count ?? 0
+    }
+
+    return (
+        <>
+        {!!revisions_count &&
+        <Button loading={revision_loading} appearance="primary" onClick={(ev) => {ev.preventDefault(); set_revisions_loading(true); store.add_revision_phase().then(() => set_revisions_loading(false))}}>
+        {t`Request changes`}
+        {` (${revisions_count})`}
+        </Button>
+        }
+        {!!!revisions_count &&
+        <Button disabled={true} appearance="primary">{t`No changes are allowed`}</Button>
+        }
+        </>
+    )
+}
+
 const PendingSketch = (props: ProcessProps) => {
 
     const [accept_loading, set_accept_loading] = useState(false)
+    const [skip_loading, set_skip_loading] = useState(false)
+
     const store = useCommissionStore()
     let commission = store.get_commission()
-    const name = commission ? commission.from_user.username : ''
+    const from_name = commission ? commission.from_user.username : ''
+    const to_name = commission ? commission.to_user.username : ''
     const done = props.data ? props.data.done : false
 
     const count = 1
     //const count = commission && commission.products ? commission.products.length : 0
+    let revisions_count = store.get_stage_count('revision')
 
     const show_panel = !props.hidden || props.active
 
@@ -138,9 +169,8 @@ const PendingSketch = (props: ProcessProps) => {
             </TimelineTitle>
             { show_panel &&
             <TimelinePanel>
-                {done && props.is_owner && <p>{t`There are ${count} sketches available.`}</p>}
-                {done && !props.is_owner && <p>{t`You have added ${count} sketches.`}</p>}
-                {!done && !props.is_owner && <p>{t`Waiting on ${name} to confirm.`}</p>}
+                {done && <p>{t`There are ${count} drafts available.`}</p>}
+                {!done && props.is_owner && !commission.finished && !!!count && <p>{t`Waiting on ${to_name} to provide a sketch.`}</p>}
                 {!done && !props.is_owner && !commission.finished &&
                 <div>
                     {!!count &&
@@ -149,18 +179,29 @@ const PendingSketch = (props: ProcessProps) => {
                     </React.Fragment>
                     }
                     {!!!count &&
-                    <p>{t`Please upload the sketches in the Drafts tab.`}</p>
+                    <React.Fragment>
+                        <p>{t`Please upload the sketches in the Drafts tab.`}</p>
+                    </React.Fragment>
                     }
                 </div>
                 }
+                {!done && !commission.finished &&
+                <ButtonToolbar>
+                    {!!!props.is_owner &&
+                    <Button appearance="primary">{t`Upload`}</Button>
+                    }
+                    <Button appearance="default" loading={skip_loading} onClick={(ev) => {ev.preventDefault(); set_skip_loading(true); store.next_phase().then(() => set_skip_loading(false))}}>{t`Skip`}</Button>
+                </ButtonToolbar>
+                }
                 {!done && props.is_owner && !commission.finished &&
                 <div>
-                    <p>{t`Waiting for you to confirm the sketches.`}</p>
                     {!!count &&
                     <React.Fragment>
+                        <p>{t`Waiting for you to confirm the sketches.`}</p>
                         <p>
                             <ButtonToolbar>
                                 <Button loading={accept_loading} color="green" onClick={(ev) => {ev.preventDefault(); set_accept_loading(true); store.confirm_sketches().then(() => set_accept_loading(false))}}>{t`Confirm`}</Button>
+                                <RevisionButton/>
                             </ButtonToolbar>
                         </p>
                     </React.Fragment>
@@ -173,17 +214,64 @@ const PendingSketch = (props: ProcessProps) => {
     )
 }
 
+const Revision = (props: ProcessProps) => {
+
+    const [accept_loading, set_accept_loading] = useState(false)
+    const store = useCommissionStore()
+    let commission = store.get_commission()
+    const name = commission ? commission.from_user.username : ''
+    const done = props.data ? props.data.done : false
+
+    let from_confirmed = false
+    let to_confirmed = false
+
+    if (props.data?.data) {
+        from_confirmed = props.data.data.confirmed.includes(commission.from_user._id)
+        to_confirmed = props.data.data.confirmed.includes(commission.to_user._id)
+    }
+
+
+    const show_panel = !props.hidden || props.active
+
+    return (
+        <React.Fragment>
+            <TimelineTitle onClick={props.onClick} date={props.done_date}>
+            {t`Revision`}
+            </TimelineTitle>
+            { show_panel &&
+            <TimelinePanel>
+                {done && <p>{t`Changed were requested.`}</p>}
+                {!done && !props.is_owner && !to_confirmed && <p>{t`${name} is asking for changes.`}</p>}
+                {!done && !commission.finished &&
+                <>
+                    {!props.is_owner && !to_confirmed && <p>{t`Please complete the requested changes and upload a new revision.`}</p>}
+                    {props.is_owner && !to_confirmed && <p>{t`Please wait for the requested changes to be completed.`}</p>}
+                    {!props.is_owner && to_confirmed && <p>{t`Please wait for ${name} to confirm the changes.`}</p>}
+                    {props.is_owner && to_confirmed && <p>{t`Waiting for you to confirm the requested changes.`}</p>}
+                    <ButtonToolbar>
+                        {!props.is_owner && !to_confirmed && <Button loading={accept_loading} color="green" onClick={(ev) => {ev.preventDefault(); set_accept_loading(true); store.confirm_revision().then(() => set_accept_loading(false))}}>{t`Done`}</Button>}
+                        {props.is_owner && to_confirmed && <Button loading={accept_loading} color="green" onClick={(ev) => {ev.preventDefault(); set_accept_loading(true); store.confirm_revision().then(() => set_accept_loading(false))}}>{t`Confirm`}</Button>}
+                    </ButtonToolbar>
+                </>
+                }
+            </TimelinePanel>
+            }
+        </React.Fragment>
+    )
+}
+
 const PendingProduct = (props: ProcessProps) => {
 
     const [accept_loading, set_accept_loading] = useState(false)
     const store = useCommissionStore()
     let commission = store.get_commission()
-    const name = commission ? commission.to_user.username : ''
-    const done = props.data ? props.data.done : false
+    const name = commission?.to_user.username ??  ''
+    const done = props?.data?.done ?? false
 
     const count = 1
     //const count = commission && commission.products ? commission.products.length : 0
-
+    
+    const revisions_count = store.get_stage_count('revision')
     const show_panel = !props.hidden || props.active
 
     return (
@@ -193,26 +281,23 @@ const PendingProduct = (props: ProcessProps) => {
             </TimelineTitle>
             { show_panel &&
             <TimelinePanel>
-                {done && props.is_owner && <p>{t`There are ${count} product(s) available.`}</p>}
+                {!!count && props.is_owner && <p>{t`There are ${count} product(s) available.`}</p>}
                 {done && !props.is_owner && <p>{t`You have added ${count} product(s).`}</p>}
-                {!done && props.is_owner && <p>{t`Waiting on ${name} to finish the commission request.`}</p>}
-                {!done && !props.is_owner && !commission.finished &&
-                <div>
-                    <p>{t`Waiting for you to finish the request.`}</p>
+                {!done && !!!count && props.is_owner && <p>{t`Waiting on ${name} to finish the commission request.`}</p>}
+                {!done && !commission.finished &&
+                <>
+                    {!props.is_owner && <p>{t`Waiting for you to finish the request.`}</p>}
+                    {!props.is_owner && !!count && <p>{t`You have added ${count} product(s).`}</p>}
                     {!!count &&
-                    <React.Fragment>
-                        <p>{t`You have added ${count} product(s).`}</p>
-                        <p>
-                            <ButtonToolbar>
-                                <Button loading={accept_loading} color="green" onClick={(ev) => {ev.preventDefault(); set_accept_loading(true); store.confirm_products().then(() => set_accept_loading(false))}}>{t`Next step`}</Button>
-                            </ButtonToolbar>
-                        </p>
-                    </React.Fragment>
+                    <ButtonToolbar>
+                        <Button loading={accept_loading} color="green" onClick={(ev) => {ev.preventDefault(); set_accept_loading(true); store.confirm_products().then(() => set_accept_loading(false))}}>{t`Done`}</Button>
+                        {props.is_owner && <RevisionButton/>}
+                    </ButtonToolbar>
                     }
                     {!!!count &&
                     <p>{t`Please upload the products in the Products tab.`}</p>
                     }
-                </div>
+                </>
                 }
             </TimelinePanel>
             }
@@ -362,13 +447,16 @@ const CommissionProcess = () => {
     const is_complete = commission.completed
     let is_owner = user._id === commission.from_user._id
     let start_date = toDate(commission ? new Date(commission.created) : new Date())
-    let end_date = commission && commission.end_date ? toDate(new Date(commission.end_date)) : null
+    let end_date = commission?.end_date ? toDate(new Date(commission.end_date)) : null
 
-    let phases = commission ? commission.phases : []
-    let latest_stage = commission ? commission.stage : null
+    let phases = commission?.phases ?? []
+    let latest_stage = commission?.stage ?? null
+    let def_stages: CommissionProcessType[] = store.state.stages
 
     let confirmed = false
+    let is_confirming = false
     if (latest_stage.type === 'complete') {
+        is_confirming = true
         if (latest_stage.data && latest_stage.data.confirmed.includes(user._id)) {
             confirmed = true
         }
@@ -376,30 +464,13 @@ const CommissionProcess = () => {
 
     let unvisited_phases = []
 
-    if (!is_finished) {
-        let d_stages = []
-        let curr_stages_values = commission.phases.map(v => v.type)
-        store.state.stages.forEach((v, idx) => {
-            let d_stages_temp = d_stages.slice()
-            let curr_stages: any[] = curr_stages_values.filter(pv => {
-                if (d_stages.includes(pv)) {
-                    let i = d_stages.indexOf(pv)
-                    if(i != -1){
-                        d_stages_temp.splice(i, 1);
-                    }
-                    return true
-                }
-                return false
-            })
-
-            console.log(curr_stages)
-            console.log(d_stages_temp)
-            console.log(d_stages)
-
-            if (!curr_stages.includes(v)) {
-            
-                d_stages.push(v)
-                switch(v) {
+    if (!is_finished && !is_confirming) {
+        let curr_stages_values = phases.map(v => v.type)
+        def_stages.forEach((v, idx) => {
+            if (curr_stages_values.includes(v.type)) {
+                curr_stages_values.splice(curr_stages_values.indexOf(v.type), 1);
+            } else {
+                switch(v.type) {
                     case 'pending_payment':
                         {
                             unvisited_phases.push(
@@ -451,8 +522,6 @@ const CommissionProcess = () => {
 
     }
 
-
-
     return (
         <div>
             <CommissionTimeline className="ml-5">
@@ -476,8 +545,11 @@ const CommissionProcess = () => {
                             El = PendingApproval
                             break
                         case 'pending_sketch':
-                                El = PendingSketch
-                                break
+                            El = PendingSketch
+                            break
+                        case 'revision':
+                            El = Revision
+                            break
                         case 'pending_payment':
                             El = PendingPayment
                             break
@@ -494,7 +566,7 @@ const CommissionProcess = () => {
                             El = Completed
                             break
                         default:
-                            null
+                            return null
                     }
                     return (
                         <CommissionTimelineItem key={phase._id}  selected={selected === phase._id} active={is_latest || selected === phase._id}>

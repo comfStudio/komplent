@@ -30,7 +30,7 @@ import useEarningsStore from '@store/earnings'
 const { publicRuntimeConfig, serverRuntimeConfig }= getConfig()
 
 const client_initialize = async () => {
-    global.primus = new global.Primus()
+    //global.primus = new global.Primus()
     localForage.config({
       name        : 'komplent',
       version     : 1.0,

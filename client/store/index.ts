@@ -2,7 +2,7 @@ import React, { useEffect, useState, useLayoutEffect } from 'react';
 import useGlobalHook, { Store as HookStore } from '@znemz/use-global-hook';
 import { useMount } from 'react-use'
 import { createContainer, ContainerProviderProps } from "unstated-next"
-import { useImmer } from "use-immer";
+import useMethods from 'use-methods';
 
 import { storage } from '@app/client'
 import { is_server } from '@utility/misc';
@@ -90,17 +90,17 @@ interface StoreActions<S> {
 export function createStore <S, A extends StoreActions<Partial<S>>> (base_state: S, actions?: A, on_init: Function = null) {
     let inited = false
     let old_initial_state = undefined
+
+    const methods = draft => ({
+        setState(next_state: Partial<S>) {
+            Object.assign(draft, next_state)
+        },
+      });
     
     const useStoreHook = (initial_state?: Partial<S>) => {
         let i_state = {...base_state, ...initial_state}
 
-        let [state, set_state] = useImmer(i_state)
-
-        const setState = (next_state: Partial<S>) => {
-            set_state(draft => {
-                Object.assign(draft, next_state)
-            })
-        }
+        const [state, { setState }] = useMethods(methods, i_state)
 
         if (initial_state) {
             let initial_state_s = JSON.stringify(initial_state)
@@ -119,12 +119,15 @@ export function createStore <S, A extends StoreActions<Partial<S>>> (base_state:
         const store_state = container.useContainer()
 
         let store_actions = {
-            setState: store_state.setState,
-            useUpdater: (updater: (draft: Draft<S>, ...args: any[]) => void) => produce(updater),
             ...actions as A
         }
             
-        let store = {state:store_state.state, ...store_actions}
+        let store = {
+            state:store_state.state,
+            setState: store_state.setState,
+            useUpdater: (updater: (draft: Draft<S>, ...args: any[]) => void) => produce(updater),
+            ...store_actions,
+        }
 
         for (let a in actions) {
             if (typeof store_actions[a] === 'function') {
