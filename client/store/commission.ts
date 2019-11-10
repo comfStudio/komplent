@@ -293,29 +293,31 @@ export const useCommissionStore = createStore(
         },
 
         async revoke_complete() {
-            const user_id = this.state._current_user._id
-            const stage = this.state.commission.stage
-            if (stage.type !== "complete") {
-                throw Error("Revoke complete can only be done in the complete phase")
-            }
-            let complete_data = {
-                confirmed: []
-            }
-            if (stage.data) {
-                complete_data = {...stage.data}
-            }
-            
-            complete_data.confirmed = complete_data.confirmed.filter(v => v !== user_id)
-            
-            let r = await update_db({
-                model: "CommissionPhase",
-                data: {_id: stage._id, data: complete_data},
-                schema: commission_schema,
-                validate: true,
-            })
+            if (!this.state.commission.finished) {
+                const user_id = this.state._current_user._id
+                const stage = this.state.commission.stage
+                if (stage.type !== "complete") {
+                    throw Error("Revoke complete can only be done in the complete phase")
+                }
+                let complete_data = {
+                    confirmed: []
+                }
+                if (stage.data) {
+                    complete_data = {...stage.data}
+                }
+                
+                complete_data.confirmed = complete_data.confirmed.filter(v => v !== user_id)
+                
+                let r = await update_db({
+                    model: "CommissionPhase",
+                    data: {_id: stage._id, data: complete_data},
+                    schema: commission_schema,
+                    validate: true,
+                })
 
-            await this.refresh()
-            return r
+                await this.refresh()
+                return r
+            }
         },
 
         get_next_stages(){
@@ -515,7 +517,7 @@ export const useCommissionsStore = createStore(
     },
     {
         sent_commissions(user_id) {
-            return this.state.commissions.filter((d) => d.from_user._id === user_id && d.accepted)
+            return this.state.commissions.filter((d) => d.from_user._id === user_id)
         },
         received_commissions(user_id) {
             return this.state.commissions.filter((d) => d.to_user._id === user_id && d.accepted)

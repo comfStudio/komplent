@@ -74,8 +74,8 @@ export const CommissionsListing = () => {
     let to_comms = store.received_commissions(user._id)
     let from_comms = store.sent_commissions(user._id)
 
-    let past_to_comms = to_comms.filter(d => !!d.finished)
-    let past_from_comms = from_comms.filter(d => !!d.finished)
+    let past_to_comms = to_comms.filter(d => d.finished)
+    let past_from_comms = from_comms.filter(d => d.finished)
 
     to_comms = to_comms.filter(d => !d.finished)
     from_comms = from_comms.filter(d => !d.finished)

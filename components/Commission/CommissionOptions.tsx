@@ -1,20 +1,26 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { Grid, Row, Col, Uploader, Icon, Button, RadioGroup, Radio, DatePicker, InputNumber } from 'rsuite';
 
 import { EditSection, EditGroup } from '@components/Settings';
 import { t } from '@utility/lang'
 import { useCommissionStore } from '@store/commission';
 import { CommissionProcess } from '@components/Settings/CommissionsSettings';
+import debounce from 'lodash/debounce';
+import { useDebounce } from 'react-use';
 
 const Deadline = () => {
 
     const store = useCommissionStore()
 
+    const update = useCallback(debounce((v: number, ev) => {
+        store.update({commission_deadline: v})
+    }, 400), [])
+
     return (
         <EditGroup>
             <span className="mr-2">{t`Deadline`}: </span>
             <div className="w-32">
-                <InputNumber defaultValue="14" postfix={t`days`}/>
+                <InputNumber defaultValue="14" postfix={t`days`} onChange={update}/>
             </div>
         </EditGroup>
     )

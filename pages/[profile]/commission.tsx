@@ -18,7 +18,8 @@ class CommissionPage extends ProfilePage {
 
       return {
         ...props,
-        error
+        error,
+        optional: false
       }
     }
 

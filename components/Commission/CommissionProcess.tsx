@@ -267,6 +267,7 @@ const PendingProduct = (props: ProcessProps) => {
     let commission = store.get_commission()
     const name = commission?.to_user.username ??  ''
     const done = props?.data?.done ?? false
+    
 
     const count = 1
     //const count = commission && commission.products ? commission.products.length : 0

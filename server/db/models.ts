@@ -8,6 +8,8 @@ import { user_schema, user_store_schema,
 import { message_schema, conversation_schema } from '@schema/message'
 import { image_schema, attachment_schema, tag_schema, event_schema, notification_schema } from '@schema/general'
 import { commission_schema, commission_extra_option_schema, comission_rate_schema, commission_phase_schema } from '@schema/commission'
+import { schedule_unique, get_milli_secs } from '@server/tasks'
+import { TASK } from '@server/constants'
 
 user_schema.pre("save", async function() {
         if (!this.name) {
@@ -23,6 +25,12 @@ commission_schema.pre("save", async function() {
       this.commission_process = cp.commission_process
     }
   }
+  if (this.rate && !this.commission_deadline) {
+    this.commission_deadline = this.rate.commission_deadline
+  }
+  if (this.isNew || (this.isModified('commission_deadline') && this._id)) {
+    this._changed_commission_deadline = true
+  }
 })
 
 commission_schema.post("save", async function() {
@@ -30,6 +38,10 @@ commission_schema.post("save", async function() {
     let c = new CommissionPhase({type: "pending_approval", commission: this._id})
     this.phases = [c]
     await c.save()
+  }
+  if (this._changed_commission_deadline) {
+    schedule_unique({task: TASK.commission_deadline, key: this._id, when: `${this.commission_deadline} days`,
+      data: {commission: this.toJSON(), from_user_id:this.from_user, to_user_id:this.to_user}})
   }
 })
 

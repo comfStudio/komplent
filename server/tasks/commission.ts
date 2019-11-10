@@ -6,6 +6,7 @@ export default function(queue) {
 
     let r = [
       TASK.commission_phase_updated,
+      TASK.commission_deadline,
     ].reduce((a, v) => {
       let d = {...a}
         d[v] = queue
@@ -22,6 +23,12 @@ export default function(queue) {
       })
       await e.save()
     });
+
+    queue.process(TASK.commission_deadline, async job => {
+      log.debug(`processing ${TASK.commission_deadline}`)
+      const { commission, from_user_id, to_user_id } = job.data as TaskDataTypeMap<TASK.commission_deadline>
+    });
+
 
     return r
   }
