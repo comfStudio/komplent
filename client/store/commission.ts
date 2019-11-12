@@ -132,8 +132,8 @@ export const useCommissionStore = createStore(
             let r = await update_db({
                 model: "CommissionPhase",
                 data: {
-                    type,commission:
-                    this.state.commission._id,
+                    type,
+                    commission: this.state.commission._id,
                     done,
                     done_date: done ? new Date() : undefined,
                     data: data,

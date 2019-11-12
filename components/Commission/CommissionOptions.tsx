@@ -11,6 +11,7 @@ import { useDebounce } from 'react-use';
 const Deadline = () => {
 
     const store = useCommissionStore()
+    const commission = store.get_commission()
 
     const update = useCallback(debounce((v: number, ev) => {
         store.update({commission_deadline: v})
@@ -20,7 +21,7 @@ const Deadline = () => {
         <EditGroup>
             <span className="mr-2">{t`Deadline`}: </span>
             <div className="w-32">
-                <InputNumber defaultValue="14" postfix={t`days`} onChange={update}/>
+                <InputNumber defaultValue={commission.commission_deadline} postfix={t`days`} onChange={update}/>
             </div>
         </EditGroup>
     )

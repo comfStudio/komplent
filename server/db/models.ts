@@ -9,7 +9,8 @@ import { message_schema, conversation_schema } from '@schema/message'
 import { image_schema, attachment_schema, tag_schema, event_schema, notification_schema } from '@schema/general'
 import { commission_schema, commission_extra_option_schema, comission_rate_schema, commission_phase_schema } from '@schema/commission'
 import { schedule_unique, get_milli_secs } from '@server/tasks'
-import { TASK } from '@server/constants'
+import { TASK, CommissionPhaseT } from '@server/constants'
+import { commissions } from '@utility/pages'
 
 user_schema.pre("save", async function() {
         if (!this.name) {
@@ -39,9 +40,41 @@ commission_schema.post("save", async function() {
     this.phases = [c]
     await c.save()
   }
-  if (this._changed_commission_deadline) {
-    schedule_unique({task: TASK.commission_deadline, key: this._id, when: `${this.commission_deadline} days`,
+  if (this._changed_commission_deadline && !this.expire_date && !this.finished) {
+    schedule_unique({task: TASK.commission_deadline, key: this._id.toString(), when: `${this.commission_deadline} days`,
       data: {commission: this.toJSON(), from_user_id:this.from_user, to_user_id:this.to_user}})
+  }
+})
+
+commission_phase_schema.pre("save", async function() {
+  this.wasNew = this.isNew
+  if (this.done && !this.done_date) {
+    this.done_date = new Date()
+  }
+})
+
+commission_phase_schema.post("save", async function() {
+  const comm = await Commission.findById(this.commission)
+  if (this.type == CommissionPhaseT.pending_approval) {
+    if (this.done && !comm.accept_date) {
+      comm.accept_date = new Date()
+      comm.save()
+    }
+  }
+  if (this.type == CommissionPhaseT.refund) {
+    if (this.wasNew && !this.done) {
+      comm.refunding = true
+      comm.save()
+      // start refund process
+      schedule_unique({task: TASK.commission_refund, key: comm._id.toString(), when: "5 minutes",
+        data: {commission: comm.toJSON(), phase: this.toJSON()}
+      })
+    }
+    if (this.done) {
+      comm.refunding = false
+      comm.refunded = true
+      comm.save()
+    }
   }
 })
 

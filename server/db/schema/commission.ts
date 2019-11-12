@@ -12,7 +12,10 @@ export const commission_schema = new Schema({
     to_title: String,
     body: String,
     expire_date: Date,
+    accept_date: Date,
     end_date: Date,
+    refunded: { type: Boolean, default: false}, // payment has been refunded
+    refunding: { type: Boolean, default: false}, // payment is being refunded
     payment: { type: Boolean, default: false}, // there has been a transaction
     finished: { type: Boolean, default: false}, // commission has finished, could be cancelled or expired
     completed: { type: Boolean, default: false}, // commission was completed successfully

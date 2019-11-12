@@ -63,7 +63,7 @@ export const useSearchStore = createStore(
                 r = d.hits.hits
             }
 
-            return r
+            return r.filter(Boolean)
         }
     }
   );

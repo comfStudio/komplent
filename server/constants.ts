@@ -42,6 +42,7 @@ export type PropType<TObj, TProp extends keyof TObj> = TObj[TProp]
 export enum TASK {
     activate_email = 'activate_email', 
     reset_login = 'reset_login', 
+    commission_refund = 'commission_refund',
     commission_deadline = 'commission_deadline',
     commission_phase_updated = 'commission_phase_updated', 
     user_commission_status_changed = 'user_commission_status_changed', 
@@ -54,6 +55,7 @@ export type TASK_T = KEYS_TO_TYPE<typeof tasks>
 
 export type TaskDataTypeMap<T> =  (
     T extends TASK.followed_user ? { user_id: string, followee: any } :
+    T extends TASK.commission_refund ? { commission: any, phase: any } :
     T extends TASK.commission_deadline ? { to_user_id: string, from_user_id: string, commission: any } :
     T extends TASK.commission_phase_updated ? { user_id: string, commission_id: string, phase: any, from_user_id: string, to_user_id: string } :
     T extends TASK.user_commission_status_changed ? { user_id: string, status: boolean } :
@@ -116,7 +118,8 @@ export const commission_phases = tuple(
     'complete',
     'cancel',
     'reopen',
-    'refund'
+    'refund',
+    'expire'
     );
 
 export type CommissionPhaseType = typeof commission_phases[number]

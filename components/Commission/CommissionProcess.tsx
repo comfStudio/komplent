@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { formatDistanceToNow, format } from 'date-fns'
+import { formatDistanceToNow, format, addDays } from 'date-fns'
 import { toDate } from 'date-fns-tz'
 import Link from 'next/link';
 
@@ -338,6 +338,21 @@ const Cancelled = (props: ProcessProps) => {
     )
 }
 
+const Expired = (props: ProcessProps) => {
+
+    return (
+        <React.Fragment>
+            <TimelineTitle onClick={props.onClick} date={props.done_date}>
+            {t`Expired`}
+            </TimelineTitle>
+            <TimelinePanel className="clearfix">
+                <span className="float-right"><Icon className="text-red-300" icon="close" size="4x"/></span>
+                <p>{t`Commission has expired`}</p>
+            </TimelinePanel>
+        </React.Fragment>
+    )
+}
+
 const Unlocked = (props: ProcessProps) => {
     const done = props.data ? props.data.done : false
     const show_panel = !props.hidden || props.active
@@ -357,6 +372,25 @@ const Unlocked = (props: ProcessProps) => {
     )
 }
 
+const Refund = (props: ProcessProps) => {
+    const done = props.data ? props.data.done : false
+    const show_panel = !props.hidden || props.active
+
+    return (
+        <React.Fragment>
+            <TimelineTitle onClick={props.onClick} date={props.done_date}>
+            {t`Refund`}
+            </TimelineTitle>
+            {show_panel &&
+            <TimelinePanel>
+                {!done && <p className="muted">{t`Refunding...`} <Icon icon="spinner" spin/></p>}
+                {done && <p>{t`Payment has been refunded`} <Icon icon="check" className="text-green-500"/></p>}
+            </TimelinePanel>
+            }
+        </React.Fragment>
+    )
+}
+
 const Completed = (props: ProcessProps) => {
 
     const store = useCommissionStore()
@@ -368,7 +402,8 @@ const Completed = (props: ProcessProps) => {
     const to_name = commission ? commission.to_user.username : ''
     const from_name = commission ? commission.from_user.username : ''
 
-    let end_date = commission && commission.end_date ? toDate(new Date(commission.end_date)) : null
+    let end_date = commission?.end_date ? toDate(new Date(commission.end_date)) : null
+    let accept_date = commission?.accept_date ? toDate(new Date(commission.accept_date)) : null
 
     let from_confirmed = false
     let to_confirmed = false
@@ -380,10 +415,15 @@ const Completed = (props: ProcessProps) => {
 
     const show_panel = !props.hidden || props.active
 
+    let deadline_txt = ""
+    if (accept_date && commission.commission_deadline) {
+        deadline_txt = ` (${formatDistanceToNow(addDays(accept_date, commission.commission_deadline), {addSuffix: true})})`
+    }
+
     return (
         <React.Fragment>
             <TimelineTitle  onClick={props.onClick} date={completed && end_date ? end_date : undefined}>
-            {finished || props.hidden ? t`Complete` : t`Confirm`}
+            {finished || props.hidden ? t`Complete` +  deadline_txt : t`Confirm`}
             </TimelineTitle>
             { show_panel &&
             <TimelinePanel>
@@ -556,6 +596,12 @@ const CommissionProcess = () => {
                             break
                         case 'cancel':
                             El = Cancelled
+                            break
+                        case 'expire':
+                            El = Expired
+                            break
+                        case 'refund':
+                            El = Refund
                             break
                         case 'pending_product':
                             El = PendingProduct
