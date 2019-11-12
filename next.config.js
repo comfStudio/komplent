@@ -74,6 +74,10 @@ let next_config = {
   poweredByHeader: false,
   distDir: 'build',
   webpack: webpack_config,
+  typescript: {
+    ignoreDevErrors: true,
+    ignoreBuildErrors: true,
+  }
 }
 
 module.exports = withConfig(

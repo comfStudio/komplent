@@ -2,20 +2,47 @@ import { createStore, bootstrapStoreDev } from '@client/store'
 import { update_db } from '@app/client/db'
 import { comission_rate_schema, commission_extra_option_schema, commission_schema } from '@schema/commission'
 import { iupdate, is_server } from '@utility/misc'
-import { CommissionExtraOption, CommissionRate, Commission } from '@db/models';
+import { CommissionExtraOption, CommissionRate, Commission, Conversation } from '@db/models';
 import { fetch } from '@utility/request';
 import { post_task, TaskMethods, post_task_d_15_secs, post_task_d_1_secs } from '@client/task';
 import { TASK, CommissionPhaseType, CommissionPhaseT, commission_phases } from '@server/constants';
 import { CommissionProcessType } from '@schema/user';
 import update from 'immutability-helper'
+import useInboxStore from './inbox';
 
 export const useCommissionStore = createStore(
     {
+        _current_user: {} as any,
         commission: undefined,
         stages: [] as CommissionProcessType[],
-        _current_user: {} as any,
+        active_conversation: undefined as any,
+        messages: []
     },
     {
+        get_messages: useInboxStore.actions.get_messages,
+        new_message: useInboxStore.actions.new_message,
+        async get_conversation(commission_id) {
+            let u
+            let q = {
+                commission: commission_id
+            }
+            if (is_server()) {
+                u = await Conversation.find(q).lean()
+            } else {
+                await fetch("/api/fetch",{
+                    method:"post",
+                    body: {model: "Conversation",
+                    method:"find",
+                    query: q,
+                }
+                }).then(async (r) => {
+                    if (r.ok) {
+                        u = (await r.json()).data
+                    }
+                })
+            }
+            return u && u.length ? u[0] : null
+        },
         get_commission() {
             let c
             if (this.state.commission) {

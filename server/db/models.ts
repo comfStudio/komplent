@@ -35,15 +35,25 @@ commission_schema.pre("save", async function() {
 })
 
 commission_schema.post("save", async function() {
+
   if (this.wasNew) {
     let c = new CommissionPhase({type: "pending_approval", commission: this._id})
     this.phases = [c]
-    await c.save()
+    c.save()
+    let m = new Conversation({
+      type: 'commission',
+      subject: this.from_title,
+      users: [this.from_user, this.to_user],
+      commission: this._id,
+    })
+    m.save()
   }
+
   if (this._changed_commission_deadline && !this.expire_date && !this.finished) {
     schedule_unique({task: TASK.commission_deadline, key: this._id.toString(), when: `${this.commission_deadline} days`,
       data: {commission: this.toJSON(), from_user_id:this.from_user, to_user_id:this.to_user}})
   }
+
 })
 
 commission_phase_schema.pre("save", async function() {

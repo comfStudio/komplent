@@ -2,7 +2,6 @@ import { useContext, useState } from 'react'
 
 import { useUserStore } from '@client/store/user'
 import { ProfileContext } from '@client/context'
-import { user_settings_schema } from '@schema/user';
 import { useUpdateDatabase } from './db';
 
 export const useUser = () => {

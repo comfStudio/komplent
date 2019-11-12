@@ -9,6 +9,7 @@ import { get_profile_name } from '@utility/misc';
 import { formatDistanceToNow, toDate, format } from 'date-fns';
 import { useUser } from '@hooks/user';
 import { Avatar } from '@components/Profile/ProfileHeader';
+import { useMountedState } from 'react-use';
 
 interface MessageProps {
     data: any
@@ -91,22 +92,27 @@ const Header = (props: HeaderProps) => {
     );
 };
 
-interface InboxConversationProps {
+interface ConversationProps {
+    messages: any[]
+    conversation: any
+    useStore: any
 }
 
-const InboxConversation = (props: InboxConversationProps) => {
+export const Conversation = (props: ConversationProps) => {
 
     const user = useUser()
-    const store = useInboxStore()
-    const active = store.state.active_conversation
-    const [messages, set_messages] = useState([])
+    const [messages, set_messages] = useState(props.messages.slice().reverse())
+    const store = props.useStore()
+    const mounted = useMountedState()
 
     useEffect(() => {
-        set_messages(store.state.messages.slice().reverse())
-    }, [store.state.messages])
+        if (mounted) {
+            set_messages(props.messages.slice().reverse())
+        }
+    }, [props.messages])
 
     const onMessage = async (message) => {
-        let r = await store.new_message(user, active, message)
+        let r = await store.new_message(user, props.conversation, message)
         if (r.status) {
             set_messages([...messages, r.body.data])
         }
@@ -114,13 +120,23 @@ const InboxConversation = (props: InboxConversationProps) => {
     }
 
     return (
-        <Panel bordered header={<Header data={active}/>}>
+        <Panel bordered header={<Header data={props.conversation}/>}>
             <ul className="messages">
                 {messages.slice(1).slice(-5).map(d => <Message key={d._id} user={user} data={d}/>)}
             </ul>
             <MessageInput onMessage={onMessage}/>
         </Panel>
     );
+};
+
+interface InboxConversationProps {
+}
+
+const InboxConversation = (props: InboxConversationProps) => {
+
+    const store = useInboxStore()
+
+    return <Conversation conversation={store.state.active_conversation} messages={store.state.messages} useStore={useInboxStore} />;
 };
 
 export default InboxConversation;

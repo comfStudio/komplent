@@ -4,6 +4,8 @@ import React from 'react'
 import NProgress from 'nprogress'
 import Router from 'next/router'
 import localForage from 'localforage'
+import { Tina, TinaCMS } from 'tinacms'
+import { GitClient } from '@tinacms/git-client'
 
 import { Title } from '@components/App'
 import { is_server } from '@utility/misc'
@@ -30,7 +32,6 @@ import useEarningsStore from '@store/earnings'
 const { publicRuntimeConfig, serverRuntimeConfig }= getConfig()
 
 const client_initialize = async () => {
-    //global.primus = new global.Primus()
     localForage.config({
       name        : 'komplent',
       version     : 1.0,
@@ -77,6 +78,14 @@ export const StoreProvider = (props: ReactProps) => {
 }
 
 class KomplentApp extends App {
+  tinacms: any
+  constructor(props) {
+    super(props)
+    this.tinacms = new TinaCMS()
+    const client = new GitClient('http://localhost:3005/___tina')
+    this.tinacms.registerApi('git', client)
+  }
+
   render() {
     const { Component, pageProps } = this.props
 
@@ -84,12 +93,14 @@ class KomplentApp extends App {
     const getLayout =(page => page)
 
     return (
-      <React.Fragment>
+      // <Tina cms={this.tinacms} position={"overlay"}>
+      <>
         <Title>Komplent</Title>
         <StoreProvider>
           {getLayout(<Component {...pageProps} />)}
         </StoreProvider>
-      </React.Fragment>
+      </>
+      // </Tina>
     )
   }
 }
