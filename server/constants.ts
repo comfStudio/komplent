@@ -124,3 +124,11 @@ export const commission_phases = tuple(
 
 export type CommissionPhaseType = typeof commission_phases[number]
 export const CommissionPhaseT = array_to_enum(commission_phases)
+
+export const guideline_types = tuple(
+    'will_draw',
+    'will_not_draw',
+    );
+
+export type Guideline = typeof guideline_types[number]
+export const GuidelineType = array_to_enum(guideline_types)

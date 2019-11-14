@@ -2,7 +2,7 @@ import { es_index, configure } from '.'
 import mongoose, { Document, Model } from 'mongoose'
 import { tag_schema } from '@schema/general'
 import { comission_rate_schema } from './commission'
-import { nsfw_levels, NSFW_LEVEL, CommissionPhaseT, CommissionPhaseType } from '@server/constants'
+import { nsfw_levels, NSFW_LEVEL, CommissionPhaseT, CommissionPhaseType, guideline_types } from '@server/constants'
 
 const { Schema } = mongoose
 
@@ -71,8 +71,14 @@ export const user_schema = new Schema({
   },
   commission_guidelines: [
     {
-      guideline_type: String,
-      value: String
+      guideline_type: {
+        type: String,
+        enum: guideline_types,
+      },
+      value: {
+        type: String,
+        trim: true,
+      }
     }
   ],
   profile_cover: { 

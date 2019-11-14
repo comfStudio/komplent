@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useSessionStorage, useMountedState } from 'react-use';
-import { InputNumber, List, Grid, Button, DatePicker, Icon, Message } from 'rsuite';
+import { InputNumber, List, Grid, Button, DatePicker, Icon, Message, Input, Row, Col } from 'rsuite';
 
 import { EditGroup, EditSection } from '.';
 import { t } from '@app/utility/lang'
@@ -9,10 +9,11 @@ import { CommissionTiersRow } from '@components/Profile/ProfileCommission';
 import Placeholder from '@components/App/Placeholder';
 import TextEditor from '@components/App/TextEditor';
 import { useCommissionStore } from '@store/commission';
-import { CommissionPhaseType, CommissionPhaseT } from '@server/constants';
+import { CommissionPhaseType, CommissionPhaseT, guideline_types, GuidelineType, Guideline } from '@server/constants';
 import useUserStore from '@store/user';
 import debounce from 'lodash/debounce';
 import { CommissionProcessType } from '@schema/user';
+import { useUpdateDatabase } from '@hooks/db';
 
 const Deadline = () => {
 
@@ -69,22 +70,65 @@ export const CommissionRequestLimit = () => {
 
 export const CommissionGuideline = () => {
 
+    const store = useUserStore()
+
+    const titles = (v: Guideline) => {switch(v){
+        case GuidelineType.will_draw: return t`Will draw`
+        case GuidelineType.will_not_draw: return t`Will not draw`
+    }}
+
+    const guidelines = store.state.current_user?.commission_guidelines ?? []
+
     return (
         <React.Fragment>
-            <EditGroup title={t`Will draw`}>
-                <EditSection>
-                <List className="w-64">
-                <List.Item key="">OCs</List.Item>
-                </List>
-                </EditSection>
-            </EditGroup>
-            <EditGroup title={t`Will not draw`}>
-                <EditSection>
-                <List className="w-64">
-                <List.Item key="">NSFW</List.Item>
-                </List>
-                </EditSection>
-            </EditGroup>
+            {guideline_types.map( gtype => {
+
+                const [gtext, set_gtext] = useState("")
+
+                return (
+                <EditGroup key={gtype} title={titles(gtype)}>
+                    <EditSection>
+                    <List className="w-64">
+                        {guidelines.filter(v => v.guideline_type === gtype).map(({guideline_type, value}, idx) => 
+                        <List.Item key={idx.toString() + value}>
+                            <a href="#" onClick={(ev) => {
+                                ev.preventDefault();
+                                store.update_user({commission_guidelines: guidelines.filter(v => !(v.value === value && v.guideline_type === gtype))})
+                                }}><Icon className="mr-2" icon="minus-circle" /></a>
+                            {value}
+                        </List.Item>
+                        )
+                        }
+                        <List.Item key="add">
+                            <form onSubmit={ev => {
+                                ev.preventDefault();
+                                if (gtext && !guidelines.filter(v => v.value === gtext && v.guideline_type === gtype).length) {
+                                    store.update_user({commission_guidelines: [...guidelines,
+                                        { guideline_type: gtype, value: gtext }
+                                    ]}).then(r => {
+                                        if (r.status) {
+                                            set_gtext("")
+                                        }
+                                    })
+                                }
+                            }}>
+                                <Grid fluid>
+                                    <Row>
+                                        <Col xs={19}>
+                                        <Input value={gtext} onChange={set_gtext} size="xs" />
+                                        </Col>
+                                        <Col xs={5}>
+                                        <Button type="submit" size="sm">{t`Add`}</Button>
+                                        </Col>
+                                    </Row>
+                                </Grid>
+                            </form>
+                        </List.Item>
+                    </List>
+                    </EditSection>
+                </EditGroup>
+                )
+            })}
         </React.Fragment>
     )
 }

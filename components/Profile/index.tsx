@@ -12,7 +12,7 @@ import { ReactProps } from '@utility/props'
 import { useUpdateDatabase } from '@hooks/db';
 import { follow_schema } from '@schema/user'
 import { post_task, TaskMethods, post_task_debounce } from '@client/task';
-import { TASK } from '@server/constants';
+import { TASK, Guideline, GuidelineType, guideline_types } from '@server/constants';
 import { dashboard } from '@utility/pages';
 
 interface LayoutProps extends ReactProps, MenuProps {
@@ -114,29 +114,36 @@ export const FollowButton = () => {
 }
 
 export const GuidelineList = () => {
+
+  const { profile_user } = useProfileUser()
+
+  const guidelines = profile_user?.commission_guidelines ?? []
+
+  if (!guidelines.length) {
+    return null
+  }
+
+  const titles = (v: Guideline) => {switch(v){
+      case GuidelineType.will_draw: return t`Will draw`
+      case GuidelineType.will_not_draw: return t`Will not draw`
+  }}
+
+  const icons = (v: Guideline) => {switch(v){
+    case GuidelineType.will_draw: return {name: 'check', color: 'text-green-500'}
+    case GuidelineType.will_not_draw: return {name: 'close', color: 'text-red-500'}
+}}
+
   return (
     <Grid fluid>
       <Row>
-        <Col xs={12}>
-          <h4 className="text-center">{t`Will draw`}</h4>
-          <ul>
-            <li><Icon icon="check" className="mr-2 text-green-500" />Mech</li>
-            <li><Icon icon="check" className="mr-2 text-green-500" />OCs and ships</li>
-            <li><Icon icon="check" className="mr-2 text-green-500" />Humanoids</li>
-            <li><Icon icon="check" className="mr-2 text-green-500" />Minor gore</li>
-            <li><Icon icon="check" className="mr-2 text-green-500" />Minor NSFW</li>
-            <li><Icon icon="check" className="mr-2 text-green-500" />Backgrounds</li>
+        {guideline_types.map(gtype => 
+        <Col key={gtype} xs={Math.floor(24/guideline_types.length)}>
+          <h4 className="text-center">{titles(gtype)}</h4>
+          <ul className="px-10">
+            {guidelines.filter(v => v.guideline_type === gtype).map(({guideline_type, value}, idx) => <li key={idx.toString() + value}><Icon icon={icons(guideline_type).name as any} className={`mr-2 ${icons(guideline_type).color}`} />{value}</li>)}
           </ul>
         </Col>
-        <Col xs={12}>
-          <h4 className="text-center">{t`Will not draw`}</h4>
-          <ul>
-            <li><Icon icon="close" className="mr-2 text-red-500"/>Full furries</li>
-            <li><Icon icon="close" className="mr-2 text-red-500"/>Hardcore gore</li>
-            <li><Icon icon="close" className="mr-2 text-red-500"/>Hardcore NSFW</li>
-            <li><Icon icon="close" className="mr-2 text-red-500"/>LGBT</li>
-          </ul>
-        </Col>
+        )}
       </Row>
     </Grid>
   )
