@@ -50,35 +50,24 @@ export class AuthPage<T extends Props = Props> extends Page<T> {
         let user_store = {user: null, has_selected_usertype: false}
         if (current_user) {
             let u_store
-            let comms = []
             if (is_server()) {
                 u_store = await UserStore.findOne({user:Types.ObjectId(current_user._id)}).lean()
-                comms = await Commission.find_related(current_user._id, {only_active: true})
             } else {
                 await fetch("/api/fetch", {method:"post", body: {model: "UserStore", method:"findOne", query: {user: current_user._id}}}).then(async r => {
                     if (r.ok) {
                         u_store = (await r.json()).data
                     }
                 })
-
-                await fetch("/api/fetch", {method:"post", body: {model: "Commission", method:"find_related", query: [current_user._id, {only_active: true}]}}).then(async r => {
-                    if (r.ok) {
-                        comms = (await r.json()).data
-                    }
-                })
             }
+
+            active_commissions_count += await useUserStore.actions.get_commissions_count({to_user: current_user._id, finished: false, accepted: true})
+            active_commissions_count += await useUserStore.actions.get_commissions_count({from_user: current_user._id, finished: false, accepted: true})
+            active_requests_count += await useUserStore.actions.get_commissions_count({to_user: current_user._id, finished: false, accepted: false})
+            active_requests_count += await useUserStore.actions.get_commissions_count({from_user: current_user._id, finished: false, accepted: false})
 
             if (u_store) {
                 user_store = u_store
                 delete user_store.user
-            }
-
-            for (let c of comms) {
-                if (c.accepted) {
-                    active_commissions_count += 1
-                } else {
-                    active_requests_count += 1
-                }
             }
 
         }

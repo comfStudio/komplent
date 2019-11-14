@@ -20,6 +20,8 @@ interface Props extends AuthProps {
     profile_user: IUser
     profile_path: string
     profile_owner: boolean
+    slots_left: number
+    requests_count: number
     follow: any
     commissionRateStoreState: object
 }
@@ -32,6 +34,8 @@ class ProfilePage extends OptionalAuthPage<Props> {
         let error = null
         let profile_user = null
         let profile_path = ""
+        let slots_left = 0
+        let requests_count = 0
         
         if (profile_id) {
             let q = {username: profile_id, type: "creator", $or: [{visibility: "public"}, {visibility: "private"} ]}
@@ -51,8 +55,10 @@ class ProfilePage extends OptionalAuthPage<Props> {
             
             if (profile_user) {
                 profile_path = make_profile_urlpath(profile_user)
+                slots_left = profile_user.ongoing_commissions_limit ?? 0
+                slots_left -= await useUserStore.actions.get_commissions_count({to_user: profile_user._id, finished: false, accepted: true})
+                requests_count += await useUserStore.actions.get_commissions_count({to_user: profile_user._id, finished: false, accepted: false})
             }
-            
         }
         
         if (!profile_user) {
@@ -78,6 +84,8 @@ class ProfilePage extends OptionalAuthPage<Props> {
             profile_user,
             profile_path,
             profile_owner,
+            slots_left,
+            requests_count,
             commissionRateStoreState,
             follow,
             ...props
@@ -98,6 +106,8 @@ class ProfilePage extends OptionalAuthPage<Props> {
                     profile_path: this.props.profile_path,
                     profile_owner: this.props.profile_owner,
                     commissions_open: this.props.profile_user.commissions_open,
+                    slots_left: this.props.slots_left,
+                    requests_count: this.props.requests_count,
                     follow: this.props.follow
                 }}>
                     {super.renderPage(children)}

@@ -9,8 +9,8 @@ import { HTMLElementProps } from '@app/utility/props'
 import './CreatorCard.scss'
 import { make_profile_id, make_profile_urlpath, make_commission_rate_urlpath } from '@utility/pages';
 import { decimal128ToMoneyToString } from '@utility/misc';
-import { CommissionButton } from '@components/Profile/ProfileCommission';
 import Tag from '@components/Profile/Tag';
+import CommissionButton from '@components/Commission/CommissionButton';
 
 interface Props extends HTMLElementProps {
     data: any

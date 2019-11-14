@@ -4,10 +4,10 @@ import { IconButton, Icon } from 'rsuite'
 
 import { Container } from '@components/App/MainLayout'
 import { ReactProps } from '@utility/props'
-import { CommissionButton } from '@app/components/Profile/ProfileCommission'
 import { useProfileUser } from '@hooks/user'
 import { t } from '@app/utility/lang'
 import { FollowButton } from '.';
+import CommissionButton from '@components/Commission/CommissionButton';
 
 export const Avatar = (props) => {
     return (

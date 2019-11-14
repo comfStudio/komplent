@@ -25,7 +25,7 @@ const CommissionDescription = () => {
                         {!is_owner &&
                         <div className="text-center">
                             <hr/>
-                            {!commission.accepted &&
+                            {!commission.accepted && !commission.finished &&
                             <>
                             <p>{t`Waiting for your approval.`}</p>
                             <p>
@@ -35,6 +35,9 @@ const CommissionDescription = () => {
                             }
                             {commission.accepted &&
                             <p>{t`You approved of this request.`}</p>
+                            }
+                            {!commission.accepted && commission.finished &&
+                            <p>{t`You declined this commission request.`}</p>
                             }
                         </div>
                         }

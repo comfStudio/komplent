@@ -6,6 +6,8 @@ interface Profile {
     profile_path?: string
     profile_owner?: boolean
     commissions_open?: boolean
+    slots_left?: number
+    requests_count?: number
     follow?: any
 }
 

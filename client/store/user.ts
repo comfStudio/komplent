@@ -11,7 +11,7 @@ import { COOKIE_AUTH_TOKEN_KEY } from '@server/constants'
 import { get_jwt_data, get_jwt_user } from '@server/middleware'
 import { update_db } from '@app/client/db'
 import user_schema, { user_store_schema } from '@schema/user'
-import { Follow, Tag, Notification, User } from '@db/models';
+import { Follow, Tag, Notification, User, Commission } from '@db/models';
 
 export const fetch_user =  async (cookies_obj) => {
     if (cookies_obj[COOKIE_AUTH_TOKEN_KEY]) {
@@ -85,29 +85,50 @@ export const useUserStore = createStore(
 
     return [false, (await r.json()).error]
     },
+    async get_commissions_count(query: object) {
+        let count = 0
+        let q = query
+        if (is_server()) {
+            count = await Commission.find(q).countDocuments()
+        } else {
+            await fetch("/api/fetch",{
+                method:"post",
+                body: {model: "Commission",
+                method:"find",
+                query: q,
+                count: true
+            }
+            }).then(async (r) => {
+                if (r.ok) {
+                    count = (await r.json()).data
+                }
+            })
+        }
+        return count
+    },
     async exists(name) {
-    const r = await fetch(`/api/user?${qs.stringify({username:name, email:name})}`, {
-        method: "get",
-    })
-    if (r.status == OK) {
-        return true
-    }
-    return false
+        const r = await fetch(`/api/user?${qs.stringify({username:name, email:name})}`, {
+            method: "get",
+        })
+        if (r.status == OK) {
+            return true
+        }
+        return false
     },
     async join(data, redirect = false) {
-    let r = await fetch("/api/join", {
-        method: "post",
-        json: true,
-        body: data,
-    })
+        let r = await fetch("/api/join", {
+            method: "post",
+            json: true,
+            body: data,
+        })
 
-    if (r.status == OK) {
-        await this.login({name:data.email, password:data.password}, redirect)
+        if (r.status == OK) {
+            await this.login({name:data.email, password:data.password}, redirect)
 
-        return [true, null]
-    }
+            return [true, null]
+        }
 
-    return [false, (await r.json()).error]
+        return [false, (await r.json()).error]
     },
     async get_follow(profile_user, current_user?) {
         let f = null

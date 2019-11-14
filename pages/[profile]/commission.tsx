@@ -2,7 +2,7 @@ import React from 'react'
 
 import ProfilePage from '@components/App/ProfilePage'
 import { ProfileLayout, RequireOwnProfileInverse } from '@components/Profile'
-import { ProfileCommission } from '@components/Profile/ProfileCommission'
+import { ProfileCommission, CommissionsClosed, RequestsClosed } from '@components/Profile/ProfileCommission'
 import { NextPageContext } from 'next'
 import { NOT_FOUND } from 'http-status-codes'
 
@@ -24,10 +24,23 @@ class CommissionPage extends ProfilePage {
     }
 
     public render() {
+
+      let open = this.props.profile_user?.commissions_open ?? false
+      if (open && this.props.slots_left < 1) {
+        open = false
+      }
+
+      let req_open = false
+      if (this.props.requests_count < this.props.profile_user?.ongoing_requests_limit ?? 0) {
+        req_open = true
+      }
+
       return this.renderPage(
         <ProfileLayout activeKey="commission">
           <RequireOwnProfileInverse/>
-          <ProfileCommission/>
+          {open && req_open && <ProfileCommission/>}
+          {open && !req_open && <RequestsClosed/>}
+          {!open && <CommissionsClosed/>}
         </ProfileLayout>
       )
     }

@@ -1,37 +1,54 @@
 import React from 'react';
 import Link from 'next/link';
-import { List, Grid, Row, Col, Divider } from 'rsuite'
+import { List, Grid, Row, Col, Divider, Tag } from 'rsuite'
 
 import { useCommissionsStore } from '@client/store/commission';
 import { t } from '@utility/lang'
 import { useUser } from '@hooks/user';
 import * as pages from '@utility/pages';
 
+interface CommissionItemProps {
+    data: any
+}
+
+const CommissionItem = (props: CommissionItemProps) => {
+
+    const user = useUser()
+    const title = user._id == props.data.from_user._id ? props.data.from_title : props.data.to_title ? props.data.to_title : props.data.from_title
+
+    return (
+        <Link href={pages.make_commission_urlpath({_id:props.data._id})}>
+            <a className="unstyled">
+            <List.Item>
+                {title}
+                <span className="float-right">
+                    {!props.data.finished && !props.data.accepted && <Tag color="orange">{t`On-hold`}</Tag>}
+                    {!props.data.finished && props.data.accepted && <Tag color="orange">{t`On-going`}</Tag>}
+                    {props.data.finished && props.data.completed && <Tag color="green">{t`Completed`}</Tag>}
+                    {props.data.finished && !props.data.completed && <Tag color="red">{t`Unsuccessful`}</Tag>}
+                    {props.data.finished && !props.data.completed && props.data.expire_date && <Tag color="yellow">{t`Expired`}</Tag>}
+                </span>
+            </List.Item>
+            </a>
+        </Link>
+    )
+}
+
 export const RequestListing = () => {
     const user = useUser()
     const store = useCommissionsStore()
-
-    const items = (comms) => comms.map(({_id, owner, from_title, to_title}) => {
-
-        const title = owner ? from_title : to_title ? to_title : from_title
-
-        return (
-            <Link key={_id} href={pages.make_commission_urlpath({_id})}>
-                <a className="unstyled">
-                    <List.Item key={_id}>
-                        {title}
-                    </List.Item>
-                </a>
-            </Link>
-        )
-    })
 
     return (
         <Grid fluid className="mt-5">
             <Row>
                 <Col xs={24}>
                 <List hover bordered>
-                    {items(store.state.commissions.filter(({to_user, accepted}) => to_user._id === user._id && !accepted).map(d => {return {...d, owner:false}}))}
+                    {store.state.commissions.filter(({to_user, accepted}) => to_user._id === user._id && !accepted).map(d => {
+                        return (
+                        <CommissionItem key={d._id} data={d}/>
+                        )
+                    })
+                    }
                 </List>
                 </Col>
             </Row>
@@ -45,17 +62,8 @@ export const CommissionsListing = () => {
     const store = useCommissionsStore()
 
     const items = (comms) => comms.map((d) => {
-
-        const title = store.get_title(user._id, d)
-
         return (
-            <Link key={d._id} href={pages.commission + `/${d._id}`}>
-                <a className="unstyled">
-                    <List.Item key={d._id}>
-                        {title}
-                    </List.Item>
-                </a>
-            </Link>
+            <CommissionItem key={d._id} data={d}/>
         )
     })
 

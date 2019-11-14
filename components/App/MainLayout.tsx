@@ -89,6 +89,28 @@ export const MainLayout = (props: Props) => {
     )
 }
 
+interface CenterPanelProps extends ReactProps, HTMLElementProps {
+  borderd?: boolean
+  padded?: boolean | number
+  title?: string
+  subtitle?: string
+}
+
+export const CenterPanel = (props: CenterPanelProps) => {
+  let cls = "mx-auto text-center"
+  if (props.padded) {
+    cls += ` py-${typeof props.padded == 'number' ? props.padded : 5}`
+  }
+
+  return (
+    <Panel bordered={props.borderd} className={cls}>
+      {props.title && <div className="text-4xl muted">{props.title}</div>}
+      {props.children}
+      {props.subtitle && <div className="text-3xl muted">{props.subtitle}</div>}
+    </Panel>
+  )
+}
+
 interface ContainerProps extends ReactProps, HTMLElementProps {
   padded?: boolean | number
 }

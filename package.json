@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "next -p 3500",
-    "debug": "docker-compose up -d && cross-env NODE_OPTIONS=\"--inspect\" && next dev -p 3500",
+    "debug": "docker-compose up -d && cross-env NODE_OPTIONS=\"--inspect\" next dev -p 3500",
     "tina": "tina-git-server 3505",
     "deploy": "git push dokku master",
     "docker": "docker-compose up",

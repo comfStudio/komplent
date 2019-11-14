@@ -42,9 +42,9 @@ export const user_schema = new Schema({
   profile_color: String,
   display_currency: String,
   profile_currency: String,
-  ongoing_commissions_limit: Number,
-  ongoing_requests_limit: Number,
-  revisions_limit: Number,
+  ongoing_commissions_limit: {type: Number, default: 5, maxlength: 20},
+  ongoing_requests_limit: {type: Number, default: 10, maxlength: 50},
+  revisions_limit: {type: Number, default: 3},
   commission_process: {
     type: [Mixed],
     default: [

@@ -62,19 +62,25 @@ export const commission_schema = new Schema({
 
  configure(commission_schema)
 
-commission_schema.statics.find_related = async function(user, {populate = true, only_active = false, lean = true} = {}) {
+commission_schema.statics.find_related = async function(user, {populate = true, only_active = false, lean = true, accepted = undefined} = {}) {
     if (user) {
       const search = (q) => {
           let s = this.find(q)
-          if (populate) {
-              s = s.populate("from_user").populate("to_user")
-          }
           if (only_active) {
               s = s.where("finished").equals(false)
+            }
+          if (typeof accepted === 'boolean') {
+              s = s.where("accepted").equals(accepted)
           }
-          if (lean) {
-              s = s.lean()
-          }
+
+            if (populate) {
+                s = s.populate("from_user").populate("to_user")
+            }
+
+            if (lean) {
+                s = s.lean()
+            }
+
           return s
       }
       let r = await search({from_user: user})

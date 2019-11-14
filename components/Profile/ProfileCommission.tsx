@@ -3,6 +3,8 @@ import { Button, Panel, Row, Col, Grid, Input, Form, Uploader, Icon, Toggle, Sch
 import Link from 'next/link'
 import qs from 'qs'
 import { useRouter } from 'next/router';
+import { ButtonProps } from 'rsuite/lib/Button';
+import { Cat, Ghost } from 'react-kawaii'
 
 import { t } from '@app/utility/lang'
 import { HTMLElementProps, ReactProps } from '@utility/props'
@@ -18,7 +20,7 @@ import * as pages from '@utility/pages';
 import { make_profile_urlpath } from '@utility/pages';
 import { RateOptions } from '@components/Form/CommissionRateForm';
 import TextEditor from '@components/App/TextEditor';
-import { ButtonProps } from 'rsuite/lib/Button';
+import { CenterPanel } from '@components/App/MainLayout';
 
 const { StringType, NumberType, BooleanType, ArrayType, ObjectType } = Schema.Types;
 
@@ -26,28 +28,6 @@ const { StringType, NumberType, BooleanType, ArrayType, ObjectType } = Schema.Ty
 const sort_rates_by_price = (rates) => {
     return [...rates].sort((a, b) => decimal128ToFloat(a.price) - decimal128ToFloat(b.price))
 }
-
-interface CommissionButtonProps extends HTMLElementProps, ButtonProps {
-    user?: any
-}
-
-export const CommissionButton = ({user, appearance = "primary", size="lg", children, ...props}: CommissionButtonProps) => {
-    let path
-    if (user) {
-        path = make_profile_urlpath(user)
-    } else {
-        const { profile_path } = useProfileContext()
-        path = profile_path
-    }
-    let cls = "commission-button"
-    return (
-        <Link href={`${path}/commission`}>
-            <Button appearance={appearance} size={size} className={props.className ? cls + ' ' + props.className : cls} {...props}>
-                { children ? children : t`Request a Commission`}
-            </Button>
-        </Link>
-    );
-};
 
 interface TotalPriceProps extends ReactProps, HTMLElementProps {}
 
@@ -216,8 +196,25 @@ const commission_request_model = Schema.Model({
     tos: StringType().isRequired(t`This field is required.`),
   });
 
+export const CommissionsClosed = () => {
+    return (
+        <CenterPanel subtitle={t`Closed for commissions`}>
+            <Cat mood="sad" className="emoji" color="rgba(0, 0, 0, 0.5)" />
+        </CenterPanel>
+    )
+}
+
+export const RequestsClosed = () => {
+    return (
+        <CenterPanel subtitle={t`Closed for any more requests, please try later`}>
+            <Ghost mood="sad" className="emoji" color="rgba(0, 0, 0, 0.5)" />
+        </CenterPanel>
+    )
+}
+
 
 export const ProfileCommission = () => {
+
     const router = useRouter()
 
     const selected_rate = router.query.selected || ''

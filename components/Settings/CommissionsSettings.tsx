@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useSessionStorage, useMountedState } from 'react-use';
 import { InputNumber, List, Grid, Button, DatePicker, Icon, Message } from 'rsuite';
 
@@ -14,21 +14,54 @@ import useUserStore from '@store/user';
 import debounce from 'lodash/debounce';
 import { CommissionProcessType } from '@schema/user';
 
+const Deadline = () => {
+
+    const store = useCommissionStore()
+    const commission = store.get_commission()
+
+    const update = useCallback(debounce((v: number, ev) => {
+        store.update({commission_deadline: v})
+    }, 400), [])
+
+    return (
+        <EditGroup>
+            <span className="mr-2">{t`Deadline`}: </span>
+            <div className="w-32">
+                <InputNumber defaultValue={commission.commission_deadline} postfix={t`days`} onChange={update}/>
+            </div>
+        </EditGroup>
+    )
+}
+
 export const CommissionLimit = () => {
+
+    const store = useUserStore()
+
+    const update = useCallback(debounce((v: number, ev) => {
+        store.update_user({ongoing_commissions_limit: v})
+    }, 400), [])
+
     return (
     <EditGroup title={t`Maximum amount of on-going commissions` + ':'}>
         <div className="w-32">
-            <InputNumber defaultValue="3"/>
+            <InputNumber defaultValue={store.state.current_user.ongoing_commissions_limit} onChange={update}/>
         </div>
     </EditGroup>
     )
 }
 
 export const CommissionRequestLimit = () => {
+    
+    const store = useUserStore()
+
+    const update = useCallback(debounce((v: number, ev) => {
+        store.update_user({ongoing_requests_limit: v})
+    }, 400), [])
+
     return (
     <EditGroup title={t`Maximum amount of on-going requests` + ':'}>
         <div className="w-32">
-            <InputNumber defaultValue="10"/>
+            <InputNumber defaultValue={store.state.current_user.ongoing_requests_limit} onChange={update}/>
         </div>
     </EditGroup>
     )
