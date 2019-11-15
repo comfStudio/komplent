@@ -9,10 +9,12 @@ import { t } from '@app/utility/lang'
 import Placeholder from '@components/App/Placeholder';
 import { ReviewsReel } from '@components/Profile/ProfileReviews';
 import { useProfileUser } from '@hooks/user';
+import { useTextToHTML } from '@hooks/db';
 
 export const ProfileIndex = () => {
 
     const { profile_user, context: { commissions_open, profile_owner } } = useProfileUser()
+    const about_html = useTextToHTML(profile_user?.about)
 
     return (
         <Grid fluid>
@@ -24,9 +26,8 @@ export const ProfileIndex = () => {
             <hr/>
             <GuidelineList/>
             <h3>{t`About`}</h3>
-            <p>
-                <Placeholder type="text" rows={8}/>
-            </p>
+            {!!!about_html && <Placeholder type="text" rows={8}/>}
+            {!!about_html && <p dangerouslySetInnerHTML={{__html: about_html}}/>}
         </Grid>
     );
 }

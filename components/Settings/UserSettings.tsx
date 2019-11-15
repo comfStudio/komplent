@@ -3,6 +3,8 @@ import { Grid, RadioGroup, Radio, SelectPicker, Button } from 'rsuite';
 import { EditGroup, EditSection } from '.';
 
 import { t } from '@app/utility/lang'
+import useUserStore from '@store/user';
+import { getCountryNames } from '@client/dataset';
 
 export const UserType = () => {
     return (
@@ -15,6 +17,23 @@ export const UserType = () => {
         </EditGroup>
     )
 }
+
+export const Location = () => {
+
+    const store = useUserStore()
+
+    let ct = store.state.current_user?.country
+
+    return (
+    <EditGroup title={t`Location` + ':'}>
+        <SelectPicker data={Object.entries(getCountryNames()).map(l => ({
+            value: l[0],
+            label: l[1]
+        }))} defaultValue={ct} onSelect={v => store.update_user({country: v})} className="ml-2" style={{ width: 300 }}/>
+    </EditGroup>
+    )
+}
+
 
 export const Theme = () => {
     return (
@@ -37,14 +56,6 @@ export const Currency = () => {
     )
 }
 
-export const Location = () => {
-    return (
-    <EditGroup title={t`Location` + ':'}>
-        <SelectPicker data={[]} className="ml-2" style={{ width: 300 }}/>
-    </EditGroup>
-    )
-}
-
 const UserSettings = () => {
     return (
         <Grid fluid>
@@ -57,7 +68,7 @@ const UserSettings = () => {
         <EditSection>
             <Theme/>
         </EditSection>
-        <h4>{t`Links`}</h4>
+        <h4>{t`Integrations`}</h4>
         <EditSection>
         </EditSection>
         <h4>{t`Account`}</h4>

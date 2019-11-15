@@ -5,6 +5,7 @@ import { ProfileLayout, RequireOwnProfileInverse } from '@components/Profile'
 import { ProfileCommission, CommissionsClosed, RequestsClosed } from '@components/Profile/ProfileCommission'
 import { NextPageContext } from 'next'
 import { NOT_FOUND } from 'http-status-codes'
+import { fetch_database_text } from '@server/misc'
 
 class CommissionPage extends ProfilePage {
 
@@ -14,6 +15,11 @@ class CommissionPage extends ProfilePage {
       if (!props.profile_user?.commissions_open) {
         error = NOT_FOUND
         ctx.res.statusCode = error
+      }
+
+      const key = 'about'
+      if (props.useUserState.current_user) {
+        props.useUserState.current_user[key] = await fetch_database_text(props.useUserState.current_user[key])
       }
 
       return {

@@ -1,6 +1,7 @@
 import React from 'react'
 import { Container as Layout, Header, Content, Footer, Panel, Grid, Row, Col} from 'rsuite';
 import NavMenu from '@components/Header/NavMenu'
+import classnames from 'classnames'
 import { ReactProps, HTMLElementProps } from '@utility/props'
 
 import UserSidebar from '@app/components/App/UserSidebar'
@@ -103,7 +104,7 @@ export const CenterPanel = (props: CenterPanelProps) => {
   }
 
   return (
-    <Panel bordered={props.borderd} className={cls}>
+    <Panel bordered={props.borderd} className={classnames(cls)}>
       {props.title && <div className="text-4xl muted">{props.title}</div>}
       {props.children}
       {props.subtitle && <div className="text-3xl muted">{props.subtitle}</div>}
@@ -120,7 +121,7 @@ export const Container = (props: ContainerProps) => {
   if (props.padded) {
     cls += ` py-${typeof props.padded == 'number' ? props.padded : 5}`
   }
-  return (<div className={props.className ? (props.className + " " + cls) : cls}>
+  return (<div className={classnames(cls, props.className)}>
     {props.children}
   </div>)
 }
@@ -139,7 +140,7 @@ export const PanelContainer = (props: PanelContainerProps) => {
     cls += props.flex ? " flex flex-grow" : " w-full"
   }
 
-  return (<Panel className={props.className ? (props.className + " " + cls) : cls} bordered={props.bordered} bodyFill={props.bodyFill} header={props.header}>
+  return (<Panel className={classnames(cls, props.className)} bordered={props.bordered} bodyFill={props.bodyFill} header={props.header}>
     {props.children}
   </Panel>)
 }
@@ -159,7 +160,7 @@ export const GridContainer = (props: GridContainerProps) => {
     cls += ` py-${typeof props.padded == 'number' ? props.padded : 5}`
   }
 
-  return (<Grid className={props.className ? (props.className + " " + cls) : cls} fluid={props.fluid}>
+  return (<Grid className={classnames(cls, props.className)} fluid={props.fluid}>
     {props.children}
   </Grid>)
 }

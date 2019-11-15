@@ -23,6 +23,12 @@ const SettingsMenu = (props: Props) => {
             <Link href="/settings/commissions" passHref>
                 <Nav.Item eventKey="commissions" active={props.activeKey=='commissions'}>{t`Commissions Settings`}</Nav.Item>
             </Link>
+            <Link href="/settings/request_message" passHref>
+                <Nav.Item eventKey="request_message" active={props.activeKey=='request_message'}>{t`Request Message`}</Nav.Item>
+            </Link>
+            <Link href="/settings/accept_message" passHref>
+                <Nav.Item eventKey="accept_message" active={props.activeKey=='accept_message'}>{t`Accept Message`}</Nav.Item>
+            </Link>
             </>
             }
         </Nav>

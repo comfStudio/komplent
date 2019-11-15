@@ -6,7 +6,7 @@ import { user_schema, user_store_schema,
         follow_schema, IUser, IUserModel } from '@schema/user'
 
 import { message_schema, conversation_schema } from '@schema/message'
-import { image_schema, attachment_schema, tag_schema, event_schema, notification_schema } from '@schema/general'
+import { image_schema, attachment_schema, tag_schema, event_schema, notification_schema, text_schema } from '@schema/general'
 import { commission_schema, commission_extra_option_schema, comission_rate_schema, commission_phase_schema } from '@schema/commission'
 import { schedule_unique, get_milli_secs } from '@server/tasks'
 import { TASK, CommissionPhaseT } from '@server/constants'
@@ -101,6 +101,7 @@ export const Gallery = is_server() ? mongoose.models.Gallery || mongoose.model<D
 export const Message = is_server() ? mongoose.models.Message || mongoose.model('Message', message_schema) : undefined
 export const Conversation = is_server() ? mongoose.models.Conversation || mongoose.model<Document>('Conversation', conversation_schema) : undefined
 
+export const Text = is_server() ? mongoose.models.Text || mongoose.model<Document>('Text', text_schema) : undefined
 export const Notification = is_server() ? mongoose.models.Notification || mongoose.model<Document>('Notification', notification_schema) : undefined
 export const Event = is_server() ? mongoose.models.Event || mongoose.model<Document>('Event', event_schema) : undefined
 export const Tag = is_server() ? mongoose.models.Tag || mongoose.model<Document>('Tag', tag_schema) : undefined

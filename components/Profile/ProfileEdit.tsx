@@ -15,7 +15,8 @@ import useUserStore from '@store/user';
 import { post_task, TaskMethods, post_task_debounce } from '@client/task';
 import { TASK } from '@server/constants';
 import TextEditor from '@components/App/TextEditor';
-
+import { getCountryNames } from '@client/dataset';
+import { MessageText } from '@components/Settings/CommissionMessage';
 
 export const Sections = () => {
     return (
@@ -62,11 +63,6 @@ export const CommissionStatus = () => {
                 <Radio value="closed">{t`Closed`}</Radio>
                 </RadioGroup>
             </EditGroup>
-            {value === 'open' &&
-            <EditGroup >
-                <Checkbox name="auto_manage_status">{t`Automatically close or open when above or below the maximum amount of requests`}</Checkbox>
-            </EditGroup>
-            }
         </React.Fragment>
     )
 }
@@ -136,14 +132,6 @@ function compare(a, b) {
     return 0;
   }
 
-export const Origin = () => {
-    return (
-    <EditGroup title={t`Origin` + ':'}>
-        <SelectPicker data={[]} className="ml-2" style={{ width: 300 }}/>
-    </EditGroup>
-    )
-}
-
 export const Tags = () => {
     
     return (
@@ -212,11 +200,14 @@ export const ProfileEdit = () => {
                 <CommissionStatus/>
                 <ProfileVisiblity/>
                 <Notice/>
-                <Sections/>
-                <ProfileColor/>
-                <Origin/>
-                <Tags/>
+                {/* <Sections/> */}
+                {/* <ProfileColor/> */}
+                {/* <Tags/> */}
                 <Socials/>
+            </EditSection>
+            <h4>{t`About`}</h4>
+            <EditSection>
+                <MessageText message_key='about'/>
             </EditSection>
         </Grid>
     );

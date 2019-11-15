@@ -82,3 +82,13 @@ export const notification_schema = new Schema({
 }, { timestamps: { createdAt: 'created', updatedAt: 'updated' } })
 
 configure(notification_schema)
+
+export const text_schema = new Schema({
+    data: Mixed,
+    user: { 
+        type: ObjectId, 
+        ref: 'User',
+    },
+}, { timestamps: { createdAt: 'created', updatedAt: 'updated' } })
+
+configure(text_schema)

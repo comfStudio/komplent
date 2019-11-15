@@ -30,12 +30,14 @@ export default function(queue) {
     queue.process(TASK.user_notice_changed, async job => {
       log.debug(`processing ${TASK.user_notice_changed}`)
       const { user_id, message } = job.data as TaskDataTypeMap<TASK.user_notice_changed>
-      let e = new Event({
-          type: EVENT.notice_changed,
-          from_user: user_id,
-          data: { message }
-      })
-      await e.save()
+      if (message) {
+        let e = new Event({
+            type: EVENT.notice_changed,
+            from_user: user_id,
+            data: { message }
+        })
+        await e.save()
+      }
     });
 
     queue.process(TASK.followed_user, async job => {

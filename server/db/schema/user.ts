@@ -31,7 +31,7 @@ export const user_schema = new Schema({
     type: ObjectId, 
     ref: 'Image'
   },
-  origin: { type: String, es_indexed:true },
+  country: { type: String, es_indexed:true },
   description: String,
   socials: [{ url: String, name: String }],
   notice_visible: {
@@ -45,6 +45,18 @@ export const user_schema = new Schema({
   ongoing_commissions_limit: {type: Number, default: 5, maxlength: 20},
   ongoing_requests_limit: {type: Number, default: 10, maxlength: 50},
   revisions_limit: {type: Number, default: 3},
+  commission_request_message: { 
+    type: ObjectId, 
+    ref: 'Text'
+  },
+  commission_accept_message: { 
+    type: ObjectId, 
+    ref: 'Text'
+  },
+  about: { 
+    type: ObjectId, 
+    ref: 'Text'
+  },
   commission_process: {
     type: [Mixed],
     default: [

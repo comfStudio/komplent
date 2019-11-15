@@ -14,6 +14,7 @@ import './ProfileInfo.scss'
 import { useUpdateDatabase } from '@hooks/db';
 import { useTagStore } from '@store/user';
 import { get_profile_name } from '@utility/misc';
+import { codeToCountryName } from '@client/dataset';
 
 interface Props extends HTMLElementProps {
 
@@ -77,9 +78,9 @@ export const ProfileInfo = (props: Props) => {
                 </p>
             </p>
             <p>
-                <strong>{t`Origin`}:</strong>
+                <strong>{t`Location`}:</strong>
                 <p>
-                    Denmark
+                    {profile_user.country ? codeToCountryName(profile_user.country) : t`Unknown`}
                 </p>
             </p>
             <p>

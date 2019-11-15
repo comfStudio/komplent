@@ -5,6 +5,7 @@ import qs from 'qs'
 import { useRouter } from 'next/router';
 import { ButtonProps } from 'rsuite/lib/Button';
 import { Cat, Ghost } from 'react-kawaii'
+import classnames from 'classnames'
 
 import { t } from '@app/utility/lang'
 import { HTMLElementProps, ReactProps } from '@utility/props'
@@ -21,6 +22,7 @@ import { make_profile_urlpath } from '@utility/pages';
 import { RateOptions } from '@components/Form/CommissionRateForm';
 import TextEditor from '@components/App/TextEditor';
 import { CenterPanel } from '@components/App/MainLayout';
+import { useTextToHTML } from '@hooks/db';
 
 const { StringType, NumberType, BooleanType, ArrayType, ObjectType } = Schema.Types;
 
@@ -34,7 +36,7 @@ interface TotalPriceProps extends ReactProps, HTMLElementProps {}
 export const TotalPriceDisplay = (props: TotalPriceProps) => {
     let cls = "text-xl leading-loose"
     return (
-        <span className={props.className ? cls + ' ' + props.className : cls}>
+        <span className={classnames("text-xl leading-loose", props.className)}>
             Total Price: <span className="text-primary">{props.children}</span>
         </span>
     );
@@ -85,11 +87,8 @@ const CommissionCardHeader = (props: CommissionCardProps) => {
 }
 
 export const CommissionCard = (props: CommissionCardProps) => {
-    let cls = "commission-card mx-auto"
-    if (props.selected)
-        cls += " selected"
     return (
-        <Panel bodyFill className={props.className ? cls + ' ' + props.className : cls} bordered>
+        <Panel bodyFill className={classnames("commission-card mx-auto", {"selected": props.selected}, props.className)} bordered>
             <CommissionCardHeader {...props}/>
             {!props.noCover && <Image w="100%" h={250}/>}
             {props.selected && <span className="select-box">Selected</span>}
@@ -217,9 +216,12 @@ export const ProfileCommission = () => {
 
     const router = useRouter()
 
+    const { profile_user, current_user } = useProfileUser()
+    const commission_message_html = useTextToHTML(profile_user?.commission_request_message)
+
     const selected_rate = router.query.selected || ''
 
-    const from_user = useUser()
+    const from_user = current_user
     const [form_ref, set_form_ref] = useState(null)
     const [form_value, set_form_value] = useState({
         commission_rate: selected_rate || undefined
@@ -266,10 +268,6 @@ export const ProfileCommission = () => {
     return (
         <Form fluid method="put" action="/api/commission" formValue={form_value} model={commission_request_model} ref={ref => (set_form_ref(ref))} onChange={(value => set_form_value(value))}>
             <Grid fluid>
-                <Row>
-                    <Placeholder type="text" rows={4}/>
-                </Row>
-                <hr/>
                 <h3>{t`Pick your commission`}</h3>
                 <CommissionCardRadioGroup/>
                 <hr/>
@@ -278,9 +276,13 @@ export const ProfileCommission = () => {
                         <RateOptions options={available_options} checkbox/>
                     </Col>
                 </Row>
-                <hr/>
                 <Row>
                     <GuidelineList/>
+                </Row>
+                <hr/>
+                <Row>
+                    {!!!commission_message_html && <Placeholder type="text" rows={8}/>}
+                    {!!commission_message_html && <p dangerouslySetInnerHTML={{__html: commission_message_html}}/>}
                 </Row>
                 <hr/>
                 <Row>
@@ -318,8 +320,8 @@ export const ProfileCommission = () => {
                     </Col>
                 </Row>
                 <Row>
-                    <Col xs={4}><TotalPriceDisplay>{moneyToString(total_price)}</TotalPriceDisplay></Col>
-                    <Col xs={4} xsPush={16}>
+                    <Col xs={10}><TotalPriceDisplay>{moneyToString(total_price)}</TotalPriceDisplay></Col>
+                    <Col xs={4} xsPush={10}>
                         <Button type="submit" appearance="primary" size="lg" loading={loading} className="commission-button" onClick={async (ev) => {
                             ev.preventDefault()
                             if (form_ref && form_ref.check()) {

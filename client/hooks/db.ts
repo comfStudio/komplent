@@ -1,7 +1,13 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Document, Schema } from 'mongoose/browser'
+import { useMount } from 'react-use'
+import dompurify from 'dompurify';
 
 import { update_db } from '@app/client/db'
+import { fetch } from '@utility/request';
+import { is_server } from '@utility/misc';
+
+const Quill = is_server() ? undefined : require("quill")
 
 export const useUpdateDatabase = (existing_document?: Document | Object, validation_schema?: Schema, always_validate = true, always_create = false) => {
     const update = async (model: string, data: Document | Object, schema?: Schema, validate?: boolean, create?: boolean) => {
@@ -52,4 +58,32 @@ export const useUpdateDocument = (initial_data?: object) => {
     }
 
     return [current_doc, set_doc]
+}
+
+export const useTextToHTML = (id: string) => {
+    let [data, set_delta] = useState()
+    useMount(() => {
+        if (id) {
+            console.log(id)
+            fetch("/api/fetch",{
+                method:"post",
+                body: {model: "Text",
+                method:"findById",
+                query: id,
+              }
+              }).then(async (r) => {
+                  if (r.ok) {
+                      set_delta((await r.json()).data.data)
+                  }
+                  return undefined
+              })
+        }
+    })
+
+    if (data) {
+        const q = new Quill(document.createElement("div"))
+        q.setContents(data)
+        data = dompurify.sanitize(q.root.innerHTML)
+    }
+    return data
 }
