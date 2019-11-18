@@ -33,8 +33,8 @@ export const ProfileInfo = (props: Props) => {
             <p>
                 <TagGroup edit={profile_owner} filteredTagIds={tags.map(v => v._id)} onChange={a => {
                     let t = store.state.tags.filter(v => a.includes(v._id))
-                    store.add_user_tags(profile_user, t)
                     set_tags([...tags, ...t])
+                    store.add_user_tags(profile_user, t)
                     }}>
                     {tags.map(t => {
                         return (
@@ -87,8 +87,20 @@ export const ProfileInfo = (props: Props) => {
                 <strong>{t`Socials`}:</strong>
                 <p>
                     <ul className="list-disc">
-                        <li><a href="#">aTwiddly</a></li>
-                        <li><a href="#">@twiddlyart</a></li>
+                    {profile_user.socials.map((v, idx) => {
+                        let u = v.url
+                        let is_link = false
+                        const matches = v.url.match(/^https?:\/\/([^/?#]+)(?:[/?#]|$)/i);
+                        if (matches && matches[1]) {
+                            u = matches[1]
+                            is_link = true
+                        }
+                        return (
+                        <li key={v.name + idx.toString()}>
+                            {is_link && <> <a href={v.url}>{v.name}</a><span className="muted">@{u}</span> </>}
+                            {!is_link && <> {v.name}<span className="muted">@{u}</span> </>}
+                        </li>)
+                    })}
                     </ul>
                 </p>
             </p>

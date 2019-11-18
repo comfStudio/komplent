@@ -157,6 +157,7 @@
     "@assets": "assets",
     "@schema": "server/db/schema",
     "@db": "server/db",
+    "@services": "server/services",
     "@client": "client",
     "@server": "server",
     "@pages": "pages",

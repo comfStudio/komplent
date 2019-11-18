@@ -41,6 +41,9 @@
       "@db/*": [
         "server/db/*"
       ],
+      "@services/*": [
+        "server/services/*"
+      ],
       "@client/*": [
         "client/*"
       ],

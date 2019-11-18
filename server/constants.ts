@@ -101,8 +101,8 @@ export const RESERVED_USERNAMES = [
 
 export const nsfw_levels = tuple(
     'level_0',  // public
-    'level_1', 
-    'level_3', 
+    'level_5', 
+    'level_10', 
     );
 
 export type NSFWType = typeof nsfw_levels[number]

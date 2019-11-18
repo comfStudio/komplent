@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Grid, Row, Col, Checkbox, CheckboxGroup, FormGroup, ControlLabel, Button, RadioGroup, Radio, TagPicker, List, SelectPicker, InputNumber, Form, Toggle, Input } from 'rsuite';
+import { Grid, Row, Col, Checkbox, CheckboxGroup, FormGroup, ControlLabel, Button, RadioGroup, Radio, TagPicker, List, SelectPicker, InputNumber, Form, Toggle, Input, Whisper, IconButton, Popover, Icon, InputGroup } from 'rsuite';
 
 import { t } from '@app/utility/lang'
 import { CommissionCard, CommissionTiersRow } from '@components/Profile/ProfileCommission';
@@ -13,7 +13,7 @@ import { useUser } from '@hooks/user';
 import { useUpdateDatabase } from '@hooks/db';
 import useUserStore from '@store/user';
 import { post_task, TaskMethods, post_task_debounce } from '@client/task';
-import { TASK } from '@server/constants';
+import { TASK, NSFW_LEVEL } from '@server/constants';
 import TextEditor from '@components/App/TextEditor';
 import { getCountryNames } from '@client/dataset';
 import { MessageText } from '@components/Settings/CommissionMessage';
@@ -80,6 +80,26 @@ export const ProfileVisiblity = () => {
             <Radio value="public">{t`Public`}</Radio>
             <Radio value="private">{t`Private`}</Radio>
             <Radio value="hidden">{t`Hidden`}</Radio>
+            </RadioGroup>
+        </EditGroup>
+    )
+}
+
+export const ProfileNSFWLevel = () => {
+
+    const store = useUserStore()
+
+    const popover = (title, content) => <Whisper speaker={<Popover title={title}>{content}</Popover>}  placement="top" trigger="focus"><IconButton size="xs" icon={<Icon icon="question2"/>}/></Whisper>
+
+    return (
+        <EditGroup>
+            <span className="mr-2">{t`Mature content`}: </span>
+            <RadioGroup name="profile_visiblity" inline appearance="picker" defaultValue={store.state.current_user.nsfw||NSFW_LEVEL.level_0} onChange={async (v) => {
+                    let r = await store.update_user({nsfw: v})
+                }}>
+            <Radio value={NSFW_LEVEL.level_0}>{t`None`}</Radio>
+            <Radio value={NSFW_LEVEL.level_5}>{t`Moderate`} {popover(t`Moderate`, <p>{t`Moderate Not-Safe-For-Work level`}</p>)}</Radio>
+            <Radio value={NSFW_LEVEL.level_10}>{t`Explicit`} {popover(t`Explicit`, <p>{t`Explicit Not-Safe-For-Work level`}</p>)}</Radio>
             </RadioGroup>
         </EditGroup>
     )
@@ -159,34 +179,67 @@ export const Tags = () => {
 
 export const Socials = () => {
 
-    const [data, set_data] = useState([
-        {text:'aTwiddly',},
-        {text:'@twiddlyart',},
-        {text:'Twiddli',},
-      ])
+    const store = useUserStore()
+
+    const [link_name, set_link_name] = useState("")
+    const [link_url, set_link_url] = useState("")
+    const [add_new, set_add_new] = useState(false)
+
+    const [data, set_data] = useState(store.state.current_user.socials ?? [])
 
     const handleSortEnd = ({oldIndex, newIndex}) => {
         const moveData=data.splice(oldIndex,1);
         const newData=[...data];
         newData.splice(newIndex,0,moveData[0]);
+        store.update_user({socials: [...newData]})
         set_data(newData)
       };
+
+    const form_el = (name, set_name, url, set_url, on_submit) => (
+        <form className="w-64" onSubmit={on_submit}>
+            <Input className="my-2" placeholder={t`Name`} value={name} onChange={set_name} size="sm" />
+            <InputGroup size="sm" className="my-2">
+                <InputGroup.Addon> @</InputGroup.Addon>
+                <Input className="my-2" placeholder={t`URL`} value={url} onChange={set_url} />
+            </InputGroup>
+            <Button type="submit" className="mb-2 float-right" size="sm">{t`Add`}</Button>
+        </form>
+    )
 
     return (
         <EditGroup title={t`Socials`}>
             <EditSection>
-            <List className="w-64" sortable onSort={handleSortEnd}>
+            <List className="w-64 mb-2" sortable onSort={handleSortEnd}>
             {
-            data.map(({text},index)=>
+            data.map(({name, url},index)=>
             <List.Item 
                 key={index}
                 index={index} 
             >
-                {text}
+                <a href="#" onClick={(ev) => {
+                    ev.preventDefault();
+                    let new_data = data.slice()
+                    new_data.splice(index, 1)
+                    set_data(new_data)
+                    store.update_user({socials: [...new_data]})
+                    }}><Icon className="mr-2" icon="minus-circle" /></a>
+                {name} - <span className="muted">{url}</span>
             </List.Item>
             )
             }
             </List>
+            {add_new && form_el(link_name, set_link_name, link_url, set_link_url, ev => {
+                ev.preventDefault()
+                if (link_name && link_url) {
+                    let new_data = [...data, {name: link_name, url: link_url}]
+                    set_data(new_data)
+                    store.update_user({socials: new_data})
+                    set_link_name("")
+                    set_link_url("")
+                    set_add_new(false)
+                }
+            })}
+            {!add_new && <Button size="sm" onClick={() => set_add_new(true)}>{t`New`}</Button>}
             </EditSection>
         </EditGroup>
     )
@@ -203,6 +256,7 @@ export const ProfileEdit = () => {
                 {/* <Sections/> */}
                 {/* <ProfileColor/> */}
                 {/* <Tags/> */}
+                <ProfileNSFWLevel/>
                 <Socials/>
             </EditSection>
             <h4>{t`About`}</h4>
