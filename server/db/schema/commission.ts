@@ -170,7 +170,11 @@ export const comission_rate_schema = new Schema({
     price: Decimal128,
     image: { 
       type: ObjectId, 
-      ref: 'Image'
+      ref: 'Image',
+      set: function(img) {
+        this._previous_image = this.image;
+        return img;
+      }
     },
     extras: [{ 
         type: ObjectId, 

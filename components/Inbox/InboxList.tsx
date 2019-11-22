@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { Panel, PanelGroup, List } from 'rsuite'
+import { Panel, PanelGroup, List, Placeholder } from 'rsuite'
 import Link from 'next/link';
 
-import Placeholder from '@components/App/Placeholder'
 import useInboxStore from '@store/inbox';
 import { useUser } from '@hooks/user';
 import { get_profile_name } from '@utility/misc';
@@ -29,7 +28,7 @@ const InboxListItem = (props: InboxListItemProps) => {
                 <p>{props.data.subject}</p>
                 <p className="muted">{p_users.map(v => get_profile_name(v)).join(",")}</p>
                 </>}
-                {loading && <Placeholder type="text" rows={2}/>}
+                {loading && <Placeholder.Paragraph rows={2}/>}
             </List.Item>
         </a>
         </Link>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Panel, Row, Col, Grid, Input, Form, Uploader, Icon, Toggle, Schema, FormControl, RadioGroup, Radio, FormGroup, Checkbox, Message, ControlLabel } from 'rsuite'
+import { Button, Panel, Row, Col, Grid, Input, Form, Uploader, Icon, Toggle, Schema, FormControl, RadioGroup, Radio, FormGroup, Checkbox, Message, ControlLabel, Placeholder } from 'rsuite'
 import Link from 'next/link'
 import qs from 'qs'
 import { useRouter } from 'next/router';
@@ -11,7 +11,6 @@ import { t } from '@app/utility/lang'
 import { HTMLElementProps, ReactProps } from '@utility/props'
 
 import './ProfileCommission.scss'
-import Placeholder from '@components/App/Placeholder';
 import Image from '@components/App/Image'
 import { useProfileContext, useProfileUser, useUser } from '@hooks/user';
 import { GuidelineList } from '@app/components/Profile'
@@ -87,10 +86,16 @@ const CommissionCardHeader = (props: CommissionCardProps) => {
 }
 
 export const CommissionCard = (props: CommissionCardProps) => {
+
+    let image_url
+    if (props.data?.image?.paths?.length) {
+        image_url = props.data.image.paths[0].url
+    }
+    
     return (
         <Panel bodyFill className={classnames("commission-card mx-auto", {"selected": props.selected}, props.className)} bordered>
             <CommissionCardHeader {...props}/>
-            {!props.noCover && <Image w="100%" h={250}/>}
+            {!props.noCover && <Image w="100%" h={250} src={image_url}/>}
             {props.selected && <span className="select-box">Selected</span>}
         </Panel>
     );
@@ -140,6 +145,7 @@ export const CommissionCardRadioGroup = () => {
 
 interface CommissionTiersRowProps {
     link?: boolean
+    onClick?: (data, ev) => void
 }
 
 export const CommissionTiersRow = (props: CommissionTiersRowProps) => {
@@ -151,8 +157,9 @@ export const CommissionTiersRow = (props: CommissionTiersRowProps) => {
                 sort_rates_by_price(store.state.rates).map((data ,index) => {
                     let el = (
                         <Col key={data._id} xs={6}>
-                            {props.link && <CommissionLinkCard data={data}/>}
-                            {!props.link && <CommissionCard data={data}/>}
+                            { props.onClick && <a href="#" onClick={(ev) => props.onClick(data, ev)}><CommissionCard data={data}/></a> }
+                            { props.link && !props.onClick && <CommissionLinkCard data={data}/> }
+                            { !props.link && !props.onClick && <CommissionCard data={data}/> }
                         </Col>
                     )
                     return el
@@ -281,7 +288,7 @@ export const ProfileCommission = () => {
                 </Row>
                 <hr/>
                 <Row>
-                    {!!!commission_message_html && <Placeholder type="text" rows={8}/>}
+                    {!!!commission_message_html && <Placeholder.Paragraph rows={8}/>}
                     {!!commission_message_html && <p dangerouslySetInnerHTML={{__html: commission_message_html}}/>}
                 </Row>
                 <hr/>
@@ -309,7 +316,7 @@ export const ProfileCommission = () => {
                 </Row>
                 <Row>
                     <h3>{t`Terms of Service`}</h3>
-                    <Placeholder type="text" rows={4}/>
+                    <Placeholder.Paragraph rows={4}/>
                     <FormControl name="tos" value="true" accepter={Checkbox}>{t`I have read and agree to the terms of service`}</FormControl>
                 </Row>
                 <hr/>

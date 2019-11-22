@@ -1,43 +1,20 @@
 import React, { Component } from 'react';
+import { Placeholder } from 'rsuite';
+import classnames from 'classnames'
 import { HTMLElementProps } from '@utility/props'
 
-import Placeholder from '@components/App/Placeholder'
-
 interface Props extends HTMLElementProps {
-    placeholderText?: string
     w?: number | string
     h?: number | string
     fluid?: boolean
+    src?: string
 }
 
 export const Image = (props: Props) => {
-    let s = {
-        marginRight: 0,
-        content: '',
-        width: undefined,
-        height: undefined,
-    }
-    if (props.placeholderText) {
-        s.content = props.placeholderText
-    }
 
-    if (props.w)
-        s.width = props.w
-    if (props.h)
-        s.height = props.h
+    let cls = classnames(props.className, {"w-full": props.fluid})
 
-    let cls = ""
-    if (props.fluid) {
-        cls += "w-full"
-    }
-
-    cls = props.className ? cls + ' ' + props.className : cls
-
-    return (
-        <Placeholder type="rect" ready={false} style={s} className={cls}>
-            <img className={cls} data-src={s}/>
-        </Placeholder>
-    );
+    return props.src ? <img className={cls} src={props.src}/> : <Placeholder.Graph width={props.w} height={props.h} className={cls} style={{margin: 0}}/>
 }
 
 export default Image;

@@ -36,21 +36,21 @@ export const LoginForm = (props: LoginFormProps) => {
         <div>
             <Divider>{t`Login with`}</Divider>
             <ButtonToolbar>
-                    <Button color="red" className="m-1" >
-                    <Icon icon="google"/> Twitter
+                <Link href="/api/auth/google" passHref>
+                    <Button color="red" className="m-1" componentClass="a">
+                    <Icon icon="google"/> Google
                     </Button>
-                    <Button color="blue" className="m-1" >
+                </Link>
+                <Link href="/api/auth/facebook" passHref>
+                    <Button color="blue" className="m-1"componentClass="a">
                     <Icon icon="facebook-official"/> Facebook
                     </Button>
-                    <Button color="cyan" className="m-1" >
+                </Link>
+                <Link href="/api/auth/twitter" passHref>
+                    <Button color="cyan" className="m-1" componentClass="a">
                     <Icon icon="twitter"/> Twitter
                     </Button>
-                    <Button color="blue" className="m-1" >
-                    <Icon icon="linkedin"/> LinkedIn
-                    </Button>
-                    <Button color="cyan" className="m-1" >
-                    Pixiv
-                    </Button>
+                </Link>
                 </ButtonToolbar>
             <Divider>{t`Or using your email address`}</Divider>
             <Form fluid className={cls} method="post" action="/api/login" formValue={form_value} model={login_model} ref={ref => (set_form_ref(ref))} onSubmit={(e) => e.preventDefault()} onChange={(value => set_form_value(value))}>

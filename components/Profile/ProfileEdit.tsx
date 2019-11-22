@@ -3,7 +3,6 @@ import { Grid, Row, Col, Checkbox, CheckboxGroup, FormGroup, ControlLabel, Butto
 
 import { t } from '@app/utility/lang'
 import { CommissionCard, CommissionTiersRow } from '@components/Profile/ProfileCommission';
-import Placeholder from '@components/App/Placeholder';
 import { EditSection, EditGroup } from '@components/Settings'
 import CommissionRateForm, { RateOptionsForm } from '@components/Form/CommissionRateForm'
 

@@ -90,7 +90,7 @@ export const ProfileInfo = (props: Props) => {
                     {profile_user.socials.map((v, idx) => {
                         let u = v.url
                         let is_link = false
-                        const matches = v.url.match(/^https?:\/\/([^/?#]+)(?:[/?#]|$)/i);
+                        const matches = v.url.match(/^(?:https?:)?(?:\/\/)?(?:www\.)?([^/?]+)/i)
                         if (matches && matches[1]) {
                             u = matches[1]
                             is_link = true

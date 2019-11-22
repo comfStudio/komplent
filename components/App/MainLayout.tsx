@@ -13,6 +13,7 @@ import { useMount } from 'react-use';
 import { is_server } from '@utility/misc';
 import { useUser } from '@hooks/user';
 import { get_user_room_id } from '@utility/request';
+import MatureContent from './MatureContent';
 
 interface Props extends ReactProps {
   activeKey?: string
@@ -62,7 +63,9 @@ export const MainLayout = (props: Props) => {
     } else {
       layout_content = (
         <Row className="h-full">
-            <Col className="h-full" xs={24}>{content}</Col>
+            <Col className="h-full" xs={24}>
+              {content}
+              </Col>
         </Row>
       )
     }

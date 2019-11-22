@@ -6,7 +6,6 @@ import { EditGroup, EditSection } from '.';
 import { t } from '@app/utility/lang'
 import CommissionRateForm, { RateOptionsForm } from '@components/Form/CommissionRateForm';
 import { CommissionTiersRow } from '@components/Profile/ProfileCommission';
-import Placeholder from '@components/App/Placeholder';
 import TextEditor from '@components/App/TextEditor';
 import { useCommissionStore } from '@store/commission';
 import { CommissionPhaseType, CommissionPhaseT, guideline_types, GuidelineType, Guideline } from '@server/constants';

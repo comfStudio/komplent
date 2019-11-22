@@ -37,6 +37,12 @@ const withConfig = withNextRuntimeDotenv({
         'AWS_BUCKET_NAME',
         'PRIMUS_1_PORT',
         'PRIMUS_1_HOST',
+        'GOOGLE_CLIENT_ID',
+        'GOOGLE_CLIENT_SECRET',
+        'AWS_ACCESS_KEY_ID',
+        'AWS_SECRET_KEY',
+        'AWS_BUCKET_NAME',
+        'AWS_S3_ENDPOINT',
       ]
 });
 

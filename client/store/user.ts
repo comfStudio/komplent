@@ -355,6 +355,8 @@ export const useTagStore = createStore(
                 {name:"Illustration", color:"blue"},
                 {name:"Furry", color: "yellow"},
                 {name:"Cover", color: "green"},
+                {name:"Mature", color: "red"},
+                {name:"Explicit", color: "red"},
                 {name:"NSFW", color: "red"},
                 {name:"Anime", color: ""},
                 {name:"Comic", color: "violet"},

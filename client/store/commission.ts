@@ -562,7 +562,7 @@ export const useCommissionRateStore = createStore(
       options: [],
   },
   {
-    async create_rate(data, ...params) {
+    async create_rate(data, params: object = undefined) {
         let r = await update_db({
             model:'CommissionRate',
             data:data,
@@ -572,7 +572,7 @@ export const useCommissionRateStore = createStore(
             populate: ["extras", "user"],
             ...params})
         if (r.status) {
-            this.setState({rates: iupdate(this.state.rates, {$push: [r.body.data]})})
+            this.setState({rates: iupdate(this.state.rates.filter(v => v._id != r.body.data._id), {$push: [r.body.data]})})
         }
         return r
       },
@@ -585,21 +585,22 @@ export const useCommissionRateStore = createStore(
             validate: true,
             ...params})
         if (r.status) {
-            this.setState({options: iupdate(this.state.options, {$push: [r.body.data]})})
+            this.setState({options: iupdate(this.state.options.filter(v => v._id != r.body.data._id), {$push: [r.body.data]})})
         }
         return r
     },
     async get_rate(rate_id) {
         let r
         let rate_q = {_id:rate_id}
+        let p = ["extras", ["user", "username"], "image"]
 
         if (is_server()) {
 
-            r = CommissionRate.findOne(rate_q).populate("extras").populate("user", "username").lean()
+            r = CommissionRate.findOne(rate_q).populate(p[0]).populate(p[1][0], p[1][1]).populate(p[2]).lean()
 
         } else {
 
-            r = await fetch("/api/fetch", {method:"post", body: {model: "CommissionRate", query: rate_q, method: "findOne"}}).then(async r => {
+            r = await fetch("/api/fetch", {method:"post", body: {model: "CommissionRate", query: rate_q, method: "findOne", populate: p}}).then(async r => {
                     if (r.ok) {
                         return (await r.json()).data
                     } else {
@@ -643,6 +644,7 @@ export const useCommissionRateStore = createStore(
         let extra_option_q = {user:profile_user._id}
 
         let rate_q = {user:profile_user._id}
+        let rate_p = ["extras", ["user", "username"], "image"]
 
         if (is_server()) {
 
@@ -650,7 +652,7 @@ export const useCommissionRateStore = createStore(
                 state.options = [...d]
             })
 
-            b = CommissionRate.find(rate_q).populate("extras").populate("user", "username").lean().then((d) => {
+            b = CommissionRate.find(rate_q).populate(rate_p[0]).populate(rate_p[1][0], rate_p[1][1]).populate(rate_p[2]).lean().then((d) => {
                 state.rates = [...d]
             })
 
@@ -662,7 +664,7 @@ export const useCommissionRateStore = createStore(
                 }
             })
 
-            b = await fetch("/api/fetch", {method:"post", body: {model: "CommissionRate", query: rate_q, populate: [["user", "username"]]}}).then(async r => {
+            b = await fetch("/api/fetch", {method:"post", body: {model: "CommissionRate", query: rate_q, populate: rate_p}}).then(async r => {
                 if (r.ok) {
                     state.rates = [...(await r.json()).data]
                 }

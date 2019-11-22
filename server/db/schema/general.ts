@@ -11,8 +11,8 @@ const { ObjectId, Buffer, Mixed } = mongoose.Schema.Types
 export const image_schema = new Schema({
     name: String,
     paths: [{ 
-        path: String,
-        data: Buffer,
+        key: String,
+        url: String,
         size: {
             type: String,
             enum : ['thumb','big', 'original'],
@@ -31,8 +31,8 @@ export const attachment_schema = new Schema({
       },
     name: String,
     paths: [{ 
-        path: String,
-        data: Buffer,
+        key: String,
+        url: String,
         size: {
             type: String,
             enum : ['thumb','big', 'original'],

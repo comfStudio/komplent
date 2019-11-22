@@ -3,12 +3,14 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import cookieSession from 'cookie-session'
 import Keygrip from 'keygrip'
 import jwt from 'jsonwebtoken'
+import with_morgan from 'micro-morgan'
 
 import cookie from 'cookie'
 
 import { get_json } from '@utility/request'
 import { KEYS, JWT_KEY } from '@server/constants'
 import { User } from '@db/models'
+
 
 export interface ExApiRequest extends NextApiRequest {
   user?: any
@@ -128,6 +130,7 @@ const middlewares = (auth = false) => [
   with_json,
   with_cookie,
   auth ? with_require_user : with_user,
+  with_morgan('tiny'),
 ]
 
 const create_middleware = (middlewares) => {

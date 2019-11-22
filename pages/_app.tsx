@@ -12,6 +12,7 @@ import { is_server } from '@utility/misc'
 import { ReactProps } from '@utility/props'
 import { setup_scheduler } from '@server/tasks'
 import { connect, synchronize_indexes } from '@server/db'
+import { setup_aws } from '@services/aws'
 
 import { useUserStore, useTagStore, useNotificationStore } from '@client/store/user'
 import { useCommissionRateStore, useCommissionStore, useCommissionsStore } from '@client/store/commission'
@@ -24,12 +25,11 @@ import { Page } from '@components/App/Page'
 import { STATES } from '@server/constants'
 import useInboxStore from '@store/inbox'
 import useEarningsStore from '@store/earnings'
+import CONFIG from '@server/config'
 
 // Router.onRouteChangeStart = () => NProgress.start();
 // Router.onRouteChangeComplete = () => NProgress.done();
 // Router.onRouteChangeError = () => NProgress.done();
-
-const { publicRuntimeConfig, serverRuntimeConfig }= getConfig()
 
 const client_initialize = async () => {
     localForage.config({
@@ -44,14 +44,15 @@ const server_initialize = async () => {
   if (!global.initialized) {
     global.store = {}
     global.initialized = true 
-    await connect(serverRuntimeConfig.MONGODB_URL)
-    await synchronize_indexes()
+    setup_scheduler(CONFIG.REDIS_URL)
+    setup_aws()
+    await connect(CONFIG.MONGODB_URL)
     if (STATES.MONGODB_CONNECTED) {
+      synchronize_indexes()
       await useTagStore.actions._create_defaults()
       await useUserStore.actions._create_defaults()
       await setup_streams()
     }
-    await setup_scheduler(serverRuntimeConfig.REDIS_URL)
   }
 }
 
@@ -105,16 +106,16 @@ class KomplentApp extends App {
   }
 }
 
-if (publicRuntimeConfig && publicRuntimeConfig.RUNNING) {
+if (!process.env.BUILDING) {
   
   if (is_server()) {
-
+  
     server_initialize()
-
+  
   } else {
-
+  
     client_initialize()
-
+  
   }
 
 }

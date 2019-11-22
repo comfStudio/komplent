@@ -7,6 +7,7 @@ export const login = "/login"
 export const commission = "/commission"
 export const commission_requests = "/commissions/requests"
 export const commissions = "/commissions"
+export const upload = "/api/upload"
 
 export const make_profile_id = (user) => {
     return `@${user.username}`

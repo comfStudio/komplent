@@ -1,11 +1,25 @@
 import unfetch from 'isomorphic-unfetch'
 import cookies from 'nookies'
+import Router from 'next/router';
 
 import { is_server } from '@utility/misc'
 import { COOKIE_AUTH_TOKEN_KEY } from '@server/constants'
 
 export const get_json = (msg) => {
     return JSON.parse(msg)
+}
+
+export const get_authorization_header = () => {
+    let c = null
+    if (!is_server()) {
+        c = cookies.get({})
+    } else {
+        throw Error("Cannot retrieve cookies server-side")
+    }
+
+    return c[COOKIE_AUTH_TOKEN_KEY] ? {
+        'Authorization': `Bearer ${c[COOKIE_AUTH_TOKEN_KEY]}`,
+        } : undefined
 }
 
 interface FetchInit extends Omit<RequestInit, 'body'> {
@@ -32,16 +46,9 @@ export const fetch = (url, props: FetchInit = {}) => {
     }
 
     if (props.auth !== false) {
-        let c = null
-        if (!is_server()) {
-            c = cookies.get({})
-        } else {
-            throw Error("Cannot retrieve cookies server-side")
-        }
-        if (c[COOKIE_AUTH_TOKEN_KEY] && (!props.headers || !props.headers['Authorization'])) {
-            def_props.headers = Object.assign(def_props.headers || {}, props.headers || {}, {
-                'Authorization': `Bearer ${c[COOKIE_AUTH_TOKEN_KEY]}`,
-                })
+        let h = get_authorization_header()
+        if (h && (!props.headers || !props.headers['Authorization'])) {
+            def_props.headers = Object.assign(def_props.headers || {}, props.headers || {}, h)
         }
 
     }
@@ -57,4 +64,15 @@ export const fetch = (url, props: FetchInit = {}) => {
 
 export const get_user_room_id = ({_id}) => {
     return `user::${_id}`
+}
+
+export const redirect_to = (destination, { res = undefined, status = undefined } = {}) => {
+  if (res) {
+    res.writeHead(status || 302, { Location: destination });
+    res.end();
+  } else if (destination[0] === '/' && destination[1] !== '/') {
+    Router.push(destination);
+  } else {
+    window.location = destination;
+  }
 }

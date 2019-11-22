@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useSessionStorage, useMountedState } from 'react-use';
-import { InputNumber, List, Grid, Button, DatePicker, Icon, Message, Input, Row, Col } from 'rsuite';
+import { InputNumber, List, Grid, Button, DatePicker, Icon, Message, Input, Row, Col, Placeholder } from 'rsuite';
 
 import { EditGroup, EditSection } from '.';
 import { t } from '@app/utility/lang'
 import CommissionRateForm, { RateOptionsForm } from '@components/Form/CommissionRateForm';
 import { CommissionTiersRow } from '@components/Profile/ProfileCommission';
-import Placeholder from '@components/App/Placeholder';
 import TextEditor from '@components/App/TextEditor';
 import { useCommissionStore } from '@store/commission';
 import { CommissionPhaseType, CommissionPhaseT, guideline_types, GuidelineType, Guideline } from '@server/constants';
@@ -242,15 +241,17 @@ export const Rates = () => {
 
     const [ show_new_rate, set_show_new_rate ] = useSessionStorage("new-commission-rate-form-show", false)
 
+    const [ edit_rate, set_edit_rate ] = useState()
+
     return (
         <React.Fragment>
             {!show_new_rate && <Button onClick={(ev) => {ev.preventDefault(); set_show_new_rate(true);}}>{t`Add new rate`}</Button>}
             {show_new_rate && <EditGroup>
-                            <CommissionRateForm panel onDone={() => {set_show_new_rate(false);}}/>
+                            <CommissionRateForm panel defaultData={edit_rate} onDone={() => {set_show_new_rate(false); set_edit_rate(undefined)}}/>
                         </EditGroup>}
             <EditGroup>
                 <Grid fluid>
-                    <CommissionTiersRow/>
+                    <CommissionTiersRow onClick={(data, ev) => { ev.preventDefault(); set_edit_rate(data); set_show_new_rate(true)}}/>
                 </Grid>
             </EditGroup>
         </React.Fragment>
@@ -268,7 +269,7 @@ export const CommissionMessage = () => {
 export const CommissionAcceptMessage = () => {
     return (
         <EditGroup>
-            <Placeholder type="text" rows={5}/>
+            <Placeholder.Paragraph rows={5}/>
         </EditGroup>
     )
 }

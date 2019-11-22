@@ -1,12 +1,11 @@
 import React from 'react';
 
-import { Col, Row, Grid, Message } from 'rsuite'
+import { Col, Row, Grid, Message, Placeholder } from 'rsuite'
 
 import { CommissionCard, CommissionTiersRow } from '@app/components/Profile/ProfileCommission'
 import { GuidelineList } from '@app/components/Profile'
 
 import { t } from '@app/utility/lang'
-import Placeholder from '@components/App/Placeholder';
 import { ReviewsReel } from '@components/Profile/ProfileReviews';
 import { useProfileUser } from '@hooks/user';
 import { useTextToHTML } from '@hooks/db';
@@ -26,7 +25,7 @@ export const ProfileIndex = () => {
             <hr/>
             <GuidelineList/>
             <h3>{t`About`}</h3>
-            {!!!about_html && <Placeholder type="text" rows={8}/>}
+            {!!!about_html && <Placeholder.Paragraph rows={8}/>}
             {!!about_html && <p dangerouslySetInnerHTML={{__html: about_html}}/>}
         </Grid>
     );

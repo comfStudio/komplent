@@ -48,7 +48,8 @@ export enum TASK {
     user_commission_status_changed = 'user_commission_status_changed', 
     user_notice_changed = 'user_notice_changed',
     followed_user = 'followed_user', 
-    cdn_upload = 'cdn_upload'
+    cdn_upload = 'cdn_upload',
+    cdn_delete = 'cdn_delete'
 }
 export const tasks = array_to_enum(tuple(...Object.keys(TASK).map((v: TASK) => v)));
 export type TASK_T = KEYS_TO_TYPE<typeof tasks>
@@ -62,7 +63,8 @@ export type TaskDataTypeMap<T> =  (
     T extends TASK.user_notice_changed ? { user_id: string, message: string } :
     T extends TASK.activate_email ? { user_id: string } :
     T extends TASK.reset_login ? { user_id: string } :
-    T extends TASK.cdn_upload ? { image_id: string } : never
+    T extends TASK.cdn_upload ? { image_id: string, local_path: string, name: string | undefined } :
+    T extends TASK.cdn_delete ? { key: string } : never
     )
 
 export const user_events = tuple(

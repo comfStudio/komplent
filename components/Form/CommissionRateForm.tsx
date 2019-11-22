@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useSessionStorage, useMount } from 'react-use'
 import { Form, FormGroup, FormControl, ControlLabel, Button, ButtonToolbar,
         HelpBlock, Input, Panel, Divider, Icon, Schema, Message, InputNumber, Toggle, Uploader, List, Checkbox, Grid, Col, Row, CheckboxGroup, IconButton } from 'rsuite'
@@ -10,8 +10,10 @@ import { useUser } from '@hooks/user';
 import { comission_rate_schema, commission_extra_option_schema } from '@schema/commission'
 import { useCommissionRateStore } from '@client/store/commission';
 import { Decimal128 } from 'bson';
-import { decimal128ToFloat, decimal128ToMoneyToString, stringToDecimal128 } from '@utility/misc';
+import { decimal128ToFloat, decimal128ToMoneyToString, stringToDecimal128, decimal128ToMoney } from '@utility/misc';
 import log from '@utility/log';
+import * as pages from '@utility/pages';
+import { get_authorization_header } from '@utility/request';
 
 const { StringType, NumberType, BooleanType, ArrayType, ObjectType } = Schema.Types;
 
@@ -104,6 +106,7 @@ export const RateOptionsForm = () => {
 interface Props extends HTMLElementProps {
     panel?: boolean
     onDone?: CallableFunction
+    defaultData?: any
 }
 
 const rate_model = Schema.Model({
@@ -111,9 +114,7 @@ const rate_model = Schema.Model({
     description: StringType(),
     price: NumberType().isRequired('This field is required.'),
     commission_deadline: NumberType(),
-    negotiable: BooleanType(),
     extras: ArrayType(),
-    cover: ArrayType(),
   });
 
 const CommissionRateForm = (props: Props) => {
@@ -126,6 +127,50 @@ const CommissionRateForm = (props: Props) => {
     const [error, set_error] = useState(null)
     const [loading, set_loading] = useState(false)
 
+    const [default_filelist, set_default_filelist] = useState([])
+    const [filelist, set_filelist] = useState([])
+    const [uploading, set_uploading] = useState(false)
+    const [upload_response, set_upload_response] = useState(undefined)
+    const [submit_value, set_submit_value] = useState()
+    const uploader = useRef<any>()
+
+    useEffect(() => {
+        if (props.defaultData) {
+            set_form_value({...props.defaultData, price: decimal128ToFloat(props.defaultData.price),
+                extras: props.defaultData?.extras.map(v => v._id)})
+            if (props.defaultData.image?.paths?.length) {
+                set_default_filelist([{
+                    name: 'image_' + props.defaultData._id,
+                    fileKey: 1,
+                    url:props.defaultData.image.paths[0].url
+                  }])
+            } else {
+                set_default_filelist([])
+            }
+        }
+    }, [props.defaultData])
+
+    useEffect(() => {
+        if (!uploading && submit_value) {
+
+            if (!submit_value.deadline) {
+                submit_value.deadline = undefined
+            }
+    
+            set_document({user:current_user._id, ...submit_value, image: upload_response, _id: props?.defaultData._id})
+    
+            store.create_rate(doc, {create: !!!props.defaultData}).then(({body, status}) => {
+                set_loading(false)
+                if (!status) {
+                    set_error(body.error)
+                } else {
+                    if (props.onDone) {
+                        props.onDone()
+                    }
+                }
+            })
+        }
+    }, [uploading, submit_value])
 
     let form = (
         <Form fluid method="put" action="/api/update" formDefaultValue={{extras: store.state.options.map((v) => v._id)}} formValue={form_value} model={rate_model} ref={ref => (set_form_ref(ref))} onChange={(value => set_form_value(value))}>
@@ -146,20 +191,20 @@ const CommissionRateForm = (props: Props) => {
                     <FormControl rows={5} name="description" componentClass="textarea" />
             </FormGroup>
             <FormGroup>
-                    <ControlLabel>{t`Negotiable`}:</ControlLabel>
-                    <FormControl fluid name="negotiable" accepter={Toggle} required />
-            </FormGroup>
-            <FormGroup>
                     <h5>{t`Extra options`}</h5>
                     <RateOptions new checkbox/>
             </FormGroup>
             <FormGroup>
                     <h5>{t`Cover`}</h5>
-                    <FormControl fluid name="cover" accepter={Uploader} listType="picture" required>
+                    <Uploader fluid data={{type: "CommissionRate"}} action={pages.upload} ref={uploader}
+                        accept="image/*" listType="picture" fileList={ filelist.length ? filelist : default_filelist } autoUpload={false} multiple={false}
+                        withCredentials={true} headers={get_authorization_header()}
+                        onChange={(f) => {set_filelist([f[f.length-1]])}}
+                        onSuccess={(r)=> { set_upload_response(r?.data); set_uploading(false) }}>
                     <button type="button">
                         <Icon icon='camera-retro' size="lg" />
                     </button>
-                    </FormControl>
+                    </Uploader>
             </FormGroup>
             <FormGroup>
                 <Grid fluid>
@@ -173,24 +218,12 @@ const CommissionRateForm = (props: Props) => {
                                 set_loading(true)
                                 set_error(null)
 
-                                if (!form_value.deadline) {
-                                    form_value.deadline = undefined
+                                if (filelist.length) {
+                                    await uploader.current.start()
+                                    set_uploading(true)
                                 }
-
-                                set_document({user:current_user._id, ...form_value})
-
-                                const {body, status} = await store.create_rate(doc).then((d) => {
-                                    set_loading(false)
-                                    return d
-                                })
-                                if (!status) {
-                                    set_error(body.error)
-                                } else {
-                                    if (props.onDone) {
-                                        props.onDone()
-                                    }
-                                }
-                            }}}>{t`Create`}</Button>
+                                set_submit_value(form_value)
+                            }}}>{props.defaultData ? t`Update` : t`Create`}</Button>
                         </Col>
                     </Row>
                 </Grid>

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Panel, Form, FormGroup, ControlLabel, FormControl, Button, Grid, Row, Col, IconButton, Icon, Input } from 'rsuite';
+import { Panel, Form, FormGroup, ControlLabel, FormControl, Button, Grid, Row, Col, IconButton, Icon, Input, Placeholder } from 'rsuite';
 
-import Placeholder from '@components/App/Placeholder'
 import './InboxConversation.scss'
 import useInboxStore from '@store/inbox';
 import { t } from '@app/utility/lang'
@@ -33,7 +32,7 @@ const Message = (props: MessageProps) => {
                     <small>{formatDistanceToNow(date, {addSuffix: true})}</small>
                 </span>
                 <div className="content">
-                    {loading && <Placeholder type="text" rows={3}/>}
+                    {loading && <Placeholder.Paragraph rows={3}/>}
                     {!loading && props.data.body}
                 </div>
             </div>

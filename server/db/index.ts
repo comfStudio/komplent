@@ -14,6 +14,7 @@ export const synchronize_indexes = async () => {
 }
 
 export async function connect(MONGODB_URL) {
+  console.log(MONGODB_URL)
   if (MONGODB_URL) {
     if (mongoose.connection.readyState == 0) {
       await mongoose.connect(MONGODB_URL, {

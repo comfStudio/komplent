@@ -8,13 +8,29 @@ import { user_schema, user_store_schema,
 import { message_schema, conversation_schema } from '@schema/message'
 import { image_schema, attachment_schema, tag_schema, event_schema, notification_schema, text_schema } from '@schema/general'
 import { commission_schema, commission_extra_option_schema, comission_rate_schema, commission_phase_schema } from '@schema/commission'
-import { schedule_unique, get_milli_secs } from '@server/tasks'
-import { TASK, CommissionPhaseT } from '@server/constants'
-import { commissions } from '@utility/pages'
+import { schedule_unique, get_milli_secs, schedule_now } from '@server/tasks'
+import { TASK, CommissionPhaseT, NSFW_LEVEL } from '@server/constants'
 
 user_schema.pre("save", async function() {
         if (!this.name) {
           this.name = this.username
+        }
+        if ([NSFW_LEVEL.level_5, NSFW_LEVEL.level_10].includes(this.nsfw)) {
+          let mat = await Tag.findOne({name: "Mature"}).lean()
+          if (mat) {
+            if (!this.tags) {
+              this.tags = []
+            }
+            if (!this.tags.includes(mat._id)) {
+              this.tags.unshift(mat._id)
+            }
+            if (this.nsfw === NSFW_LEVEL.level_10) {
+              let expl = await Tag.findOne({name: "Explicit"}).lean()
+              if (expl && !this.tags.includes(expl._id)) {
+                this.tags.unshift(expl._id)
+              }
+            }
+          }
         }
       })
 
@@ -85,6 +101,23 @@ commission_phase_schema.post("save", async function() {
       comm.refunded = true
       comm.save()
     }
+  }
+})
+
+image_schema.post('remove', async function() {
+  if (this.paths && this.paths.length) {
+    for (let p of this.paths) {
+      if (p.key) {
+        schedule_now({task: TASK.cdn_delete, data: { key: p.key }})
+      }
+    }
+  }
+})
+
+comission_rate_schema.post('save', async function() {
+  if (this._previous_image) {
+    let im = await Image.findById({_id: this._previous_image})
+    if (im) im.remove()
   }
 })
 
