@@ -2,8 +2,8 @@ import bodybuilder from 'bodybuilder'
 
 import { createStore } from '@client/store'
 import { User } from '@db/models'
-import { is_server, promisify_es_search } from '@utility/misc';
-import { fetch } from '@utility/request';
+import { is_server, promisify_es_search } from '@utility/misc'
+import { fetch } from '@utility/request'
 import log from '@utility/log'
 
 export const useSearchStore = createStore(
@@ -11,16 +11,16 @@ export const useSearchStore = createStore(
         results: [],
     },
     {
-        parse_search_query(search_query, build=true) {
+        parse_search_query(search_query, build = true) {
             let q = bodybuilder()
-            q = q.notQuery("match", "type", "consumer")
-            q = q.query("match", "visibility", "public")
+            q = q.notQuery('match', 'type', 'consumer')
+            q = q.query('match', 'visibility', 'public')
 
             if (search_query) {
                 if (search_query.q) {
-                    q = q.orQuery("multi_match", {
+                    q = q.orQuery('multi_match', {
                         query: search_query.q,
-                        fields: ["username^10", "name^5", "*"],
+                        fields: ['username^10', 'name^5', '*'],
                     })
                 }
             }
@@ -36,21 +36,21 @@ export const useSearchStore = createStore(
                 hydrate: true,
                 hydrateOptions: {
                     lean: true,
-                    populate: "rates tags settings",
-                }
-                }
+                    populate: 'rates tags settings',
+                },
+            }
             let d: any
 
             if (is_server()) {
                 try {
                     d = await promisify_es_search(User, q.build(), opt)
-                } catch(err) {
+                } catch (err) {
                     log.error(err)
                 }
             } else {
-                d = await fetch("/api/esearch",{
-                    method:"post",
-                    body: { model: "User", query: q.build(), options: opt}
+                d = await fetch('/api/esearch', {
+                    method: 'post',
+                    body: { model: 'User', query: q.build(), options: opt },
                 }).then(async r => {
                     if (r.ok) {
                         return (await r.json()).data
@@ -64,8 +64,8 @@ export const useSearchStore = createStore(
             }
 
             return r.filter(Boolean)
-        }
+        },
     }
-  );
-  
-  export default useSearchStore
+)
+
+export default useSearchStore

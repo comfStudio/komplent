@@ -12,33 +12,33 @@ interface Props extends AuthProps {
 }
 
 class CommissionSettingsPage extends AuthPage<Props> {
+    static async getInitialProps(ctx: NextPageContext) {
+        const props = await super.getInitialProps(ctx)
 
-  static async getInitialProps(ctx: NextPageContext) {
+        let commissionRateStoreState = useCommissionRateStore.createState({})
+        if (props.useUserState.current_user) {
+            commissionRateStoreState = await useCommissionRateStore.actions.load(
+                props.useUserState.current_user
+            )
+        }
 
-    const props = await super.getInitialProps(ctx)
-
-    let commissionRateStoreState = useCommissionRateStore.createState({})
-    if (props.useUserState.current_user) {
-        commissionRateStoreState = await useCommissionRateStore.actions.load(props.useUserState.current_user)
+        return {
+            ...props,
+            commissionRateStoreState,
+        }
     }
 
-    return {
-        ...props,
-        commissionRateStoreState,
+    public render() {
+        return this.renderPage(
+            <useCommissionRateStore.Provider
+                initialState={this.props.commissionRateStoreState}>
+                <SettingsLayout activeKey="commissions">
+                    <RequireCreator />
+                    <CommissionsSettings />
+                </SettingsLayout>
+            </useCommissionRateStore.Provider>
+        )
     }
-    
-  }
-
-  public render() {
-    return this.renderPage(
-    <useCommissionRateStore.Provider initialState={this.props.commissionRateStoreState}>
-      <SettingsLayout activeKey="commissions">
-        <RequireCreator/>
-        <CommissionsSettings/>
-      </SettingsLayout>
-    </useCommissionRateStore.Provider>
-    )
-  }
 }
 
 export default CommissionSettingsPage

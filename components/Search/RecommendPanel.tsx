@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 
 import { Grid, Col, Row, Panel, PanelGroup } from 'rsuite'
 
@@ -14,8 +14,8 @@ class RecommendPanel extends Component {
                     <UserCard/> */}
                 </PanelGroup>
             </Panel>
-        );
+        )
     }
 }
 
-export default RecommendPanel;
+export default RecommendPanel

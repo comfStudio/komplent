@@ -1,16 +1,15 @@
-import React from 'react';
-import { Nav, Badge } from 'rsuite';
-import Link from 'next/link';
+import React from 'react'
+import { Nav, Badge } from 'rsuite'
+import Link from 'next/link'
 
 import { t } from '@app/utility/lang'
-import useUserStore from '@client/store/user';
+import useUserStore from '@client/store/user'
 
 interface Props {
     activeKey?: string
 }
 
 const CommissionsMenu = (props: Props) => {
-
     const store = useUserStore()
 
     let active_comm_count = store.state.active_commissions_count
@@ -22,17 +21,28 @@ const CommissionsMenu = (props: Props) => {
     return (
         <Nav appearance="subtle" activeKey={props.activeKey}>
             <Link href="/commissions" passHref>
-                <Nav.Item eventKey="commissions" active={props.activeKey=='commissions'}>{t`Commissions`} <Badge content={active_comm_count}/></Nav.Item>
+                <Nav.Item
+                    eventKey="commissions"
+                    active={props.activeKey == 'commissions'}>
+                    {t`Commissions`} <Badge content={active_comm_count} />
+                </Nav.Item>
             </Link>
-            {store.state.current_user.type === 'creator' &&
-            <>
-            <Link href="/commissions/requests" passHref>
-                <Nav.Item eventKey="requests" active={props.activeKey=='requests'}>{t`Requests`} <Badge content={store.state.active_requests_count}/></Nav.Item>
-            </Link>
-            </>
-            }
+            {store.state.current_user.type === 'creator' && (
+                <>
+                    <Link href="/commissions/requests" passHref>
+                        <Nav.Item
+                            eventKey="requests"
+                            active={props.activeKey == 'requests'}>
+                            {t`Requests`}{' '}
+                            <Badge
+                                content={store.state.active_requests_count}
+                            />
+                        </Nav.Item>
+                    </Link>
+                </>
+            )}
         </Nav>
-    );
-};
+    )
+}
 
-export default CommissionsMenu;
+export default CommissionsMenu

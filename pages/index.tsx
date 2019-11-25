@@ -4,11 +4,11 @@ import MainLayout from '@components/App/MainLayout'
 
 const IndexPage = () => {
     return (
-      <MainLayout>
-        {/* <Layout><Empty image={Empty.PRESENTED_IMAGE_SIMPLE}/></Layout>
+        <MainLayout>
+            {/* <Layout><Empty image={Empty.PRESENTED_IMAGE_SIMPLE}/></Layout>
         <Layout><Empty image={Empty.PRESENTED_IMAGE_SIMPLE}/></Layout> */}
-      </MainLayout>
+        </MainLayout>
     )
-  }
+}
 
 export default IndexPage

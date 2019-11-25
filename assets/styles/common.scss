@@ -1,100 +1,113 @@
-@import "~@assets/styles/variables.scss";
+@import '~@assets/styles/variables.scss';
 
-@import url("https://fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap");
+@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap');
 
 .inverted-top-gradient {
-    background: rgb(255,255,255);
-    background: linear-gradient(0deg, rgba(255,255,255,0) 0%, rgba(0,0,0,0.5) 100%);  
+    background: rgb(255, 255, 255);
+    background: linear-gradient(
+        0deg,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(0, 0, 0, 0.5) 100%
+    );
 }
 
-.unstyled, .unstyled:hover {
-  color: unset;
-  text-decoration: unset;
+.unstyled,
+.unstyled:hover {
+    color: unset;
+    text-decoration: unset;
 }
 
 blockquote {
-    background: rgba(0,0,0,0.03);
-    border-left: 0.3em solid rgba(0,0,0,0.25);
+    background: rgba(0, 0, 0, 0.03);
+    border-left: 0.3em solid rgba(0, 0, 0, 0.25);
     margin: 0.8em 0 0 0.1em;
     padding: 0.5em 0.5em;
-    quotes: "\201C""\201D""\2018""\2019";
+    quotes: '\201C''\201D''\2018''\2019';
     font-size: 0.95em;
-    color: rgba(0,0,0,0.4);
-  }
-  blockquote:before {
+    color: rgba(0, 0, 0, 0.4);
+}
+blockquote:before {
     content: open-quote;
     font-size: 4em;
     line-height: 0.1em;
     margin-right: 0.25em;
     vertical-align: -0.4em;
-  }
-  blockquote p {
+}
+blockquote p {
     display: inline;
-  }
+}
 
 h1 {
     @apply text-3xl;
     @apply font-bold;
-  }
-  
-  h2 {
+}
+
+h2 {
     @apply text-2xl;
     @apply font-semibold;
 }
 
 h3 {
-  @apply text-xl;
-  @apply font-medium;
+    @apply text-xl;
+    @apply font-medium;
 }
 
 h4 {
-  @apply text-lg;
-  @apply font-medium;
+    @apply text-lg;
+    @apply font-medium;
 }
 
 h5 {
-  @apply text-base;
-  @apply font-medium;
+    @apply text-base;
+    @apply font-medium;
 }
 
 h6 {
-  @apply text-sm;
-  @apply font-medium;
+    @apply text-sm;
+    @apply font-medium;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  margin-bottom: .8em;
-  margin-top: .5em;
-  @apply antialiased;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    margin-bottom: 0.8em;
+    margin-top: 0.5em;
+    @apply antialiased;
 }
-  
-h1, h2, h3 {
-border-bottom: 1px solid;
-@apply border-secondary-light;
-padding-bottom: .3em;
+
+h1,
+h2,
+h3 {
+    border-bottom: 1px solid;
+    @apply border-secondary-light;
+    padding-bottom: 0.3em;
 }
 
 hr.line {
-  overflow: hidden;
-  text-align: center;
+    overflow: hidden;
+    text-align: center;
 }
 
-.subtext, .muted {
-  @apply text-secondary-light;
+.subtext,
+.muted {
+    @apply text-secondary-light;
 }
 
 .animate-width {
-  transition: width .5s;
+    transition: width 0.5s;
 }
 
 .animate-height {
-  transition: height .5s;
+    transition: height 0.5s;
 }
 
 .animate-width-height {
-  transition: width .5s, height .5s;
+    transition: width 0.5s, height 0.5s;
 }
 
 .emoji svg {
-  margin: auto;
+    margin: auto;
 }

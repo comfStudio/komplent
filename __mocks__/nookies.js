@@ -1,1 +1,1 @@
-module.exports = jest.genMockFromModule('nookies');
+module.exports = jest.genMockFromModule('nookies')

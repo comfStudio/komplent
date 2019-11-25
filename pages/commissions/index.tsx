@@ -1,19 +1,17 @@
-import React from 'react';
+import React from 'react'
 
 import CommissionsPage from '@components/App/CommissionsPage'
 import CommissionsLayout from '@components/Commissions/CommissionsLayout'
-import CommissionsListing from '@components/Commissions/CommissionsListing';
-
+import CommissionsListing from '@components/Commissions/CommissionsListing'
 
 class Page extends CommissionsPage {
-
     render() {
         return this.renderPage(
-        <CommissionsLayout activeKey="commissions">
-            <CommissionsListing/>
-        </CommissionsLayout>
-        );
+            <CommissionsLayout activeKey="commissions">
+                <CommissionsListing />
+            </CommissionsLayout>
+        )
     }
 }
 
-export default Page;
+export default Page

@@ -1,105 +1,104 @@
 version: '3.1'
 
 services:
+    mongo:
+        image: mongo
+        command: 'mongo "mongodb://komplent:komplent@mongo1:27017" --eval "rs.initiate( {_id:\"devrs\", members:[{ _id: 0, host: \"host.docker.internal:27956\" },{ _id: 1, host: \"host.docker.internal:27955\"},]});" '
+        container_name: komplent-mongodb
+        depends_on:
+            - mongo1
+            - mongo2
+        volumes:
+            - komplent-v-mongo1db:/data/db
+            - komplent-v-mongo1db_config:/data/configdb
 
-  mongo:
-    image: mongo
-    command: 'mongo "mongodb://komplent:komplent@mongo1:27017" --eval "rs.initiate( {_id:\"devrs\", members:[{ _id: 0, host: \"host.docker.internal:27956\" },{ _id: 1, host: \"host.docker.internal:27955\"},]});" '
-    container_name: komplent-mongodb
-    depends_on:
-      - mongo1
-      - mongo2
-    volumes:
-      - komplent-v-mongo1db:/data/db
-      - komplent-v-mongo1db_config:/data/configdb
+    mongo1:
+        build:
+            context: '.'
+            dockerfile: dev/Dockerfile
+        command: --keyFile /data/mongodb_keyfile --bind_ip_all --replSet devrs
+        container_name: komplent-mongodb-1
+        restart: unless-stopped
+        environment:
+            MONGO_INITDB_DATABASE: admin
+            MONGO_INITDB_ROOT_USERNAME: komplent
+            MONGO_INITDB_ROOT_PASSWORD: komplent
+        volumes:
+            - komplent-v-mongo1db:/data/db
+            - komplent-v-mongo1db_config:/data/configdb
+        ports:
+            - 27956:27017
 
-  mongo1:
-    build:
-      context: '.'
-      dockerfile: dev/Dockerfile
-    command: --keyFile /data/mongodb_keyfile --bind_ip_all --replSet devrs
-    container_name: komplent-mongodb-1
-    restart: unless-stopped
-    environment:
-      MONGO_INITDB_DATABASE: admin
-      MONGO_INITDB_ROOT_USERNAME: komplent
-      MONGO_INITDB_ROOT_PASSWORD: komplent
-    volumes:
-      - komplent-v-mongo1db:/data/db
-      - komplent-v-mongo1db_config:/data/configdb
-    ports:
-      - 27956:27017
+    mongo2:
+        build:
+            context: '.'
+            dockerfile: dev/Dockerfile
+        command: --keyFile /data/mongodb_keyfile --bind_ip_all --replSet devrs
+        container_name: komplent-mongodb-2
+        restart: unless-stopped
+        environment:
+            MONGO_INITDB_DATABASE: admin
+            MONGO_INITDB_ROOT_USERNAME: komplent
+            MONGO_INITDB_ROOT_PASSWORD: komplent
+        volumes:
+            - komplent-v-mongo2db:/data/db
+            - komplent-v-mongo2db_config:/data/configdb
+        ports:
+            - 27955:27017
 
-  mongo2:
-    build:
-      context: '.'
-      dockerfile: dev/Dockerfile
-    command: --keyFile /data/mongodb_keyfile --bind_ip_all --replSet devrs
-    container_name: komplent-mongodb-2
-    restart: unless-stopped
-    environment:
-      MONGO_INITDB_DATABASE: admin
-      MONGO_INITDB_ROOT_USERNAME: komplent
-      MONGO_INITDB_ROOT_PASSWORD: komplent
-    volumes:
-      - komplent-v-mongo2db:/data/db
-      - komplent-v-mongo2db_config:/data/configdb
-    ports:
-      - 27955:27017
+    elastic-search:
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.4.0
+        container_name: komplent-elsatic-search
+        environment:
+            - node.name=es01
+            - cluster.initial_master_nodes=es01
+            - cluster.name=docker-cluster
+            - bootstrap.memory_lock=true
+            - 'ES_JAVA_OPTS=-Xms512m -Xmx512m'
+        ulimits:
+            memlock:
+                soft: -1
+                hard: -1
+        volumes:
+            - komplent-v-elastic_search:/usr/share/elasticsearch/data
+        ports:
+            - 9245:9200
 
-  elastic-search:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.4.0
-    container_name: komplent-elsatic-search
-    environment:
-      - node.name=es01
-      - cluster.initial_master_nodes=es01
-      - cluster.name=docker-cluster
-      - bootstrap.memory_lock=true
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-    volumes:
-      - komplent-v-elastic_search:/usr/share/elasticsearch/data
-    ports:
-      - 9245:9200
+    localstack:
+        image: localstack/localstack:latest
+        container_name: komplent-localstack
+        ports:
+            - '4563-4599:4563-4599'
+            - '8055:8080'
+        environment:
+            - SERVICES=s3
+            - DEBUG=1
+            - DATA_DIR=/tmp/localstack/data
+        volumes:
+            - './.localstack:/tmp/localstack'
+            - '/var/run/docker.sock:/var/run/docker.sock'
 
-  localstack:
-    image: localstack/localstack:latest
-    container_name: komplent-localstack
-    ports:
-      - '4563-4599:4563-4599'
-      - '8055:8080'
-    environment:
-      - SERVICES=s3
-      - DEBUG=1
-      - DATA_DIR=/tmp/localstack/data
-    volumes:
-      - './.localstack:/tmp/localstack'
-      - '/var/run/docker.sock:/var/run/docker.sock'
+    redis:
+        image: bitnami/redis
+        environment:
+            - ALLOW_EMPTY_PASSWORD=yes
+        ports:
+            - 6834:6379
+        volumes:
+            - komplent-v-redis:/bitnami/redis/data
 
-  redis:
-    image: bitnami/redis
-    environment:
-      - ALLOW_EMPTY_PASSWORD=yes
-    ports:
-      - 6834:6379
-    volumes:
-      - komplent-v-redis:/bitnami/redis/data
-
-  scheduler-ui:
-    image: mixmaxhq/arena
-    container_name: komplent-scheduler-ui
-    ports:
-      - 3501:4567
-    volumes:
-      - ./scheduler_ui.json:/opt/arena/src/server/config/index.json:rw
+    scheduler-ui:
+        image: mixmaxhq/arena
+        container_name: komplent-scheduler-ui
+        ports:
+            - 3501:4567
+        volumes:
+            - ./scheduler_ui.json:/opt/arena/src/server/config/index.json:rw
 
 volumes:
-  komplent-v-redis:
-  komplent-v-elastic_search:
-  komplent-v-mongo1db:
-  komplent-v-mongo1db_config:
-  komplent-v-mongo2db:
-  komplent-v-mongo2db_config:
+    komplent-v-redis:
+    komplent-v-elastic_search:
+    komplent-v-mongo1db:
+    komplent-v-mongo1db_config:
+    komplent-v-mongo2db:
+    komplent-v-mongo2db_config:

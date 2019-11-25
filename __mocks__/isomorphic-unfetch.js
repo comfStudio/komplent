@@ -1,1 +1,1 @@
-module.exports = jest.genMockFromModule('isomorphic-unfetch');
+module.exports = jest.genMockFromModule('isomorphic-unfetch')

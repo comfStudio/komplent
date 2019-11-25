@@ -8,11 +8,13 @@ import { logout_user } from '@server/db'
 
 const cors = microCors({ allowMethods: ['POST', 'GET'] })
 
-export default with_middleware(async (req: ExApiRequest, res: NextApiResponse) => {
-    if (req.user) {
-        await logout_user(req, res)
-        res.status(OK).json(message("Logged out"))
-    } else {
-        res.status(OK).json(error_message("No active user"))
+export default with_middleware(
+    async (req: ExApiRequest, res: NextApiResponse) => {
+        if (req.user) {
+            await logout_user(req, res)
+            res.status(OK).json(message('Logged out'))
+        } else {
+            res.status(OK).json(error_message('No active user'))
+        }
     }
-})
+)

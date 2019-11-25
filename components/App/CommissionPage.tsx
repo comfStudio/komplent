@@ -1,10 +1,10 @@
-import React from 'react';
+import React from 'react'
 import { NextPageContext } from 'next'
-import { NOT_FOUND } from 'http-status-codes';
+import { NOT_FOUND } from 'http-status-codes'
 import Error from 'next/error'
 
 import { AuthPage, Props as AuthProps } from '@components/App/AuthPage'
-import { useCommissionStore } from '@client/store/commission';
+import { useCommissionStore } from '@client/store/commission'
 
 interface Props extends AuthProps {
     error: number | null
@@ -12,7 +12,6 @@ interface Props extends AuthProps {
 }
 
 class CommissionPage extends AuthPage<Props> {
-
     static allow_owner = true
 
     static async getInitialProps(ctx: NextPageContext) {
@@ -26,21 +25,26 @@ class CommissionPage extends AuthPage<Props> {
                 commission: null,
                 _current_user: props.useUserState.current_user,
             })
-    
+
             if (commission_id) {
-                commissionStoreState.commission = await useCommissionStore.actions.load(commission_id)
+                commissionStoreState.commission = await useCommissionStore.actions.load(
+                    commission_id
+                )
             }
 
-            
             if (!commissionStoreState.commission) {
                 error = NOT_FOUND
                 ctx.res.statusCode = error
             } else {
                 let is_owner
                 if (typeof props.useUserState.current_user._id === 'string') {
-                    is_owner = props.useUserState.current_user._id === commissionStoreState.commission.from_user._id
+                    is_owner =
+                        props.useUserState.current_user._id ===
+                        commissionStoreState.commission.from_user._id
                 } else {
-                    is_owner = commissionStoreState.commission.from_user._id.equals(props.useUserState.current_user._id)
+                    is_owner = commissionStoreState.commission.from_user._id.equals(
+                        props.useUserState.current_user._id
+                    )
                 }
                 if (!this.allow_owner && is_owner) {
                     error = NOT_FOUND
@@ -50,7 +54,8 @@ class CommissionPage extends AuthPage<Props> {
                     if (c.commission_process && c.commission_process.length) {
                         commissionStoreState.stages = c.commission_process
                     } else if (c.to_user.commission_process) {
-                        commissionStoreState.stages = c.to_user.commission_process
+                        commissionStoreState.stages =
+                            c.to_user.commission_process
                     }
                 }
             }
@@ -59,22 +64,22 @@ class CommissionPage extends AuthPage<Props> {
         return {
             error,
             commissionStoreState,
-            ...props
+            ...props,
         }
     }
 
     renderPage(children) {
-
         if (this.props.error) {
-            return <Error statusCode={this.props.error}/>
+            return <Error statusCode={this.props.error} />
         }
 
         return (
-            <useCommissionStore.Provider initialState={this.props.commissionStoreState}>
+            <useCommissionStore.Provider
+                initialState={this.props.commissionStoreState}>
                 {super.renderPage(children)}
             </useCommissionStore.Provider>
-        ) 
+        )
     }
 }
 
-export default CommissionPage;
+export default CommissionPage

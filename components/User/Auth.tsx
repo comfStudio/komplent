@@ -1,10 +1,9 @@
-import React, { useEffect } from 'react';
+import React, { useEffect } from 'react'
 import Router from 'next/router'
 
 import * as pages from '@utility/pages'
 import { ReactProps } from '@app/utility/props'
 import { useLoginStatus } from '@hooks/auth'
-
 
 interface Props extends ReactProps {
     inverse?: boolean
@@ -13,15 +12,14 @@ interface Props extends ReactProps {
 export const NoLoginPage = () => {
     const logged_in = useLoginStatus()
     useEffect(() => {
-      if (logged_in) {
-        Router.replace(pages.dashboard)
-      }
+        if (logged_in) {
+            Router.replace(pages.dashboard)
+        }
     }, [logged_in])
     return null
-  }
-  
-export const Auth = (props: Props) => {
+}
 
+export const Auth = (props: Props) => {
     const logged_in = useLoginStatus()
 
     useEffect(() => {
@@ -29,7 +27,6 @@ export const Auth = (props: Props) => {
             if (logged_in) {
                 Router.push(pages.home)
             }
-
         } else {
             if (!logged_in) {
                 Router.push(pages.login)
@@ -37,9 +34,10 @@ export const Auth = (props: Props) => {
         }
     }, [logged_in])
 
-    return (((logged_in && !props.inverse) || (!logged_in && props.inverse)) && props.children)
-};
+    return (
+        ((logged_in && !props.inverse) || (!logged_in && props.inverse)) &&
+        props.children
+    )
+}
 
-
-
-export default Auth;
+export default Auth

@@ -2,18 +2,18 @@ import bodybuilder from 'bodybuilder'
 
 import { createStore } from '@client/store'
 import { User, Conversation, Message } from '@db/models'
-import { is_server, promisify_es_search } from '@utility/misc';
-import { fetch } from '@utility/request';
-import { update_db } from '@client/db';
+import { is_server, promisify_es_search } from '@utility/misc'
+import { fetch } from '@utility/request'
+import { update_db } from '@client/db'
 import { conversation_schema, message_schema } from '@schema/message'
 import log from '@utility/log'
 
-export type InboxKey = "active" | "archive" | "staff" | "trash"
+export type InboxKey = 'active' | 'archive' | 'staff' | 'trash'
 
 export enum InboxType {
     private,
     staff,
-    commission
+    commission,
 }
 
 export const useInboxStore = createStore(
@@ -22,34 +22,39 @@ export const useInboxStore = createStore(
         page: 0,
         conversations: [],
         active_conversation: undefined as any,
-        messages: []
+        messages: [],
     },
     {
-        async new_conversation(user: any, subject: string, { to = undefined as string, commission = undefined as any, users = [], params = undefined } = {}) {
-            
+        async new_conversation(
+            user: any,
+            subject: string,
+            {
+                to = undefined as string,
+                commission = undefined as any,
+                users = [],
+                params = undefined,
+            } = {}
+        ) {
             let d = {
                 subject,
                 users: [user._id],
-                commission
+                commission,
             }
-            
+
             if (users) {
                 d.users = [...d.users, ...users]
             }
 
             if (to) {
-                let q = {username: to}
+                let q = { username: to }
                 let u
                 if (is_server()) {
                     u = await User.findOne(q).lean()
                 } else {
-                    await fetch("/api/fetch",{
-                        method:"post",
-                        body: {model: "User",
-                        method:"findOne",
-                        query: q,
-                    }
-                    }).then(async (r) => {
+                    await fetch('/api/fetch', {
+                        method: 'post',
+                        body: { model: 'User', method: 'findOne', query: q },
+                    }).then(async r => {
                         if (r.ok) {
                             u = (await r.json()).data
                         }
@@ -63,37 +68,47 @@ export const useInboxStore = createStore(
             }
 
             let r = await update_db({
-                model:'Conversation',
-                data:d,
-                schema:conversation_schema,
+                model: 'Conversation',
+                data: d,
+                schema: conversation_schema,
                 create: true,
                 validate: true,
-                populate: "users",
-                ...params})
+                populate: 'users',
+                ...params,
+            })
             if (r.status) {
-                this.setState({conversations: [r.body.data, ...this.state.conversations], active_conversation: r.body.data})
+                this.setState({
+                    conversations: [r.body.data, ...this.state.conversations],
+                    active_conversation: r.body.data,
+                })
             }
             return r
         },
-        parse_search_query(user, type: InboxType, search_query, build=true, {active = false, trashed = false} = {}) {
+        parse_search_query(
+            user,
+            type: InboxType,
+            search_query,
+            build = true,
+            { active = false, trashed = false } = {}
+        ) {
             let q = bodybuilder()
-            q = q.query("match", "users", user._id.toString())
+            q = q.query('match', 'users', user._id.toString())
             if (active) {
-                q = q.query("match", "active", true)
+                q = q.query('match', 'active', true)
             }
             if (trashed) {
-                q = q.query("match", "trashed", true)
+                q = q.query('match', 'trashed', true)
             }
             if (type) {
-                q = q.query("match", "type", type.toString())
+                q = q.query('match', 'type', type.toString())
             }
             // q = q.notQuery("match", "type", "consumer")
 
             if (search_query) {
                 if (search_query.q) {
-                    q = q.orQuery("multi_match", {
+                    q = q.orQuery('multi_match', {
                         query: search_query.q,
-                        fields: ["subject^10"],
+                        fields: ['subject^10'],
                     })
                 }
             }
@@ -102,29 +117,41 @@ export const useInboxStore = createStore(
 
             return build ? q.build() : q
         },
-        async search_conversations(user, type: InboxType, search_query, {active = false, trashed = false} = {}) {
+        async search_conversations(
+            user,
+            type: InboxType,
+            search_query,
+            { active = false, trashed = false } = {}
+        ) {
             let r = []
-            let q = this.parse_search_query(user, type, search_query, false, {active, trashed})
+            let q = this.parse_search_query(user, type, search_query, false, {
+                active,
+                trashed,
+            })
 
             let opt = {
                 hydrate: true,
                 hydrateOptions: {
                     lean: true,
-                    populate: "commission users",
-                }
-                }
+                    populate: 'commission users',
+                },
+            }
             let d: any
 
             if (is_server()) {
                 try {
                     d = await promisify_es_search(Conversation, q.build(), opt)
-                } catch(err) {
+                } catch (err) {
                     log.error(err)
                 }
             } else {
-                d = await fetch("/api/esearch",{
-                    method:"post",
-                    body: { model: "Conversation", query: q.build(), options: opt}
+                d = await fetch('/api/esearch', {
+                    method: 'post',
+                    body: {
+                        model: 'Conversation',
+                        query: q.build(),
+                        options: opt,
+                    },
                 }).then(async r => {
                     if (r.ok) {
                         return (await r.json()).data
@@ -144,13 +171,14 @@ export const useInboxStore = createStore(
             if (is_server()) {
                 u = await Conversation.findById(conversation_id).lean()
             } else {
-                await fetch("/api/fetch",{
-                    method:"post",
-                    body: {model: "Conversation",
-                    method:"findById",
-                    query: conversation_id,
-                }
-                }).then(async (r) => {
+                await fetch('/api/fetch', {
+                    method: 'post',
+                    body: {
+                        model: 'Conversation',
+                        method: 'findById',
+                        query: conversation_id,
+                    },
+                }).then(async r => {
                     if (r.ok) {
                         u = (await r.json()).data
                     }
@@ -160,22 +188,27 @@ export const useInboxStore = createStore(
         },
         async get_messages(conversation_id) {
             let mdata = []
-            let q = {conversation: conversation_id}
-            let s = {created: -1}
-            let p = "user"
+            let q = { conversation: conversation_id }
+            let s = { created: -1 }
+            let p = 'user'
             let l = 10
             if (is_server()) {
-                mdata = await Message.find(q).populate(p).sort(s).limit(l).lean()
+                mdata = await Message.find(q)
+                    .populate(p)
+                    .sort(s)
+                    .limit(l)
+                    .lean()
             } else {
-                await fetch("/api/fetch",{
-                    method:"post",
-                    body: {model: "Message",
-                    query: q,
-                    populate: p,
-                    sort: s,
-                    limit: l
-                }
-                }).then(async (r) => {
+                await fetch('/api/fetch', {
+                    method: 'post',
+                    body: {
+                        model: 'Message',
+                        query: q,
+                        populate: p,
+                        sort: s,
+                        limit: l,
+                    },
+                }).then(async r => {
                     if (r.ok) {
                         mdata = (await r.json()).data
                     }
@@ -183,30 +216,37 @@ export const useInboxStore = createStore(
             }
             return mdata
         },
-        async new_message(user: any, conversation: any, body: string, { params = undefined } = {}) {
-            
+        async new_message(
+            user: any,
+            conversation: any,
+            body: string,
+            { params = undefined } = {}
+        ) {
             let d = {
                 body,
                 users_read: [user._id],
                 user: user,
-                conversation
+                conversation,
             }
-            
+
             let r = await update_db({
-                model:'Message',
-                data:d,
-                schema:message_schema,
+                model: 'Message',
+                data: d,
+                schema: message_schema,
                 create: true,
                 validate: true,
-                populate: "user",
-                ...params})
+                populate: 'user',
+                ...params,
+            })
             if (r.status) {
-                this.setState({message: [r.body.data, ...this.state.messages]})
+                this.setState({
+                    message: [r.body.data, ...this.state.messages],
+                })
             }
 
             return r
         },
     }
-  );
-  
-  export default useInboxStore
+)
+
+export default useInboxStore

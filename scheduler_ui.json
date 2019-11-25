@@ -1,14 +1,14 @@
 {
     "queues": [
         {
-          "name": "user",
-          "hostId": "Komplent",
-          "url": "redis://redis:6379"
+            "name": "user",
+            "hostId": "Komplent",
+            "url": "redis://redis:6379"
         },
         {
-          "name": "commission",
-          "hostId": "Komplent",
-          "url": "redis://redis:6379"
+            "name": "commission",
+            "hostId": "Komplent",
+            "url": "redis://redis:6379"
         }
     ]
-  }
+}

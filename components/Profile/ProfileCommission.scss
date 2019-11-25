@@ -3,7 +3,6 @@
     position: relative;
 
     .header {
-
         margin: 0;
         padding: 0.8em;
 
@@ -33,7 +32,6 @@
         .extra-row > div:first-child {
             margin-top: 0.4em;
         }
-
     }
 
     .select-box {
@@ -51,15 +49,16 @@ a > .commission-card:hover {
     cursor: pointer;
 }
 
-a > .commission-card:hover, .commission-card.selected, .commission-rates-group label input:checked + .commission-card {
+a > .commission-card:hover,
+.commission-card.selected,
+.commission-rates-group label input:checked + .commission-card {
     border: 0.15em solid;
     @apply border-primary;
 }
 
 .commission-rates-group {
-    
     label input {
         text-align: center;
-        width:100%
+        width: 100%;
     }
 }

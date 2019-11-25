@@ -11,7 +11,7 @@ const mongooseVirtuals = require('mongoose-lean-virtuals')
 const mongooseDefaults = require('mongoose-lean-defaults')
 const mongooseGetters = require('mongoose-lean-getters')
 
-const { publicRuntimeConfig, serverRuntimeConfig }= getConfig()
+const { publicRuntimeConfig, serverRuntimeConfig } = getConfig()
 
 mongoose.plugin ? mongoose.plugin(mongooseAutopopulate) : null
 mongoose.plugin ? mongoose.plugin(mongooseVirtuals) : null
@@ -27,11 +27,19 @@ if (CONFIG.ELASTIC_URL) {
 
 export const es_index = (schema, params) => {
     if (is_server() && EL_HOSTS.length) {
-        schema.plugin(mongoosastic, {hosts: EL_HOSTS, ...params})
+        schema.plugin(mongoosastic, { hosts: EL_HOSTS, ...params })
     }
 }
 
-export const configure = (schema, {autopopulate = true, virtuals = true, defaults = true, getters = true} = {}) => {
+export const configure = (
+    schema,
+    {
+        autopopulate = true,
+        virtuals = true,
+        defaults = true,
+        getters = true,
+    } = {}
+) => {
     if (is_server()) {
         if (autopopulate) {
             schema.plugin(mongooseAutopopulate)

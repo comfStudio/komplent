@@ -5,11 +5,8 @@ import { ProfileLayout } from '@components/Profile'
 
 class ShopPage extends ProfilePage {
     public render() {
-      return this.renderPage(
-        <ProfileLayout activeKey="shop">
-        </ProfileLayout>
-      )
+        return this.renderPage(<ProfileLayout activeKey="shop"></ProfileLayout>)
     }
-  }
+}
 
 export default ShopPage

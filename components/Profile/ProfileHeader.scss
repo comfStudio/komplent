@@ -1,4 +1,4 @@
-@import "~@assets/styles/common.scss";
+@import '~@assets/styles/common.scss';
 
 #profile-header {
     height: 25em;
@@ -6,7 +6,8 @@
     position: relative;
 }
 
-#profile-header .container, #profile-header .container .cover {
+#profile-header .container,
+#profile-header .container .cover {
     height: inherit;
 }
 
@@ -39,12 +40,11 @@ $header-container-indent: 16em;
     z-index: 3;
 }
 
-
 #profile-header .gradient {
     @extend .inverted-top-gradient;
     position: absolute;
-    left:0;
-    right:0;
+    left: 0;
+    right: 0;
     height: 100%;
     z-index: 2;
     pointer-events: none;
@@ -56,7 +56,7 @@ $header-container-indent: 16em;
     right: 0;
     top: -99999px;
     bottom: -99999px;
-    width:100%;
+    width: 100%;
     margin: auto 0;
 }
 

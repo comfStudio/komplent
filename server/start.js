@@ -1,16 +1,18 @@
-"use strict";
+'use strict'
 exports.default = start
-var _http = require("http")
-var _next = require("next")
-var _next_config = require("next/config")
+var _http = require('http')
+var _next = require('next')
+var _next_config = require('next/config')
 var Primus = require('primus')
 var PrimusRedisRooms = require('primus-redis-rooms')
 
 async function start(serverOptions, port, hostname) {
-    const app = (0, _next)(serverOptions);
-    const srv = _http.createServer(app.getRequestHandler());
+    const app = (0, _next)(serverOptions)
+    const srv = _http.createServer(app.getRequestHandler())
     const next_cfg = _next_config.default()
-    const { serverRuntimeConfig: { PRIMUS_1_HOST, PRIMUS_1_PORT } } = next_cfg
+    const {
+        serverRuntimeConfig: { PRIMUS_1_HOST, PRIMUS_1_PORT },
+    } = next_cfg
     const primus = new Primus(srv, {
         transformer: 'websockets',
         // redis: {
@@ -48,11 +50,12 @@ async function start(serverOptions, port, hostname) {
     //       }
     //     });
     //   });
-    await new Promise((resolve, reject) => { // This code catches EADDRINUSE error if the port is already in use
-        srv.on('error', reject);
-        srv.on('listening', () => resolve());
-        srv.listen(port, hostname);
-    }); // It's up to caller to run `app.prepare()`, so it can notify that the server
+    await new Promise((resolve, reject) => {
+        // This code catches EADDRINUSE error if the port is already in use
+        srv.on('error', reject)
+        srv.on('listening', () => resolve())
+        srv.listen(port, hostname)
+    }) // It's up to caller to run `app.prepare()`, so it can notify that the server
     // is listening before starting any intensive operations.
-    return app;
+    return app
 }

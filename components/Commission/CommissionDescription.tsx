@@ -1,12 +1,12 @@
-import React from 'react';
-import { useCommissionStore } from '@client/store/commission';
-import { Grid, Row, Col } from 'rsuite';
-import { PanelContainer } from '@components/App/MainLayout';
+import React from 'react'
+import { useCommissionStore } from '@client/store/commission'
+import { Grid, Row, Col } from 'rsuite'
+import { PanelContainer } from '@components/App/MainLayout'
 import { t } from '@utility/lang'
-import { ApprovalButtons } from './CommissionProcess';
-import UserInfoCard from '@components/User/UserInfoCard';
-import { CommissionCard } from '@components/Profile/ProfileCommission';
-import { useUser } from '@hooks/user';
+import { ApprovalButtons } from './CommissionProcess'
+import UserInfoCard from '@components/User/UserInfoCard'
+import { CommissionCard } from '@components/Profile/ProfileCommission'
+import { useUser } from '@hooks/user'
 
 const CommissionDescription = () => {
     const user = useUser()
@@ -18,50 +18,54 @@ const CommissionDescription = () => {
 
     return (
         <Grid fluid>
-             <Row>
+            <Row>
                 <Col xs={24}>
-                    <UserInfoCard notBodyFill data={commission.from_user} text={t`is requesting a commission`}>
-                        <CommissionCard noCover data={commission.rate} extras={commission.extras}/>
-                        {!is_owner &&
-                        <div className="text-center">
-                            <hr/>
-                            {!commission.accepted && !commission.finished &&
-                            <>
-                            <p>{t`Waiting for your approval.`}</p>
-                            <p>
-                                <ApprovalButtons/>
-                            </p>
-                            </>
-                            }
-                            {commission.accepted &&
-                            <p>{t`You approved of this request.`}</p>
-                            }
-                            {!commission.accepted && commission.finished &&
-                            <p>{t`You declined this commission request.`}</p>
-                            }
-                        </div>
-                        }
+                    <UserInfoCard
+                        notBodyFill
+                        data={commission.from_user}
+                        text={t`is requesting a commission`}>
+                        <CommissionCard
+                            noCover
+                            data={commission.rate}
+                            extras={commission.extras}
+                        />
+                        {!is_owner && (
+                            <div className="text-center">
+                                <hr />
+                                {!commission.accepted && !commission.finished && (
+                                    <>
+                                        <p>{t`Waiting for your approval.`}</p>
+                                        <p>
+                                            <ApprovalButtons />
+                                        </p>
+                                    </>
+                                )}
+                                {commission.accepted && (
+                                    <p>{t`You approved of this request.`}</p>
+                                )}
+                                {!commission.accepted &&
+                                    commission.finished && (
+                                        <p>{t`You declined this commission request.`}</p>
+                                    )}
+                            </div>
+                        )}
                     </UserInfoCard>
                 </Col>
             </Row>
             <Row>
                 <Col xs={24}>
                     <h4 className="pb-1 mb-2">{t`Information`}</h4>
-                    <p>
-                        {commission.body}
-                    </p>
+                    <p>{commission.body}</p>
                 </Col>
             </Row>
             <Row>
                 <Col xs={24}>
                     <h4 className="pb-1 mb-2">{t`Attachments`}</h4>
-                    <PanelContainer bordered>
-
-                    </PanelContainer>
+                    <PanelContainer bordered></PanelContainer>
                 </Col>
             </Row>
         </Grid>
-    );
-};
+    )
+}
 
-export default CommissionDescription;
+export default CommissionDescription

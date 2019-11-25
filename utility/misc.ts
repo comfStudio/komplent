@@ -1,5 +1,5 @@
-import update from 'immutability-helper';
-import { Decimal128 } from 'bson';
+import update from 'immutability-helper'
+import { Decimal128 } from 'bson'
 import dinero from 'dinero.js'
 
 export const iupdate = update
@@ -28,7 +28,7 @@ export const decimal128ToMoney = (d: Decimal128) => {
             s += '.00'
         }
 
-        n = dinero({amount: parseInt(s.replace('.', ''))})
+        n = dinero({ amount: parseInt(s.replace('.', '')) })
     }
     return n
 }
@@ -45,17 +45,17 @@ export const decimal128ToMoneyToString = (d: Decimal128) => {
     return moneyToString(decimal128ToMoney(d))
 }
 
-export const moneyToString = (d) => {
+export const moneyToString = d => {
     return d.toFormat('$0,0.00')
 }
 
-export const capitalizeFirstLetter = (string) => {
-    return string.charAt(0).toUpperCase() + string.slice(1);
+export const capitalizeFirstLetter = string => {
+    return string.charAt(0).toUpperCase() + string.slice(1)
 }
 
 export function promisify_es_search(model, ...args) {
-    return new Promise(function (resolve, reject) {
-        model.esSearch(...args, function (err, result) {
+    return new Promise(function(resolve, reject) {
+        model.esSearch(...args, function(err, result) {
             if (err) {
                 reject(err)
             } else {
@@ -65,15 +65,18 @@ export function promisify_es_search(model, ...args) {
     })
 }
 
-export const tuple = <T extends string[]>(...args: T) => args;
+export const tuple = <T extends string[]>(...args: T) => args
 
-export function array_to_enum<T extends string>(o: Array<T>): {[K in T]: K} {
+export function array_to_enum<T extends string>(o: Array<T>): { [K in T]: K } {
     return o.reduce((res, key) => {
-      res[key] = key;
-      return res;
-    }, Object.create(null));
-  }
+        res[key] = key
+        return res
+    }, Object.create(null))
+}
 
-  export const get_profile_name = ({ name = undefined, username = undefined } = {}) => {
-      return name || username
-  }
+export const get_profile_name = ({
+    name = undefined,
+    username = undefined,
+} = {}) => {
+    return name || username
+}

@@ -1,6 +1,6 @@
-import React from 'react';
-import { Navbar, Nav } from 'rsuite';
-import Link from 'next/link';
+import React from 'react'
+import { Navbar, Nav } from 'rsuite'
+import Link from 'next/link'
 
 import { Container } from '@components/App/MainLayout'
 import { useProfileUser } from '@hooks/user'
@@ -11,21 +11,26 @@ export interface Props {
 }
 
 export const ProfileMenu = (props: Props) => {
-    const { context: { profile_path, profile_owner } } = useProfileUser()
+    const {
+        context: { profile_path, profile_owner },
+    } = useProfileUser()
 
     return (
         <Navbar className="">
-
             <Navbar.Body>
                 <Container>
                     <Nav activeKey={props.activeKey}>
                         <Link href={`${profile_path}`} passHref>
-                            <Nav.Item eventKey="index" active={props.activeKey=='index'}>
+                            <Nav.Item
+                                eventKey="index"
+                                active={props.activeKey == 'index'}>
                                 {t`Summary`}
                             </Nav.Item>
                         </Link>
                         <Link href={`${profile_path}/gallery`} passHref>
-                            <Nav.Item eventKey="gallery" active={props.activeKey=='gallery'}>
+                            <Nav.Item
+                                eventKey="gallery"
+                                active={props.activeKey == 'gallery'}>
                                 {t`Gallery`}
                             </Nav.Item>
                         </Link>
@@ -44,19 +49,20 @@ export const ProfileMenu = (props: Props) => {
                                 {t`Shop`}
                             </Nav.Item>
                         </Link> */}
-                        { profile_owner && 
+                        {profile_owner && (
                             <Link href={`${profile_path}/edit`} passHref>
-                                <Nav.Item eventKey="edit" active={props.activeKey=='edit'}>
+                                <Nav.Item
+                                    eventKey="edit"
+                                    active={props.activeKey == 'edit'}>
                                     {t`Edit Profile`}
                                 </Nav.Item>
                             </Link>
-                        }
+                        )}
                     </Nav>
                 </Container>
             </Navbar.Body>
         </Navbar>
-
-    );
+    )
 }
 
-export default ProfileMenu;
+export default ProfileMenu

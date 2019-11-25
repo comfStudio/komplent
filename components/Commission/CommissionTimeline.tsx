@@ -1,9 +1,9 @@
-import React from 'react';
-import { Timeline, Icon, Panel } from 'rsuite';
-import { ReactProps, HTMLElementProps } from '@utility/props';
+import React from 'react'
+import { Timeline, Icon, Panel } from 'rsuite'
+import { ReactProps, HTMLElementProps } from '@utility/props'
 import { formatDistanceToNow, format, toDate } from 'date-fns'
 
-import { capitalizeFirstLetter } from '@utility/misc';
+import { capitalizeFirstLetter } from '@utility/misc'
 
 import './CommissionTimeline.scss'
 
@@ -12,9 +12,7 @@ interface TimelineTitleProps extends ReactProps {
     onClick?: any
 }
 
-
 export const TimelineTitle = (props: TimelineTitleProps) => {
-
     let date = props.date
     if (date) {
         if (typeof date === 'string') {
@@ -27,19 +25,21 @@ export const TimelineTitle = (props: TimelineTitleProps) => {
     return (
         <span onClick={props.onClick} className="title">
             <h4 className="inline">{props.children}</h4>
-            {!!date && <span className="muted ml-1 text-sm">- ({format(date as Date, "yyyy-MM-dd - HH:mm:ss")})</span>}
+            {!!date && (
+                <span className="muted ml-1 text-sm">
+                    - ({format(date as Date, 'yyyy-MM-dd - HH:mm:ss')})
+                </span>
+            )}
         </span>
     )
 }
 
-interface TimelinePanelProps extends ReactProps, HTMLElementProps {
-
-}
+interface TimelinePanelProps extends ReactProps, HTMLElementProps {}
 
 export const TimelinePanel = (props: TimelinePanelProps) => {
-    let cls = "timeline-panel"
+    let cls = 'timeline-panel'
     return (
-        <div className={props.className ? (props.className + " " + cls) : cls}>
+        <div className={props.className ? props.className + ' ' + cls : cls}>
             {props.children}
         </div>
     )
@@ -52,23 +52,27 @@ interface CommissionTimelineItemProps extends ReactProps {
 
 export const CommissionTimelineItem = (props: CommissionTimelineItemProps) => {
     return (
-        <Timeline.Item className={"item" + (props.active ? " active" : "") + (props.selected ? " selected" : "")}>
+        <Timeline.Item
+            className={
+                'item' +
+                (props.active ? ' active' : '') +
+                (props.selected ? ' selected' : '')
+            }>
             {props.children}
         </Timeline.Item>
     )
 }
 
-interface CommissionTimelineProps extends ReactProps, HTMLElementProps {
-
-}
+interface CommissionTimelineProps extends ReactProps, HTMLElementProps {}
 
 const CommissionTimeline = (props: CommissionTimelineProps) => {
-    let cls = "commission-timeline"
+    let cls = 'commission-timeline'
     return (
-        <Timeline className={props.className ? (props.className + " " + cls) : cls}>
+        <Timeline
+            className={props.className ? props.className + ' ' + cls : cls}>
             {props.children}
         </Timeline>
-);
-};
+    )
+}
 
-export default CommissionTimeline;
+export default CommissionTimeline
