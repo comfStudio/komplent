@@ -576,7 +576,16 @@ export const useCommissionRateStore = createStore(
         }
         return r
       },
-    async create_option(data: object, ...params) {
+    async delete_option(id, params: object = undefined) {
+        let r = await update_db({
+            model:'CommissionExtraOption',
+            data:{_id: id},
+            schema:commission_extra_option_schema,
+            delete: true,
+            ...params})
+        return r
+    },
+    async update_option(data: object, params: object = undefined) {
         let r = await update_db({
             model:'CommissionExtraOption',
             data:data,
@@ -632,7 +641,7 @@ export const useCommissionRateStore = createStore(
         }
         return r
     },
-    async load(profile_user) {
+    async load(profile_user, {options = true, rates = true} = {}) {
 
         let state = {
             options: [],
@@ -648,27 +657,35 @@ export const useCommissionRateStore = createStore(
 
         if (is_server()) {
 
-            a = CommissionExtraOption.find(extra_option_q).lean().then((d) => {
-                state.options = [...d]
-            })
+            if (options) {
+                a = CommissionExtraOption.find(extra_option_q).lean().then((d) => {
+                    state.options = [...d]
+                })
+            }
 
-            b = CommissionRate.find(rate_q).populate(rate_p[0]).populate(rate_p[1][0], rate_p[1][1]).populate(rate_p[2]).lean().then((d) => {
-                state.rates = [...d]
-            })
+            if (rates) {
+                b = CommissionRate.find(rate_q).populate(rate_p[0]).populate(rate_p[1][0], rate_p[1][1]).populate(rate_p[2]).lean().then((d) => {
+                    state.rates = [...d]
+                })
+            }
 
         } else {
 
-            a = await fetch("/api/fetch", {method:"post", body: {model: "CommissionExtraOption", query: extra_option_q}}).then(async r => {
-                if (r.ok) {
-                    state.options = [...(await r.json()).data]
-                }
-            })
+            if (rates) {
+                a = await fetch("/api/fetch", {method:"post", body: {model: "CommissionExtraOption", query: extra_option_q}}).then(async r => {
+                    if (r.ok) {
+                        state.options = [...(await r.json()).data]
+                    }
+                })
+            }
 
-            b = await fetch("/api/fetch", {method:"post", body: {model: "CommissionRate", query: rate_q, populate: rate_p}}).then(async r => {
-                if (r.ok) {
-                    state.rates = [...(await r.json()).data]
-                }
-            })
+            if (options) {
+                b = await fetch("/api/fetch", {method:"post", body: {model: "CommissionRate", query: rate_q, populate: rate_p}}).then(async r => {
+                    if (r.ok) {
+                        state.rates = [...(await r.json()).data]
+                    }
+                })
+            }
             
         }
 

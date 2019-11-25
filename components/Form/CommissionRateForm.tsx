@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, SyntheticEvent } from 'react';
 import { useSessionStorage, useMount } from 'react-use'
 import { Form, FormGroup, FormControl, ControlLabel, Button, ButtonToolbar,
         HelpBlock, Input, Panel, Divider, Icon, Schema, Message, InputNumber, Toggle, Uploader, List, Checkbox, Grid, Col, Row, CheckboxGroup, IconButton } from 'rsuite'
@@ -23,6 +23,7 @@ interface RateOptionProps {
     edit?: boolean
     editing?: boolean
     onUpdate?: Function
+    onRemove?: (event: SyntheticEvent<Element, Event>) => void
     onCancel?: Function
 }
 
@@ -36,7 +37,7 @@ const RateOption = (props: RateOptionProps) => {
 
     return (
         <React.Fragment>
-            {(props.edit && !editing) && <IconButton icon={<Icon icon="close" />} circle size="xs" />}
+            {(props.edit && !editing) && <IconButton onClick={props.onRemove} icon={<Icon icon="close" />} circle size="xs" />}
             {editing &&
             <Grid fluid>
                 <Row>
@@ -75,7 +76,9 @@ export const RateOptions = (props: RateOptionsProps) => {
             <FormControl name={props.name || "extras"} accepter={CheckboxGroup}>
             {
             store.state.options.filter(({_id}) => options.includes(_id)).map(({title, price, _id},index) => {
-                let opt = <RateOption edit={props.edit} price={price} title={title} onUpdate={(v) => log.info(v)}/>
+                let opt = <RateOption edit={props.edit} price={price} title={title}
+                onRemove={() => {store.delete_option(_id).then(async r => {if (r.status) store.setState(await store.load(user, {rates: false}))})}}
+                onUpdate={(v) => store.update_option({_id, ...v}, {create: false})}/>
                 if (props.checkbox) {
                    return (<Checkbox key={_id} value={_id} >{opt}</Checkbox>)
                 } else {
@@ -87,7 +90,7 @@ export const RateOptions = (props: RateOptionsProps) => {
                 }
             })
             }
-            {new_option && <List.Item><RateOption edit={true} editing={true} price={stringToDecimal128("0")} title="" onUpdate={(v) => {store.create_option({user:user._id, ...v}); set_new_option(false)}} onCancel={() => {set_new_option(false) }}/></List.Item>}
+            {new_option && <List.Item><RateOption edit={true} editing={true} price={stringToDecimal128("0")} title="" onUpdate={(v) => {store.update_option({user:user._id, ...v}, {create: true}); set_new_option(false)}} onCancel={() => {set_new_option(false) }}/></List.Item>}
             {(props.new && !new_option) && <List.Item><Button size="sm" className="ml-5 pl-5" onClick={(ev) => {ev.preventDefault(); set_new_option(true) }}>{t`Add new option`}</Button></List.Item>}
             </FormControl>
         </List>
