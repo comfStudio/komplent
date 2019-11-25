@@ -11,7 +11,7 @@ export const commission_schema = new Schema(
     {
         from_title: String,
         to_title: String,
-        body: String,
+        body: Mixed,
         expire_date: Date,
         accept_date: Date,
         end_date: Date,

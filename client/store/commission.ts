@@ -515,6 +515,7 @@ export const useCommissionStore = createStore(
                     const r = await Commission.findById(commission_id)
                         .populate('from_user')
                         .populate('to_user')
+                        .populate('attachments')
                         .populate('phases', phase_select)
                         .populate('stage', phase_select)
                     return r.toJSON()
@@ -533,6 +534,7 @@ export const useCommissionStore = createStore(
                         populate: [
                             'from_user',
                             'to_user',
+                            'attachments',
                             ['phases', phase_select],
                             ['stage', phase_select],
                         ],

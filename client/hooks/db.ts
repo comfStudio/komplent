@@ -71,7 +71,28 @@ export const useUpdateDocument = (initial_data?: object) => {
     return [current_doc, set_doc]
 }
 
-export const useTextToHTML = (id: string) => {
+export const messageTextToHTML = (data: any) => {
+    let h
+    if (data && !is_server()) {
+        const q = new Quill(document.createElement('div'))
+        q.setContents(data)
+        h = dompurify.sanitize(q.root.innerHTML)
+    }
+    return h
+}
+
+export const useMessageTextToHTML = (data: any) => {
+    let [html, set_html] = useState()
+    useEffect(() => {
+        if (!is_server()) {
+            set_html(messageTextToHTML(data))
+        }
+    }, [data])
+    
+    return html
+}
+
+export const useDatabaseTextToHTML = (id: string) => {
     let [data, set_delta] = useState()
     useMount(() => {
         if (id) {
@@ -88,10 +109,5 @@ export const useTextToHTML = (id: string) => {
         }
     })
 
-    if (data) {
-        const q = new Quill(document.createElement('div'))
-        q.setContents(data)
-        data = dompurify.sanitize(q.root.innerHTML)
-    }
-    return data
+    return messageTextToHTML(data)
 }

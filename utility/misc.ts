@@ -1,10 +1,22 @@
 import update from 'immutability-helper'
 import { Decimal128 } from 'bson'
 import dinero from 'dinero.js'
+import debounce from 'lodash/debounce'
 
 export const iupdate = update
 
 export const is_server = () => typeof window === 'undefined'
+
+export const debounceReduce = (func, wait, combine = (acc, args) => (acc || []).concat(args)) => {
+    let allArgs; // accumulator for args across calls
+
+    const wrapper = debounce(() => func(allArgs), wait);
+
+    return (...args) => {
+      allArgs = combine(allArgs, [...args]);
+      wrapper();
+    }
+}
 
 export const decimal128ToFloat = (d: Decimal128) => {
     let n = 0.0

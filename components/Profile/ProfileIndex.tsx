@@ -11,14 +11,14 @@ import { GuidelineList } from '@app/components/Profile'
 import { t } from '@app/utility/lang'
 import { ReviewsReel } from '@components/Profile/ProfileReviews'
 import { useProfileUser } from '@hooks/user'
-import { useTextToHTML } from '@hooks/db'
+import { useDatabaseTextToHTML } from '@hooks/db'
 
 export const ProfileIndex = () => {
     const {
         profile_user,
         context: { commissions_open, profile_owner },
     } = useProfileUser()
-    const about_html = useTextToHTML(profile_user?.about)
+    const about_html = useDatabaseTextToHTML(profile_user?.about)
 
     return (
         <Grid fluid>

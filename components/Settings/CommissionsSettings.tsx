@@ -459,16 +459,6 @@ const CommissionsSettings = () => {
                     <CommissionGuideline />
                 </EditGroup>
             </EditSection>
-
-            <h4>{t`Message`}</h4>
-            <EditSection>
-                <CommissionMessage />
-            </EditSection>
-
-            <h4>{t`Request Accept Message`}</h4>
-            <EditSection>
-                <CommissionAcceptMessage />
-            </EditSection>
         </Grid>
     )
 }

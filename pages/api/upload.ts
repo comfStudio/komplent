@@ -7,7 +7,7 @@ import {
     ExApiRequest,
     ExApiResponse,
 } from '@server/middleware'
-import { create_image } from '@services/general'
+import { create_file } from '@services/general'
 import log from '@utility/log'
 
 export const config = {
@@ -25,8 +25,9 @@ export default with_auth_middleware(
             form.maxFileSize = 10 * 1024 * 1024 // 20mb
 
             return form.parse(req, (err, fields, files) => {
-                if (files.file) {
-                    create_image(files.file.path)
+                if (files.file && !err) {
+                    log.debug(fields)
+                    create_file(fields.type, fields.user, files.file.path)
                         .then(im => {
                             return res
                                 .status(OK)
@@ -39,7 +40,7 @@ export default with_auth_middleware(
                                 .json(error_message(r))
                         })
                 } else {
-                    return res.status(BAD_REQUEST).json(error_message(''))
+                    return res.status(BAD_REQUEST).json(error_message(err))
                 }
             })
         }

@@ -150,6 +150,12 @@ image_schema.post('remove', async function() {
     }
 })
 
+attachment_schema.post('remove', async function() {
+    if (this.key) {
+        schedule_now({ task: TASK.cdn_delete, data: { key: this.key } })
+    }
+})
+
 comission_rate_schema.post('save', async function() {
     if (this._previous_image) {
         let im = await Image.findById({ _id: this._previous_image })

@@ -22,6 +22,10 @@ export const image_schema = new Schema(
                 },
             },
         ],
+        user: {
+            type: ObjectId,
+            ref: 'User',
+        },
     },
     { timestamps: { createdAt: 'created', updatedAt: 'updated' } }
 )
@@ -30,23 +34,13 @@ configure(image_schema)
 
 export const attachment_schema = new Schema(
     {
-        type: {
-            type: String,
-            enum: ['image', 'file'],
-            default: 'file',
-        },
         name: String,
-        paths: [
-            {
-                key: String,
-                url: String,
-                size: {
-                    type: String,
-                    enum: ['thumb', 'big', 'original'],
-                    default: 'original',
-                },
-            },
-        ],
+        key: String,
+        url: String,
+        user: {
+            type: ObjectId,
+            ref: 'User',
+        },
     },
     { timestamps: { createdAt: 'created', updatedAt: 'updated' } }
 )

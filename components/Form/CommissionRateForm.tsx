@@ -45,6 +45,7 @@ import {
 import log from '@utility/log'
 import * as pages from '@utility/pages'
 import { get_authorization_header } from '@utility/request'
+import Upload from '@components/App/Upload'
 
 const {
     StringType,
@@ -73,12 +74,9 @@ const RateOption = (props: RateOptionProps) => {
     return (
         <React.Fragment>
             {props.edit && !editing && (
-                <IconButton
-                    onClick={props.onRemove}
-                    icon={<Icon icon="close" />}
-                    circle
-                    size="xs"
-                />
+                <a href="#" onClick={props.onRemove}>
+                    <Icon className="mr-2" icon="minus-circle"/>
+                </a>
             )}
             {editing && (
                 <Grid fluid>
@@ -183,9 +181,7 @@ export const RateOptions = (props: RateOptionsProps) => {
                                     store.delete_option(_id).then(async r => {
                                         if (r.status)
                                             store.setState(
-                                                await store.load(user, {
-                                                    rates: false,
-                                                })
+                                                {options: store.state.options.filter(v => v._id !== _id)}
                                             )
                                     })
                                 }}
@@ -278,7 +274,6 @@ const CommissionRateForm = (props: Props) => {
     const [error, set_error] = useState(null)
     const [loading, set_loading] = useState(false)
 
-    const [default_filelist, set_default_filelist] = useState([])
     const [filelist, set_filelist] = useState([])
     const [uploading, set_uploading] = useState(false)
     const [upload_response, set_upload_response] = useState(undefined)
@@ -292,17 +287,6 @@ const CommissionRateForm = (props: Props) => {
                 price: decimal128ToFloat(props.defaultData.price),
                 extras: props.defaultData?.extras.map(v => v._id),
             })
-            if (props.defaultData.image?.paths?.length) {
-                set_default_filelist([
-                    {
-                        name: 'image_' + props.defaultData._id,
-                        fileKey: 1,
-                        url: props.defaultData.image.paths[0].url,
-                    },
-                ])
-            } else {
-                set_default_filelist([])
-            }
         }
     }, [props.defaultData])
 
@@ -315,7 +299,7 @@ const CommissionRateForm = (props: Props) => {
             set_document({
                 user: current_user._id,
                 ...submit_value,
-                image: upload_response,
+                image: upload_response?.data,
                 _id: props?.defaultData._id,
             })
 
@@ -390,29 +374,8 @@ const CommissionRateForm = (props: Props) => {
             </FormGroup>
             <FormGroup>
                 <h5>{t`Cover`}</h5>
-                <Uploader
-                    fluid
-                    data={{ type: 'CommissionRate' }}
-                    action={pages.upload}
-                    ref={uploader}
-                    accept="image/*"
-                    listType="picture"
-                    fileList={filelist.length ? filelist : default_filelist}
-                    autoUpload={false}
-                    multiple={false}
-                    withCredentials={true}
-                    headers={get_authorization_header()}
-                    onChange={f => {
-                        set_filelist([f[f.length - 1]])
-                    }}
-                    onSuccess={r => {
-                        set_upload_response(r?.data)
-                        set_uploading(false)
-                    }}>
-                    <button type="button">
-                        <Icon icon="camera-retro" size="lg" />
-                    </button>
-                </Uploader>
+                <Upload ref={uploader} defaultData={props.defaultData} type="Image"
+                onChange={set_filelist} onUpload={r => {set_upload_response(r); set_uploading(false)}}/>
             </FormGroup>
             <FormGroup>
                 <Grid fluid>

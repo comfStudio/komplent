@@ -1,12 +1,13 @@
 import React from 'react'
 import { useCommissionStore } from '@client/store/commission'
-import { Grid, Row, Col } from 'rsuite'
+import { Grid, Row, Col, Placeholder, List, Icon } from 'rsuite'
 import { PanelContainer } from '@components/App/MainLayout'
 import { t } from '@utility/lang'
 import { ApprovalButtons } from './CommissionProcess'
 import UserInfoCard from '@components/User/UserInfoCard'
 import { CommissionCard } from '@components/Profile/ProfileCommission'
 import { useUser } from '@hooks/user'
+import { useMessageTextToHTML } from '@hooks/db'
 
 const CommissionDescription = () => {
     const user = useUser()
@@ -15,6 +16,8 @@ const CommissionDescription = () => {
     let commission = store.get_commission()
 
     let is_owner = user._id === commission.from_user._id
+
+    let descr_html = useMessageTextToHTML(commission.body)
 
     return (
         <Grid fluid>
@@ -55,13 +58,28 @@ const CommissionDescription = () => {
             <Row>
                 <Col xs={24}>
                     <h4 className="pb-1 mb-2">{t`Information`}</h4>
-                    <p>{commission.body}</p>
+                    {!!!descr_html && <Placeholder.Paragraph rows={8} />}
+                    {!!descr_html && <p dangerouslySetInnerHTML={{ __html: descr_html }} />}
                 </Col>
             </Row>
             <Row>
                 <Col xs={24}>
                     <h4 className="pb-1 mb-2">{t`Attachments`}</h4>
-                    <PanelContainer bordered></PanelContainer>
+                    <PanelContainer bordered>
+                        <List hover>
+                            {commission.attachments.map(v => {
+                                return (
+                                    <a href={v.url} className="unstyled" key={v._id}>
+                                    <List.Item>
+                                        <div className="pl-2">
+                                            <Icon icon="file" className="mr-2"/> {v.name}
+                                        </div>
+                                    </List.Item>
+                                    </a>
+                                )
+                            })}
+                        </List>
+                    </PanelContainer>
                 </Col>
             </Row>
         </Grid>

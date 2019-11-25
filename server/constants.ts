@@ -77,7 +77,7 @@ export type TaskDataTypeMap<T> = T extends TASK.followed_user
     : T extends TASK.reset_login
     ? { user_id: string }
     : T extends TASK.cdn_upload
-    ? { image_id: string; local_path: string; name: string | undefined }
+    ? { file_id: string; local_path: string; name: string | undefined, type: "Image" | "Attachment" }
     : T extends TASK.cdn_delete
     ? { key: string }
     : never

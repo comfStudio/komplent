@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import {
     Button,
     Panel,
@@ -50,7 +50,10 @@ import { make_profile_urlpath } from '@utility/pages'
 import { RateOptions } from '@components/Form/CommissionRateForm'
 import TextEditor from '@components/App/TextEditor'
 import { CenterPanel } from '@components/App/MainLayout'
-import { useTextToHTML } from '@hooks/db'
+import { useDatabaseTextToHTML } from '@hooks/db'
+import MessageText from '@components/App/MessageText'
+import Upload, { UploadProps } from '@components/App/Upload'
+import debounce from 'lodash/debounce'
 
 const {
     StringType,
@@ -235,39 +238,11 @@ export const CommissionTiersRow = (props: CommissionTiersRowProps) => {
     )
 }
 
-const Attachments = props => {
-    const fileList = [
-        {
-            name: 'a.png',
-            fileKey: 1,
-            url:
-                'https://user-images.githubusercontent.com/1203827/47638792-92414e00-db9a-11e8-89c2-f8f430a23cd3.png',
-        },
-        {
-            name: 'b.png',
-            fileKey: 2,
-            url:
-                'https://user-images.githubusercontent.com/1203827/47638807-9d947980-db9a-11e8-9ee5-e0cc9cd7e8ad.png',
-        },
-    ]
-
-    return (
-        <Uploader
-            listType="picture"
-            defaultFileList={fileList}
-            action="//jsonplaceholder.typicode.com/posts/">
-            <button>
-                <Icon icon="camera-retro" size="lg" />
-            </button>
-        </Uploader>
-    )
-}
-
 const commission_request_model = Schema.Model({
     from_title: StringType().isRequired(t`This field is required.`),
     commission_rate: StringType().isRequired(t`This field is required.`),
     extras: ArrayType(),
-    body: StringType().isRequired(t`This field is required.`),
+    body: ObjectType().isRequired(t`This field is required.`),
     tos: StringType().isRequired(t`This field is required.`),
 })
 
@@ -292,7 +267,7 @@ export const ProfileCommission = () => {
     const router = useRouter()
 
     const { profile_user, current_user } = useProfileUser()
-    const commission_message_html = useTextToHTML(
+    const commission_message_html = useDatabaseTextToHTML(
         profile_user?.commission_request_message
     )
 
@@ -302,12 +277,18 @@ export const ProfileCommission = () => {
     const [form_ref, set_form_ref] = useState(null)
     const [form_value, set_form_value] = useState({
         commission_rate: selected_rate || undefined,
-    })
+    } as any)
     const [error, set_error] = useState(null)
     const [loading, set_loading] = useState(false)
 
     const commission_store = useCommissionStore()
     const store = useCommissionRateStore()
+
+    const [ file_count, set_file_count ] = useState(0)
+    const [ attachments, set_attachments ] = useState({} as any)
+    const [ uploading, set_uploading ] = useState(false)
+    const [ submit_value, set_submit_value ] = useState()
+    const uploader = useRef<any>()
 
     let selected_rate_obj = null
 
@@ -342,6 +323,41 @@ export const ProfileCommission = () => {
         }
     }
 
+    useEffect(() => {
+        if (submit_value && !uploading && file_count === Object.keys(attachments).length) {
+            set_submit_value(undefined)
+            let data = {
+                ...submit_value,
+                extras: submit_value.extras
+                    ? submit_value.extras.filter(i =>
+                          available_options.includes(i)
+                      )
+                    : [],
+                from_user: from_user._id,
+                to_user: to_user._id,
+                rate: submit_value.commission_rate,
+                attachments: Object.values(attachments)
+            }
+    
+            commission_store
+                .create_commission(data)
+                .then(r => {
+                    set_loading(false)
+                    if (r.status) {
+                        router.push(
+                            pages.commission +
+                                `/${r.body.data._id}`
+                        )
+                    } else {
+                        set_error(r.body.error)
+                    }
+                    return r
+                })
+        }
+    }, [submit_value, uploading, file_count, attachments])
+
+    const on_upload = debounce((r) => set_uploading(r), 500)
+
     return (
         <Form
             fluid
@@ -361,7 +377,7 @@ export const ProfileCommission = () => {
                     </Col>
                 </Row>
                 <Row>
-                    <GuidelineList />
+                    <GuidelineList/>
                 </Row>
                 <hr />
                 <Row>
@@ -396,8 +412,7 @@ export const ProfileCommission = () => {
                             </ControlLabel>
                             <FormControl
                                 name="body"
-                                componentClass="textarea"
-                                rows={3}
+                                accepter={MessageText}
                                 placeholder={t`Describe your request`}
                             />
                         </FormGroup>
@@ -405,7 +420,19 @@ export const ProfileCommission = () => {
                 </Row>
                 <Row>
                     <h3>{t`Attachments`}</h3>
-                    <Attachments />
+                    <Upload ref={uploader} type="Attachment" multiple
+                    onRemove={f => { 
+                        let d = {...attachments}
+                        delete d[f.name]
+                        set_attachments(d)
+                    }}
+                    onChange={f => set_file_count(f.length)}
+                    onUpload={(r_data, f) => {
+                        if (r_data.data) {
+                            attachments[f.name] = r_data.data
+                        }
+                        on_upload(false)
+                    }} />
                 </Row>
                 <Row>
                     <h3>{t`Terms of Service`}</h3>
@@ -444,37 +471,11 @@ export const ProfileCommission = () => {
                                 if (form_ref && form_ref.check()) {
                                     set_loading(true)
                                     set_error(null)
-                                    let data = {
-                                        ...form_value,
-                                        extras: form_value.extras
-                                            ? form_value.extras.filter(i =>
-                                                  available_options.includes(i)
-                                              )
-                                            : [],
-                                        from_user: from_user._id,
-                                        to_user: to_user._id,
-                                        rate: form_value.commission_rate,
+                                    if (file_count) {
+                                        await uploader.current.start()
+                                        set_uploading(true)
                                     }
-
-                                    try {
-                                        let r = await commission_store
-                                            .create_commission(data)
-                                            .then(r => {
-                                                set_loading(false)
-                                                return r
-                                            })
-
-                                        if (r.status) {
-                                            router.push(
-                                                pages.commission +
-                                                    `/${r.body.data._id}`
-                                            )
-                                        } else {
-                                            set_error(r.body.error)
-                                        }
-                                    } catch (err) {
-                                        set_error(err.message)
-                                    }
+                                    set_submit_value(form_value)
                                 }
                             }}>
                             {t`Send request`}
