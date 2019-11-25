@@ -384,8 +384,7 @@ const PendingProduct = (props: ProcessProps) => {
     const name = commission?.to_user.username ?? ''
     const done = props?.data?.done ?? false
 
-    const count = 1
-    //const count = commission && commission.products ? commission.products.length : 0
+    const count = commission && commission.products ? commission.products.length : 0
 
     const revisions_count = store.get_stage_count('revision')
     const show_panel = !props.hidden || props.active
@@ -393,15 +392,15 @@ const PendingProduct = (props: ProcessProps) => {
     return (
         <React.Fragment>
             <TimelineTitle onClick={props.onClick} date={props.done_date}>
-                {props.hidden || done ? t`Product` : t`Pending product`}
+                {props.hidden || done ? t`Assets` : t`Pending assets`}
             </TimelineTitle>
             {show_panel && (
                 <TimelinePanel>
                     {!!count && props.is_owner && (
-                        <p>{t`There are ${count} product(s) available.`}</p>
+                        <p>{t`There are ${count} asset(s) available.`}</p>
                     )}
                     {done && !props.is_owner && (
-                        <p>{t`You have added ${count} product(s).`}</p>
+                        <p>{t`You have added ${count} asset(s).`}</p>
                     )}
                     {!done && !!!count && props.is_owner && (
                         <p>{t`Waiting on ${name} to finish the commission request.`}</p>
@@ -412,7 +411,7 @@ const PendingProduct = (props: ProcessProps) => {
                                 <p>{t`Waiting for you to finish the request.`}</p>
                             )}
                             {!props.is_owner && !!count && (
-                                <p>{t`You have added ${count} product(s).`}</p>
+                                <p>{t`You have added ${count} asset(s).`}</p>
                             )}
                             {!!count && (
                                 <ButtonToolbar>
@@ -432,7 +431,7 @@ const PendingProduct = (props: ProcessProps) => {
                                 </ButtonToolbar>
                             )}
                             {!!!count && (
-                                <p>{t`Please upload the products in the Products tab.`}</p>
+                                <p>{t`Please upload the assets in the Assets tab.`}</p>
                             )}
                         </>
                     )}
@@ -503,9 +502,9 @@ const Unlocked = (props: ProcessProps) => {
             {show_panel && (
                 <TimelinePanel>
                     {!done && (
-                        <p>{t`Commission product(s) will get unlocked`}</p>
+                        <p>{t`Commission asset(s) will get unlocked`}</p>
                     )}
-                    {done && <p>{t`Commission product(s) is now unlocked!`}</p>}
+                    {done && <p>{t`Commission asset(s) is now unlocked!`}</p>}
                 </TimelinePanel>
             )}
         </React.Fragment>
@@ -601,7 +600,7 @@ const Completed = (props: ProcessProps) => {
                             </span>
                             <p>{t`Commission request was completed.`}</p>
                             {props.is_owner && (
-                                <p>{t`Please check the Products section for your product(s).`}</p>
+                                <p>{t`Please check the Assets section for your asset(s).`}</p>
                             )}
                         </React.Fragment>
                     )}
@@ -914,24 +913,24 @@ const CommissionProcess = () => {
                                 <Link
                                     href={
                                         pages.commission +
-                                        `/${commission._id}/products`
+                                        `/${commission._id}/assets`
                                     }
                                     passHref>
                                     <Button
                                         componentClass="a"
-                                        appearance="primary">{t`Add Products(s)`}</Button>
+                                        appearance="primary">{t`Add Asset`}</Button>
                                 </Link>
                             )}
                             {is_owner && is_complete && (
                                 <Link
                                     href={
                                         pages.commission +
-                                        `/${commission._id}/products`
+                                        `/${commission._id}/assets`
                                     }
                                     passHref>
                                     <Button
                                         componentClass="a"
-                                        appearance="primary">{t`Check Products(s)`}</Button>
+                                        appearance="primary">{t`Check Asset`}</Button>
                                 </Link>
                             )}
                         </ButtonToolbar>

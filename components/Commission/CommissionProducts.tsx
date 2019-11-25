@@ -1,30 +1,46 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Grid, Row, Col, Uploader, Icon, Button } from 'rsuite'
+import { File } from 'react-kawaii'
 
 import Image from '@components/App/Image'
 import { t } from '@utility/lang'
 import { useCommissionStore } from '@store/commission'
 import { useUser } from '@hooks/user'
+import Upload from '@components/App/Upload'
+import { CenterPanel } from '@components/App/MainLayout'
+import { useUpdateDatabase } from '@hooks/db'
+import { update_db } from '@client/db'
+import { debounceReduce } from '@utility/misc'
 
 interface ProductProps {
     is_owner: boolean
-    commission: any
+    data: any
 }
 
 export const Product = (props: ProductProps) => {
+
+    const store = useCommissionStore()
+    const commission = store.get_commission()
+    const [ delete_loading, set_delete_loading ] = useState(false)
+
     return (
         <div>
-            <Image h="200px" />
+            <Image src={props?.data?.url} h="200px" />
             <div className="mt-2">
                 <Button
+                    href={props?.data?.url}
+                    componentClass="a"
                     appearance="primary"
                     block
                     size="sm">{t`Download`}</Button>
-                {!props.is_owner && !props.commission.finished && (
+                {!props.is_owner && !commission.finished && (
                     <Button
                         appearance="ghost"
                         block
-                        size="sm">{t`Delete`}</Button>
+                        loading={delete_loading}
+                        size="sm"
+                        onClick={() => {set_delete_loading(true); store.delete_product(props.data._id).finally(() => { set_delete_loading(false) })}}
+                        >{t`Delete`}</Button>
                 )}
             </div>
         </div>
@@ -35,32 +51,60 @@ const CommissionProducts = () => {
     const user = useUser()
     const store = useCommissionStore()
     const commission = store.get_commission()
+    const [uploading, set_uploading] = useState(false)
+
     let is_owner = user._id === commission.from_user._id
+    const products = commission?.products ?? []
+
+    const on_upload = debounceReduce((args: any[]) => {
+        const d = args.map(v => v?.data).filter(Boolean)
+        if (d.length) {
+            store.update({products: [...commission.products, ...d]}).finally(() => {
+                set_uploading(false)
+            })
+        } else {
+            set_uploading(false)
+        }
+    }, 500)
 
     return (
         <Grid fluid>
+            {!commission.accepted &&
             <Row>
-                <Col xs={3}>
-                    <Product commission={commission} is_owner={is_owner} />
+                <Col>
+                    <CenterPanel
+                        subtitle={t`Please accept the commission request to add assets`}>
+                        <File mood="sad" className="emoji" color="rgba(0, 0, 0, 0.5)" />
+                    </CenterPanel>
                 </Col>
-                <Col xs={3}>
-                    <Product commission={commission} is_owner={is_owner} />
-                </Col>
-                <Col xs={3}>
-                    <Product commission={commission} is_owner={is_owner} />
-                </Col>
+            </Row>}
+            {commission.accepted &&
+            <Row>
+                {products.map(v => {
+                    return (
+                        <Col key={v._id} xs={3}>
+                            <Product data={v} is_owner={is_owner} />
+                        </Col>
+                    )
+                })}
                 {!is_owner && (
-                    <Col xs={2}>
+                    <Col xs={2} key="add">
                         <div className="text-center">
-                            <Uploader multiple listType="picture" action="">
+                            <Upload autoUpload hideFileList multiple type="Attachment"
+                            onError={() => set_uploading(false)}
+                            onChange={() => set_uploading(true)}
+                            onUpload={(r, f) => {
+                                on_upload(r)                                
+                            }}>
                                 <button>
-                                    <Icon icon="plus" size="lg" />
+                                    <Icon icon={uploading ? "circle-o-notch" : "plus"} size="lg" spin={uploading} />
                                 </button>
-                            </Uploader>
+                            </Upload>
                         </div>
                     </Col>
                 )}
             </Row>
+            }
         </Grid>
     )
 }

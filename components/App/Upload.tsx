@@ -5,18 +5,22 @@ import * as pages from '@utility/pages'
 import { FileType } from 'rsuite/lib/Uploader';
 import { useUser } from '@hooks/user';
 import { is_server } from '@utility/misc';
+import { ReactProps } from '@utility/props';
 
-export interface UploadProps {
+export interface UploadProps extends ReactProps {
     defaultData?: any
     requestData?: object
     type?: "Image" | "Attachment"
     multiple?: boolean
+    autoUpload?: boolean
+    hideFileList?: boolean
     onChange?: (filelist: FileType[]) => void
     onRemove?: (file: FileType) => void
     onUpload?: (response, file: FileType) => void
+    onError?: (reason, file: FileType) => void
 }
 
-const Upload = React.forwardRef((({type = "Image", ...props}: UploadProps = {}, ref) => {
+const Upload = React.forwardRef((({type = "Image", autoUpload = false, ...props}: UploadProps = {}, ref) => {
 
     const [default_filelist, set_default_filelist] = useState([])
     const [filelist, set_filelist] = useState([])
@@ -39,6 +43,8 @@ const Upload = React.forwardRef((({type = "Image", ...props}: UploadProps = {}, 
         }
     }, [props.defaultData])
 
+    const el = props.children ? props.children : <button type="button"><Icon icon={props.multiple ? "file" : "camera-retro"} size="lg" /></button>
+
     return (
         <Uploader
             fluid
@@ -48,10 +54,12 @@ const Upload = React.forwardRef((({type = "Image", ...props}: UploadProps = {}, 
             accept="image/*"
             listType="picture"
             fileList={filelist.length ? filelist : default_filelist}
-            autoUpload={false}
+            autoUpload={autoUpload}
             multiple={props.multiple}
+            fileListVisible={!props.hideFileList}
             withCredentials={true}
             headers={!is_server() ? get_authorization_header() : undefined}
+            onError={props.onError}
             onRemove={props.onRemove}
             onChange={f => {
                 let d = f
@@ -68,9 +76,7 @@ const Upload = React.forwardRef((({type = "Image", ...props}: UploadProps = {}, 
                     props.onUpload(r, f)
                 }
             }}>
-            <button type="button">
-                <Icon icon="camera-retro" size="lg" />
-            </button>
+            {el}
         </Uploader>
     )
 }))

@@ -89,6 +89,8 @@ commission_schema.statics.find_related = async function(
                 s = s.populate('from_user').populate('to_user')
             }
 
+            s = s.sort({created: -1, accepted: -1})
+
             if (lean) {
                 s = s.lean()
             }

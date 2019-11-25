@@ -45,13 +45,13 @@ const CommissionMenu = (props: MenuProps) => {
                     active={props.activeKey == 'inbox'}>{t`Messages`}</Nav.Item>
             </Link>
             <Link
-                href={pages.commission + `/${commission._id}/products`}
+                href={pages.commission + `/${commission._id}/assets`}
                 passHref>
                 <Nav.Item
-                    eventKey="products"
+                    eventKey="assets"
                     active={
-                        props.activeKey == 'products'
-                    }>{t`Products`}</Nav.Item>
+                        props.activeKey == 'assets'
+                    }>{t`Assets`}</Nav.Item>
             </Link>
             {!is_owner && (
                 <Link

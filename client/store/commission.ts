@@ -26,7 +26,6 @@ import {
     commission_phases,
 } from '@server/constants'
 import { CommissionProcessType } from '@schema/user'
-import update from 'immutability-helper'
 import useInboxStore from './inbox'
 
 export const useCommissionStore = createStore(
@@ -299,6 +298,12 @@ export const useCommissionStore = createStore(
             return r
         },
 
+        async delete_product(_id) {
+            const r = await update_db({model: "Attachment", data:{_id}, delete: true})
+            this.update({products: this.get_commission().products.filter(v => v._id !== _id)})
+            return r
+        },
+
         async confirm_sketches() {
             await this.exhaust_revisions()
             let r = await this.next_phase()
@@ -516,6 +521,7 @@ export const useCommissionStore = createStore(
                         .populate('from_user')
                         .populate('to_user')
                         .populate('attachments')
+                        .populate('products')
                         .populate('phases', phase_select)
                         .populate('stage', phase_select)
                     return r.toJSON()
@@ -535,6 +541,7 @@ export const useCommissionStore = createStore(
                             'from_user',
                             'to_user',
                             'attachments',
+                            'products',
                             ['phases', phase_select],
                             ['stage', phase_select],
                         ],
