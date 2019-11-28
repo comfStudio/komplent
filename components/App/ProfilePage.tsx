@@ -48,10 +48,12 @@ class ProfilePage extends OptionalAuthPage<Props> {
             ) {
                 q['$or'].push({ visibility: 'hidden' })
             }
-            let p = 'tags'
+            let p = ['tags', 'profile_cover', 'avatar']
             if (is_server()) {
                 profile_user = await User.findOne(q)
-                    .populate(p)
+                    .populate(p[0])
+                    .populate(p[1])
+                    .populate(p[2])
                     .lean()
             } else {
                 await fetch('/api/fetch', {

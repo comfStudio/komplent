@@ -36,14 +36,16 @@ import CommissionRateForm, {
 
 import './ProfileEdit.scss'
 import { useSessionStorage } from 'react-use'
-import { useUser } from '@hooks/user'
+import { useUser, useProfileUser } from '@hooks/user'
 import { useUpdateDatabase } from '@hooks/db'
 import useUserStore from '@store/user'
 import { post_task, TaskMethods, post_task_debounce } from '@client/task'
 import { TASK, NSFW_LEVEL } from '@server/constants'
 import TextEditor from '@components/App/TextEditor'
 import { getCountryNames } from '@client/dataset'
-import { MessageText } from '@components/Settings/CommissionMessage'
+import MessageText from '@components/App/MessageText'
+import Upload from '@components/App/Upload'
+import { UserAvatar } from '@components/Settings/UserSettings'
 
 export const Sections = () => {
     return (
@@ -63,6 +65,22 @@ export const Sections = () => {
 
 export const ProfileColor = () => {
     return <EditGroup title={t`Color`}></EditGroup>
+}
+
+export const ProfileCoverAvatar = () => {
+
+    const store = useUserStore()
+
+    const [cover_changed, set_cover_changed] = useState(false)
+
+    return <EditGroup>
+        <Upload autoUpload hideFileList onUpload={(res) => {
+                    store.update_user({profile_cover: res?.data}).then(r => set_cover_changed(r.status))
+                }}>
+                    {cover_changed ? <Button><Icon icon="check" size="3x"/></Button> : <Button>{t`Cover`}</Button>}
+        </Upload>
+        <UserAvatar/>
+    </EditGroup>
 }
 
 export const CommissionStatus = () => {
@@ -390,6 +408,8 @@ export const ProfileEdit = () => {
                 {/* <ProfileColor/> */}
                 {/* <Tags/> */}
                 <ProfileNSFWLevel />
+                <span>{t`Change Cover & Avatar:`}</span>
+                <ProfileCoverAvatar/>
                 <Socials />
             </EditSection>
             <h4>{t`About`}</h4>

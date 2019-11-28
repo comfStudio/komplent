@@ -20,7 +20,7 @@ export const debounceReduce = (func, wait, combine = (acc, args) => (acc || []).
 
 export const decimal128ToFloat = (d: Decimal128) => {
     let n = 0.0
-    if (d !== undefined) {
+    if (d !== undefined && d !== null) {
         n = parseFloat(d.toString())
         if (isNaN(n)) {
             n = parseFloat(d['$numberDecimal'])
@@ -31,7 +31,7 @@ export const decimal128ToFloat = (d: Decimal128) => {
 
 export const decimal128ToMoney = (d: Decimal128) => {
     let n = dinero()
-    if (d !== undefined) {
+    if (d !== undefined && d !== null) {
         let s = d.toString()
         if (isNaN(parseFloat(s))) {
             s = d['$numberDecimal']

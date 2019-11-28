@@ -181,7 +181,6 @@ export const comission_rate_schema = new Schema(
     {
         title: String,
         description: String,
-        negotiable: Boolean,
         commission_deadline: {
             // in days
             type: Number,

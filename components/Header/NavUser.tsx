@@ -9,6 +9,7 @@ import { t } from '@app/utility/lang'
 import './NavUser.scss'
 import { useMount } from 'react-use'
 import { useNotificationStore } from '@store/user'
+import { NoProfileContext } from '@client/context'
 
 interface Props {}
 
@@ -115,17 +116,19 @@ export const NavUserDropdown = (props: NavUserProps) => {
     const user = useUser()
 
     return (
-        <Dropdown
-            className="nav-user-dropdown lg:!hidden"
-            placement="bottomEnd"
-            renderTitle={NavUserAvatar}>
-            <li className="header">✦ {`${user.name || user.username}`} ✦</li>
-            <NavUserMenu
-                element={Dropdown}
-                activeKey={props.activeKey}
-                dropdown
-            />
-        </Dropdown>
+        <NoProfileContext>
+            <Dropdown
+                className="nav-user-dropdown lg:!hidden"
+                placement="bottomEnd"
+                renderTitle={NavUserAvatar}>
+                <li className="header">✦ {`${user.name || user.username}`} ✦</li>
+                <NavUserMenu
+                    element={Dropdown}
+                    activeKey={props.activeKey}
+                    dropdown
+                />
+            </Dropdown>
+        </NoProfileContext>
     )
 }
 

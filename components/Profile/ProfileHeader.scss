@@ -27,10 +27,11 @@ $header-container-indent: 16em;
     width: 12em;
     height: 12em;
     border-radius: 10%;
-}
-
-.avatar img {
-    border-radius: 10%;
+    overflow: hidden;
+    
+    img {
+        border-radius: 10%;
+    }
 }
 
 #profile-header .container .avatar {
@@ -50,7 +51,7 @@ $header-container-indent: 16em;
     pointer-events: none;
 }
 
-#profile-header .container img {
+#profile-header .container .cover-image {
     position: absolute;
     left: 0;
     right: 0;

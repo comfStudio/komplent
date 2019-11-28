@@ -156,9 +156,22 @@ attachment_schema.post('remove', async function() {
     }
 })
 
+comission_rate_schema.pre('save', async function() {
+    if (!this.commission_deadline) {
+        this.commission_deadline = 14
+    }
+})
+
 comission_rate_schema.post('save', async function() {
     if (this._previous_image) {
         let im = await Image.findById({ _id: this._previous_image })
+        if (im) im.remove()
+    }
+})
+
+comission_rate_schema.post('remove', async function() {
+    if (this.image) {
+        let im = await Image.findById(this.image)
         if (im) im.remove()
     }
 })

@@ -677,6 +677,21 @@ export const useCommissionRateStore = createStore(
             }
             return r
         },
+        async delete_rate(id, params: object = undefined) {
+            let r = await update_db({
+                model: 'CommissionRate',
+                data: { _id: id },
+                schema: comission_rate_schema,
+                delete: true,
+                ...params,
+            })
+            if (r.status) {
+                this.setState({
+                    rates: this.state.rates.filter(v => v._id != id),
+                })
+            }
+            return r
+        },
         async delete_option(id, params: object = undefined) {
             let r = await update_db({
                 model: 'CommissionExtraOption',

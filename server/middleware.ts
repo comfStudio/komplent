@@ -30,6 +30,7 @@ export const get_jwt_user = async jwt_data => {
     if (jwt_data.user_id) {
         return await User.findById(jwt_data.user_id)
             .populate('settings')
+            .populate('avatar')
             .lean()
     }
 }

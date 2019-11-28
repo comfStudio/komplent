@@ -1,26 +1,51 @@
 import './ProfileHeader.scss'
-import React from 'react'
+import React, { useRef, useState } from 'react'
 import { IconButton, Icon } from 'rsuite'
 
 import { Container } from '@components/App/MainLayout'
 import { ReactProps } from '@utility/props'
-import { useProfileUser } from '@hooks/user'
+import { useProfileUser, useUser } from '@hooks/user'
 import { t } from '@app/utility/lang'
 import { FollowButton } from '.'
 import CommissionButton from '@components/Commission/CommissionButton'
+import { useHoverDirty } from 'react-use'
+import Upload from '@components/App/Upload'
+import { FileType } from 'rsuite/lib/Uploader'
+import useUserStore from '@store/user'
+import Image from '@components/App/Image'
+
+interface HoverImageUploadProps {
+    children: any
+    elementRef: any
+    enabled?: boolean
+    onUpload: (response, file: FileType) => void
+}
+
 
 export const Avatar = props => {
+
+    const {
+        profile_user,
+    } = useProfileUser()
+
+    const user = useUser()
+
     return (
-        <div className="avatar border-r-4 border-l-4 border-t-4 border-white">
-            <img src="https://pbs.twimg.com/profile_images/1020783894042488832/lm0a9IeQ_400x400.jpg" />
+        <div className="avatar">
+            <Image className="avatar-image" src={(profile_user || user)?.avatar?.paths?.[0]?.url} w={"250px"} h={"250px"}/>
         </div>
     )
 }
 
 export const Cover = props => {
+
+    const {
+        profile_user,
+    } = useProfileUser()
+
     return (
         <div className="cover">
-            <img src="https://pbs.twimg.com/profile_banners/1003433765148987392/1532208395/1500x500" />
+            <Image className="cover-image" src={profile_user?.profile_cover?.paths?.[0]?.url} w={"1500px"} h={"500px"}/>
         </div>
     )
 }

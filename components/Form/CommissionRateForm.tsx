@@ -273,6 +273,7 @@ const CommissionRateForm = (props: Props) => {
     const [form_value, set_form_value] = useState()
     const [error, set_error] = useState(null)
     const [loading, set_loading] = useState(false)
+    const [price_disabled, set_price_disabled] = useState(false)
 
     const [filelist, set_filelist] = useState([])
     const [uploading, set_uploading] = useState(false)
@@ -287,6 +288,7 @@ const CommissionRateForm = (props: Props) => {
                 price: decimal128ToFloat(props.defaultData.price),
                 extras: props.defaultData?.extras.map(v => v._id),
             })
+            set_price_disabled(props?.defaultData?.price === null ? true : false)
         }
     }, [props.defaultData])
 
@@ -299,8 +301,9 @@ const CommissionRateForm = (props: Props) => {
             set_document({
                 user: current_user._id,
                 ...submit_value,
+                price: price_disabled ? null : submit_value.price,
                 image: upload_response?.data,
-                _id: props?.defaultData._id,
+                _id: props?.defaultData?._id,
             })
 
             store
@@ -339,15 +342,31 @@ const CommissionRateForm = (props: Props) => {
                 />
             </FormGroup>
             <FormGroup>
-                <ControlLabel>{t`Price`}:</ControlLabel>
-                <FormControl
-                    fluid
-                    name="price"
-                    prefix="$"
-                    accepter={InputNumber}
-                    type="number"
-                    required
-                />
+                <Grid fluid>
+                    <Row>
+                        <Col xs={18}>
+                        <ControlLabel>{t`Price`}:</ControlLabel>
+                        <FormControl
+                            fluid
+                            disabled={price_disabled}
+                            name="price"
+                            prefix="$"
+                            accepter={InputNumber}
+                            type="number"
+                            required
+                        />
+                        </Col>
+                        <Col xs={4}>
+                        <ControlLabel style={{visibility: "hidden"}}>{t`Custom`}</ControlLabel>
+                        <Checkbox checked={price_disabled} onChange={(v, checked) => { 
+                            if (checked && !form_value?.price) {
+                                set_form_value({...form_value, price: 0})
+                            }
+                            set_price_disabled(checked)
+                         }}>{t`Custom`}</Checkbox>
+                        </Col>
+                    </Row>
+                </Grid>
             </FormGroup>
             <FormGroup>
                 <ControlLabel>{t`Deadline`}:</ControlLabel>
@@ -380,7 +399,7 @@ const CommissionRateForm = (props: Props) => {
             <FormGroup>
                 <Grid fluid>
                     <Row>
-                        <Col xs={8}>
+                        <Col xs={14}>
                             <Button
                                 type="button"
                                 onClick={ev => {
@@ -389,8 +408,23 @@ const CommissionRateForm = (props: Props) => {
                                         props.onDone()
                                     }
                                 }}>{t`Cancel`}</Button>
+                            {!!props.defaultData &&
+                            <Button
+                            className="ml-2"
+                            type="button"
+                            color="red"
+                            onClick={ev => {
+                                ev.preventDefault();
+                                store.delete_rate(props.defaultData._id).then(r => {
+                                    if (r.status) {
+                                        if (props.onDone) {
+                                            props.onDone()
+                                        }
+                                    }
+                                })
+                            }}>{t`Delete`}</Button>}
                         </Col>
-                        <Col xs={12} xsPush={4}>
+                        <Col xs={6} xsPush={4}>
                             <Button
                                 loading={loading}
                                 type="submit"

@@ -5,9 +5,10 @@ import * as pages from '@utility/pages'
 import { FileType } from 'rsuite/lib/Uploader';
 import { useUser } from '@hooks/user';
 import { is_server } from '@utility/misc';
-import { ReactProps } from '@utility/props';
+import { ReactProps, HTMLElementProps } from '@utility/props';
 
 export interface UploadProps extends ReactProps {
+    fluid?: boolean
     defaultData?: any
     requestData?: object
     type?: "Image" | "Attachment"
@@ -32,7 +33,7 @@ const Upload = React.forwardRef((({type = "Image", autoUpload = false, ...props}
             if (props.defaultData.image?.paths?.length) {
                 set_default_filelist([
                     {
-                        name: 'image_' + props.defaultData._id,
+                        name: 'image_' + props.defaultData?._id,
                         fileKey: 1,
                         url: props.defaultData.image.paths[0].url,
                     },
@@ -48,10 +49,11 @@ const Upload = React.forwardRef((({type = "Image", autoUpload = false, ...props}
     return (
         <Uploader
             fluid
+            className={props.fluid ? "fluid-uploader" : undefined}
             data={{user: user?._id, type, ...props.requestData}}
             action={pages.upload}
             ref={ref}
-            accept="image/*"
+            accept={type === 'Image' ? "image/*" : undefined}
             listType="picture"
             fileList={filelist.length ? filelist : default_filelist}
             autoUpload={autoUpload}

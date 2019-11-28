@@ -12,6 +12,7 @@ interface Profile {
 }
 
 export const ProfileContext = React.createContext<Profile>({})
+export const NoProfileContext = (props: any) => { return React.createElement(ProfileContext.Provider, {value: {}}, props.children) }
 
 interface Login {
     next_page?: string | boolean

@@ -97,7 +97,7 @@ const CommissionCardHeader = (props: CommissionCardProps) => {
             <Row>
                 <Col xs={8}>
                     <span className="price">
-                        {decimal128ToMoneyToString(price)}
+                        {price === null ? t`Custom` : decimal128ToMoneyToString(price)}
                     </span>
                 </Col>
                 <Col xs={16}>

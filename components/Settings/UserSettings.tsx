@@ -1,10 +1,11 @@
-import React from 'react'
-import { Grid, RadioGroup, Radio, SelectPicker, Button } from 'rsuite'
+import React, { useState } from 'react'
+import { Grid, RadioGroup, Radio, SelectPicker, Button, Icon } from 'rsuite'
 import { EditGroup, EditSection } from '.'
 
 import { t } from '@app/utility/lang'
 import useUserStore from '@store/user'
 import { getCountryNames } from '@client/dataset'
+import Upload from '@components/App/Upload'
 
 export const UserType = () => {
     return (
@@ -67,11 +68,26 @@ export const Currency = () => {
     )
 }
 
+export const UserAvatar = () => {
+
+    const store = useUserStore()
+    const [avatar_changed, set_avatar_changed] = useState(false)
+
+    return (
+        <Upload autoUpload hideFileList onUpload={(res) => {
+                    store.update_user({avatar: res?.data}).then(r => set_avatar_changed(r.status))
+                }}>
+                    {avatar_changed ? <Button><Icon icon="check" size="3x"/></Button> : <Button>{t`Avatar`}</Button>}
+        </Upload>
+    )
+}
+
 const UserSettings = () => {
     return (
         <Grid fluid>
             <h4>{t`General`}</h4>
             <EditSection>
+                <UserAvatar/>
                 <Currency />
                 <Location />
             </EditSection>
