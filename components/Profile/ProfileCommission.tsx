@@ -239,7 +239,11 @@ export const CommissionTiersRow = (props: CommissionTiersRowProps) => {
 }
 
 const commission_request_model = Schema.Model({
-    from_title: StringType().isRequired(t`This field is required.`),
+    from_title: StringType().isRequired(t`This field is required.`)
+        .addRule((value, data) => {
+            if (value.length > 300) return false
+            return true
+        }, t`Title cannot be longer than 80 characters`),
     commission_rate: StringType().isRequired(t`This field is required.`),
     extras: ArrayType(),
     body: ObjectType().isRequired(t`This field is required.`),
@@ -413,6 +417,7 @@ export const ProfileCommission = () => {
                             <FormControl
                                 name="body"
                                 accepter={MessageText}
+                                maxLength={4000}
                                 placeholder={t`Describe your request`}
                             />
                         </FormGroup>

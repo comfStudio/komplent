@@ -414,7 +414,7 @@ export const ProfileEdit = () => {
             </EditSection>
             <h4>{t`About`}</h4>
             <EditSection>
-                <MessageText message_key="about" />
+                <MessageText message_key="about" maxLength={1000} />
             </EditSection>
         </Grid>
     )

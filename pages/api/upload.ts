@@ -26,7 +26,6 @@ export default with_auth_middleware(
 
             return form.parse(req, (err, fields, files) => {
                 if (files.file && !err) {
-                    log.debug(fields)
                     create_file(fields.type, fields.user, files.file.path)
                         .then(im => {
                             return res

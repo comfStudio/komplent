@@ -8,11 +8,12 @@ import { text_schema } from '@schema/general'
 interface MessageTextProps {
     message_key?: string
     placeholder?: string
+    maxLength?: number
     defaultValue?: any
     onChange?: (value) => void
 }
 
-export const MessageText = (props: MessageTextProps) => {
+export const MessageText = ({maxLength = 3500, ...props}: MessageTextProps) => {
     const store = useUserStore()
     const user = store.state.current_user
     const update = useUpdateDatabase(
@@ -54,6 +55,7 @@ export const MessageText = (props: MessageTextProps) => {
                     ? user[props.message_key].data
                     : undefined) : props.defaultValue
             }
+            maxLength={maxLength}
             placeholder={props.placeholder}
             onTextChange={({ delta }) => { set_delta(delta) } }
         />

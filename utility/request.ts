@@ -26,6 +26,7 @@ export const get_authorization_header = () => {
 
 interface FetchInit extends Omit<RequestInit, 'body'> {
     body?: string | object
+    file?: boolean
     json?: boolean
     auth?: boolean
 }
@@ -36,7 +37,7 @@ export const fetch = (url, props: FetchInit = {}) => {
         method: 'get',
     }
 
-    if (props.json || typeof props.body === 'object') {
+    if (!props.file && (props.json || typeof props.body === 'object')) {
         def_props.headers = Object.assign(
             def_props.headers || {},
             props.headers || {},

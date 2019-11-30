@@ -1,20 +1,89 @@
 import React, { Component } from 'react'
 import classNames from 'classnames'
-
+import { base64StringToBlob } from 'blob-util'
 import { t } from '@app/utility/lang'
 
 import { is_server } from '@utility/misc'
+import * as pages from '@utility/pages'
+import { fetch } from '@utility/request'
 
 import 'quill/dist/quill.snow.css'
 import 'quill/dist/quill.bubble.css'
+import { OK } from 'http-status-codes'
 const Quill = is_server() ? undefined : require('quill')
-const ImageDrop = is_server()
+const imageDropAndPaste = is_server()
     ? undefined
-    : require('quill-image-drop-module').ImageDrop
+    : require('quill-image-drop-and-paste').default
 
 if (!is_server()) {
-    Quill.register('modules/imageDrop', ImageDrop)
+    Quill.register('modules/imageDropAndPaste', imageDropAndPaste)
 }
+
+function upload_image(formdata, range, quill) {
+    const editor = quill.editor
+    quill.enable(false);
+
+    return fetch(pages.cdn_upload, {
+        method: 'post',
+        file: true,
+        body: formdata
+    }).then(async (response) => {
+        quill.enable(true);
+        if (response.status === OK) {
+            editor.insertEmbed(range.index, 'image', (await response.json()).data.url);
+            quill.setSelection(range.index + 1, Quill.sources.SILENT);
+        }
+    })
+    .catch(error => {
+        quill.enable(true);
+    });
+}
+
+function toolbar_img_handler() {
+    let fileInput = this.container.querySelector('input.ql-image[type=file]');
+
+    if (fileInput == null) {
+        fileInput = document.createElement('input');
+        fileInput.setAttribute('type', 'file');
+        fileInput.setAttribute('accept', 'image/png, image/gif, image/jpeg, image/bmp, image/x-icon');
+        fileInput.classList.add('ql-image');
+        fileInput.addEventListener('change', () => {
+            const files = fileInput.files;
+            const range = this.quill.getSelection(true);
+
+            if (!files || !files.length) {
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', files[0]);
+
+            upload_image(formData, range, this.quill).then(() => {
+                fileInput.value = '';
+            })
+        });
+        this.container.appendChild(fileInput);
+    }
+    fileInput.click();
+}
+
+function image_drop_handler(data_url, type) {
+    if (!type) type = 'image/png'
+
+    const range = this.quill.getSelection(true);
+   
+    // base64 to blob
+    var blob = base64StringToBlob(data_url.replace(/^data:image\/\w+;base64,/, ''), type)
+   
+    var filename = ['img_', Math.floor(Math.random() * 1e12), '_', new Date().getTime(), '.', type.match(/^image\/(\w+)$/i)[1]].join('')
+   
+    // generate a form data
+    var formData = new FormData()
+    formData.append('filename', filename)
+    formData.append('file', blob)
+
+    upload_image(formData, range, this.quill)
+  }
 
 interface TextEditorProps {
     id?: string
@@ -24,6 +93,7 @@ interface TextEditorProps {
     style?: object
     className?: string
     placeholder?: string
+    maxLength?: number
     readOnly?: boolean
     modules?: object
     formats?: string[]
@@ -33,6 +103,7 @@ interface TextEditorProps {
         htmlValue: string
         textValue: string
         delta: any
+        length: number
         source: 'api' | 'user' | 'silent'
     }) => void
     onSelectionChange?: (value: {
@@ -62,12 +133,23 @@ export class TextEditor extends Component<TextEditorProps> {
     toolbarElement: any
     quill: any
 
+    constructor(props) {
+        super(props);
+        this.state = { chars_count: props.maxLength };
+      }
+
     componentDidMount() {
         if (is_server()) return
+
         this.quill = new Quill(this.editorElement, {
             modules: {
-                toolbar: this.toolbarElement,
-                imageDrop: true,
+                toolbar: {
+                    container: this.toolbarElement,
+                    handlers: { image: toolbar_img_handler },
+                },
+                imageDropAndPaste: {
+                    handler: image_drop_handler.bind(this)
+                },
                 ...this.props.modules,
             },
             placeholder: this.props.placeholder,
@@ -88,7 +170,16 @@ export class TextEditor extends Component<TextEditorProps> {
             this.quill.setContents(this.props.delta)
         }
 
+        if ((this.props.delta || this.props.defaultDelta || this.props.value) && this.props.maxLength) {
+            this.setState({chars_count: this.props.maxLength - this.quill.getLength() })
+        }
+
         this.quill.on('text-change', (delta, source) => {
+            if (this.props.maxLength && this.quill.getLength() > this.props.maxLength) {
+                this.quill.deleteText(this.props.maxLength, this.quill.getLength());
+                return
+            }
+
             let html = this.editorElement.children[0].innerHTML
             let text = this.quill.getText()
             if (html === '<p><br></p>') {
@@ -100,8 +191,13 @@ export class TextEditor extends Component<TextEditorProps> {
                     htmlValue: html,
                     textValue: text,
                     delta: this.quill.getContents(),
+                    length: this.quill.getLength(),
                     source: source,
                 })
+            }
+
+            if (this.props.maxLength) {
+                this.setState({chars_count: this.props.maxLength - this.quill.getLength() })
             }
         })
 
@@ -213,6 +309,11 @@ export class TextEditor extends Component<TextEditorProps> {
                             className="ql-clean"
                             aria-label="Remove Styles"></button>
                     </span>
+                    {(this.state.chars_count !== undefined) && this.state.chars_count < 250 &&
+                    <span className="float-right muted">
+                        {t`${this.state.chars_count} characters left`}
+                    </span>
+                    }
                 </div>
             )
         }
