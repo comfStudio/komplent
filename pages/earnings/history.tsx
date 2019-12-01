@@ -1,15 +1,42 @@
 import React, { Component } from 'react'
+import { Grid, Row, Col } from 'rsuite'
 
 import EarningsPage from '@components/App/EarningsPage'
 import { EarningsKey } from '@store/earnings'
 import EarningsLayout from '@components/Earnings/EarningsLayout'
+import { RequireCreator } from '@components/Profile'
+import { MonthBarChart, EarningsMonthBarChart, EarningsMonthTable } from '@components/Earnings/Charts'
+import { t } from '@app/utility/lang'
 
 class HistoryPage extends EarningsPage {
+
     static activeKey: EarningsKey = 'history'
 
     render() {
         return this.renderPage(
-            <EarningsLayout activeKey={HistoryPage.activeKey}></EarningsLayout>
+            <EarningsLayout activeKey={HistoryPage.activeKey}>
+                <RequireCreator />
+                <Grid fluid>
+                    <Row>
+                        <Col>
+                            <h3>{t`Commissions the past 12 months`}</h3>
+                            <MonthBarChart/>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col>
+                            <h3>{t`Earnings these past 12 months`}</h3>
+                            <EarningsMonthBarChart/>
+                        </Col>
+                    </Row>
+                    <hr/>
+                    <Row>
+                        <Col>
+                            <EarningsMonthTable/>
+                        </Col>
+                    </Row>
+                </Grid>
+            </EarningsLayout>
         )
     }
 }

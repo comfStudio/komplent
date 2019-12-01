@@ -43,7 +43,7 @@ export const NavUserMenu = (props: UserMenuProps) => {
 
     return (
         <React.Fragment>
-            {user.type === 'creator' && (
+            {user.type === 'creator' && 
                 <Link href={make_profile_urlpath(user)} passHref>
                     <El.Item
                         eventKey="profile"
@@ -51,7 +51,7 @@ export const NavUserMenu = (props: UserMenuProps) => {
                         {t`My Profile`}
                     </El.Item>
                 </Link>
-            )}
+            }
             <Link href="/dashboard" passHref>
                 <El.Item
                     eventKey="dashboard"
@@ -76,13 +76,15 @@ export const NavUserMenu = (props: UserMenuProps) => {
                     {t`Messages`}
                 </El.Item>
             </Link>
-            <Link href="/earnings" passHref>
-                <El.Item
-                    eventKey="earnings"
-                    active={props.activeKey == 'earnings'}>
-                    {t`Earnings`}
-                </El.Item>
-            </Link>
+            {user.type === 'creator' &&
+                <Link href="/earnings" passHref>
+                    <El.Item
+                        eventKey="earnings"
+                        active={props.activeKey == 'earnings'}>
+                        {t`Earnings`}
+                    </El.Item>
+                </Link>
+            }
             {!!props.dropdown && <li className="header">{t`Community`}</li>}
             {!!!props.dropdown && <hr />}
             <Link href="/hub" passHref>
