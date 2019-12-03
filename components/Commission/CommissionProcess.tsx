@@ -3,11 +3,12 @@ import { formatDistanceToNow, format, addDays } from 'date-fns'
 import { toDate } from 'date-fns-tz'
 import Link from 'next/link'
 
-import CommissionTimeline, {
-    CommissionTimelineItem,
-    TimelinePanel,
-    TimelineTitle,
-} from './CommissionTimeline'
+import CommissionSteps, {
+    CommissionStepItem,
+    StepPanel,
+    StepTitle,
+    CommissionStepItemProps,
+} from './CommissionSteps'
 import { useCommissionStore } from '@client/store/commission'
 import { t } from '@utility/lang'
 import { capitalizeFirstLetter, decimal128ToMoneyToString } from '@utility/misc'
@@ -16,8 +17,9 @@ import { ButtonToolbar, Button, Grid, Row, Col, Icon } from 'rsuite'
 import * as pages from '@utility/pages'
 import { CommissionPhaseType } from '@server/constants'
 import { CommissionProcessType } from '@schema/user'
+import NoSSR from '@components/App/NoSSR'
 
-interface ProcessProps {
+interface ProcessProps extends CommissionStepItemProps {
     data: any
     is_owner?: boolean
     is_latest?: boolean
@@ -61,12 +63,12 @@ const PendingApproval = (props: ProcessProps) => {
     const show_panel = !props.hidden || props.active
 
     return (
-        <React.Fragment>
-            <TimelineTitle onClick={props.onClick} date={props.done_date}>
+        <CommissionStepItem {...props}>
+            <StepTitle onClick={props.onClick} date={props.done_date}>
                 {commission.accepted ? t`Approved` : t`Pending approval`}
-            </TimelineTitle>
+            </StepTitle>
             {show_panel && (
-                <TimelinePanel>
+                <StepPanel>
                     {props.is_owner && !commission.accepted && (
                         <p>{t`Waiting for approval from ${to_name}.`}</p>
                     )}
@@ -91,9 +93,9 @@ const PendingApproval = (props: ProcessProps) => {
                                 </p>
                             </div>
                         )}
-                </TimelinePanel>
+                </StepPanel>
             )}
-        </React.Fragment>
+        </CommissionStepItem>
     )
 }
 
@@ -111,15 +113,15 @@ const PendingPayment = (props: ProcessProps) => {
     const price = decimal128ToMoneyToString(commission.rate.price)
 
     return (
-        <React.Fragment>
-            <TimelineTitle onClick={props.onClick} date={props.done_date}>
+        <CommissionStepItem {...props}>
+            <StepTitle onClick={props.onClick} date={props.done_date}>
                 {/* {!props.hidden && !done ? (last ? t`Pending last payment` : count === 1 ? t`Pending first payment` : t`Pending payment`) : null} */}
                 {!props.hidden && !done ? t`Pending payment` : null}
                 {/* {props.hidden || done ? (last ? t`Last payment` : count === 1 ? t`First payment` : t`Payment`) : null} */}
                 {props.hidden || done ? t`Payment` : null}
-            </TimelineTitle>
+            </StepTitle>
             {show_panel && (
-                <TimelinePanel>
+                <StepPanel>
                     {commission.finished && !done && (
                         <p>{t`Payment was cancelled.`}</p>
                     )}
@@ -156,9 +158,9 @@ const PendingPayment = (props: ProcessProps) => {
                             )}
                         </div>
                     )}
-                </TimelinePanel>
+                </StepPanel>
             )}
-        </React.Fragment>
+        </CommissionStepItem>
     )
 }
 
@@ -216,12 +218,12 @@ const PendingSketch = (props: ProcessProps) => {
     const show_panel = !props.hidden || props.active
 
     return (
-        <React.Fragment>
-            <TimelineTitle onClick={props.onClick} date={props.done_date}>
+        <CommissionStepItem {...props}>
+            <StepTitle onClick={props.onClick} date={props.done_date}>
                 {props.hidden || done ? t`Initial sketch` : t`Pending sketch`}
-            </TimelineTitle>
+            </StepTitle>
             {show_panel && (
-                <TimelinePanel>
+                <StepPanel>
                     {done && <p>{t`There are ${count} drafts available.`}</p>}
                     {!done &&
                         props.is_owner &&
@@ -288,9 +290,9 @@ const PendingSketch = (props: ProcessProps) => {
                             )}
                         </div>
                     )}
-                </TimelinePanel>
+                </StepPanel>
             )}
-        </React.Fragment>
+        </CommissionStepItem>
     )
 }
 
@@ -316,12 +318,12 @@ const Revision = (props: ProcessProps) => {
     const show_panel = !props.hidden || props.active
 
     return (
-        <React.Fragment>
-            <TimelineTitle onClick={props.onClick} date={props.done_date}>
+        <CommissionStepItem {...props}>
+            <StepTitle onClick={props.onClick} date={props.done_date}>
                 {t`Revision`}
-            </TimelineTitle>
+            </StepTitle>
             {show_panel && (
-                <TimelinePanel>
+                <StepPanel>
                     {done && <p>{t`Changed were requested.`}</p>}
                     {!done && !props.is_owner && !to_confirmed && (
                         <p>{t`${name} is asking for changes.`}</p>
@@ -372,9 +374,9 @@ const Revision = (props: ProcessProps) => {
                             </ButtonToolbar>
                         </>
                     )}
-                </TimelinePanel>
+                </StepPanel>
             )}
-        </React.Fragment>
+        </CommissionStepItem>
     )
 }
 
@@ -391,12 +393,12 @@ const PendingProduct = (props: ProcessProps) => {
     const show_panel = !props.hidden || props.active
 
     return (
-        <React.Fragment>
-            <TimelineTitle onClick={props.onClick} date={props.done_date}>
+        <CommissionStepItem {...props}>
+            <StepTitle onClick={props.onClick} date={props.done_date}>
                 {props.hidden || done ? t`Assets` : t`Pending assets`}
-            </TimelineTitle>
+            </StepTitle>
             {show_panel && (
-                <TimelinePanel>
+                <StepPanel>
                     {!!count && props.is_owner && (
                         <p>{t`There are ${count} asset(s) available.`}</p>
                     )}
@@ -436,9 +438,9 @@ const PendingProduct = (props: ProcessProps) => {
                             )}
                         </>
                     )}
-                </TimelinePanel>
+                </StepPanel>
             )}
-        </React.Fragment>
+        </CommissionStepItem>
     )
 }
 
@@ -461,33 +463,33 @@ const Cancelled = (props: ProcessProps) => {
     }
 
     return (
-        <React.Fragment>
-            <TimelineTitle onClick={props.onClick} date={props.done_date}>
+        <CommissionStepItem {...props}>
+            <StepTitle onClick={props.onClick} date={props.done_date}>
                 {t`Cancelled`}
-            </TimelineTitle>
-            <TimelinePanel className="clearfix">
+            </StepTitle>
+            <StepPanel className="clearfix">
                 <span className="float-right">
                     <Icon className="text-red-300" icon="close" size="4x" />
                 </span>
                 <p>{t`Commission request was cancelled by ${name}.`}</p>
-            </TimelinePanel>
-        </React.Fragment>
+            </StepPanel>
+        </CommissionStepItem>
     )
 }
 
 const Expired = (props: ProcessProps) => {
     return (
-        <React.Fragment>
-            <TimelineTitle onClick={props.onClick} date={props.done_date}>
+        <CommissionStepItem {...props}>
+            <StepTitle onClick={props.onClick} date={props.done_date}>
                 {t`Expired`}
-            </TimelineTitle>
-            <TimelinePanel className="clearfix">
+            </StepTitle>
+            <StepPanel className="clearfix">
                 <span className="float-right">
                     <Icon className="text-red-300" icon="close" size="4x" />
                 </span>
                 <p>{t`Commission has expired`}</p>
-            </TimelinePanel>
-        </React.Fragment>
+            </StepPanel>
+        </CommissionStepItem>
     )
 }
 
@@ -496,19 +498,19 @@ const Unlocked = (props: ProcessProps) => {
     const show_panel = !props.hidden || props.active
 
     return (
-        <React.Fragment>
-            <TimelineTitle onClick={props.onClick} date={props.done_date}>
+        <CommissionStepItem {...props}>
+            <StepTitle onClick={props.onClick} date={props.done_date}>
                 {t`Unlock`}
-            </TimelineTitle>
+            </StepTitle>
             {show_panel && (
-                <TimelinePanel>
+                <StepPanel>
                     {!done && (
                         <p>{t`Commission asset(s) will get unlocked`}</p>
                     )}
                     {done && <p>{t`Commission asset(s) is now unlocked!`}</p>}
-                </TimelinePanel>
+                </StepPanel>
             )}
-        </React.Fragment>
+        </CommissionStepItem>
     )
 }
 
@@ -517,12 +519,12 @@ const Refund = (props: ProcessProps) => {
     const show_panel = !props.hidden || props.active
 
     return (
-        <React.Fragment>
-            <TimelineTitle onClick={props.onClick} date={props.done_date}>
+        <CommissionStepItem {...props}>
+            <StepTitle onClick={props.onClick} date={props.done_date}>
                 {t`Refund`}
-            </TimelineTitle>
+            </StepTitle>
             {show_panel && (
-                <TimelinePanel>
+                <StepPanel>
                     {!done && (
                         <p className="muted">
                             {t`Refunding...`} <Icon icon="spinner" spin />
@@ -534,9 +536,9 @@ const Refund = (props: ProcessProps) => {
                             <Icon icon="check" className="text-green-500" />
                         </p>
                     )}
-                </TimelinePanel>
+                </StepPanel>
             )}
-        </React.Fragment>
+        </CommissionStepItem>
     )
 }
 
@@ -580,16 +582,16 @@ const Completed = (props: ProcessProps) => {
     }
 
     return (
-        <React.Fragment>
-            <TimelineTitle
+        <CommissionStepItem {...props}>
+            <StepTitle
                 onClick={props.onClick}
                 date={completed && end_date ? end_date : undefined}>
                 {finished || props.hidden
                     ? t`Complete` + deadline_txt
                     : t`Confirm`}
-            </TimelineTitle>
+            </StepTitle>
             {show_panel && (
-                <TimelinePanel>
+                <StepPanel>
                     {completed && (
                         <React.Fragment>
                             <span className="float-right">
@@ -644,9 +646,9 @@ const Completed = (props: ProcessProps) => {
                             </p>
                         </React.Fragment>
                     )}
-                </TimelinePanel>
+                </StepPanel>
             )}
-        </React.Fragment>
+        </CommissionStepItem>
     )
 }
 
@@ -724,61 +726,56 @@ const CommissionProcess = () => {
                 switch (v.type) {
                     case 'pending_payment': {
                         unvisited_phases.push(
-                            <CommissionTimelineItem key={idx}>
-                                <PendingPayment
-                                    hidden
-                                    data={{ data: { last: false, count: 1 } }}
-                                    is_owner={is_owner}
-                                />
-                            </CommissionTimelineItem>
+                            <PendingPayment
+                                key={idx}
+                                hidden
+                                data={{ data: { last: false, count: 1 } }}
+                                is_owner={is_owner}
+                            />
                         )
                         break
                     }
                     case 'pending_sketch': {
                         unvisited_phases.push(
-                            <CommissionTimelineItem key={idx}>
-                                <PendingSketch
-                                    hidden
-                                    data={null}
-                                    is_owner={is_owner}
-                                />
-                            </CommissionTimelineItem>
+                            <PendingSketch
+                                key={idx}
+                                hidden
+                                data={null}
+                                is_owner={is_owner}
+                            />
                         )
                         break
                     }
                     case 'pending_product': {
                         unvisited_phases.push(
-                            <CommissionTimelineItem key={idx}>
-                                <PendingProduct
-                                    hidden
-                                    data={null}
-                                    is_owner={is_owner}
-                                />
-                            </CommissionTimelineItem>
+                            <PendingProduct
+                                key={idx}
+                                hidden
+                                data={null}
+                                is_owner={is_owner}
+                            />
                         )
                         break
                     }
                     case 'unlock': {
                         unvisited_phases.push(
-                            <CommissionTimelineItem key={idx}>
-                                <Unlocked
-                                    hidden
-                                    data={null}
-                                    is_owner={is_owner}
-                                />
-                            </CommissionTimelineItem>
+                            <Unlocked
+                                key={idx}
+                                hidden
+                                data={null}
+                                is_owner={is_owner}
+                            />
                         )
                         break
                     }
                     case 'complete': {
                         unvisited_phases.push(
-                            <CommissionTimelineItem key={idx}>
-                                <Completed
-                                    hidden
-                                    data={null}
-                                    is_owner={is_owner}
-                                />
-                            </CommissionTimelineItem>
+                            <Completed
+                                key={idx}
+                                hidden
+                                data={null}
+                                is_owner={is_owner}
+                            />
                         )
                         break
                     }
@@ -787,17 +784,27 @@ const CommissionProcess = () => {
         })
     }
 
+    let latest_idx = 0
+
+    phases.forEach(v => {
+        if (["pending_approval"].includes(v.type)) {
+            latest_idx++
+        }
+    })
+
     return (
+        <NoSSR>
         <div>
-            <CommissionTimeline className="ml-5">
-                <CommissionTimelineItem>
-                    <TimelineTitle date={start_date}>
+            <CommissionSteps current={latest_idx} className="ml-5">
+                <CommissionStepItem>
+                    <StepTitle date={start_date}>
                         {capitalizeFirstLetter(
                             formatDistanceToNow(start_date, { addSuffix: true })
                         )}
-                    </TimelineTitle>
-                </CommissionTimelineItem>
+                    </StepTitle>
+                </CommissionStepItem>
                 {phases.map(phase => {
+
                     let is_latest = latest_stage
                         ? phase._id === latest_stage._id
                         : false
@@ -849,33 +856,32 @@ const CommissionProcess = () => {
                             return null
                     }
                     return (
-                        <CommissionTimelineItem
+                        <El
                             key={phase._id}
                             selected={selected === phase._id}
-                            active={is_latest || selected === phase._id}>
-                            <El
-                                onClick={on_select}
-                                done_date={done_date}
-                                data={phase}
-                                is_latest={is_latest}
-                                is_owner={is_owner}
-                            />
-                        </CommissionTimelineItem>
+                            active={is_latest || selected === phase._id}
+                            onClick={on_select}
+                            done_date={done_date}
+                            status={['expire'].includes(phase.type) ? "error" : phase.done ?  'finish': is_latest ? 'process' : 'error'}
+                            data={phase}
+                            is_latest={is_latest}
+                            is_owner={is_owner}
+                        />
                     )
                 })}
                 {unvisited_phases}
                 {!!end_date && (
-                    <CommissionTimelineItem active>
-                        <TimelineTitle date={end_date}>
+                    <CommissionStepItem active status={is_complete ? "finish" : "error"}>
+                        <StepTitle date={end_date}>
                             {capitalizeFirstLetter(
                                 formatDistanceToNow(end_date, {
                                     addSuffix: true,
                                 })
                             )}
-                        </TimelineTitle>
-                    </CommissionTimelineItem>
+                        </StepTitle>
+                    </CommissionStepItem>
                 )}
-            </CommissionTimeline>
+            </CommissionSteps>
             <Grid fluid className="mt-3">
                 <Row>
                     <Col xs={12}>
@@ -958,6 +964,7 @@ const CommissionProcess = () => {
                 </Row>
             </Grid>
         </div>
+        </NoSSR>
     )
 }
 

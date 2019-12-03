@@ -48,7 +48,7 @@ class Page extends EarningsPage {
                 <Grid fluid>
                     <Row>
                         <Col xs={10} className="h-full">
-                            <h3>{t`Funds`}</h3>
+                            <h3>{t`Funds earned`}</h3>
                             <Earnings/>
                         </Col>
                         <Col xs={14}>

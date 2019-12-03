@@ -23,6 +23,7 @@ export const commission_schema = new Schema(
         commission_process: [Mixed],
         commission_deadline: Number,
         revisions_limit: Number,
+        queue_index: {type: Number, default: 0},
         rate: {
             type: Mixed,
             required: true,
