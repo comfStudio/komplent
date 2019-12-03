@@ -85,13 +85,13 @@ export const NavUserMenu = (props: UserMenuProps) => {
                     </El.Item>
                 </Link>
             }
-            {!!props.dropdown && <li className="header">{t`Community`}</li>}
+            {/* {!!props.dropdown && <li className="header">{t`Community`}</li>}
             {!!!props.dropdown && <hr />}
             <Link href="/hub" passHref>
                 <El.Item eventKey="hub" active={props.activeKey == 'hub'}>
                     {t`Feedback Hub`}
                 </El.Item>
-            </Link>
+            </Link> */}
             {!!props.dropdown && <li className="header">{t`General`}</li>}
             {!!!props.dropdown && <hr />}
             <Link href="/settings" passHref>

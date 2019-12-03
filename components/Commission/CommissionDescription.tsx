@@ -8,6 +8,7 @@ import UserInfoCard from '@components/User/UserInfoCard'
 import { CommissionCard } from '@components/Profile/ProfileCommission'
 import { useUser } from '@hooks/user'
 import { useMessageTextToHTML } from '@hooks/db'
+import { get_profile_name } from '@utility/misc'
 
 const CommissionDescription = () => {
     const user = useUser()
@@ -26,7 +27,7 @@ const CommissionDescription = () => {
                     <UserInfoCard
                         notBodyFill
                         data={commission.from_user}
-                        text={t`is requesting a commission`}>
+                        text={<span>{t`is requesting a commission from`} <span className="name">{get_profile_name(commission.to_user)}</span></span>}>
                         <CommissionCard
                             noCover
                             data={commission.rate}

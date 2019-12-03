@@ -10,7 +10,7 @@ import CommissionTimeline, {
 } from './CommissionTimeline'
 import { useCommissionStore } from '@client/store/commission'
 import { t } from '@utility/lang'
-import { capitalizeFirstLetter } from '@utility/misc'
+import { capitalizeFirstLetter, decimal128ToMoneyToString } from '@utility/misc'
 import { useUser } from '@hooks/user'
 import { ButtonToolbar, Button, Grid, Row, Col, Icon } from 'rsuite'
 import * as pages from '@utility/pages'
@@ -108,6 +108,7 @@ const PendingPayment = (props: ProcessProps) => {
     const from_name = commission ? commission.from_user.username : ''
     const done = props.data ? props.data.done : false
     const show_panel = !props.hidden || props.active
+    const price = decimal128ToMoneyToString(commission.rate.price)
 
     return (
         <React.Fragment>
@@ -145,11 +146,11 @@ const PendingPayment = (props: ProcessProps) => {
                                 <p>
                                     <ButtonToolbar>
                                         <Button
-                                            color="green"
+                                            appearance="primary"
                                             onClick={ev => {
                                                 ev.preventDefault()
                                                 store.pay(props.data)
-                                            }}>{t`Pay`}</Button>
+                                            }}>{t`Pay ${price}`}</Button>
                                     </ButtonToolbar>
                                 </p>
                             )}
@@ -930,7 +931,7 @@ const CommissionProcess = () => {
                                     passHref>
                                     <Button
                                         componentClass="a"
-                                        appearance="primary">{t`Check Asset`}</Button>
+                                        appearance="primary">{t`Check Assets`}</Button>
                                 </Link>
                             )}
                         </ButtonToolbar>

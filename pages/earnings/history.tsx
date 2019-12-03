@@ -5,7 +5,7 @@ import EarningsPage from '@components/App/EarningsPage'
 import { EarningsKey } from '@store/earnings'
 import EarningsLayout from '@components/Earnings/EarningsLayout'
 import { RequireCreator } from '@components/Profile'
-import { MonthBarChart, EarningsMonthBarChart, EarningsMonthTable } from '@components/Earnings/Charts'
+import { CommissionsMonthBarChart, EarningsMonthBarChart, EarningsMonthTable } from '@components/Earnings/Charts'
 import { t } from '@app/utility/lang'
 
 class HistoryPage extends EarningsPage {
@@ -20,7 +20,7 @@ class HistoryPage extends EarningsPage {
                     <Row>
                         <Col>
                             <h3>{t`Commissions the past 12 months`}</h3>
-                            <MonthBarChart/>
+                            <CommissionsMonthBarChart/>
                         </Col>
                     </Row>
                     <Row>

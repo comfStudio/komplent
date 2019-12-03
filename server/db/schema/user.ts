@@ -255,7 +255,7 @@ export const follow_schema = new Schema(
     { timestamps: { createdAt: 'created', updatedAt: 'updated' } }
 )
 
-configure(follow_schema)
+configure(follow_schema, {paginate: true})
 
 export const commission_stats_schema = new Schema({
     approval_rate: Number,

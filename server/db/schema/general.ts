@@ -6,7 +6,7 @@ import { configure } from '.'
 
 const { Schema } = mongoose
 
-const { ObjectId, Buffer, Mixed } = mongoose.Schema.Types
+const { ObjectId, Buffer, Mixed, Decimal128 } = mongoose.Schema.Types
 
 export const image_schema = new Schema(
     {
@@ -102,6 +102,27 @@ export const text_schema = new Schema(
         user: {
             type: ObjectId,
             ref: 'User',
+        },
+    },
+    { timestamps: { createdAt: 'created', updatedAt: 'updated' } }
+)
+
+configure(text_schema)
+
+export const payment_schema = new Schema(
+    {
+        method: String,
+        transaction_id: String,
+        price: { type: Decimal128, required: true },
+        status: {
+            type: String,
+            enum: ['pending', 'completed', 'failed', 'refunding', 'refunded'],
+            default: 'pending',
+        },
+        user: {
+            type: ObjectId,
+            ref: 'User',
+            required: true
         },
     },
     { timestamps: { createdAt: 'created', updatedAt: 'updated' } }

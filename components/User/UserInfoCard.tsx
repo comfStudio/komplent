@@ -7,7 +7,7 @@ import { ReactProps } from '@utility/props'
 
 interface UserInfoCardProps extends ReactProps {
     data: any
-    text?: string
+    text?: React.ReactNode
     notBordered?: boolean
     notBodyFill?: boolean
 }

@@ -17,7 +17,6 @@ export const commission_schema = new Schema(
         end_date: Date,
         refunded: { type: Boolean, default: false }, // payment has been refunded
         refunding: { type: Boolean, default: false }, // payment is being refunded
-        payment: { type: Boolean, default: false }, // there has been a transaction
         finished: { type: Boolean, default: false }, // commission has finished, could be cancelled or expired
         completed: { type: Boolean, default: false }, // commission was completed successfully
         accepted: { type: Boolean, default: false },
@@ -28,6 +27,10 @@ export const commission_schema = new Schema(
             type: Mixed,
             required: true,
         },
+        payments: [{
+            type: ObjectId,
+            ref: 'Payment',
+        }],
         extras: [Mixed],
         payment_count: {
             // how many times customer should pay
@@ -64,7 +67,7 @@ export const commission_schema = new Schema(
     }
 )
 
-configure(commission_schema)
+configure(commission_schema, {paginate: true})
 
 commission_schema.statics.find_related = async function(
     user,

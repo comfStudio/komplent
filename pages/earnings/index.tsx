@@ -1,14 +1,42 @@
-import React, { Component } from 'react'
+import React, { Component, useState } from 'react'
 
 import { Grid, Row, Col } from 'rsuite'
 import CountUp from 'react-countup';
 
 import EarningsPage from '@components/App/EarningsPage'
-import { EarningsKey } from '@store/earnings'
+import useEarningsStore, { EarningsKey } from '@store/earnings'
 import EarningsLayout from '@components/Earnings/EarningsLayout'
 import { RequireCreator } from '@components/Profile'
-import { DayLineChart, EarningsDaysPieChart, DayTable } from '@components/Earnings/Charts'
+import { CommissionsDayLineChart, EarningsDaysPieChart, CommissionsDayTable } from '@components/Earnings/Charts'
 import { t } from '@app/utility/lang'
+import { useMount } from 'react-use';
+import { decimal128ToFloat } from '@utility/misc';
+import { format, startOfMonth, endOfMonth } from 'date-fns';
+
+const Earnings = () => {
+
+    const store = useEarningsStore()
+
+    const [data, set_data] = useState(0)
+
+    useMount(() => {
+        store.get_month_earnings().then(d => set_data(decimal128ToFloat(d.earned)))
+    })
+
+
+    return (
+        <div className="h-full text-center">
+            <div className="justify-center content-center flex h-full">
+                <p className="text-primary text-6xl">
+                    $ <CountUp delay={1} end={data} decimals={2}/>
+                </p>
+            </div>
+            <p className="muted text-2xl" >
+                {format(startOfMonth(new Date()), 'dd MMM')} - {format(endOfMonth(new Date()), 'dd MMM')}
+            </p>
+        </div>
+    )
+}
 
 class Page extends EarningsPage {
     static activeKey: EarningsKey = 'status'
@@ -21,16 +49,7 @@ class Page extends EarningsPage {
                     <Row>
                         <Col xs={10} className="h-full">
                             <h3>{t`Funds`}</h3>
-                            <div className="h-full text-center">
-                                <div className="justify-center content-center flex h-full">
-                                    <p className="text-primary text-6xl">
-                                        $ <CountUp delay={1} end={59945} decimals={2}/>
-                                    </p>
-                                </div>
-                                <p className="muted text-2xl" >
-                                    {t`01 Jan`} - {t`30 Jan`}
-                                </p>
-                            </div>
+                            <Earnings/>
                         </Col>
                         <Col xs={14}>
                             <EarningsDaysPieChart/>
@@ -39,13 +58,13 @@ class Page extends EarningsPage {
                     <Row>
                         <h3>{t`Commissions this month`}</h3>
                         <Col xs={24}>
-                            <DayLineChart/>
+                            <CommissionsDayLineChart/>
                         </Col>
                     </Row>
                     <hr/>
                     <Row>
                         <Col xs={24}>
-                            <DayTable/>
+                            <CommissionsDayTable/>
                         </Col>
                     </Row>
                 </Grid>

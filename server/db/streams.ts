@@ -59,7 +59,7 @@ export async function setup_streams() {
                     await notify_user(
                         d.type,
                         d.from_user,
-                        d.data.to_user_id === d.from_user._id
+                        d.data.to_user_id === (d.from_user?._id ?? d.from_user)
                             ? d.data.from_user_id
                             : d.data.to_user_id,
                         d.data

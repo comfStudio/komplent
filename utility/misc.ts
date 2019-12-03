@@ -61,6 +61,10 @@ export const moneyToString = d => {
     return d.toFormat('$0,0.00')
 }
 
+export const stringToMoneyToString = d => moneyToString(stringToMoney(d))
+export const floatToMoney = d => stringToMoney(d.toString())
+export const floatToMoneyToString = d => stringToMoneyToString(d.toString())
+
 export const capitalizeFirstLetter = string => {
     return string.charAt(0).toUpperCase() + string.slice(1)
 }

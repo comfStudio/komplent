@@ -1,12 +1,9 @@
-import bodybuilder from 'bodybuilder'
-
 import { createStore } from '@client/store'
-import { User, Conversation, Message } from '@db/models'
-import { is_server, promisify_es_search } from '@utility/misc'
+import { is_server } from '@utility/misc'
 import { fetch } from '@utility/request'
-import { update_db } from '@client/db'
-import { conversation_schema, message_schema } from '@schema/message'
 import log from '@utility/log'
+import * as pages from '@utility/pages'
+import { AnalyticsType } from '@server/constants'
 
 export type EarningsKey = 'payout' | 'history' | 'status'
 
@@ -14,7 +11,35 @@ export const useEarningsStore = createStore(
     {
         activeKey: undefined as EarningsKey,
     },
-    {}
+    {
+        fetch_data(type: AnalyticsType, page = 0, limit = 30) {
+            return fetch(pages.analytics, {
+                method: 'post',
+                auth: true,
+                body: {
+                    type,
+                    page,
+                    limit
+                }
+            })
+        },
+        async get_day_commission_data(page = 0, limit = 30) {
+            let r = await this.fetch_data(AnalyticsType.commissions_day, page, limit)
+            return (await r.json())?.data ?? []
+        },
+        async get_day_commission_count_data(page = 0, limit = 100) {
+            let r = await this.fetch_data(AnalyticsType.commissions_day_count, page, limit)
+            return (await r.json())?.data ?? []
+        },
+        async get_day_commission_earnings_data(page = 0, limit = 100) {
+            let r = await this.fetch_data(AnalyticsType.commissions_day_earnings, page, limit)
+            return (await r.json())?.data ?? []
+        },
+        async get_month_earnings() {
+            let r = await this.fetch_data(AnalyticsType.month_earnings)
+            return (await r.json())?.data ?? 0
+        },
+    }
 )
 
 export default useEarningsStore

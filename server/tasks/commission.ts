@@ -101,7 +101,7 @@ export default function(queue) {
             comm.expire_date = d
             comm.save()
 
-            if (comm.payment && !comm.refunded && !unlocked) {
+            if (comm.payments.length && !comm.refunded && !unlocked) {
                 let refund_phase = new CommissionPhase({
                     type: CommissionPhaseT.refund,
                     commission: comm._id,

@@ -139,3 +139,10 @@ export const guideline_types = tuple('will_draw', 'will_not_draw')
 
 export type Guideline = typeof guideline_types[number]
 export const GuidelineType = array_to_enum(guideline_types)
+
+export enum AnalyticsType {
+    month_earnings,
+    commissions_day,
+    commissions_day_count,
+    commissions_day_earnings
+}

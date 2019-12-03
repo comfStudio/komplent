@@ -19,6 +19,7 @@ import {
     event_schema,
     notification_schema,
     text_schema,
+    payment_schema
 } from '@schema/general'
 import {
     commission_schema,
@@ -224,6 +225,9 @@ export const Conversation = is_server()
       mongoose.model<Document>('Conversation', conversation_schema)
     : undefined
 
+export const Payment = is_server()
+    ? mongoose.models.Payment || mongoose.model<Document>('Payment', payment_schema)
+    : undefined
 export const Text = is_server()
     ? mongoose.models.Text || mongoose.model<Document>('Text', text_schema)
     : undefined

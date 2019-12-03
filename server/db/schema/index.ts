@@ -10,6 +10,7 @@ const mongooseAutopopulate = require('mongoose-autopopulate')
 const mongooseVirtuals = require('mongoose-lean-virtuals')
 const mongooseDefaults = require('mongoose-lean-defaults')
 const mongooseGetters = require('mongoose-lean-getters')
+const mongoosePaginate = require('mongoose-paginate')
 
 const { publicRuntimeConfig, serverRuntimeConfig } = getConfig()
 
@@ -38,6 +39,7 @@ export const configure = (
         virtuals = true,
         defaults = true,
         getters = true,
+        paginate = false,
     } = {}
 ) => {
     if (is_server()) {
@@ -52,6 +54,9 @@ export const configure = (
         }
         if (getters) {
             schema.plugin(mongooseGetters)
+        }
+        if (paginate) {
+            schema.plugin(mongoosePaginate)
         }
     }
 }

@@ -12,53 +12,82 @@ import { Table } from 'rsuite';
 
 import { useUser } from '@hooks/user';
 import { t } from '@app/utility/lang'
+import { useMount } from 'react-use';
+import useEarningsStore from '@store/earnings';
+import { format, endOfMonth } from 'date-fns';
+import { stringToMoney, moneyToString, stringToMoneyToString, decimal128ToMoneyToString, decimal128ToFloat, floatToMoneyToString } from '@utility/misc';
 
 const { Column, Cell, HeaderCell } = Table
 
-export const DayLineChart = () => {
+export const CommissionsDayLineChart = () => {
 
-    const user = useUser()
+    const store = useEarningsStore()
 
-    let days = {}
-    _.times(31, n => {
-        n++
-        days[n] = [n.toString(), 0, 0]
+    const [data, set_data] = useState([])
+    const [rates, set_rates] = useState([])
+    const [loading, set_loading] = useState(true)
+
+    useMount(() => {
+        store.get_day_commission_count_data().then(d => {
+            let rates_data = _.uniq(d.map(v => v.rate))
+            set_rates(_.uniq(rates_data))
+
+            let days = {}
+            _.times(endOfMonth(new Date()).getDate(), n => {
+                n++
+                days[n] = [n.toString(), ..._.times(rates_data.length, _.constant(0))]
+            })
+
+            d.forEach(v => {
+                days[v.day][rates_data.indexOf(v.rate)+1] = v.count
+            })
+
+            set_data(Object.values(days))
+            set_loading(false)
+        })
+
     })
 
-    days[2] = ["2", 2,54]
-    days[4] = ["4", 87,1]
-    days[7] = ["7", 7,9,]
-
-    const [data, set_data] = useState(Object.values(days))
-
     return (
-        <LineChart data={data}>
-            <YAxis minInterval={0} axisLabel={value => `${value}`} />
-            <Line name="data 1" />
-            <Line name="data 2" />
+        <LineChart data={data} loading={loading}>
+            <XAxis name={t`Days`} data={data.map(v => v[0])}/>
+            <YAxis name={t`Count`} minInterval={0} axisLabel={value => `${value}`} />
+            {rates.map(v => <Line key={v} name={v}/>)}
         </LineChart>
     );
 };
 
-export const DayTable = () => {
+export const CommissionsDayTable = () => {
 
-    const [data, set_data] = useState([
-        {time: Date(), price: 12.43, rate: "hello", payment_fee: 0.5, platform_fee: 0.8, refunds: 0},
-        {time: Date(), price: 12.43, rate: "hello", payment_fee: 0.5, platform_fee: 0.8, refunds: 0},
-        {time: Date(), price: 12.43, rate: "hello", payment_fee: 0.5, platform_fee: 0.8, refunds: 0},
-        {time: Date(), price: 12.43, rate: "hello", payment_fee: 0.5, platform_fee: 0.8, refunds: 0},
-    ])
+    const store = useEarningsStore()
+
+    const [data, set_data] = useState([])
+    const [loading, set_loading] = useState(true)
+
+    useMount(() => {
+        store.get_day_commission_data().then(d => {
+            set_data(d.map(v => ({
+                date: format(new Date(v.date ?? new Date()), 'dd MMM HH:mm:ss'),
+                price: decimal128ToMoneyToString(v.price),
+                rate: v.rate,
+                payment_fee: 0.5,
+                platform_fee: 0.8,
+                refunded: decimal128ToMoneyToString(v.refunded)})))
+            set_loading(false)
+        })
+    })
 
     return (
         <Table
         virtualized
         autoHeight
         bordered
+        loading={loading}
         data={data}
         >
         <Column flexGrow={2} align="center" fixed>
             <HeaderCell>{t`Time`}</HeaderCell>
-            <Cell dataKey="time" />
+            <Cell dataKey="date" />
         </Column>
 
         <Column flexGrow={3}>
@@ -82,14 +111,14 @@ export const DayTable = () => {
         </Column>
 
         <Column flexGrow={1} align="right">
-            <HeaderCell>{t`Refunds`}</HeaderCell>
-            <Cell dataKey="refunds" />
+            <HeaderCell>{t`Refunded`}</HeaderCell>
+            <Cell dataKey="refunded" />
         </Column>
         </Table>
       );
 }
 
-export const MonthBarChart = () => {
+export const CommissionsMonthBarChart = () => {
 
     
     const user = useUser()
@@ -121,19 +150,26 @@ export const MonthBarChart = () => {
 
 export const EarningsDaysPieChart = () => {
     
-    const user = useUser()
+    const store = useEarningsStore()
 
-    const [data, set_data] = useState([
-        ["1", 19],
-        ["2", 964],
-        ["3", 544]
-    ])
+    const [data, set_data] = useState([])
+
+    const [loading, set_loading] = useState(true)
+
+    useMount(() => {
+        store.get_day_commission_earnings_data().then(d => {
+            set_data(d.map(v => [v.rate, decimal128ToFloat(v.earned)]))
+            set_loading(false)
+        })
+
+    })
 
     return (
         <PieChart
             name="Earnings"
             data={data}
             legend={false}
+            loading={loading}
             startAngle={210}
         />
     )

@@ -27,6 +27,7 @@ import {
 } from '@server/constants'
 import { CommissionProcessType } from '@schema/user'
 import useInboxStore from './inbox'
+import { payment_schema } from '@schema/general'
 
 export const useCommissionStore = createStore(
     {
@@ -234,13 +235,21 @@ export const useCommissionStore = createStore(
         },
 
         async pay(phase_data: any) {
-            let r
-            if (!this.state.commission.payment) {
-                r = await this.update({
-                    payment: true,
-                })
+            let r = await update_db({
+                model: 'Payment',
+                data: {
+                    user: this.state._current_user,
+                    price: this.state.commission.rate.price,
+                    status: "completed"
+                },
+                schema: payment_schema,
+                validate: true,
+                create: true
+            })
+            if (r.status) {
+                this.update({payments: [...this.state.commission.payments, r.body.data]})
+                r = await this.next_phase()
             }
-            r = await this.next_phase()
             return r
         },
 
@@ -375,14 +384,18 @@ export const useCommissionStore = createStore(
         },
 
         async cancel() {
-            let r = await this.add_phase('cancel', {
-                done: true,
-                complete_previous_phase: false,
-            })
-            if (r.status) {
-                r = await this.end()
+            if (!this.state.commission.payments.length) {
+                let r = await this.add_phase('cancel', {
+                    done: true,
+                    complete_previous_phase: false,
+                })
+                if (r.status) {
+                    r = await this.end()
+                }
+                return r
+            } else {
+                throw Error("Cannot cancel a request that has had a transaction")
             }
-            return r
         },
 
         async revoke_complete() {
