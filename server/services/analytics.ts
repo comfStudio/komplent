@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { Commission } from "@db/models"
+import { Commission, Payment, Payout } from "@db/models"
 
 const { ObjectId, Decimal128 } = mongoose.Types
 
@@ -177,5 +177,47 @@ export const get_earnings = async (user, since: Date) => {
     }
 
     return earned
+}
+
+export const get_payout_balance = async (user) => {
+    let date_since
+    const p = await Payout.latest_payout(user, "completed")
+    if (p) {
+        date_since = p.created
+    } else {
+        let pm = await Payment.findOne({to_user: user, status: "completed"}).select("created").sort({created: 1}).lean()
+        if (!pm) {
+            return 0
+        }
+        date_since = pm.created
+    }
+
+    let balance = await Payment.aggregate([
+        {$project: {
+            to_user: "$to_user",
+            date: "$created",
+            status: "$status",
+            fees: "$fees",
+            price: "$price",
+        }},
+        {$match: {
+            status: "completed",
+            to_user: ObjectId(user._id),
+            date: {$gte: date_since},
+        }},
+        {$unwind: "$fees"},
+        {$group: {
+            _id: null,
+            fees_price: { $sum: "$fees.price" },
+            total_balance: { $sum: "$price" },
+        }},
+        {$unset: ["_id"]},
+    ])
+
+    if (balance && balance.length) {
+        balance = balance[0]
+    }
+
+    return balance
 }
 

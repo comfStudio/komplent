@@ -62,24 +62,9 @@ export const CommissionList = (props: CommissionListProps) => {
     const user = useUser()
     const store = useCommissionsStore()
 
-    const sort_by_title = (a, b) => {
-        let nameA = store.get_title(user._id, a).toUpperCase() // ignore upper and lowercase
-        let nameB = store.get_title(user._id, b).toUpperCase() // ignore upper and lowercase
-        if (nameA < nameB) {
-            return -1
-        }
-        if (nameA > nameB) {
-            return 1
-        }
-        return 0
-    }
-
-    let comms = props.data.slice()
-    comms.sort(sort_by_title)
-
     return (
         <List hover bordered>
-            {comms.map(d => <CommissionListItem key={d._id} data={d} />)}
+            {props.data.map(d => <CommissionListItem key={d._id} data={d} />)}
         </List>
     )
 }

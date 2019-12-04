@@ -15,6 +15,7 @@ import { debounceReduce } from '@utility/misc'
 interface ProductProps {
     is_owner: boolean
     data: any
+    locked?: boolean
 }
 
 export const Asset = (props: ProductProps) => {

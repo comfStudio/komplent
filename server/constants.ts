@@ -146,3 +146,19 @@ export enum AnalyticsType {
     commissions_day_count,
     commissions_day_earnings
 }
+
+export const fee_types = tuple(
+    'platform_payout',
+    'platform_transaction',
+    'platform_transaction_percent',
+    'stripe',
+)
+
+export type Fee = typeof fee_types[number]
+export const FeeType = array_to_enum(fee_types)
+export const FeeValue: Record<Fee, number> = {
+    platform_payout: 2.99,
+    platform_transaction: 0.99,
+    platform_transaction_percent: 0.5,
+    stripe: 0.99
+}

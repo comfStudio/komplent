@@ -19,8 +19,11 @@ import {
     event_schema,
     notification_schema,
     text_schema,
-    payment_schema
 } from '@schema/general'
+import {
+    payout_schema,
+    payment_schema
+} from '@schema/monetary'
 import {
     commission_schema,
     commission_extra_option_schema,
@@ -225,9 +228,6 @@ export const Conversation = is_server()
       mongoose.model<Document>('Conversation', conversation_schema)
     : undefined
 
-export const Payment = is_server()
-    ? mongoose.models.Payment || mongoose.model<Document>('Payment', payment_schema)
-    : undefined
 export const Text = is_server()
     ? mongoose.models.Text || mongoose.model<Document>('Text', text_schema)
     : undefined
@@ -247,4 +247,14 @@ export const Image = is_server()
 export const Attachment = is_server()
     ? mongoose.models.Attachment ||
       mongoose.model<Document>('Attachment', attachment_schema)
+    : undefined
+
+
+export const Payment = is_server()
+    ? mongoose.models.Payment || mongoose.model<Document>('Payment', payment_schema)
+    : undefined
+
+
+export const Payout = is_server()
+    ? mongoose.models.Payout || mongoose.model<Document>('Payout', payout_schema)
     : undefined

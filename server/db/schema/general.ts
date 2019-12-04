@@ -108,24 +108,3 @@ export const text_schema = new Schema(
 )
 
 configure(text_schema)
-
-export const payment_schema = new Schema(
-    {
-        method: String,
-        transaction_id: String,
-        price: { type: Decimal128, required: true },
-        status: {
-            type: String,
-            enum: ['pending', 'completed', 'failed', 'refunding', 'refunded'],
-            default: 'pending',
-        },
-        user: {
-            type: ObjectId,
-            ref: 'User',
-            required: true
-        },
-    },
-    { timestamps: { createdAt: 'created', updatedAt: 'updated' } }
-)
-
-configure(text_schema)

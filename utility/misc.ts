@@ -29,6 +29,8 @@ export const decimal128ToFloat = (d: Decimal128) => {
     return n
 }
 
+export const decimal128ToPlainString = (d: Decimal128) => decimal128ToFloat(d).toString()
+
 export const decimal128ToMoney = (d: Decimal128) => {
     let n = dinero()
     if (d !== undefined && d !== null) {

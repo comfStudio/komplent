@@ -29,7 +29,7 @@ import {
 } from '@server/constants'
 import { CommissionProcessType } from '@schema/user'
 import useInboxStore from './inbox'
-import { payment_schema } from '@schema/general'
+import { payment_schema } from '@schema/monetary'
 import log from '@utility/log'
 
 export const useCommissionStore = createStore(
@@ -96,6 +96,13 @@ export const useCommissionStore = createStore(
 
             if (typeof d.rate === 'object') {
                 d.rate.price = d.rate.price['$numberDecimal']
+
+                if (d.rate.extras) {
+                    d.rate.extras = d.rate.extras.map(v => ({
+                        ...v,
+                        price: v.price['$numberDecimal'],
+                    }))
+                }
             }
 
             if (d.extras && typeof d.extras[0] === 'string') {
@@ -241,7 +248,8 @@ export const useCommissionStore = createStore(
             let r = await update_db({
                 model: 'Payment',
                 data: {
-                    user: this.state._current_user,
+                    from_user: this.state._current_user,
+                    to_user: this.state.commission.to_user._id,
                     price: this.state.commission.rate.price,
                     status: "completed"
                 },
@@ -674,6 +682,8 @@ export const useCommissionsStore = createStore(
             let q = bodybuilder()
             
             q = q.sort("updated", "desc")
+            // q = q.sort("to_title", "asc")
+            q = q.sort("from_title.keyword", "asc")
 
             if (type === 'received') {
                 q = q.query('match', 'to_user', user._id.toString())
@@ -683,7 +693,7 @@ export const useCommissionsStore = createStore(
             if (not_accepted) {
                 q = q.query('match', 'accepted', false)
             }
-            if (accepted || ongoing) {
+            if (accepted) {
                 q = q.query('match', 'accepted', true)
             }
             if (ongoing) {

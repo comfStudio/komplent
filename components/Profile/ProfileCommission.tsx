@@ -44,6 +44,7 @@ import {
     stringToMoney,
     decimal128ToMoney,
     decimal128ToMoneyToString,
+    decimal128ToPlainString,
 } from '@utility/misc'
 import * as pages from '@utility/pages'
 import { make_profile_urlpath } from '@utility/pages'
