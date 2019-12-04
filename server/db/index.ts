@@ -12,12 +12,6 @@ import {
     STATES,
 } from '@server/constants'
 
-export const synchronize_indexes = async () => {
-    if (STATES.ES_SETUP) {
-        User.synchronize()
-    }
-}
-
 export async function connect(MONGODB_URL) {
     console.log(MONGODB_URL)
     if (MONGODB_URL) {

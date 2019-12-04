@@ -1,7 +1,7 @@
 import '.'
 import mongoose from 'mongoose'
 import { commission_phases } from '@server/constants'
-import { configure } from '.'
+import { configure, es_index, es_date_type } from '.'
 
 const { Schema } = mongoose
 
@@ -9,21 +9,21 @@ const { ObjectId, Mixed, Decimal128, Buffer } = mongoose.Schema.Types
 
 export const commission_schema = new Schema(
     {
-        from_title: String,
-        to_title: String,
+        from_title: { type: String, es_indexed: true },
+        to_title: { type: String, es_indexed: true },
         body: Mixed,
-        expire_date: Date,
-        accept_date: Date,
-        end_date: Date,
-        refunded: { type: Boolean, default: false }, // payment has been refunded
+        expire_date: { type: Date, es_indexed: true, ...es_date_type },
+        accept_date: { type: Date, es_indexed: true, ...es_date_type },
+        end_date: { type: Date, es_indexed: true, ...es_date_type },
+        refunded: { type: Boolean, default: false, es_indexed: true }, // payment has been refunded
         refunding: { type: Boolean, default: false }, // payment is being refunded
-        finished: { type: Boolean, default: false }, // commission has finished, could be cancelled or expired
-        completed: { type: Boolean, default: false }, // commission was completed successfully
-        accepted: { type: Boolean, default: false },
+        finished: { type: Boolean, default: false, es_indexed: true }, // commission has finished, could be cancelled or expired
+        completed: { type: Boolean, default: false, es_indexed: true }, // commission was completed successfully
+        accepted: { type: Boolean, default: false, es_indexed: true },
         commission_process: [Mixed],
-        commission_deadline: Number,
+        commission_deadline: { type: Number, es_indexed: true },
         revisions_limit: Number,
-        queue_index: {type: Number, default: 0},
+        queue_index: {type: Number, default: 0, es_indexed: true},
         rate: {
             type: Mixed,
             required: true,
@@ -42,11 +42,13 @@ export const commission_schema = new Schema(
             type: ObjectId,
             ref: 'User',
             required: true,
+            es_indexed: true
         },
         to_user: {
             type: ObjectId,
             ref: 'User',
             required: true,
+            es_indexed: true
         },
         attachments: [
             {
@@ -60,6 +62,18 @@ export const commission_schema = new Schema(
                 ref: 'Attachment',
             },
         ],
+        created: {
+            type: Date,
+            es_indexed: true,
+            default: Date.now,
+            ...es_date_type
+        },
+        updated: {
+            type: Date,
+            es_indexed: true,
+            default: Date.now,
+            ...es_date_type
+        },
     },
     {
         timestamps: { createdAt: 'created', updatedAt: 'updated' },
@@ -69,6 +83,9 @@ export const commission_schema = new Schema(
 )
 
 configure(commission_schema, {paginate: true})
+
+es_index(commission_schema, {
+})
 
 commission_schema.statics.find_related = async function(
     user,

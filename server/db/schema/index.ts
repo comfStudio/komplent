@@ -60,3 +60,8 @@ export const configure = (
         }
     }
 }
+
+export const es_date_type = {
+    es_type: 'date',
+    es_format: "yyyy-MM-DD'T'HH:mm:ss.SSSZ"
+}

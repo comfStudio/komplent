@@ -11,7 +11,7 @@ import { Title } from '@components/App'
 import { is_server } from '@utility/misc'
 import { ReactProps } from '@utility/props'
 import { setup_scheduler } from '@server/tasks'
-import { connect, synchronize_indexes } from '@server/db'
+import { connect } from '@server/db'
 import { setup_aws } from '@services/aws'
 
 import {
@@ -34,6 +34,7 @@ import { STATES } from '@server/constants'
 import useInboxStore from '@store/inbox'
 import useEarningsStore from '@store/earnings'
 import CONFIG from '@server/config'
+import { synchronize_indexes } from '@services/search'
 
 // Router.onRouteChangeStart = () => NProgress.start();
 // Router.onRouteChangeComplete = () => NProgress.done();

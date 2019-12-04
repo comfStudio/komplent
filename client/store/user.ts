@@ -32,6 +32,7 @@ export const useUserStore = createStore(
     {
         _id: undefined as string,
         current_user: undefined as any,
+        is_creator: false,
         logged_in: undefined as boolean,
         has_selected_usertype: true,
         active_commissions_count: 0,

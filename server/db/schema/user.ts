@@ -1,4 +1,4 @@
-import { es_index, configure } from '.'
+import { es_index, configure, es_date_type } from '.'
 import mongoose, { Document, Model } from 'mongoose'
 import { tag_schema } from '@schema/general'
 import { comission_rate_schema } from './commission'
@@ -150,11 +150,13 @@ export const user_schema = new Schema(
             type: Date,
             es_indexed: true,
             default: Date.now,
+            ...es_date_type
         },
         updated: {
             type: Date,
             es_indexed: true,
             default: Date.now,
+            ...es_date_type
         },
     },
     { timestamps: { createdAt: 'created', updatedAt: 'updated' } }

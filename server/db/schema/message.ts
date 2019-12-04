@@ -1,6 +1,6 @@
 import '.'
 import mongoose from 'mongoose'
-import { es_index, configure } from '.'
+import { es_index, configure, es_date_type } from '.'
 import { commission_schema } from './commission'
 
 const { Schema } = mongoose
@@ -34,6 +34,7 @@ export const conversation_schema = new Schema(
             type: Date,
             es_indexed: true,
             default: Date.now,
+            ...es_date_type
         },
         users: [
             {
@@ -52,11 +53,13 @@ export const conversation_schema = new Schema(
             type: Date,
             es_indexed: true,
             default: Date.now,
+            ...es_date_type
         },
         updated: {
             type: Date,
             es_indexed: true,
             default: Date.now,
+            ...es_date_type
         },
     },
     { timestamps: { createdAt: 'created', updatedAt: 'updated' } }
@@ -109,11 +112,13 @@ export const message_schema = new Schema(
             type: Date,
             es_indexed: true,
             default: Date.now,
+            ...es_date_type
         },
         updated: {
             type: Date,
             es_indexed: true,
             default: Date.now,
+            ...es_date_type
         },
     },
     { timestamps: { createdAt: 'created', updatedAt: 'updated' } }

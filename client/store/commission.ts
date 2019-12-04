@@ -1,3 +1,5 @@
+import bodybuilder from 'bodybuilder'
+
 import { createStore, bootstrapStoreDev } from '@client/store'
 import { update_db } from '@app/client/db'
 import {
@@ -5,7 +7,7 @@ import {
     commission_extra_option_schema,
     commission_schema,
 } from '@schema/commission'
-import { iupdate, is_server } from '@utility/misc'
+import { iupdate, is_server, promisify_es_search } from '@utility/misc'
 import {
     CommissionExtraOption,
     CommissionRate,
@@ -28,6 +30,7 @@ import {
 import { CommissionProcessType } from '@schema/user'
 import useInboxStore from './inbox'
 import { payment_schema } from '@schema/general'
+import log from '@utility/log'
 
 export const useCommissionStore = createStore(
     {
@@ -660,6 +663,113 @@ export const useCommissionsStore = createStore(
                 : commission.to_title
                 ? commission.to_title
                 : commission.from_title
+        },
+        parse_search_query(
+            user,
+            type: 'received'|'sent',
+            search_query,
+            build = true,
+            { ongoing = false, completed = false, failed = false, rejected = false, expired = false, accepted = false, not_accepted = false, active = false } = {}
+        ) {
+            let q = bodybuilder()
+            
+            q = q.sort("updated", "desc")
+
+            if (type === 'received') {
+                q = q.query('match', 'to_user', user._id.toString())
+            } else if (type === 'sent') {
+                q = q.query('match', 'from_user', user._id.toString())
+            }
+            if (not_accepted) {
+                q = q.query('match', 'accepted', false)
+            }
+            if (accepted || ongoing) {
+                q = q.query('match', 'accepted', true)
+            }
+            if (ongoing) {
+                q = q.query('match', 'finished', false)
+            }
+            if (completed) {
+                q = q.query('match', 'completed', true)
+            }
+            if (rejected) {
+                q = q.query('match', 'finished', true)
+                q = q.query('match', 'accepted', false)
+            }
+            if (failed) {
+                q = q.query('match', 'completed', false)
+                q = q.query('match', 'finished', true)
+            }
+            if (expired) {
+                q = q.query('match', 'finished', true)
+                q = q.query('exists', 'expire_date')
+            }
+
+            if (search_query) {
+                q = q.orQuery('multi_match', {
+                    query: search_query,
+                    fields: ['to_title^10'],
+                })
+            }
+
+            q = q.from(0).size(30)
+
+            return build ? q.build() : q
+        },
+        async search_commissions(
+            user,
+            type: 'received'|'sent',
+            search_query,
+            { ongoing = false, completed = false, failed = false, rejected = false, expired = false, accepted = false, not_accepted = false, active = true } = {}
+        ) {
+            let r = []
+            let q = this.parse_search_query(user, type, search_query, false, {
+                ongoing,
+                completed,
+                failed,
+                expired,
+                accepted,
+                rejected,
+                not_accepted,
+                active,
+            })
+
+            let opt = {
+                hydrate: true,
+                hydrateOptions: {
+                    lean: true,
+                    populate: 'to_user from_user',
+                },
+            }
+            let d: any
+
+            if (is_server()) {
+                try {
+                    d = await promisify_es_search(Commission, q.build(), opt)
+                } catch (err) {
+                    log.error(err)
+                }
+            } else {
+                d = await fetch('/api/esearch', {
+                    method: 'post',
+                    body: {
+                        model: 'Commission',
+                        query: q.build(),
+                        options: opt,
+                    },
+                }).then(async r => {
+                    if (r.ok) {
+                        return (await r.json()).data
+                    }
+                    return null
+                })
+            }
+
+            if (d && d.hits && d.hits.hits) {
+                r = d.hits.hits
+            }
+
+            return r
         },
     }
 )

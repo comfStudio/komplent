@@ -90,6 +90,7 @@ export class AuthPage<T extends Props = Props> extends Page<T> {
         let useUserState = useUserStore.createState({
             current_user,
             logged_in: !!current_user,
+            is_creator: current_user?.type === 'creator',
             active_commissions_count,
             active_requests_count,
             ...user_store,
