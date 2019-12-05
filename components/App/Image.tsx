@@ -8,6 +8,7 @@ interface Props extends HTMLElementProps {
     h?: number | string
     fluid?: boolean
     src?: string
+    loading?: boolean
 }
 
 export const Image = (props: Props) => {
@@ -17,6 +18,7 @@ export const Image = (props: Props) => {
         <img className={cls} src={props.src} />
     ) : (
         <Placeholder.Graph
+            active={props.loading}
             width={props.w}
             height={props.h}
             className={cls}

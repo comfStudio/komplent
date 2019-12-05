@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Grid, Row, Col, Uploader, Icon, Button } from 'rsuite'
 import { File } from 'react-kawaii'
 
@@ -11,6 +11,8 @@ import { CenterPanel } from '@components/App/MainLayout'
 import { useUpdateDatabase } from '@hooks/db'
 import { update_db } from '@client/db'
 import { debounceReduce } from '@utility/misc'
+import { fetch } from '@utility/request'
+import { OK } from 'http-status-codes'
 
 interface ProductProps {
     is_owner: boolean
@@ -23,13 +25,34 @@ export const Asset = (props: ProductProps) => {
     const store = useCommissionStore()
     const commission = store.get_commission()
     const [ delete_loading, set_delete_loading ] = useState(false)
+    const [ data, set_data ] = useState(typeof props.data === 'string' ? undefined : props.data )
+    const [ loading, set_loading ] = useState(false)
+
+    useEffect(() => {
+        if (!props.locked && typeof props.data === 'string') {
+            set_loading(true)
+            fetch('/api/fetch', {
+                method: 'post',
+                body: {
+                    model: 'Attachment',
+                    method: 'findById',
+                    query: props.data,
+                }}).then(r => {
+                    if (r.status === OK) {
+                        r.json().then(d => set_data(d.data))
+                    }
+                    set_loading(false)
+                })
+        }
+    }, [props.data])
 
     return (
         <div>
-            <Image src={props?.data?.url} h="200px" />
+            <Image src={data?.url} h="200px" loading={loading} />
             <div className="mt-2">
                 <Button
-                    href={props?.data?.url}
+                    href={data?.url}
+                    disabled={props.locked}
                     componentClass="a"
                     appearance="primary"
                     block
@@ -40,7 +63,7 @@ export const Asset = (props: ProductProps) => {
                         block
                         loading={delete_loading}
                         size="sm"
-                        onClick={() => {set_delete_loading(true); store.delete_product(props.data._id).finally(() => { set_delete_loading(false) })}}
+                        onClick={() => {set_delete_loading(true); store.delete_product(data?._id).finally(() => { set_delete_loading(false) })}}
                         >{t`Delete`}</Button>
                 )}
             </div>
@@ -68,15 +91,36 @@ const CommissionAssets = () => {
         }
     }, 500)
 
+    let unlocked = !is_owner
+
+    if (is_owner && commission.phases.some(v => {
+        if (v.type === 'unlock' && v.done) {
+            return true
+        }
+        return false
+        })) {
+            unlocked = true
+    }
+
     return (
         <Grid fluid>
             {!commission.accepted &&
             <Row>
-                <Col>
+                <Col xs={24}>
                     <CenterPanel
                         subtitle={t`Please accept the commission request to add assets`}>
                         <File mood="sad" className="emoji" color="rgba(0, 0, 0, 0.5)" />
                     </CenterPanel>
+                </Col>
+            </Row>}
+            {!unlocked &&
+            <Row>
+                <Col xs={24}>
+                    <CenterPanel
+                        subtitle={t`Assets are locked`}>
+                        <File mood="sad" className="emoji" color="rgba(0, 0, 0, 0.5)" />
+                    </CenterPanel>
+                    <hr/>
                 </Col>
             </Row>}
             {commission.accepted &&
@@ -84,7 +128,7 @@ const CommissionAssets = () => {
                 {products.map(v => {
                     return (
                         <Col key={v._id} xs={3}>
-                            <Asset data={v} is_owner={is_owner} />
+                            <Asset data={v} is_owner={is_owner} locked={!unlocked} />
                         </Col>
                     )
                 })}

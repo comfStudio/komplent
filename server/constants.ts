@@ -141,10 +141,13 @@ export type Guideline = typeof guideline_types[number]
 export const GuidelineType = array_to_enum(guideline_types)
 
 export enum AnalyticsType {
-    month_earnings,
+    user_month_earnings,
     commissions_day,
+    commissions_month,
     commissions_day_count,
-    commissions_day_earnings
+    commissions_month_count,
+    commissions_day_earnings,
+    commissions_month_earnings
 }
 
 export const fee_types = tuple(

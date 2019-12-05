@@ -31,6 +31,7 @@ import { CommissionProcessType } from '@schema/user'
 import useInboxStore from './inbox'
 import { payment_schema } from '@schema/monetary'
 import log from '@utility/log'
+import { OK } from 'http-status-codes'
 
 export const useCommissionStore = createStore(
     {
@@ -245,20 +246,12 @@ export const useCommissionStore = createStore(
         },
 
         async pay(phase_data: any) {
-            let r = await update_db({
-                model: 'Payment',
-                data: {
-                    from_user: this.state._current_user,
-                    to_user: this.state.commission.to_user._id,
-                    price: this.state.commission.rate.price,
-                    status: "completed"
-                },
-                schema: payment_schema,
-                validate: true,
-                create: true
+            let r = await fetch('/api/pay_commission', {
+                method: 'post',
+                body: { commission_id: this.state.commission._id, payment_phase_id: phase_data._id },
             })
-            if (r.status) {
-                this.update({payments: [...this.state.commission.payments, r.body.data]})
+
+            if (r.status === OK) {
                 r = await this.next_phase()
             }
             return r
@@ -545,7 +538,6 @@ export const useCommissionStore = createStore(
                         .populate('from_user')
                         .populate('to_user')
                         .populate('attachments')
-                        .populate('products')
                         .populate('phases', phase_select)
                         .populate('stage', phase_select)
                     return r.toJSON()
@@ -565,7 +557,6 @@ export const useCommissionStore = createStore(
                             'from_user',
                             'to_user',
                             'attachments',
-                            'products',
                             ['phases', phase_select],
                             ['stage', phase_select],
                         ],

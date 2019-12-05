@@ -3,8 +3,18 @@ import { Commission, Payment, Payout } from "@db/models"
 
 const { ObjectId, Decimal128 } = mongoose.Types
 
-export const get_commissions_count = async (user, since: Date, page = 0, limit = 30) => {
+export const get_commissions_count = async (user, since: Date, page = 0, limit = 30, { by_day = true, by_month = false } = {}) => {
     const offset = page * limit
+
+    let group_exp: any = { year: { '$year': "$date" } }
+
+    if (by_day) {
+        group_exp = {...group_exp, day: { '$dayOfMonth': "$date" }}
+    }
+
+    if (by_month) {
+        group_exp = {...group_exp, month: { '$month': "$date" }}
+    }
 
     let comms = await Commission.aggregate([
         {$project: {
@@ -21,19 +31,21 @@ export const get_commissions_count = async (user, since: Date, page = 0, limit =
             to_user: ObjectId(user._id),
             date: {$gte: since},
         }},
-        {$limit: limit},
-        {$skip: offset},
         {$group: {
-            _id: { rate: "$rate", year: { '$year': "$date" }, month: { '$month': "$date" }, day: { '$dayOfMonth': "$date" } },
+            _id: { rate: "$rate", ...group_exp },
             count:{$sum: 1},
             rate: { $first: "$rate" },
         }},
         {$project: {
+            year: "$_id.year",
+            month: "$_id.month",
             day: "$_id.day",
             count: "$count",
             rate: "$rate",
         }},
         {$unset: ["_id"]},
+        {$limit: limit},
+        {$skip: offset},
     ])
 
     return comms
@@ -41,6 +53,7 @@ export const get_commissions_count = async (user, since: Date, page = 0, limit =
 
 export const get_commissions = async (user, since: Date, page = 0, limit = 30) => {
     const offset = page * limit
+    
     let comms = await Commission.aggregate([
         {$project: {
             to_user: "$to_user",
@@ -57,7 +70,6 @@ export const get_commissions = async (user, since: Date, page = 0, limit = 30) =
             to_user: ObjectId(user._id),
             date: {$gte: since},
         }},
-        {$sort: { date : -1} },
         {$limit: limit},
         {$skip: offset},
         // Unwind the source
@@ -81,13 +93,77 @@ export const get_commissions = async (user, since: Date, page = 0, limit = 30) =
             to_user: { $first: "$to_user" }, 
             rate: { $first: "$rate" }   
         }},
+        {$sort: { date : -1} },
         {$unset: ["payments"]},
     ])
     return comms
 }
 
+export const get_commissions_by_date = async (user, since: Date, page = 0, limit = 30, { by_day = true, by_month = false } = {}) => {
+    const offset = page * limit
 
-export const get_commissions_earnings = async (user, since: Date, page = 0, limit = 30) => {
+    let group_exp: any = { year: { '$year': "$date" } }
+
+    if (by_day) {
+        group_exp = {...group_exp, day: { '$dayOfMonth': "$date" }}
+    }
+
+    if (by_month) {
+        group_exp = {...group_exp, month: { '$month': "$date" }}
+    }
+
+    let comms = await Commission.aggregate([
+        {$project: {
+            to_user: "$to_user",
+            date: "$created",
+            payments: "$payments",
+            rate: "$rate.title",
+            // rate: {$ifNull: ["$to_title", "$from_title"]},
+            accepted: "$accepted",
+            finished: "$finished"
+        }},
+        {$match: {
+            accepted: true,
+            finished: true,
+            to_user: ObjectId(user._id),
+            date: {$gte: since},
+        }},
+        // Unwind the source
+        {$unwind: "$payments"},
+        // Do the lookup matching
+        {$lookup: {
+            from: "payments",
+            localField: "payments",
+            foreignField: "_id",
+            as: "payment_objects"
+            }
+        },
+        // Unwind the result arrays ( likely one or none )
+        {$unwind: "$payment_objects"},
+        // Group back to arrays
+        {$group: {
+            _id: {...group_exp},
+            price: { $sum: {$cond: [{$eq: ["$payment_objects.status", "completed"]}, "$payment_objects.price", 0]} },
+            refunded: { $sum: {$cond: [{$eq: ["$payment_objects.status", "refunded"]}, "$payment_objects.price", 0]} },
+            to_user: { $first: "$to_user" }, 
+        }},
+        {$project: {
+            year: "$_id.year",
+            month: "$_id.month",
+            day: "$_id.day",
+            price: "$price",
+            refunded: "$refunded",
+            to_user: "$to_user",
+        }},
+        {$unset: ["payments", "_id"]},
+        {$limit: limit},
+        {$skip: offset},
+    ])
+    return comms
+}
+
+
+export const get_commissions_earnings_per_rate = async (user, since: Date, page = 0, limit = 30) => {
     const offset = page * limit
 
     let comms = await Commission.aggregate([
@@ -134,6 +210,63 @@ export const get_commissions_earnings = async (user, since: Date, page = 0, limi
     ])
 
     return comms
+}
+
+export const get_commissions_earnings_per_date = async (user, since: Date, { by_day = true, by_month = false } = {}) => {
+
+    let group_exp: any = { year: { '$year': "$date" } }
+
+    if (by_day) {
+        group_exp = {...group_exp, day: { '$dayOfMonth': "$date" }}
+    }
+
+    if (by_month) {
+        group_exp = {...group_exp, month: { '$month': "$date" }}
+    }
+
+    let earnings = await Commission.aggregate([
+        {$project: {
+            to_user: "$to_user",
+            date: "$created",
+            rate: "$rate.title",
+            accepted: "$accepted",
+            finished: "$finished",
+            payments: "$payments",
+        }},
+        {$match: {
+            accepted: true,
+            finished: true,
+            to_user: ObjectId(user._id),
+            date: {$gte: since},
+        }},
+        {$sort: { date : -1} },
+        // Unwind the source
+        {$unwind: "$payments"},
+        // Do the lookup matching
+        {$lookup: {
+            from: "payments",
+            localField: "payments",
+            foreignField: "_id",
+            as: "payment_objects"
+            }
+        },
+        // Unwind the result arrays ( likely one or none )
+        {$unwind: "$payment_objects"},
+        // Group back to arrays
+        {$group: {
+            _id: { ...group_exp },
+            earned: { $sum: {$cond: [{$eq: ["$payment_objects.status", "completed"]}, "$payment_objects.price", 0]} },
+        }},
+        {$project: {
+            year: "$_id.year",
+            month: "$_id.month",
+            day: "$_id.day",
+            earned: "$earned",
+        }},
+        {$unset: ["_id"]},
+    ])
+
+    return earnings
 }
 
 export const get_earnings = async (user, since: Date) => {

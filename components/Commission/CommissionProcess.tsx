@@ -574,7 +574,7 @@ const Completed = (props: ProcessProps) => {
     const show_panel = !props.hidden || props.active
 
     let deadline_txt = ''
-    if (accept_date && commission.commission_deadline) {
+    if (!finished && accept_date && commission.commission_deadline) {
         deadline_txt = ` (${formatDistanceToNow(
             addDays(accept_date, commission.commission_deadline),
             { addSuffix: true }

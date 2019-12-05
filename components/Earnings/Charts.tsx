@@ -50,7 +50,7 @@ export const CommissionsDayLineChart = () => {
 
     return (
         <LineChart data={data} loading={loading}>
-            <XAxis name={t`Days`} data={data.map(v => v[0])}/>
+            <XAxis name={t`Day`} data={data.map(v => v[0])}/>
             <YAxis name={t`Count`} minInterval={0} axisLabel={value => `${value}`} />
             {rates.map(v => <Line key={v} name={v}/>)}
         </LineChart>
@@ -65,7 +65,7 @@ export const CommissionsDayTable = () => {
     const [loading, set_loading] = useState(true)
 
     useMount(() => {
-        store.get_day_commission_data().then(d => {
+        store.get_day_commission_data_per_rate().then(d => {
             set_data(d.map(v => ({
                 date: format(new Date(v.date ?? new Date()), 'dd MMM HH:mm:ss'),
                 price: decimal128ToMoneyToString(v.price),
@@ -119,31 +119,39 @@ export const CommissionsDayTable = () => {
 }
 
 export const CommissionsMonthBarChart = () => {
-
     
-    const user = useUser()
+    const store = useEarningsStore()
 
-    let months = {}
-    _.times(12, n => {
-        n++
-        months[n] = [n.toString(), 0, 0]
+    const [data, set_data] = useState([])
+    const [rates, set_rates] = useState([])
+    const [loading, set_loading] = useState(true)
+
+    useMount(() => {
+        store.get_month_commission_count_data().then(d => {
+            let rates_data = _.uniq(d.map(v => v.rate))
+            set_rates(_.uniq(rates_data))
+
+            let months = {}
+            _.times(12, n => {
+                n++
+                months[n] = [n.toString(), ..._.times(rates_data.length, _.constant(0))]
+            })
+            
+            d.forEach(v => {
+                months[v.month][rates_data.indexOf(v.rate)+1] = v.count
+            })
+
+            set_data(Object.values(months))
+            set_loading(false)
+        })
+
     })
 
-    months[2] = ["2", 2,54]
-    months[4] = ["4", 87,1]
-    months[7] = ["7", 7,9,]
-
-    const [data, set_data] = useState(Object.values(months))
-
     return (
-        <BarChart data={data}>
-            <YAxis axisLabel={value => `${value}`} minInterval={0} splitLine={false} />
-            <Bars name="1" />
-            <Bars name="2" />
-            <Bars name="3" />
-            <Bars name="4" />
-            <Bars name="5" />
-            <Bars name="6" />
+        <BarChart data={data} loading={loading}>
+            <XAxis name={t`Month`} data={data.map(v => v[0])}/>
+            <YAxis name={t`Count`} axisLabel={value => `${value}`} minInterval={0} splitLine={false} />
+            {rates.map(v => <Bars key={v} name={v}/>)}
         </BarChart>
     )
 }
@@ -177,23 +185,32 @@ export const EarningsDaysPieChart = () => {
 
 export const EarningsMonthBarChart = () => {
 
-    
-    const user = useUser()
+    const store = useEarningsStore()
 
-    let months = {}
-    _.times(12, n => {
-        n++
-        months[n] = [n.toString(), 0]
+    const [data, set_data] = useState([])
+    const [loading, set_loading] = useState(true)
+
+    useMount(() => {
+        store.get_month_commission_earnings_data().then(d => {
+
+            let months = {}
+            _.times(12, n => {
+                n++
+                months[n] = [n.toString(), 0]
+            })
+            
+            d.forEach(v => {
+                months[v.month][1] = decimal128ToFloat(v.earned)
+            })
+
+            set_data(Object.values(months))
+            set_loading(false)
+        })
+
     })
 
-    months[2] = ["2", 2]
-    months[4] = ["4", 87]
-    months[7] = ["7", 7]
-
-    const [data, set_data] = useState(Object.values(months))
-
     return (
-        <BarChart data={data}>
+        <BarChart data={data} loading={loading}>
             <YAxis axisLabel={value => `$ ${value}`} minInterval={0} splitLine={false} />
             <Bars label={({ value }) => `$ ${(value).toFixed(2)}`}/>
         </BarChart>
@@ -208,7 +225,26 @@ export const EarningsMonthTable = () => {
         months.push({month: n.toString(), price: 12.43, payment_fee: 0.5, platform_fee: 0.8, refunds: 0})
     })
 
-    const [data, set_data] = useState(Object.values(months))
+    const store = useEarningsStore()
+
+    const [data, set_data] = useState([])
+    const [loading, set_loading] = useState(true)
+
+    useMount(() => {
+        store.get_month_commission_data().then(d => {
+
+            console.log(d)
+
+            set_data(d.map(v => ({
+                month: v.month,
+                price: decimal128ToMoneyToString(v.price),
+                payment_fee: 0.5,
+                platform_fee: 0.8,
+                refunded: decimal128ToMoneyToString(v.refunded)})))
+            set_loading(false)
+        })
+    })
+
 
     return (
         <Table
@@ -216,6 +252,7 @@ export const EarningsMonthTable = () => {
         autoHeight
         bordered
         data={data}
+        loading={loading}
         >
         <Column flexGrow={1} align="center" fixed>
             <HeaderCell>{t`Month`}</HeaderCell>
@@ -238,8 +275,8 @@ export const EarningsMonthTable = () => {
         </Column>
 
         <Column flexGrow={1} align="right">
-            <HeaderCell>{t`Total Refunds`}</HeaderCell>
-            <Cell dataKey="refunds" />
+            <HeaderCell>{t`Total Refunded`}</HeaderCell>
+            <Cell dataKey="refunded" />
         </Column>
         </Table>
       );

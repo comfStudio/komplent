@@ -23,20 +23,32 @@ export const useEarningsStore = createStore(
                 }
             })
         },
-        async get_day_commission_data(page = 0, limit = 30) {
+        async get_day_commission_data_per_rate(page = 0, limit = 30) {
             let r = await this.fetch_data(AnalyticsType.commissions_day, page, limit)
+            return (await r.json())?.data ?? []
+        },
+        async get_month_commission_data(page = 0, limit = 30) {
+            let r = await this.fetch_data(AnalyticsType.commissions_month, page, limit)
             return (await r.json())?.data ?? []
         },
         async get_day_commission_count_data(page = 0, limit = 100) {
             let r = await this.fetch_data(AnalyticsType.commissions_day_count, page, limit)
             return (await r.json())?.data ?? []
         },
+        async get_month_commission_count_data(page = 0, limit = 100) {
+            let r = await this.fetch_data(AnalyticsType.commissions_month_count, page, limit)
+            return (await r.json())?.data ?? []
+        },
         async get_day_commission_earnings_data(page = 0, limit = 100) {
             let r = await this.fetch_data(AnalyticsType.commissions_day_earnings, page, limit)
             return (await r.json())?.data ?? []
         },
+        async get_month_commission_earnings_data() {
+            let r = await this.fetch_data(AnalyticsType.commissions_month_earnings)
+            return (await r.json())?.data ?? []
+        },
         async get_month_earnings() {
-            let r = await this.fetch_data(AnalyticsType.month_earnings)
+            let r = await this.fetch_data(AnalyticsType.user_month_earnings)
             return (await r.json())?.data ?? 0
         },
     }
