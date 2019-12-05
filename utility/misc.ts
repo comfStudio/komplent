@@ -60,7 +60,7 @@ export const decimal128ToMoneyToString = (d: Decimal128) => {
 }
 
 export const moneyToString = d => {
-    return d.toFormat('$0,0.00')
+    return d?.toFormat('$0,0.00')
 }
 
 export const stringToMoneyToString = d => moneyToString(stringToMoney(d))

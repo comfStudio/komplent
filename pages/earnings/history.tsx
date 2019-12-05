@@ -19,7 +19,7 @@ class HistoryPage extends EarningsPage {
                 <Grid fluid>
                     <Row>
                         <Col>
-                            <h3>{t`Commissions the past 12 months`}</h3>
+                            <h3>{t`Commissions this past year`}</h3>
                             <CommissionsMonthBarChart/>
                         </Col>
                     </Row>

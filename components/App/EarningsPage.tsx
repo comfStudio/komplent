@@ -5,11 +5,11 @@ import { AuthPage, Props as AuthProps } from '@components/App/AuthPage'
 import log from '@utility/log'
 import useEarningsStore, { EarningsKey } from '@store/earnings'
 
-interface Props extends AuthProps {
+export interface EarningsProps extends AuthProps {
     EarningsStoreeState: object
 }
 
-class EarningsPage extends AuthPage<Props> {
+class EarningsPage<T extends EarningsProps = EarningsProps> extends AuthPage<T> {
     static activeKey: EarningsKey
 
     static async getInitialProps(ctx: NextPageContext) {
@@ -18,8 +18,6 @@ class EarningsPage extends AuthPage<Props> {
         let EarningsStoreeState = useEarningsStore.createState({
             activeKey: this.activeKey,
         })
-        if (props.useUserState.logged_in) {
-        }
 
         return {
             ...props,

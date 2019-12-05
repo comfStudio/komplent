@@ -146,11 +146,13 @@ export const get_commissions_by_date = async (user, since: Date, page = 0, limit
             price: { $sum: {$cond: [{$eq: ["$payment_objects.status", "completed"]}, "$payment_objects.price", 0]} },
             refunded: { $sum: {$cond: [{$eq: ["$payment_objects.status", "refunded"]}, "$payment_objects.price", 0]} },
             to_user: { $first: "$to_user" }, 
+            date: { $first: "$date" }, 
         }},
         {$project: {
             year: "$_id.year",
             month: "$_id.month",
             day: "$_id.day",
+            date: "$date",
             price: "$price",
             refunded: "$refunded",
             to_user: "$to_user",
@@ -182,8 +184,6 @@ export const get_commissions_earnings_per_rate = async (user, since: Date, page 
             date: {$gte: since},
         }},
         {$sort: { date : -1} },
-        {$limit: limit},
-        {$skip: offset},
         // Unwind the source
         {$unwind: "$payments"},
         // Do the lookup matching
@@ -207,6 +207,8 @@ export const get_commissions_earnings_per_rate = async (user, since: Date, page 
             rate: "$rate",
         }},
         {$unset: ["_id"]},
+        {$limit: limit},
+        {$skip: offset},
     ])
 
     return comms
@@ -307,6 +309,8 @@ export const get_earnings = async (user, since: Date) => {
 
     if (earned && earned.length) {
         earned = earned[0]
+    } else {
+        earned = undefined
     }
 
     return earned
@@ -320,7 +324,7 @@ export const get_payout_balance = async (user) => {
     } else {
         let pm = await Payment.findOne({to_user: user, status: "completed"}).select("created").sort({created: 1}).lean()
         if (!pm) {
-            return 0
+            return undefined
         }
         date_since = pm.created
     }
@@ -338,17 +342,21 @@ export const get_payout_balance = async (user) => {
             to_user: ObjectId(user._id),
             date: {$gte: date_since},
         }},
-        {$unwind: "$fees"},
+        {$unwind: { path: "$fees", preserveNullAndEmptyArrays: true }},
         {$group: {
             _id: null,
             fees_price: { $sum: "$fees.price" },
             total_balance: { $sum: "$price" },
+            from_date: { $min: "$date" },
+            to_date: { $max: "$date" },
         }},
         {$unset: ["_id"]},
     ])
 
     if (balance && balance.length) {
         balance = balance[0]
+    } else {
+        balance = undefined
     }
 
     return balance

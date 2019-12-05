@@ -542,7 +542,7 @@ export const useCommissionStore = createStore(
                         .populate('stage', phase_select)
                     return r.toJSON()
                 } catch (err) {
-                    console.error(err)
+                    log.error(err)
                     return null
                 }
             } else {

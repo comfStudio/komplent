@@ -13,8 +13,8 @@ import { Table } from 'rsuite';
 import { useUser } from '@hooks/user';
 import { t } from '@app/utility/lang'
 import { useMount } from 'react-use';
-import useEarningsStore from '@store/earnings';
-import { format, endOfMonth } from 'date-fns';
+import useEarningsStore, { usePayoutStore } from '@store/earnings';
+import { format, endOfMonth, getMonth, getDay } from 'date-fns';
 import { stringToMoney, moneyToString, stringToMoneyToString, decimal128ToMoneyToString, decimal128ToFloat, floatToMoneyToString } from '@utility/misc';
 
 const { Column, Cell, HeaderCell } = Table
@@ -32,6 +32,7 @@ export const CommissionsDayLineChart = () => {
             let rates_data = _.uniq(d.map(v => v.rate))
             set_rates(_.uniq(rates_data))
 
+            
             let days = {}
             _.times(endOfMonth(new Date()).getDate(), n => {
                 n++
@@ -219,12 +220,6 @@ export const EarningsMonthBarChart = () => {
 
 export const EarningsMonthTable = () => {
 
-    let months = []
-    _.times(12, n => {
-        n++
-        months.push({month: n.toString(), price: 12.43, payment_fee: 0.5, platform_fee: 0.8, refunds: 0})
-    })
-
     const store = useEarningsStore()
 
     const [data, set_data] = useState([])
@@ -233,10 +228,8 @@ export const EarningsMonthTable = () => {
     useMount(() => {
         store.get_month_commission_data().then(d => {
 
-            console.log(d)
-
             set_data(d.map(v => ({
-                month: v.month,
+                month: format(new Date(v.date ?? new Date()), 'MMM yyyy'),
                 price: decimal128ToMoneyToString(v.price),
                 payment_fee: 0.5,
                 platform_fee: 0.8,
@@ -284,13 +277,24 @@ export const EarningsMonthTable = () => {
 
 export const PayoutHistoryTable = () => {
 
+    const store = usePayoutStore()
+
     let months = []
     _.times(12, n => {
         n++
-        months.push({month: n.toString(), fund: 12.43, fee: 0.5})
+        months.push({interval: n.toString(), fund: 12.43, fee: 0.5})
     })
 
-    const [data, set_data] = useState(Object.values(months))
+    const data = store.state.payouts.map(v => ({
+        interval: `${format(new Date(v.from_date ?? new Date()), 'dd MMM')} - ${format(new Date(v.to_date ?? new Date()), 'dd MMM')}`,
+        fund: decimal128ToMoneyToString(v.fund),
+        fees: 0,
+        status: {
+            pending: t`Pending`,
+            completed: t`Completed`,
+            failed: t`Failed`,
+        }[v.status]
+    }))
 
     return (
         <Table
@@ -300,8 +304,8 @@ export const PayoutHistoryTable = () => {
         data={data}
         >
         <Column flexGrow={1} align="center" fixed>
-            <HeaderCell>{t`Month`}</HeaderCell>
-            <Cell dataKey="month" />
+            <HeaderCell>{t`Interval`}</HeaderCell>
+            <Cell dataKey="interval" />
         </Column>
 
         <Column flexGrow={2} align="right">
@@ -312,6 +316,10 @@ export const PayoutHistoryTable = () => {
         <Column flexGrow={2} align="right">
             <HeaderCell>{t`Fees`}</HeaderCell>
             <Cell dataKey="fee" />
+        </Column>
+        <Column flexGrow={1} align="center">
+            <HeaderCell>{t`Status`}</HeaderCell>
+            <Cell dataKey="status" />
         </Column>
         </Table>
       );
