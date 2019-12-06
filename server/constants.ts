@@ -39,6 +39,7 @@ export type PropType<TObj, TProp extends keyof TObj> = TObj[TProp]
 
 export enum TASK {
     activate_email = 'activate_email',
+    payout_user = 'payout_user',
     reset_login = 'reset_login',
     commission_refund = 'commission_refund',
     commission_deadline = 'commission_deadline',
@@ -78,6 +79,8 @@ export type TaskDataTypeMap<T> = T extends TASK.followed_user
     ? { user_id: string }
     : T extends TASK.cdn_upload
     ? { file_id: string; local_path: string; name: string | undefined, type: "Image" | "Attachment" }
+    : T extends TASK.payout_user
+    ? { payout_id: string }
     : T extends TASK.cdn_delete
     ? { key: string }
     : never
@@ -166,3 +169,5 @@ export const FeeValue: Record<Fee, number> = {
     platform_transaction_percent: 0.5,
     stripe: 0.99
 }
+
+export const minimumPayoutBalance = 5.0

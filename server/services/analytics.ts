@@ -359,6 +359,6 @@ export const get_payout_balance = async (user) => {
         balance = undefined
     }
 
-    return balance
+    return balance as any
 }
 

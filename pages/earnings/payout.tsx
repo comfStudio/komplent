@@ -27,7 +27,8 @@ class PayoutPage extends EarningsPage<Props> {
         if (props.useUserState.logged_in) {
             PayoutStoreState = {
                 ...PayoutStoreState,
-                ...await usePayoutStore.actions.load(props.useUserState.current_user)
+                ...await usePayoutStore.actions.load(props.useUserState.current_user),
+                pending_payout: await usePayoutStore.actions.load_pending_payout(props.useUserState.current_user)
             }
         }
 

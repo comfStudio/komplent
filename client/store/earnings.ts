@@ -60,6 +60,7 @@ export const usePayoutStore = createStore(
     {
         payouts: [] as any[],
         balance: undefined as any,
+        pending_payout: undefined as any,
     },{
         async load(user) {
 
@@ -109,6 +110,32 @@ export const usePayoutStore = createStore(
 
             return state
         },
+        async create_payout() {
+            let r = await fetch('/api/payout', {
+                method: 'post',
+            })
+            return r
+        },
+        async load_pending_payout(user) {
+            const q = {status: "pending", user}
+            if (is_server()) {
+                return await Payout.findOne(q).lean()
+            } else {
+                return await fetch('/api/fetch', {
+                    method: 'post',
+                    body: {
+                        model: 'Payout',
+                        method: 'findOne',
+                        query: q,
+                    },
+                }).then(async r => {
+                    if (r.ok) {
+                        return (await r.json()).data
+                    }
+                    return null
+                })
+            }
+        }
     }
 )
 

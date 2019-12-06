@@ -4,6 +4,7 @@ import Bull, { Queue } from 'bull'
 import user_tasks from './user'
 import commission_tasks from './commission'
 import cdn_tasks from './cdn'
+import monetary_tasks from './monetary'
 import { TASK, TaskPriority, TaskDataTypeMap, STATES } from '@server/constants'
 import log from '@utility/log'
 
@@ -21,6 +22,7 @@ export const setup_scheduler = async SCHEDULER_URL => {
             ...user_tasks(new Bull('user', SCHEDULER_URL)),
             ...commission_tasks(new Bull('commission', SCHEDULER_URL)),
             ...cdn_tasks(new Bull('cdn', SCHEDULER_URL)),
+            ...monetary_tasks(new Bull('monetary', SCHEDULER_URL)),
         }
     }
     if (scheduler) {
