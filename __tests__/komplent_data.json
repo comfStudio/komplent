@@ -1,0 +1,35 @@
+[
+    {
+        "database": "komplent",
+        "collection": "users",
+        "count": 1000,
+        "content": {
+            "type":  { "type": "fromArray", "in": ["consumer", "creator"], "randomOrder":true },
+            "nsfw":  { "type": "fromArray", "in": ["level_0", "level_5", "level_10"], "randomOrder":true },
+            "visibility": { "type": "constant", "constVal":"private" },
+            "password": { "type": "constant", "constVal":"test" },
+            "username": { "type": "faker", "method": "UserName" },
+            "email": { "type": "faker", "method": "Email" },
+            "name": { "type": "faker", "method": "Name" },
+            "country": { "type": "faker", "method": "StateAbbr" },
+            "created": {
+                "type": "date",
+                "startDate": "2004-05-01T12:45:00+00:00",
+                "endDate": "2018-05-01T12:45:00+00:00"
+            },
+            "updated": {
+                "type": "date",
+                "startDate": "2019-01-01T12:45:00+00:00",
+                "endDate": "2019-08-01T12:45:00+00:00"
+            },
+            "tags": {
+                "type": "valueAggregator",
+                "database": "komplent",
+                "collection": "tags",
+                "key": "_id",
+                "field": "_id",
+                "query": {"name": { "$exists": true }}
+              }
+        }
+    }
+]		
