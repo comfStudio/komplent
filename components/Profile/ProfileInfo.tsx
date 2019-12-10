@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Button, Panel, Progress } from 'rsuite'
 
 import { ProfileNameTag } from '@components/Profile'
@@ -15,6 +15,7 @@ import { useUpdateDatabase } from '@hooks/db'
 import { useTagStore } from '@store/user'
 import { get_profile_name } from '@utility/misc'
 import { codeToCountryName } from '@client/dataset'
+import useProfileStore from '@store/profile'
 
 interface Props extends HTMLElementProps {}
 
@@ -24,9 +25,30 @@ export const ProfileInfo = (props: Props) => {
         profile_user,
         context: { profile_owner },
     } = useProfileUser()
-    const store = useTagStore()
+
+    const tag_store = useTagStore()
+    const store = useProfileStore()
+
     const [tags, set_tags] = useState(profile_user.tags)
+    const [approval_stats, set_approval_stats] = useState({} as any)
+    const [completion_stats, set_completion_stats] = useState({} as any)
+
     let cls = 'w-64'
+    const approval_days = approval_stats?.avg_accept_days?.toFixed(2) ?? '?'
+    const approval_time = approval_stats?.accepted_count ? ((approval_stats.accepted_count / approval_stats.total_count) * 100).toFixed(2) : '?'
+
+    const completion_days = completion_stats?.avg_complete_days?.toFixed(2) ?? '?'
+    const completion_time = completion_stats?.complete_count ? ((completion_stats.complete_count / completion_stats.total_count) * 100).toFixed(2) : '?'
+    
+    useEffect(() => {
+
+        if (profile_user) {
+            store.get_approval_stats(profile_user._id).then(r => set_approval_stats(r ?? {}))
+            store.get_completion_stats(profile_user._id).then(r => set_completion_stats(r ?? {}))
+        }
+
+    }, [profile_user])
+
     return (
         <Panel
             id="profile-info"
@@ -40,9 +62,9 @@ export const ProfileInfo = (props: Props) => {
                     edit={profile_owner}
                     filteredTagIds={tags.map(v => v._id)}
                     onChange={a => {
-                        let t = store.state.tags.filter(v => a.includes(v._id))
+                        let t = tag_store.state.tags.filter(v => a.includes(v._id))
                         set_tags([...tags, ...t])
-                        store.add_user_tags(profile_user, t)
+                        tag_store.add_user_tags(profile_user, t)
                     }}>
                     {tags.map(t => {
                         return (
@@ -51,7 +73,7 @@ export const ProfileInfo = (props: Props) => {
                                 closable={profile_owner}
                                 onClose={ev => {
                                     ev.preventDefault()
-                                    store.remove_user_tag(profile_user, t._id)
+                                    tag_store.remove_user_tag(profile_user, t._id)
                                     set_tags(
                                         tags.filter(ot => t._id !== ot._id)
                                     )
@@ -71,23 +93,19 @@ export const ProfileInfo = (props: Props) => {
                         <tbody>
                             <tr className="border-t border-b">
                                 <td>{t`Approval rate`}:</td>
-                                <td>100%</td>
+                                <td>{approval_time}%</td>
                             </tr>
                             <tr className="border-t border-b">
                                 <td>{t`Approval time`}:</td>
-                                <td>1 day</td>
-                            </tr>
-                            <tr className="border-t border-b">
-                                <td>{t`Completion time`}:</td>
-                                <td>3 days</td>
+                                <td>{t`${approval_days} days`}</td>
                             </tr>
                             <tr className="border-t border-b">
                                 <td>{t`Completion rate`}:</td>
-                                <td>100%</td>
+                                <td>{completion_time}%</td>
                             </tr>
                             <tr className="border-t border-b">
-                                <td>{t`Total`}:</td>
-                                <td>25</td>
+                                <td>{t`Completion time`}:</td>
+                                <td>{t`${completion_days} days`}</td>
                             </tr>
                         </tbody>
                     </table>

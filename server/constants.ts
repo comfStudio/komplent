@@ -151,7 +151,9 @@ export enum AnalyticsType {
     commissions_day_count,
     commissions_month_count,
     commissions_day_earnings,
-    commissions_month_earnings
+    commissions_month_earnings,
+    commission_approval,
+    commission_completion,
 }
 
 export const fee_types = tuple(

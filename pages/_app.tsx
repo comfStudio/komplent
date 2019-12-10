@@ -35,6 +35,7 @@ import useInboxStore from '@store/inbox'
 import useEarningsStore from '@store/earnings'
 import CONFIG from '@server/config'
 import { synchronize_indexes } from '@services/search'
+import useProfileStore from '@store/profile'
 
 // Router.onRouteChangeStart = () => NProgress.start();
 // Router.onRouteChangeComplete = () => NProgress.done();
@@ -75,7 +76,9 @@ export const StoreProvider = (props: ReactProps) => {
                             <useNotificationStore.Provider>
                                 <useInboxStore.Provider>
                                     <useEarningsStore.Provider>
+                                        <useProfileStore.Provider>
                                         {props.children}
+                                        </useProfileStore.Provider>
                                     </useEarningsStore.Provider>
                                 </useInboxStore.Provider>
                             </useNotificationStore.Provider>

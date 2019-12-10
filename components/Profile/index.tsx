@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useLayoutEffect } from 'react'
 import Router from 'next/router'
-import { Grid, Row, Col, Icon, IconButton } from 'rsuite'
+import { Grid, Row, Col, Icon, IconButton, Panel } from 'rsuite'
 
 import {
     MainLayout,
@@ -192,34 +192,36 @@ export const GuidelineList = () => {
     }
 
     return (
-        <Grid fluid>
-            <Row>
-                {guideline_types.map(gtype => (
-                    <Col
-                        key={gtype}
-                        xs={Math.floor(24 / guideline_types.length)}>
-                        <h4 className="text-center">{titles(gtype)}</h4>
-                        <ul className="px-10">
-                            {guidelines
-                                .filter(v => v.guideline_type === gtype)
-                                .map(({ guideline_type, value }, idx) => (
-                                    <li key={idx.toString() + value}>
-                                        <Icon
-                                            icon={
-                                                icons(guideline_type)
-                                                    .name as any
-                                            }
-                                            className={`mr-2 ${
-                                                icons(guideline_type).color
-                                            }`}
-                                        />
-                                        {value}
-                                    </li>
-                                ))}
-                        </ul>
-                    </Col>
-                ))}
-            </Row>
-        </Grid>
+        <Panel bordered>
+            <Grid fluid>
+                <Row>
+                    {guideline_types.map(gtype => (
+                        <Col
+                            key={gtype}
+                            xs={Math.floor(24 / guideline_types.length)}>
+                            <h4 className="text-center">{titles(gtype)}</h4>
+                            <ul className="px-10">
+                                {guidelines
+                                    .filter(v => v.guideline_type === gtype)
+                                    .map(({ guideline_type, value }, idx) => (
+                                        <li key={idx.toString() + value}>
+                                            <Icon
+                                                icon={
+                                                    icons(guideline_type)
+                                                        .name as any
+                                                }
+                                                className={`mr-2 ${
+                                                    icons(guideline_type).color
+                                                }`}
+                                            />
+                                            {value}
+                                        </li>
+                                    ))}
+                            </ul>
+                        </Col>
+                    ))}
+                </Row>
+            </Grid>
+        </Panel>
     )
 }

@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
 import { Commission, Payment, Payout } from "@db/models"
+import { subMonths } from 'date-fns'
 
 const { ObjectId, Decimal128 } = mongoose.Types
 
@@ -360,5 +361,82 @@ export const get_payout_balance = async (user) => {
     }
 
     return balance as any
+}
+
+export const get_approval_stats = async (user) => {
+    let date_since = subMonths(new Date(), 6)
+
+    let stats = await Commission.aggregate([
+        {$project: {
+            to_user: "$to_user",
+            date: "$created",
+            accept_date: "$accept_date",
+            accepted: "$accepted",
+        }},
+        {$match: {
+            to_user: ObjectId(user._id),
+            date: {$gte: date_since},
+        }},
+        {$addFields: {
+            avg_accept_days: { $divide: [{ $subtract: [{$ifNull: [ "$accept_date", '$date' ] }, '$date'] }, 1000 * 60 * 60 * 24] },
+        }},
+        {$group: {
+            _id: null,
+            accepted_count: { $sum: { $cond: ["$accepted", 1, 0] } },
+            total_count:{$sum: 1},
+            avg_accept_days: { $first: "$avg_accept_days" },
+        }},
+        {$unset: ["_id"]},
+    ])
+
+    if (stats && stats.length) {
+        stats = stats[0]
+    } else {
+        stats = undefined
+    }
+
+
+    return stats as any
+}
+
+export const get_completion_stats = async (user) => {
+    let date_since = subMonths(new Date(), 6)
+
+    let stats = await Commission.aggregate([
+        {$project: {
+            to_user: "$to_user",
+            date: "$created",
+            accept_date: "$accept_date",
+            accepted: "$accepted",
+            end_date: "$end_date",
+            completed: "$completed",
+        }},
+        {$match: {
+            to_user: ObjectId(user._id),
+            date: {$gte: date_since},
+            accepted: true,
+        }},
+        {$addFields: {
+            avg_complete_days: { $divide: [{ $subtract: [{$ifNull: [ "$end_date", new Date() ] }, {$ifNull: [ "$accept_date", '$date' ] }] }, 1000 * 60 * 60 * 24] },
+        }},
+        {$group: {
+            _id: null,
+            complete_count: { $sum: { $cond: ["$completed", 1, 0] } },
+            total_count:{$sum: 1},
+            avg_complete_days: { $first: "$avg_complete_days" },
+        }},
+        {$unset: ["_id"]},
+    ])
+
+    console.log(stats)
+
+    if (stats && stats.length) {
+        stats = stats[0]
+    } else {
+        stats = undefined
+    }
+
+
+    return stats as any
 }
 

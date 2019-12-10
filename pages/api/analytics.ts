@@ -7,7 +7,7 @@ import {
     ExApiResponse,
 } from '@server/middleware'
 import { AnalyticsType } from '@server/constants'
-import { get_commissions, get_commissions_count, get_commissions_earnings_per_rate as get_commissions_earnings, get_earnings, get_commissions_earnings_per_date, get_commissions_by_date, get_payout_balance } from '@services/analytics'
+import { get_commissions, get_commissions_count, get_commissions_earnings_per_rate, get_earnings, get_commissions_earnings_per_date, get_commissions_by_date, get_payout_balance, get_approval_stats } from '@services/analytics'
 import { startOfMonth, startOfYear, subYears, subMonths } from 'date-fns'
 
 export default with_auth_middleware(
@@ -23,7 +23,7 @@ export default with_auth_middleware(
                 } else if (type === AnalyticsType.commissions_month_count) {
                     return res.status(OK).json(data_message(await get_commissions_count(req.user, startOfYear(new Date()), page ?? 0, limit ?? 30, {by_day: false, by_month: true})))
                 } else if (type === AnalyticsType.commissions_day_earnings) {
-                    return res.status(OK).json(data_message(await get_commissions_earnings(req.user, startOfMonth(new Date()), page ?? 0, limit ?? 30)))
+                    return res.status(OK).json(data_message(await get_commissions_earnings_per_rate(req.user, startOfMonth(new Date()), page ?? 0, limit ?? 30)))
                 } else if (type === AnalyticsType.user_month_earnings) {
                     return res.status(OK).json(data_message(await get_earnings(req.user, startOfMonth(new Date()))))
                 } else if (type === AnalyticsType.commissions_month_earnings) {
