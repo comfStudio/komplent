@@ -2,10 +2,6 @@
     width: 100%;
 }
 
-.footer {
-    margin-top: 2em;
-}
-
 .body-content {
     margin-top: 1em;
     margin-bottom: 1em;
@@ -26,5 +22,33 @@
     &.no-padding {
         padding: 0;
         padding-bottom: 1.8em;
+    }
+}
+
+#main-layout {
+
+    min-height: 100vh;
+
+    .header {
+        flex: 0;
+    }
+    .content {
+        flex: 3;
+    }
+    .footer {
+        flex: 0;
+
+        .footer-list {
+
+            li {
+                display: inline;
+                
+                &:not(:first-child):before {
+                    margin: 0 0.8em;
+                    content: '| ';  
+                    }
+            }
+
+        }
     }
 }

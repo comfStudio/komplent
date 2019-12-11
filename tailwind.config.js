@@ -61,6 +61,9 @@ module.exports = {
         },
     },
     variants: variants,
+    corePlugins: {
+        container: false
+      },
     plugins: [
         // prepend class with an exclamation mark to be important
         function({ addVariant }) {
@@ -71,6 +74,25 @@ module.exports = {
                         decl.important = true
                     })
                 })
+            })
+        },
+        function ({ addComponents }) {
+            addComponents({
+              '.container': {
+                maxWidth: '100%',
+                '@screen sm': {
+                  maxWidth: '736px',
+                },
+                '@screen md': {
+                  maxWidth: '980px',
+                },
+                '@screen lg': {
+                  maxWidth: '1280px',
+                },
+                '@screen xl': {
+                  maxWidth: '1690px',
+                },
+              }
             })
         },
     ],

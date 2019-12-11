@@ -3,7 +3,7 @@ import {
     Container as Layout,
     Header,
     Content,
-    Footer,
+    Footer as FooterLayout,
     Panel,
     Grid,
     Row,
@@ -22,11 +22,14 @@ import { is_server } from '@utility/misc'
 import { useUser } from '@hooks/user'
 import { get_user_room_id } from '@utility/request'
 import MatureContent from './MatureContent'
+import Footer from './Footer'
 
 interface Props extends ReactProps {
     activeKey?: string
     pageProps?: object
     noSidebar?: boolean
+    noContainer?: boolean
+    noPanel?: boolean
     header?: React.ReactNode
     paddedTop?: boolean
     noContentMarginTop?: boolean
@@ -51,7 +54,9 @@ export const MainLayout = (props: Props) => {
         content = (
             <>
                 {props.header}
-                <Panel
+                {props.noPanel && props.children}
+                {!props.noPanel &&
+                    <Panel
                     bodyFill
                     className={
                         'body-content header' +
@@ -59,12 +64,14 @@ export const MainLayout = (props: Props) => {
                         (props.noContentPadded ? ' no-padding' : '')
                     }
                     >
-                    {props.children}
-                </Panel>
+                        {props.children}
+                    </Panel>
+                }
             </>
         )
     } else {
-        content = (
+        content = props.noPanel ? props.children
+            : (
             <Panel bodyFill className="body-content">
                 {props.children}
             </Panel>
@@ -73,7 +80,7 @@ export const MainLayout = (props: Props) => {
 
     if (logged_in && !props.noSidebar) {
         layout_content = (
-            <Row className="h-full">
+            <Row className="h-full !m-0">
                 <Col className="sm:hidden md:block h-full" xs={4} lg={4}>
                     <UserSidebar activeKey={props.activeKey} />
                 </Col>
@@ -88,8 +95,8 @@ export const MainLayout = (props: Props) => {
         )
     } else {
         layout_content = (
-            <Row className="h-full">
-                <Col className="h-full" xs={24}>
+            <Row className="h-full !m-0">
+                <Col className="h-full !p-0" xs={24}>
                     {content}
                 </Col>
             </Row>
@@ -97,22 +104,19 @@ export const MainLayout = (props: Props) => {
     }
 
     return (
-        <Layout id="main-layout" className="!h-screen">
-            <Header>
+        <Layout id="main-layout">
+            <Header className="header">
                 <NavMenu activeKey={props.activeKey} />
             </Header>
-            <Content>
-                <Grid className={'h-full'}>{layout_content}</Grid>
+            <Content className="content">
+                {props.noContainer && <Grid fluid className={'h-full !p-0'}>{layout_content}</Grid>}
+                {!props.noContainer && <PageContainer><Grid fluid className={'h-full !p-0'}>{layout_content}</Grid></PageContainer>}
             </Content>
-            <Footer className="footer">
-                <GridContainer fluid padded className="bg-secondary h-64">
-                    <Container>
-                        <Row>
-                            <Col xs={12}></Col>
-                        </Row>
-                    </Container>
+            <FooterLayout className="footer bg-secondary h-64">
+                <GridContainer fluid padded>
+                    <Footer/>
                 </GridContainer>
-            </Footer>
+            </FooterLayout>
         </Layout>
     )
 }
@@ -155,6 +159,16 @@ export const Container = (props: ContainerProps) => {
     )
 }
 
+export const PageContainer = (props: ContainerProps) => {
+    let cls = 'container mx-auto'
+    if (props.padded) {
+        cls += ` py-${typeof props.padded == 'number' ? props.padded : 5}`
+    }
+    return (
+        <div className={classnames(cls, props.className)}>{props.children}</div>
+    )
+}
+
 interface PanelContainerProps extends ReactProps, HTMLElementProps {
     flex?: boolean
     bordered?: boolean
@@ -180,7 +194,7 @@ export const PanelContainer = (props: PanelContainerProps) => {
     )
 }
 
-interface GridContainerProps extends ReactProps, HTMLElementProps {
+interface GridContainerProps extends ContainerProps {
     fluid?: boolean
     padded?: boolean | number
 }
@@ -191,14 +205,12 @@ export const GridContainer = (props: GridContainerProps) => {
         cls += ' !w-full'
     }
 
-    if (props.padded) {
-        cls += ` py-${typeof props.padded == 'number' ? props.padded : 5}`
-    }
-
     return (
-        <Grid className={classnames(cls, props.className)} fluid={props.fluid}>
-            {props.children}
-        </Grid>
+        <Container {...props}>
+            <Grid className={classnames(cls, props.className)} fluid={props.fluid}>
+                {props.children}
+            </Grid>
+        </Container>
     )
 }
 
