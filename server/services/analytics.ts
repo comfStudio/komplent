@@ -428,8 +428,6 @@ export const get_completion_stats = async (user) => {
         {$unset: ["_id"]},
     ])
 
-    console.log(stats)
-
     if (stats && stats.length) {
         stats = stats[0]
     } else {

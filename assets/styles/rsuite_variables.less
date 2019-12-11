@@ -8,86 +8,94 @@
 
 //== Colors
 
-@base-color: #ee6666;
+@base-color: #f65c77;
 
-@H050: #fdf0f0;
-@H100: #fad1d1;
-@H200: #f7b3b3;
-@H300: #f39494;
-@H400: #f07575;
-@H500: #ee6666;
-@H600: #d65c5c;
-@H700: #a74747;
-@H800: #773333;
-@H900: #471f1f;
+@H050:#fff2f6;
+@H100:#fcd7e0;
+@H200: #fab6c6;
+@H300: #fa98ae;
+@H400: #f77992;
+@H500: #f65c77;
+@H600: #eb425e;
+@H700: #d62943;
+@H800: #b81228;
+@H900: #8f0112;
 
 //** Gray levels.
-@B000: #fff;
-@B050: #f7f7fa;
-@B100: #f2f2f5;
-@B200: #e5e5ea;
-@B300: #d9d9d9;
-@B400: #c5c6c7;
-@B500: #a6a6a6;
-@B600: #8e8e93;
-@B700: #7a7a7a;
-@B800: #575757;
-@B900: #272c36;
+@B000: #faf6e9;
+@B050: #e1ddd2;
+@B100: #c8c5ba;
+@B200: #afaca3;
+@B300: #96948c;
+@B400: #7d7b75;
+@B500: #64625d;
+@B600: #4b4a46;
+@B700: #32312f;
+@B800: #191917;
+@B900: #000000;
 
 //** spectrum
-@red: #db2828;
-@orange: #f2711c;
-@yellow: #fbbd08;
-@green: #21ba45;
+@primary: #f65c77;
+@secondary: #494949;
+@tertiary: #ece8d9;
+@red: #f7635c;
+@orange: #eb6331;
+@yellow: #ffec5e;
+@green: #5ea83e;
 @cyan: #00b5ad;
-@blue: #2185d0;
-@violet: #a333c8;
-@spectrum: red, orange, yellow, green, cyan, blue, violet;
+@blue: #34c3ff;
+@violet: #9c27b0;
+@spectrum: red, orange, yellow, green, cyan, blue, violet, primary, secondary, tertiary;
 
-@body-bg: #fafbfc;
+@body-bg: #fffdf6;
 @border-base-color: @B700;
-@text-color: @B800;
+@text-color: @B900;
 
 //** Sub colors.
-@success-color: @orange;
-@success-light-color: #edfae1;
+@success-color: @green;
+@success-light-color: #a5d48e;
 
 @info-color: @blue;
-@info-light-color: #e9f5fe;
+@info-light-color: #80ddff;
 
 @warning-color: @orange;
-@warning-light-color: #fff9e6;
+@warning-light-color: #f2977c;
 
 @error-color: @red;
-@error-light-color: #fde9ef;
+@error-light-color: #fa9a98;
 
 @link-color: @H500;
-@link-active-color: @H500;
-@dropdown-link-active-color: @H500;
-@nav-bar-default-active-color: @H500;
+@link-active-color: @H700;
+@dropdown-link-active-color: @H700;
+@nav-bar-default-active-color: @H700;
 @nav-bar-subtle-font-active-color: @H500;
 @nav-bar-inverse-active-bg: @H500;
 @picker-select-menu-item-selected-color: @H500;
 
 //== Nav
 @nav-item-font-default-color: @B600;
-@nav-item-default-hover-bg: @H700;
+@nav-item-default-hover-bg: @H500;
 @nav-item-click-bg: @B200;
 @nav-tab-waterline-color: @B300;
 @nav-subtle-hover-bg: @nav-item-default-hover-bg;
 @nav-subtle-waterline-default-color: @B050;
 
 //== Navbar
-@nav-bar-default-bg: @B600;
+@nav-bar-default-bg: @secondary;
 @nav-bar-default-font-color: @H050;
-@nav-bar-default-active-color: @H200;
-@nav-bar-subtle-bg: @B200;
+@nav-bar-default-active-color: @H500;
+@nav-bar-subtle-bg: @tertiary;
 @nav-bar-subtle-font-color: @B700;
 @nav-bar-subtle-font-active-color: @B600;
 @nav-bar-subtle-hover-bg: @B050;
 @nav-bar-subtle-hover-font-color: @B800;
-@nav-bar-inverse-bg: @B600;
+@nav-bar-inverse-bg: @tertiary;
 @nav-bar-inverse-active-bg: @B600;
+
+//== Panel
+@panel-border: 1px solid @B400;
+@panel-heading-color: @B600;
+@panel-background-color: unset;
 
 //== Media queries breakpoints
 //
