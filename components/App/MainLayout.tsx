@@ -58,14 +58,14 @@ export const MainLayout = (props: Props) => {
                         (props.noContentMarginTop ? ' connected' : '') +
                         (props.noContentPadded ? ' no-padding' : '')
                     }
-                    bordered>
+                    >
                     {props.children}
                 </Panel>
             </>
         )
     } else {
         content = (
-            <Panel bodyFill className="body-content" bordered>
+            <Panel bodyFill className="body-content">
                 {props.children}
             </Panel>
         )

@@ -10,13 +10,13 @@ Object.entries(variants).forEach(([k, v]) => {
 module.exports = {
     theme: {
         colors: {
-            primary: '#f65c77',
+            primary: '#eb425e',
             secondary: {
                 default: '#494949',
                 light: '#8e8e93',
             },
             tertiary: {
-                default: '#ece8d9',
+                default: '#afafaf',
                 light: '#8e8e93',
             },
             success: {
@@ -44,7 +44,21 @@ module.exports = {
             violet: '#9c27b0',
             ...colors,
         },
-        extend: {},
+        extend: {
+            colors: {
+                gray: {
+                  '100': '#e1e1e1',
+                  '200': '#c8c8c8',
+                  '300': '#afafaf',
+                  '400': '#969696',
+                  '500': '#7d7d7d',
+                  '600': '#646464',
+                  '700': '#4b4b4b',
+                  '800': '#323232',
+                  '900': '#191919',
+                }
+              }
+        },
     },
     variants: variants,
     plugins: [

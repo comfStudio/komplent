@@ -8,30 +8,32 @@ import log from '@utility/log'
 
 export const useSearchStore = createStore(
     {
-        results: [],
+        items: [],
+        count: 0,
+        size: 30,
+        page: 1,
     },
     {
-        parse_search_query(search_query, build = true) {
+        parse_search_query(search_query, page, size, build = true) {
             let q = bodybuilder()
             q = q.notQuery('match', 'type', 'consumer')
             q = q.query('match', 'visibility', 'public')
 
             if (search_query) {
-                if (search_query.q) {
-                    q = q.orQuery('multi_match', {
-                        query: search_query.q,
-                        fields: ['username^10', 'name^5', '*'],
-                    })
-                }
+                q = q.orQuery('multi_match', {
+                    query: search_query,
+                    fields: ['username^10', 'name^5', '*'],
+                })
             }
 
-            q = q.from(0).size(30)
+            q = q.from((page - 1) * size).size(size)
 
             return build ? q.build() : q
         },
-        async search_creators(search_query) {
+        async search_creators(search_query: string, page: number = 1, size: number = 30) {
+            let count = 0
             let r = []
-            let q = this.parse_search_query(search_query, false)
+            let q = this.parse_search_query(search_query, page, size, false)
             let opt = {
                 hydrate: true,
                 hydrateOptions: {
@@ -61,9 +63,10 @@ export const useSearchStore = createStore(
 
             if (d && d.hits && d.hits.hits) {
                 r = d.hits.hits
+                count = d.hits.total.value
             }
 
-            return r.filter(Boolean)
+            return {count, items: r.filter(Boolean)}
         },
     }
 )

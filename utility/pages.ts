@@ -4,6 +4,7 @@ export const dashboard = '/dashboard'
 export const home = '/'
 export const inbox = '/inbox'
 export const login = '/login'
+export const search = '/search'
 export const commission = '/commission'
 export const commission_requests = '/commissions/requests'
 export const commissions = '/commissions'
@@ -58,5 +59,11 @@ export const make_conversation_urlpath = (
 export const make_commission_urlpath = (commission_object: { _id: string }) => {
     let url = commission
     url += '/' + commission_object._id
+    return url
+}
+
+export const make_search_urlpath = (page, size, query) => {
+    let url = search
+    url += '?' + qs.stringify({...query, page, size})
     return url
 }

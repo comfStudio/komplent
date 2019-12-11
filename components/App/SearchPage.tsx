@@ -5,28 +5,34 @@ import { OptionalAuthPage, Props as AuthProps } from '@components/App/AuthPage'
 import useSearchStore from '@store/search'
 
 interface Props extends AuthProps {
-    searchStoreeState: object
+    searchStoreState: object
 }
 
 class SearchPage extends OptionalAuthPage<Props> {
     static async getInitialProps(ctx: NextPageContext) {
         const props = await super.getInitialProps(ctx)
 
-        let searchStoreeState = useSearchStore.createState({})
-        searchStoreeState.results = await useSearchStore.actions.search_creators(
-            ctx.query
-        )
+        const page = parseInt((ctx.query.page as string) ?? '1')
+        const size = parseInt((ctx.query.size as string) ?? '30')
+
+        let searchStoreState = useSearchStore.createState({
+            page,
+            size
+        })
+        
+        searchStoreState = {...searchStoreState,
+            ...await useSearchStore.actions.search_creators(ctx.query.q as string, page, size)}
 
         return {
             ...props,
-            searchStoreeState,
+            searchStoreState,
         }
     }
 
     renderPage(children) {
         return (
             <useSearchStore.Provider
-                initialState={this.props.searchStoreeState}>
+                initialState={this.props.searchStoreState}>
                 {super.renderPage(children)}
             </useSearchStore.Provider>
         )

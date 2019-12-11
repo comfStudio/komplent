@@ -6,7 +6,8 @@
         "content": {
             "type":  { "type": "fromArray", "in": ["consumer", "creator"], "randomOrder":true },
             "nsfw":  { "type": "fromArray", "in": ["level_0", "level_5", "level_10"], "randomOrder":true },
-            "visibility": { "type": "constant", "constVal":"private" },
+            "visibility": { "type": "constant", "constVal":"public" },
+            "commissions_open": { "type": "fromArray", "in": [true, false], "randomOrder":true },
             "password": { "type": "constant", "constVal":"test" },
             "username": { "type": "faker", "method": "UserName" },
             "email": { "type": "faker", "method": "Email" },

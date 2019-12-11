@@ -13,11 +13,8 @@ export const SearchLayout = () => {
                 <Col xs={6}>
                     <FiltersPanel />
                 </Col>
-                <Col className="h-full" xs={12}>
+                <Col className="h-full" xs={18}>
                     <ResultLayout />
-                </Col>
-                <Col xs={6}>
-                    <RecommendPanel />
                 </Col>
             </Row>
         </Grid>
