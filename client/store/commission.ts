@@ -96,7 +96,9 @@ export const useCommissionStore = createStore(
             }
 
             if (typeof d.rate === 'object') {
-                d.rate.price = d.rate.price['$numberDecimal']
+                if (d.rate.price && typeof d.rate.price === 'object') {
+                    d.rate.price = d.rate.price['$numberDecimal']
+                }
 
                 if (d.rate.extras) {
                     d.rate.extras = d.rate.extras.map(v => ({

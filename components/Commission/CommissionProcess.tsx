@@ -11,7 +11,7 @@ import CommissionSteps, {
 } from './CommissionSteps'
 import { useCommissionStore } from '@client/store/commission'
 import { t } from '@utility/lang'
-import { capitalizeFirstLetter, decimal128ToMoneyToString } from '@utility/misc'
+import { capitalizeFirstLetter, decimal128ToMoneyToString, price_is_null } from '@utility/misc'
 import { useUser } from '@hooks/user'
 import { ButtonToolbar, Button, Grid, Row, Col, Icon } from 'rsuite'
 import * as pages from '@utility/pages'
@@ -31,14 +31,19 @@ interface ProcessProps extends CommissionStepItemProps {
 
 export const ApprovalButtons = () => {
     const store = useCommissionStore()
+    let commission = store.get_commission()
+
     const [accept_loading, set_accept_loading] = useState(false)
     const [decline_loading, set_decline_loading] = useState(false)
+
+    const custom_price = price_is_null(commission.rate.price)
 
     return (
         <ButtonToolbar>
             <Button
                 color="green"
                 loading={accept_loading}
+                disabled={custom_price}
                 onClick={ev => {
                     ev.preventDefault()
                     set_accept_loading(true)
@@ -110,7 +115,7 @@ const PendingPayment = (props: ProcessProps) => {
     const from_name = commission ? commission.from_user.username : ''
     const done = props.data ? props.data.done : false
     const show_panel = !props.hidden || props.active
-    const price = decimal128ToMoneyToString(commission.rate.price)
+    const price = price_is_null(commission.rate.price) ? t`custom price` : decimal128ToMoneyToString(commission.rate.price)
 
     return (
         <CommissionStepItem {...props}>

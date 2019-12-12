@@ -260,7 +260,11 @@ interface Props extends HTMLElementProps {
 const rate_model = Schema.Model({
     title: StringType().isRequired(t`This field is required.`),
     description: StringType(),
-    price: NumberType().isRequired('This field is required.'),
+    price: NumberType().isRequired('This field is required.')
+        .addRule((value, data) => {
+            if (value < 0) return false
+            return true
+        }, t`No negatives allowed`),
     commission_deadline: NumberType(),
     extras: ArrayType(),
 })
@@ -369,7 +373,7 @@ const CommissionRateForm = (props: Props) => {
                 </Grid>
             </FormGroup>
             <FormGroup>
-                <ControlLabel>{t`Deadline`}:</ControlLabel>
+                <ControlLabel>{t`Delivery time`}:</ControlLabel>
                 <FormControl
                     fluid
                     name="commission_deadline"

@@ -1,6 +1,6 @@
 import React from 'react'
 import { useCommissionStore } from '@client/store/commission'
-import { Grid, Row, Col, Placeholder, List, Icon } from 'rsuite'
+import { Grid, Row, Col, Placeholder, List, Icon, Message } from 'rsuite'
 import { PanelContainer } from '@components/App/MainLayout'
 import { t } from '@utility/lang'
 import { ApprovalButtons } from './CommissionProcess'
@@ -8,7 +8,7 @@ import UserInfoCard from '@components/User/UserInfoCard'
 import { CommissionCard } from '@components/Profile/ProfileCommission'
 import { useUser } from '@hooks/user'
 import { useMessageTextToHTML } from '@hooks/db'
-import { get_profile_name } from '@utility/misc'
+import { get_profile_name, price_is_null } from '@utility/misc'
 
 const CommissionDescription = () => {
     const user = useUser()
@@ -19,6 +19,8 @@ const CommissionDescription = () => {
     let is_owner = user._id === commission.from_user._id
 
     let descr_html = useMessageTextToHTML(commission.body)
+
+    const custom_price = price_is_null(commission.rate.price)
 
     return (
         <Grid fluid>
@@ -38,6 +40,7 @@ const CommissionDescription = () => {
                                 <hr />
                                 {!commission.accepted && !commission.finished && (
                                     <>
+                                        {custom_price && <Message className="mb-2" type="warning" description={t`Cannot approve request before a price has been decided`}/>}
                                         <p>{t`Waiting for your approval.`}</p>
                                         <p>
                                             <ApprovalButtons />

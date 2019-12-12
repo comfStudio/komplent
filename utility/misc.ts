@@ -59,6 +59,12 @@ export const decimal128ToMoneyToString = (d: Decimal128) => {
     return moneyToString(decimal128ToMoney(d))
 }
 
+export const price_is_null = (d) => {
+    if (!d) return true
+    if (typeof d === 'object') return (d['$numberDecimal'] === null || d['$numberDecimal'] === undefined)
+    return false
+}
+
 export const moneyToString = d => {
     return d?.toFormat('$0,0.00')
 }

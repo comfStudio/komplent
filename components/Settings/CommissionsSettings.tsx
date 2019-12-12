@@ -368,10 +368,7 @@ export const CommissionProcess = (props: CommissionProcessProps) => {
 }
 
 export const Rates = () => {
-    const [show_new_rate, set_show_new_rate] = useSessionStorage(
-        'new-commission-rate-form-show',
-        false
-    )
+    const [show_new_rate, set_show_new_rate] = useState(false)
 
     const [edit_rate, set_edit_rate] = useState()
 

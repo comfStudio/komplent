@@ -19,6 +19,11 @@ import {
     Message,
     ControlLabel,
     Placeholder,
+    DatePicker,
+    FlexboxGrid,
+    HelpBlock,
+    Divider,
+    InputNumber,
 } from 'rsuite'
 import Link from 'next/link'
 import qs from 'qs'
@@ -45,6 +50,7 @@ import {
     decimal128ToMoney,
     decimal128ToMoneyToString,
     decimal128ToPlainString,
+    price_is_null,
 } from '@utility/misc'
 import * as pages from '@utility/pages'
 import { make_profile_urlpath } from '@utility/pages'
@@ -55,6 +61,7 @@ import { useDatabaseTextToHTML } from '@hooks/db'
 import MessageText from '@components/App/MessageText'
 import Upload, { UploadProps } from '@components/App/Upload'
 import debounce from 'lodash/debounce'
+import { isBefore } from 'date-fns'
 
 const {
     StringType,
@@ -62,6 +69,7 @@ const {
     BooleanType,
     ArrayType,
     ObjectType,
+    DateType,
 } = Schema.Types
 
 // returns a new array
@@ -98,20 +106,13 @@ const CommissionCardHeader = (props: CommissionCardProps) => {
             <Row>
                 <Col xs={8}>
                     <span className="price">
-                        {price === null ? t`Custom` : decimal128ToMoneyToString(price)}
+                        {price_is_null(price) ? t`Custom` : decimal128ToMoneyToString(price)}
                     </span>
                 </Col>
                 <Col xs={16}>
                     <h4 className="title inline-block">{title}</h4>
                 </Col>
             </Row>
-            {negotiable && (
-                <Row>
-                    <Col xs={24} className="text-center">
-                        <span className="text-primary">{t`Negotiable`}</span>
-                    </Col>
-                </Row>
-            )}
             <Row>
                 <Col xs={24} className="text-center">
                     <span className="muted">{t`Delivery ~ ${commission_deadline} days`}</span>
@@ -245,6 +246,12 @@ const commission_request_model = Schema.Model({
             if (value.length > 300) return false
             return true
         }, t`Title cannot be longer than 80 characters`),
+    requester_deadline_date: DateType(),
+    suggested_price: NumberType()
+        .addRule((value, data) => {
+            if (value < 0) return false
+            return true
+        }, t`No negatives allowed`),
     commission_rate: StringType().isRequired(t`This field is required.`),
     extras: ArrayType(),
     body: ObjectType().isRequired(t`This field is required.`),
@@ -285,6 +292,8 @@ export const ProfileCommission = () => {
     } as any)
     const [error, set_error] = useState(null)
     const [loading, set_loading] = useState(false)
+    const [deadline_disabled, set_deadline_disabled] = useState(false)
+    const [suggest_price_disabled, set_suggest_price_disabled] = useState(false)
 
     const commission_store = useCommissionStore()
     const store = useCommissionRateStore()
@@ -298,7 +307,7 @@ export const ProfileCommission = () => {
     let selected_rate_obj = null
 
     let total_price = stringToMoney('0.0')
-
+    
     if (form_value.commission_rate) {
         for (let c of store.state.rates) {
             if (c._id === form_value.commission_rate) {
@@ -327,6 +336,8 @@ export const ProfileCommission = () => {
             }
         }
     }
+
+    const custom_price = selected_rate_obj?.price === null
 
     useEffect(() => {
         if (submit_value && !uploading && file_count === Object.keys(attachments).length) {
@@ -373,14 +384,39 @@ export const ProfileCommission = () => {
             ref={ref => set_form_ref(ref)}
             onChange={value => set_form_value(value)}>
             <Grid fluid>
-                <h3>{t`Pick your commission`}</h3>
+                <h2>{t`Create a new commission request`}</h2>
                 <CommissionCardRadioGroup />
-                <hr />
+                <hr className="invisible" />
                 <Row>
-                    <Col xs={24}>
+                    {(!!available_options.length || custom_price) &&
+                    <Panel bordered header={<h4>{t`Extra Options`}</h4>}>
+                        {custom_price &&
+                        <FormGroup>
+                            <ControlLabel>
+                                {t`Suggested price`}:
+                            </ControlLabel>
+                            <FlexboxGrid fluid className="!p-0">
+                                <FlexboxGrid.Item className="!p-0">
+                                    <FormControl
+                                        disabled={suggest_price_disabled}
+                                        name="suggested_price"
+                                        prefix="$"
+                                        accepter={InputNumber}
+                                        type="number"
+                                    />
+                                </FlexboxGrid.Item>
+                                <FlexboxGrid.Item xs={10}>
+                                    <Checkbox onChange={(_, v) => set_suggest_price_disabled(v)}>{t`Let creator decide`}</Checkbox>
+                                </FlexboxGrid.Item>
+                            </FlexboxGrid>
+                            <HelpBlock>{t`Suggest a price for this commission request.`}</HelpBlock>
+                        </FormGroup>
+                        }
                         <RateOptions options={available_options} checkbox />
-                    </Col>
+                    </Panel>
+                    }
                 </Row>
+                <hr />
                 <Row>
                     <GuidelineList/>
                 </Row>
@@ -422,6 +458,27 @@ export const ProfileCommission = () => {
                                 placeholder={t`Describe your request`}
                             />
                         </FormGroup>
+                        <FormGroup>
+                            <ControlLabel>
+                                {t`Request deadline`}:
+                            </ControlLabel>
+                            <FlexboxGrid fluid className="!p-0">
+                                <FlexboxGrid.Item className="!p-0">
+                                    <FormControl
+                                        name="requester_deadline_date"
+                                        oneTap
+                                        block
+                                        disabled={deadline_disabled}
+                                        disabledDate={date => isBefore(date, new Date())}
+                                        accepter={DatePicker}
+                                    />
+                                </FlexboxGrid.Item>
+                                <FlexboxGrid.Item xs={10}>
+                                    <Checkbox onChange={(_, v) => set_deadline_disabled(v)}>{t`No deadline`}</Checkbox>
+                                </FlexboxGrid.Item>
+                            </FlexboxGrid>
+                            <HelpBlock>{t`Set a deadline if you need your request done by a certain date.`}</HelpBlock>
+                        </FormGroup>
                     </Col>
                 </Row>
                 <Row>
@@ -462,6 +519,7 @@ export const ProfileCommission = () => {
                 <Row>
                     <Col xs={10}>
                         <TotalPriceDisplay>
+                            {custom_price && <span>{t`Custom`} + </span>}
                             {moneyToString(total_price)}
                         </TotalPriceDisplay>
                     </Col>
