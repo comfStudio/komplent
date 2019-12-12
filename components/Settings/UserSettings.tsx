@@ -88,15 +88,16 @@ const UserSettings = () => {
             <h4>{t`General`}</h4>
             <EditSection>
                 <UserAvatar/>
-                <Currency />
                 <Location />
             </EditSection>
-            <h4>{t`Site`}</h4>
+            {/* <h4>{t`Site`}</h4>
             <EditSection>
                 <Theme />
-            </EditSection>
+            </EditSection> */}
             <h4>{t`Integrations`}</h4>
-            <EditSection></EditSection>
+            <EditSection>
+                
+            </EditSection>
             <h4>{t`Account`}</h4>
             <EditSection>
                 <UserType />

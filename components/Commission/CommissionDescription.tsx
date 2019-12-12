@@ -9,6 +9,7 @@ import { CommissionCard } from '@components/Profile/ProfileCommission'
 import { useUser } from '@hooks/user'
 import { useMessageTextToHTML } from '@hooks/db'
 import { get_profile_name, price_is_null } from '@utility/misc'
+import PriceSuggestionForm from '@components/Form/PriceSuggestionForm'
 
 const CommissionDescription = () => {
     const user = useUser()
@@ -17,6 +18,7 @@ const CommissionDescription = () => {
     let commission = store.get_commission()
 
     let is_owner = user._id === commission.from_user._id
+    const current_user_id = is_owner ? commission.from_user._id : commission.to_user._id
 
     let descr_html = useMessageTextToHTML(commission.body)
 
@@ -35,8 +37,19 @@ const CommissionDescription = () => {
                             data={commission.rate}
                             extras={commission.extras}
                         />
+                        <div className="text-center">
+                        {custom_price &&
+                        <>
+                        <hr/>
+                        <PriceSuggestionForm
+                            onAcceptPrice={() => store.accept_suggested_price()}
+                            onSuggestPrice={v => store.suggest_price(v)}
+                            waiting={commission.suggested_price_user === current_user_id}
+                            user={commission.suggested_price_user === commission.to_user._id ? commission.to_user : commission.from_user}
+                            price={commission.suggested_price}/>
+                        </>}
                         {!is_owner && (
-                            <div className="text-center">
+                            <div>
                                 <hr />
                                 {!commission.accepted && !commission.finished && (
                                     <>
@@ -56,6 +69,7 @@ const CommissionDescription = () => {
                                     )}
                             </div>
                         )}
+                        </div>
                     </UserInfoCard>
                 </Col>
             </Row>

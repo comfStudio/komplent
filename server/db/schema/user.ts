@@ -74,7 +74,7 @@ export const user_schema = new Schema(
         commission_process: {
             type: [Mixed],
             default: [
-                { type: CommissionPhaseT.pending_approval, done: true },
+                { type: CommissionPhaseT.pending_approval, done: false },
                 { type: CommissionPhaseT.pending_sketch, done: false },
                 { type: CommissionPhaseT.revision, done: false, count: 3 },
                 { type: CommissionPhaseT.pending_product, done: false },

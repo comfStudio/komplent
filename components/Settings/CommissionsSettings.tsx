@@ -347,7 +347,7 @@ export const CommissionProcess = (props: CommissionProcessProps) => {
                             ] as CommissionPhaseType[]).includes(v.type)
                         }
                         key={v.type + idx.toString()}>
-                        {addable_stages.includes(v.type) && (
+                        {!accepted && addable_stages.includes(v.type) && (
                             <a
                                 href="#"
                                 onClick={ev => {
@@ -432,8 +432,13 @@ const CommissionsSettings = () => {
                 <Rates />
             </EditSection>
 
-            <h4>{t`Extras`}</h4>
+            <h4>{t`Extra options`}</h4>
             <EditSection>
+                <h5>{t`Additions`}</h5>
+                <EditGroup>
+                    <RateOptionsForm />
+                </EditGroup>
+                <h5>{t`Custom Licenses`}</h5>
                 <EditGroup>
                     <RateOptionsForm />
                 </EditGroup>

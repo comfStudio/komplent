@@ -18,6 +18,7 @@ import * as pages from '@utility/pages'
 import { CommissionPhaseType } from '@server/constants'
 import { CommissionProcessType } from '@schema/user'
 import NoSSR from '@components/App/NoSSR'
+import PriceSuggestionForm from '@components/Form/PriceSuggestionForm'
 
 interface ProcessProps extends CommissionStepItemProps {
     data: any
@@ -263,6 +264,7 @@ const PendingSketch = (props: ProcessProps) => {
                                     set_skip_loading(true)
                                     store
                                         .next_phase()
+                                        .then(() => { store.refresh() })
                                         .then(() => set_skip_loading(false))
                                 }}>{t`Skip`}</Button>
                         </ButtonToolbar>
@@ -493,6 +495,33 @@ const Expired = (props: ProcessProps) => {
                     <Icon className="text-red-300" icon="close" size="4x" />
                 </span>
                 <p>{t`Commission has expired`}</p>
+            </StepPanel>
+        </CommissionStepItem>
+    )
+}
+
+const Negotiating = (props: ProcessProps) => {
+    const store = useCommissionStore()
+    let commission = store.get_commission()
+    const current_user_id = props.is_owner ? commission.from_user._id : commission.to_user._id
+
+    const done = props?.data?.done ?? false
+
+    return (
+        <CommissionStepItem {...props}>
+            <StepTitle onClick={props.onClick} date={props.done_date}>
+            {props.hidden || done ? t`Negotiated price` : t`Negotiating price`}
+            </StepTitle>
+            <StepPanel className="clearfix">
+                {!done && (
+                    <PriceSuggestionForm
+                        onAcceptPrice={() => store.accept_suggested_price()}
+                        onSuggestPrice={v => store.suggest_price(v)}
+                        waiting={commission.suggested_price_user === current_user_id}
+                        user={commission.suggested_price_user === commission.to_user._id ? commission.to_user : commission.from_user}
+                        price={commission.suggested_price}/>
+                    )}
+                {done && <p>{t`A price was negotiated`}</p>}
             </StepPanel>
         </CommissionStepItem>
     )
@@ -729,6 +758,28 @@ const CommissionProcess = () => {
                 curr_stages_values.splice(curr_stages_values.indexOf(v.type), 1)
             } else {
                 switch (v.type) {
+                    case 'negotiate': {
+                        unvisited_phases.push(
+                            <Negotiating
+                                key={idx}
+                                hidden
+                                data={null}
+                                is_owner={is_owner}
+                            />
+                        )
+                        break
+                    }
+                    case 'pending_approval': {
+                        unvisited_phases.push(
+                            <PendingApproval
+                                key={idx}
+                                hidden
+                                data={null}
+                                is_owner={is_owner}
+                            />
+                        )
+                        break
+                    }
                     case 'pending_payment': {
                         unvisited_phases.push(
                             <PendingPayment
@@ -827,6 +878,9 @@ const CommissionProcess = () => {
                     let El = null
 
                     switch (phase.type) {
+                        case 'negotiate':
+                            El = Negotiating
+                            break
                         case 'pending_approval':
                             El = PendingApproval
                             break

@@ -122,6 +122,7 @@ export type NSFWType = typeof nsfw_levels[number]
 export const NSFW_LEVEL = array_to_enum(nsfw_levels)
 
 export const commission_phases = tuple(
+    'negotiate',
     'pending_approval',
     'pending_sketch',
     'revision',

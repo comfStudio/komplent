@@ -40,6 +40,8 @@ export const ProfileInfo = (props: Props) => {
     const completion_days = completion_stats?.avg_complete_days?.toFixed(2) ?? '?'
     const completion_time = completion_stats?.complete_count ? ((completion_stats.complete_count / completion_stats.total_count) * 100).toFixed(2) : '?'
     
+    const profile_name = get_profile_name(profile_user)
+
     useEffect(() => {
 
         if (profile_user) {
@@ -55,7 +57,7 @@ export const ProfileInfo = (props: Props) => {
             className={props.className ? cls + ' ' + props.className : cls}
             bordered>
             <p>
-                <ProfileNameTag name={get_profile_name(profile_user)} />
+                <ProfileNameTag name={profile_name} />
             </p>
             <p>
                 <TagGroup
@@ -120,7 +122,7 @@ export const ProfileInfo = (props: Props) => {
                 </p>
             </p>
             <p>
-                <strong>{t`Socials`}:</strong>
+                <strong>{t`Follow me on`}:</strong>
                 <p>
                     <ul className="list-disc">
                         {profile_user.socials.map((v, idx) => {

@@ -13,6 +13,7 @@ export const commission_schema = new Schema(
         to_title: { type: String, es_indexed: true },
         body: Mixed,
         suggested_price: { type: Decimal128 },
+        suggested_price_user: { type: ObjectId, ref: 'User' },
         requester_deadline_date: { type: Date },
         expire_date: { type: Date, es_indexed: true, ...es_date_type },
         accept_date: { type: Date, es_indexed: true, ...es_date_type },

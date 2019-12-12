@@ -102,14 +102,12 @@ const CommissionCardHeader = (props: CommissionCardProps) => {
     extras = props.extras || extras
 
     return (
-        <Grid className="header !w-full">
+        <Grid fluid className="header">
+            <span className="price">
+                {price_is_null(price) ? t`Custom` : decimal128ToMoneyToString(price)}
+            </span>
             <Row>
-                <Col xs={8}>
-                    <span className="price">
-                        {price_is_null(price) ? t`Custom` : decimal128ToMoneyToString(price)}
-                    </span>
-                </Col>
-                <Col xs={16}>
+                <Col xs={24}>
                     <h4 className="title inline-block">{title}</h4>
                 </Col>
             </Row>
@@ -193,7 +191,7 @@ export const CommissionCardRadioGroup = () => {
                     <Col key={data._id} xs={6}>
                         <label title={data.title}>
                             <FormControl
-                                className="mb-2"
+                                className="mb-5"
                                 type="radio"
                                 name="commission_rate"
                                 value={data._id}
@@ -352,6 +350,8 @@ export const ProfileCommission = () => {
                 from_user: from_user._id,
                 to_user: to_user._id,
                 rate: submit_value.commission_rate,
+                suggested_price: suggest_price_disabled ? null : submit_value.suggested_price,
+                requester_deadline_date: deadline_disabled ? null : submit_value.requester_deadline_date,
                 attachments: Object.values(attachments)
             }
     

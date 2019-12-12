@@ -108,6 +108,10 @@ export const useCommissionStore = createStore(
                 }
             }
 
+            if (typeof d.suggested_price !== 'number' && !d.suggested_price) {
+                d.suggested_price = null
+            }
+
             if (d.extras && typeof d.extras[0] === 'string') {
                 d.extras = await useCommissionRateStore.actions.get_extraoptions(
                     d.extras
@@ -156,6 +160,30 @@ export const useCommissionStore = createStore(
                 this.setState({ commission: rc, stages: rc.commission_process })
             }
             return rc
+        },
+
+        async accept_suggested_price() {
+            let r = await fetch('/api/commission/suggest_price', {
+                method: 'post',
+                body: { commission_id: this.state.commission._id, accept: true },
+            })
+
+            if (r.status === OK) {
+                r = await this.next_phase()
+                r = await this.refresh()
+            }
+            return r
+        },
+
+        async suggest_price(new_price: number) {
+            let r = await fetch('/api/commission/suggest_price', {
+                method: 'post',
+                body: { commission_id: this.state.commission._id, accept: false, new_price },
+            })
+            if (r.status === OK) {
+                r = await this.refresh()
+            }
+            return r
         },
 
         async complete_phase(done = true) {
@@ -248,13 +276,14 @@ export const useCommissionStore = createStore(
         },
 
         async pay(phase_data: any) {
-            let r = await fetch('/api/pay_commission', {
+            let r = await fetch('/api/commission/pay', {
                 method: 'post',
                 body: { commission_id: this.state.commission._id, payment_phase_id: phase_data._id },
             })
 
             if (r.status === OK) {
                 r = await this.next_phase()
+                this.refresh()
             }
             return r
         },
@@ -267,6 +296,9 @@ export const useCommissionStore = createStore(
             r = await this.add_phase('complete', {
                 complete_previous_phase: false,
             })
+            if (r.status) {
+                this.refresh()
+            }
             return r
         },
 
@@ -289,6 +321,7 @@ export const useCommissionStore = createStore(
             })
             if (r.status) {
                 r = await this.next_phase()
+                this.refresh()
             }
             return r
         },
@@ -310,6 +343,7 @@ export const useCommissionStore = createStore(
         async confirm_products() {
             await this.exhaust_revisions()
             let r = await this.next_phase()
+            this.refresh()
             return r
         },
 
@@ -322,6 +356,7 @@ export const useCommissionStore = createStore(
         async confirm_sketches() {
             await this.exhaust_revisions()
             let r = await this.next_phase()
+            this.refresh()
             return r
         },
 
@@ -385,6 +420,7 @@ export const useCommissionStore = createStore(
                         r = this.next_phase()
                     }
                 }
+                this.refresh()
             }
             return r
         },

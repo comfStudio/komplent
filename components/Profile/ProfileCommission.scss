@@ -1,6 +1,7 @@
 .commission-card {
     width: 12rem;
     position: relative;
+    overflow: visible;
 
     .header {
         margin: 0;
@@ -9,11 +10,18 @@
         .price {
             @apply border-primary;
             @apply text-primary;
-            font-size: 1.2em;
-            border: 1px solid;
-            padding: 0.3em;
-            border-radius: 2px;
+            @apply text-base;
+            @apply bg-gray-000;
+            @apply rounded;
+            border: 0.1em solid;
+            padding: 0.1em 0.4em;
             font-weight: 600;
+            position: absolute;
+            top: -1em;
+            left: 50%;
+            transform: translateX(-50%);
+            text-transform: uppercase;
+            letter-spacing: .05em;
         }
 
         .title {
@@ -52,8 +60,10 @@ a > .commission-card:hover {
 a > .commission-card:hover,
 .commission-card.selected,
 .commission-rates-group label input:checked + .commission-card {
-    border: 0.15em solid;
+    border: 0.1em solid;
     @apply border-primary;
+    box-shadow: 0 4px 8px 0 rgba(152, 162, 179, 0.15), 0 2px 2px -1px rgba(152, 162, 179, 0.3);
+    transform: translateY(-2px);
 }
 
 .commission-rates-group {

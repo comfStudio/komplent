@@ -1,5 +1,5 @@
 import mongoose, { Document } from 'mongoose'
-import { is_server } from '@utility/misc'
+import { is_server, price_is_null } from '@utility/misc'
 
 import {
     user_schema,
@@ -76,10 +76,26 @@ commission_schema.pre('save', async function() {
 
 commission_schema.post('save', async function() {
     if (this.wasNew) {
-        let c = new CommissionPhase({
-            type: 'pending_approval',
-            commission: this._id,
-        })
+        let c
+
+        if (price_is_null(this.rate.price)) {
+            c = new CommissionPhase({
+                type: CommissionPhaseT.negotiate,
+                commission: this._id,
+            })
+        } else {
+            c = new CommissionPhase({
+                type: CommissionPhaseT.pending_approval,
+                commission: this._id,
+            })
+            this.commission_process = this.commission_process.map(v => {
+                if (v.type === CommissionPhaseT.pending_approval) {
+                    v.done
+                }
+                return v
+            })
+        }
+
         this.phases = [c]
         c.save()
         let m = new Conversation({

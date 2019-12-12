@@ -38,6 +38,9 @@ export const decimal128ToMoney = (d: Decimal128) => {
         if (isNaN(parseFloat(s))) {
             s = d['$numberDecimal']
         }
+        if (typeof s === 'object') {
+            return decimal128ToMoney(s)
+        }
         if (s.indexOf('.') == -1) {
             s += '.00'
         }
