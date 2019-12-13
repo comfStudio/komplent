@@ -84,7 +84,7 @@ export const messageTextToHTML = (data: any) => {
 export const useMessageTextToHTML = (data: any) => {
     let [html, set_html] = useState()
     useEffect(() => {
-        if (!is_server()) {
+        if (!is_server() && data) {
             set_html(messageTextToHTML(data))
         }
     }, [data])
@@ -96,7 +96,6 @@ export const useDatabaseTextToHTML = (id: string) => {
     let [data, set_delta] = useState()
     useMount(() => {
         if (id) {
-            console.log(id)
             fetch('/api/fetch', {
                 method: 'post',
                 body: { model: 'Text', method: 'findById', query: id },

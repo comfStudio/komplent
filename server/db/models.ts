@@ -19,6 +19,7 @@ import {
     event_schema,
     notification_schema,
     text_schema,
+    license_schema,
 } from '@schema/general'
 import {
     payout_schema,
@@ -263,6 +264,10 @@ export const Image = is_server()
 export const Attachment = is_server()
     ? mongoose.models.Attachment ||
       mongoose.model<Document>('Attachment', attachment_schema)
+    : undefined
+
+export const License = is_server()
+    ? mongoose.models.License || mongoose.model<Document>('License', license_schema)
     : undefined
 
 

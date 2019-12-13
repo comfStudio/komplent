@@ -226,6 +226,10 @@ export const comission_rate_schema = new Schema(
                 ref: 'CommissionExtraOption',
             },
         ],
+        license: {
+            type: ObjectId,
+            ref: 'License',
+        },
         user: {
             type: ObjectId,
             ref: 'User',

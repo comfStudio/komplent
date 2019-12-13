@@ -24,6 +24,8 @@ import {
     Row,
     CheckboxGroup,
     IconButton,
+    RadioGroup,
+    Radio,
 } from 'rsuite'
 
 import { HTMLElementProps } from '@app/utility/props'
@@ -46,6 +48,7 @@ import log from '@utility/log'
 import * as pages from '@utility/pages'
 import { get_authorization_header } from '@utility/request'
 import Upload from '@components/App/Upload'
+import { LicenseList } from './LicenseForm'
 
 const {
     StringType,
@@ -178,12 +181,7 @@ export const RateOptions = (props: RateOptionsProps) => {
                                 price={price}
                                 title={title}
                                 onRemove={() => {
-                                    store.delete_option(_id).then(async r => {
-                                        if (r.status)
-                                            store.setState(
-                                                {options: store.state.options.filter(v => v._id !== _id)}
-                                            )
-                                    })
+                                    store.delete_option(_id)
                                 }}
                                 onUpdate={v =>
                                     store.update_option(
@@ -259,6 +257,7 @@ interface Props extends HTMLElementProps {
 
 const rate_model = Schema.Model({
     title: StringType().isRequired(t`This field is required.`),
+    license: StringType(),
     description: StringType(),
     price: NumberType().isRequired('This field is required.')
         .addRule((value, data) => {
@@ -391,9 +390,15 @@ const CommissionRateForm = (props: Props) => {
                     componentClass="textarea"
                 />
             </FormGroup>
+            <h5>{t`Extra options`}</h5>
             <FormGroup>
-                <h5>{t`Extra options`}</h5>
+                <h6>{t`Additions`}</h6>
                 <RateOptions new checkbox />
+            </FormGroup>
+            <FormGroup controlId="license" >
+                <h6>{t`License`}</h6>
+                <Radio checked disabled value="default_license">{t`Default license`}</Radio>
+                <LicenseList new radiobox/>
             </FormGroup>
             <FormGroup>
                 <h5>{t`Cover`}</h5>

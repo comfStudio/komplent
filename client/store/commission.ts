@@ -13,6 +13,7 @@ import {
     CommissionRate,
     Commission,
     Conversation,
+    License,
 } from '@db/models'
 import { fetch } from '@utility/request'
 import {
@@ -32,6 +33,7 @@ import useInboxStore from './inbox'
 import { payment_schema } from '@schema/monetary'
 import log from '@utility/log'
 import { OK } from 'http-status-codes'
+import { license_schema } from '@schema/general'
 
 export const useCommissionStore = createStore(
     {
@@ -817,6 +819,7 @@ export const useCommissionRateStore = createStore(
     {
         rates: [],
         options: [],
+        licenses: [],
     },
     {
         async create_rate(data, params: object = undefined) {
@@ -862,6 +865,11 @@ export const useCommissionRateStore = createStore(
                 delete: true,
                 ...params,
             })
+            if (r.status) {
+                this.setState({
+                    options: this.state.options.filter(v => v._id != id),
+                })
+            }
             return r
         },
         async update_option(data: object, params: object = undefined) {
@@ -881,6 +889,42 @@ export const useCommissionRateStore = createStore(
                         ),
                         { $push: [r.body.data] }
                     ),
+                })
+            }
+            return r
+        },
+        async update_license(data: object, params: object = undefined) {
+            let r = await update_db({
+                model: 'License',
+                data: data,
+                schema: license_schema,
+                create: true,
+                validate: true,
+                ...params,
+            })
+            if (r.status) {
+                this.setState({
+                    licenses: iupdate(
+                        this.state.licenses.filter(
+                            v => v._id != r.body.data._id
+                        ),
+                        { $push: [r.body.data] }
+                    ),
+                })
+            }
+            return r
+        },
+        async delete_license(id, params: object = undefined) {
+            let r = await update_db({
+                model: 'License',
+                data: { _id: id },
+                schema: license_schema,
+                delete: true,
+                ...params,
+            })
+            if (r.status) {
+                this.setState({
+                    licenses: this.state.licenses.filter(v => v._id != id),
                 })
             }
             return r
@@ -938,20 +982,31 @@ export const useCommissionRateStore = createStore(
             }
             return r
         },
-        async load(profile_user, { options = true, rates = true } = {}) {
+        async load(profile_user, { options = true, rates = true, licenses = true, populate_license = false} = {}) {
             let state = {
                 options: [],
                 rates: [],
+                licenses: []
             }
 
-            let a, b
+            let a, b, c
+
+            let license_q = { user: profile_user._id }
 
             let extra_option_q = { user: profile_user._id }
 
             let rate_q = { user: profile_user._id }
-            let rate_p = ['extras', ['user', 'username'], 'image']
+            let rate_p = ['extras', ['user', 'username'], 'image', populate_license ? 'license' : undefined]
 
             if (is_server()) {
+                if (licenses) {
+                    c = License.find(license_q)
+                        .lean()
+                        .then(d => {
+                            state.licenses = [...d]
+                        })
+                }
+
                 if (options) {
                     a = CommissionExtraOption.find(extra_option_q)
                         .lean()
@@ -965,13 +1020,28 @@ export const useCommissionRateStore = createStore(
                         .populate(rate_p[0])
                         .populate(rate_p[1][0], rate_p[1][1])
                         .populate(rate_p[2])
+                        .populate(rate_p[3])
                         .lean()
                         .then(d => {
                             state.rates = [...d]
                         })
                 }
             } else {
-                if (rates) {
+                if (licenses) {
+                    c = await fetch('/api/fetch', {
+                        method: 'post',
+                        body: {
+                            model: 'License',
+                            query: license_q,
+                        },
+                    }).then(async r => {
+                        if (r.ok) {
+                            state.licenses = [...(await r.json()).data]
+                        }
+                    })
+                }
+
+                if (options) {
                     a = await fetch('/api/fetch', {
                         method: 'post',
                         body: {
@@ -985,7 +1055,7 @@ export const useCommissionRateStore = createStore(
                     })
                 }
 
-                if (options) {
+                if (rates) {
                     b = await fetch('/api/fetch', {
                         method: 'post',
                         body: {
@@ -1003,6 +1073,7 @@ export const useCommissionRateStore = createStore(
 
             await a
             await b
+            await c
 
             return state
         },

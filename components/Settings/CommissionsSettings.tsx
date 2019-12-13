@@ -33,6 +33,7 @@ import useUserStore from '@store/user'
 import debounce from 'lodash/debounce'
 import { CommissionProcessType } from '@schema/user'
 import { useUpdateDatabase } from '@hooks/db'
+import LicenseForm from '@components/Form/LicenseForm'
 
 const Deadline = () => {
     const store = useCommissionStore()
@@ -440,7 +441,7 @@ const CommissionsSettings = () => {
                 </EditGroup>
                 <h5>{t`Custom Licenses`}</h5>
                 <EditGroup>
-                    <RateOptionsForm />
+                    <LicenseForm />
                 </EditGroup>
             </EditSection>
 

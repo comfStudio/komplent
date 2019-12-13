@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, ReactNode } from 'react'
 import {
     Button,
     Panel,
@@ -24,6 +24,7 @@ import {
     HelpBlock,
     Divider,
     InputNumber,
+    Modal,
 } from 'rsuite'
 import Link from 'next/link'
 import qs from 'qs'
@@ -57,7 +58,7 @@ import { make_profile_urlpath } from '@utility/pages'
 import { RateOptions } from '@components/Form/CommissionRateForm'
 import TextEditor from '@components/App/TextEditor'
 import { CenterPanel } from '@components/App/MainLayout'
-import { useDatabaseTextToHTML } from '@hooks/db'
+import { useDatabaseTextToHTML, useMessageTextToHTML } from '@hooks/db'
 import MessageText from '@components/App/MessageText'
 import Upload, { UploadProps } from '@components/App/Upload'
 import debounce from 'lodash/debounce'
@@ -273,6 +274,48 @@ export const RequestsClosed = () => {
     )
 }
 
+interface LicensePanelProps {
+    borderd?: boolean
+    bodyFill?: boolean
+    header?: ReactNode
+    title?: ReactNode
+    description?: ReactNode
+    body?: ReactNode
+    control?: ReactNode
+    line?: boolean
+}
+
+const LicensePanel = (props: LicensePanelProps) => {
+
+    const [ show, set_show ] = useState(false)
+
+    return (
+        <Panel bordered={props.borderd} bodyFill={props.bodyFill} header={props.header}>
+            <Modal size="lg" overflow show={show} onHide={() => set_show(false)}>
+                <Modal.Header>
+                    <Modal.Title>{props.title}</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {props.body}
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button onClick={() => set_show(false)} appearance="primary">
+                    {t`Ok`}
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+            <p>
+                {props.description}
+            </p>
+            <p>
+                {props.body && <Button type="button" onClick={ev => { ev.preventDefault(); set_show(true)} } className="!p-0" appearance="link">{t`Read the full version`} »</Button>}
+            </p>
+            {props.line && <hr/>}
+            {props.control}
+        </Panel>
+    )
+}
+
 export const ProfileCommission = () => {
     const router = useRouter()
 
@@ -336,6 +379,8 @@ export const ProfileCommission = () => {
     }
 
     const custom_price = selected_rate_obj?.price === null
+
+    const license_html = useMessageTextToHTML(selected_rate_obj?.license?.body)
 
     useEffect(() => {
         if (submit_value && !uploading && file_count === Object.keys(attachments).length) {
@@ -444,7 +489,6 @@ export const ProfileCommission = () => {
                                 name="from_title"
                                 accepter={Input}
                                 type="text"
-                                required
                             />
                         </FormGroup>
                         <FormGroup>
@@ -497,15 +541,38 @@ export const ProfileCommission = () => {
                         on_upload(false)
                     }} />
                 </Row>
+                <hr/>
+                {!!selected_rate_obj?.license &&
+                <Row>
+                    <LicensePanel
+                        borderd
+                        header={<h3>{t`Creator License`}: {selected_rate_obj.license.name}</h3>}
+                        title={<h3>{t`Creator License`}: {selected_rate_obj.license.name}</h3>}
+                        description={selected_rate_obj.license.description}
+                        body={<div dangerouslySetInnerHTML={{ __html: license_html }} />}
+                        control={<FormControl
+                            name="license"
+                            value="true"
+                            required
+                            accepter={
+                                Checkbox
+                            }>{t`I have read and agree to the license provided by the creator`}</FormControl>}
+                        />
+                </Row>}
                 <Row>
                     <h3>{t`Terms of Service`}</h3>
-                    <Placeholder.Paragraph rows={4} />
-                    <FormControl
-                        name="tos"
-                        value="true"
-                        accepter={
-                            Checkbox
-                        }>{t`I have read and agree to the terms of service`}</FormControl>
+                    <LicensePanel
+                        bodyFill
+                        title={<h3>{t`Terms of Service`}</h3>}
+                        description={<Placeholder.Paragraph rows={4} />}
+                        control={<FormControl
+                            name="tos"
+                            value="true"
+                            required
+                            accepter={
+                                Checkbox
+                            }>{t`I have read and agree to the terms of service`}</FormControl>}
+                        />
                 </Row>
                 <hr />
                 <Row>

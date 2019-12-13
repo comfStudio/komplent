@@ -108,3 +108,18 @@ export const text_schema = new Schema(
 )
 
 configure(text_schema)
+
+export const license_schema = new Schema(
+    {
+        name: String,
+        description: String,
+        body: Mixed,
+        user: {
+            type: ObjectId,
+            ref: 'User',
+        },
+    },
+    { timestamps: { createdAt: 'created', updatedAt: 'updated' } }
+)
+
+configure(license_schema)

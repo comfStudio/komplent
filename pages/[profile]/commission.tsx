@@ -12,6 +12,9 @@ import { NOT_FOUND } from 'http-status-codes'
 import { fetch_database_text } from '@server/misc'
 
 class CommissionPage extends ProfilePage {
+
+    static populate_license = true
+
     static async getInitialProps(ctx: NextPageContext) {
         const props = await super.getInitialProps(ctx)
         let error

@@ -26,6 +26,9 @@ interface Props extends AuthProps {
 }
 
 class ProfilePage extends OptionalAuthPage<Props> {
+
+    static populate_license = false
+
     static async getInitialProps(ctx: NextPageContext) {
         const props = await super.getInitialProps(ctx)
         let profile_id = parse_profile_id(ctx.asPath)
@@ -102,7 +105,7 @@ class ProfilePage extends OptionalAuthPage<Props> {
         let commissionRateStoreState = useCommissionRateStore.createState({})
         if (profile_user) {
             commissionRateStoreState = await useCommissionRateStore.actions.load(
-                profile_user
+                profile_user, {licenses: false, populate_license: this.populate_license }
             )
         }
 

@@ -10,6 +10,7 @@ interface MessageTextProps {
     placeholder?: string
     maxLength?: number
     defaultValue?: any
+    value?: any
     onChange?: (value) => void
 }
 
@@ -53,7 +54,7 @@ export const MessageText = ({maxLength = 3500, ...props}: MessageTextProps) => {
             defaultDelta={
                 props.message_key ? (user[props.message_key]
                     ? user[props.message_key].data
-                    : undefined) : props.defaultValue
+                    : undefined) : props.value ?? props.defaultValue
             }
             maxLength={maxLength}
             placeholder={props.placeholder}
