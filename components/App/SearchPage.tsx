@@ -19,9 +19,9 @@ class SearchPage extends OptionalAuthPage<Props> {
             page,
             size
         })
-        
+
         searchStoreState = {...searchStoreState,
-            ...await useSearchStore.actions.search_creators(ctx.query.q as string, page, size)}
+            ...await useSearchStore.actions.search_creators(ctx.query.q as string, page, size, ctx.query)}
 
         return {
             ...props,

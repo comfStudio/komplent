@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useReducer, useEffect } from 'react'
 
 import {
     Grid,
@@ -14,12 +14,17 @@ import {
     Nav,
     Icon,
     Dropdown,
-    Button
+    Button,
+    RadioGroup,
+    Radio
 } from 'rsuite'
 
 import { t } from '@app/utility/lang'
 import { ReactProps } from '@utility/props'
-
+import * as pages from '@utility/pages'
+import { useRouter } from 'next/router'
+import useSearchStore from '@store/search'
+import Link from 'next/link'
 
 const FiltersItem = (props: ReactProps) => {
     return (
@@ -110,9 +115,36 @@ const Subject = () => {
     )
 }
 
+export interface FilterType {
+    comm_status: string
+}
+
 const FiltersPanel = () => {
 
-    const [dirty, set_dirty] = useState(true)
+    const router = useRouter()
+    const store = useSearchStore()
+    
+    const rquery: FilterType = router.query as any
+    const initial_filters = {
+        comm_status: rquery?.comm_status ?? 'any'
+    } 
+
+    const [query_url, set_query_url] = useState(router.asPath)
+    const [first, set_first] = useState(true)
+    const [dirty, set_dirty] = useState(false)
+    const [state, dispatch] = useReducer((old_state: FilterType, new_state: FilterType) => {
+        return {...old_state, ...new_state}
+    }, initial_filters)
+
+    useEffect(() => {
+        if (!first) set_dirty(true)
+        set_first(false)
+        set_query_url(pages.make_search_urlpath(1, store.state.size, {...router.query, ...state}))
+    }, [state])
+
+    useEffect(() => {
+        set_dirty(false)
+    }, [router.asPath])
 
     return (
         <Panel bordered bodyFill>
@@ -132,25 +164,34 @@ const FiltersPanel = () => {
                 <Row>
                     <Col>
                         <Panel>
-                            <CheckboxGroup name="options">
-                                <p>Group1</p>
-                                <Checkbox>Item A</Checkbox>
-                                <Checkbox>Item B</Checkbox>
-                                <p>Group2</p>
-                                <Checkbox>Item C</Checkbox>
-                                <Checkbox disabled>Item D</Checkbox>
-                            </CheckboxGroup>
+                            <p>
+                                <label>{t`Commission Status`}</label>
+                                <RadioGroup
+                                    name="comm_status"
+                                    inline
+                                    appearance="picker"
+                                    value={state.comm_status}
+                                    onChange={v => {
+                                        dispatch({comm_status: v})
+                                    }}>
+                                    <Radio value="any">{t`Any`}</Radio>
+                                    <Radio value="open">{t`Open`}</Radio>
+                                    <Radio value="closed">{t`Closed`}</Radio>
+                                </RadioGroup>
+                            </p>
                         </Panel>
                     </Col>
                 </Row>
                 <Row>
                     <Col className="text-center px-5">
-                        <Button appearance={dirty ? 'primary' : 'default'} block>{t`Apply`}</Button>
+                        <Link href={query_url} passHref>
+                            <Button appearance={dirty ? 'primary' : 'default'} componentClass="a" block>{t`Apply`}</Button>
+                        </Link>
                     </Col>
                 </Row>
                 <Row>
                     <Col className="text-center px-5 pb-5 pt-3">
-                        <Button block>{t`Clear all filters`}</Button>
+                        <Button block onClick={ev => { ev.preventDefault(); dispatch(initial_filters); }}>{t`Clear all filters`}</Button>
                     </Col>
                 </Row>
             </Grid>

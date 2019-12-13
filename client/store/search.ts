@@ -5,6 +5,7 @@ import { User } from '@db/models'
 import { is_server, promisify_es_search } from '@utility/misc'
 import { fetch } from '@utility/request'
 import log from '@utility/log'
+import { FilterType } from '@components/Search/FiltersPanel'
 
 export const useSearchStore = createStore(
     {
@@ -14,10 +15,16 @@ export const useSearchStore = createStore(
         page: 1,
     },
     {
-        parse_search_query(search_query, page, size, build = true) {
+        parse_search_query(search_query, page, size, query: FilterType, build = true) {
             let q = bodybuilder()
             q = q.notQuery('match', 'type', 'consumer')
             q = q.query('match', 'visibility', 'public')
+            
+            if (query?.comm_status === 'open') {
+                q = q.query('match', 'commissions_open', true)
+            } else if (query?.comm_status === 'closed') {
+                q = q.query('match', 'commissions_open', false)
+            }
 
             if (search_query) {
                 q = q.orQuery('multi_match', {
@@ -30,10 +37,10 @@ export const useSearchStore = createStore(
 
             return build ? q.build() : q
         },
-        async search_creators(search_query: string, page: number = 1, size: number = 30) {
+        async search_creators(search_query: string, page: number = 1, size: number = 30, query) {
             let count = 0
             let r = []
-            let q = this.parse_search_query(search_query, page, size, false)
+            let q = this.parse_search_query(search_query, page, size, query, false)
             let opt = {
                 hydrate: true,
                 hydrateOptions: {
