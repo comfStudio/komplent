@@ -94,9 +94,6 @@ const Price = (props: FiltersItemProps) => {
                         }}
                     />
                 </Col>
-                <Col>
-                    <TagPicker block data={[]} />
-                </Col>
             </Row>
         </FiltersItem>
     )
