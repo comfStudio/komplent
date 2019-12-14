@@ -6,7 +6,7 @@ import {
     get_milli_secs,
 } from '@server/tasks'
 import { fetch } from '@utility/request'
-import { array_to_enum, tuple } from '@utility/misc'
+import { array_to_enum, tuple } from '@utility/types'
 import { TASK } from '@server/constants'
 import debounce from 'lodash/debounce'
 

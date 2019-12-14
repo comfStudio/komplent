@@ -49,7 +49,15 @@ configure(attachment_schema)
 
 export const tag_schema = new Schema(
     {
-        name: { type: String, required: true, unique: true },
+        name: { type: String, required: true },
+        identifier: { type: String, required: true, unique: true },
+        special: { type: Boolean, default: false },
+        categories: [
+            {
+                type: ObjectId,
+                ref: 'Tag',
+            }
+        ],
         color: String,
     },
     { timestamps: { createdAt: 'created', updatedAt: 'updated' } }

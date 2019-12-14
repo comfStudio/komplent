@@ -31,6 +31,7 @@ export const user_schema = new Schema(
             default: NSFW_LEVEL.level_0,
             es_indexed: true,
         },
+        show_nsfw: { type: String, enum: nsfw_levels, default: NSFW_LEVEL.level_0 },
         email: { type: String, unique: true, trim: true },
         username: {
             type: String,
@@ -48,10 +49,7 @@ export const user_schema = new Schema(
         country: { type: String, es_indexed: true },
         description: String,
         socials: [{ url: String, name: String }],
-        notice_visible: {
-            type: Boolean,
-            default: false,
-        },
+        notice_visible: { type: Boolean, default: false },
         notice: { type: String, maxLength: 250 },
         profile_color: String,
         display_currency: String,
@@ -118,7 +116,7 @@ export const user_schema = new Schema(
                 ref: 'Tag',
                 es_schema: tag_schema,
                 es_indexed: true,
-                es_select: 'name',
+                es_select: 'name identifier',
             },
         ],
         last_commissions_update: Date,

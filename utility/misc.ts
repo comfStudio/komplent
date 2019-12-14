@@ -2,6 +2,7 @@ import update from 'immutability-helper'
 import { Decimal128 } from 'bson'
 import dinero from 'dinero.js'
 import debounce from 'lodash/debounce'
+import { NSFWType, NSFW_LEVEL } from '@server/constants'
 
 export const iupdate = update
 
@@ -92,18 +93,15 @@ export function promisify_es_search(model, ...args) {
     })
 }
 
-export const tuple = <T extends string[]>(...args: T) => args
-
-export function array_to_enum<T extends string>(o: Array<T>): { [K in T]: K } {
-    return o.reduce((res, key) => {
-        res[key] = key
-        return res
-    }, Object.create(null))
-}
-
 export const get_profile_name = ({
     name = undefined,
     username = undefined,
 } = {}) => {
     return name || username
+}
+
+export const get_highest_nsfw_level = (levels: NSFWType[]) => {
+    if (levels?.includes(NSFW_LEVEL.level_10)) return NSFW_LEVEL.level_10
+    if (levels?.includes(NSFW_LEVEL.level_5)) return NSFW_LEVEL.level_5
+    return NSFW_LEVEL.level_0
 }

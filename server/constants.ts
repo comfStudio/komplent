@@ -1,4 +1,4 @@
-import { tuple, array_to_enum } from '@utility/misc'
+import { tuple, array_to_enum } from '@utility/types'
 import { string } from 'prop-types'
 
 export let STATES = (global.STATES = global.STATES

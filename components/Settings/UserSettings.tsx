@@ -6,6 +6,7 @@ import { t } from '@app/utility/lang'
 import useUserStore from '@store/user'
 import { getCountryNames } from '@client/dataset'
 import Upload from '@components/App/Upload'
+import { ProfileNSFWLevel } from '@components/Profile/ProfileEdit'
 
 export const UserType = () => {
     return (
@@ -89,6 +90,7 @@ const UserSettings = () => {
             <EditSection>
                 <UserAvatar/>
                 <Location />
+                <ProfileNSFWLevel text={t`Show mature content`} key='show_nsfw' only_show />
             </EditSection>
             {/* <h4>{t`Site`}</h4>
             <EditSection>

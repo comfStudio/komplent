@@ -142,7 +142,7 @@ export const ProfileVisiblity = () => {
     )
 }
 
-export const ProfileNSFWLevel = () => {
+export const ProfileNSFWLevel = ({key = 'nsfw', ...props}: { text: string, key: 'nsfw' | 'show_nsfw', only_show: boolean }) => {
     const store = useUserStore()
 
     const popover = (title, content) => (
@@ -156,16 +156,16 @@ export const ProfileNSFWLevel = () => {
 
     return (
         <EditGroup>
-            <span className="mr-2">{t`Mature content`}: </span>
+            <span className="mr-2">{props.text}: </span>
             <RadioGroup
                 name="profile_visiblity"
                 inline
                 appearance="picker"
                 defaultValue={
-                    store.state.current_user.nsfw || NSFW_LEVEL.level_0
+                    store.state.current_user[key] || NSFW_LEVEL.level_0
                 }
                 onChange={async v => {
-                    let r = await store.update_user({ nsfw: v })
+                    let r = await store.update_user({ nsfw: props.only_show ? undefined : v, show_nsfw: v })
                 }}>
                 <Radio value={NSFW_LEVEL.level_0}>{t`None`}</Radio>
                 <Radio value={NSFW_LEVEL.level_5}>
@@ -407,7 +407,7 @@ export const ProfileEdit = () => {
                 {/* <Sections/> */}
                 {/* <ProfileColor/> */}
                 {/* <Tags/> */}
-                <ProfileNSFWLevel />
+                <ProfileNSFWLevel text={t`Mature content`} />
                 <span>{t`Change Cover & Avatar:`}</span>
                 <ProfileCoverAvatar/>
                 <Socials />

@@ -407,27 +407,52 @@ export const useTagStore = createStore(
             return r
         },
         async _create_defaults() {
+
+            const default_categories = [
+                { name: 'Digital Art', identifier: 'digital_art' },
+                { name: 'Traditional', identifier: 'traditional' },
+                { name: 'Photography', identifier: 'photography' },
+                { name: 'Animation', identifier: 'animation' },
+            ]
+
             const default_tags = [
-                { name: 'Illustration', color: 'blue' },
-                { name: 'Furry', color: 'yellow' },
-                { name: 'Cover', color: 'green' },
-                { name: 'Mature', color: 'red' },
-                { name: 'Explicit', color: 'red' },
-                { name: 'NSFW', color: 'red' },
-                { name: 'Anime', color: '' },
-                { name: 'Comic', color: 'violet' },
-                { name: 'Concept', color: '' },
-                { name: 'Animation', color: 'orange' },
+                { name: 'Painting', identifier: 'painting', color: 'blue', categories: [ 'Digital Art', 'Traditional' ] },
+                { name: 'Abstract', identifier: 'abstract', color: 'blue', categories: [ 'Digital Art', 'Traditional', 'Photography', 'Animation' ] },
+                { name: 'Portrait', identifier: 'portrait', color: 'blue', categories: [ 'Digital Art', 'Traditional', 'Photography' ] },
+                { name: 'Typographic', identifier: 'typographic', color: 'blue', categories: [ 'Digital Art', 'Traditional' ] },
+                { name: 'Graphic', identifier: 'graphic', color: 'blue', categories: [ 'Digital Art', 'Animation' ] },
+                { name: 'Photorealistic', identifier: 'photorealistic', color: 'blue', categories: [ 'Digital Art', 'Traditional'] },
+                { name: 'Illustration', identifier: 'illustration', color: 'blue', categories: [ 'Digital Art', 'Traditional' ] },
+                { name: 'Furry', identifier: 'furry', color: 'yellow', categories: [ 'Digital Art', 'Traditional' ] },
+                { name: 'Cover', identifier: 'cover', color: 'green', categories: [ 'Digital Art', 'Traditional' ] },
+                { name: 'Mature', identifier: 'mature', color: 'red', special: true },
+                { name: 'Explicit', identifier: 'explicit', color: 'red', special: true },
+                { name: 'NSFW', identifier: 'nsfw', color: 'red', special: true },
+                { name: 'Anime', identifier: 'anime', color: '', categories: [ 'Digital Art', 'Traditional', 'Animation' ] },
+                { name: 'Comic', identifier: 'comic', color: '', categories: [ 'Digital Art', 'Traditional' ] },
+                { name: 'Cartoon', identifier: 'cartoon', color: '', categories: [ 'Digital Art', 'Traditional', 'Animation' ] },
+                { name: 'Concept', identifier: 'concept', color: '', categories: [ 'Digital Art' ] },
             ]
 
             if (is_server()) {
-                for (let t of default_tags) {
-                    await Tag.findOne({ name: t.name }).then(v => {
-                        if (!v) {
-                            let d = new Tag(t)
-                            d.save()
-                        }
-                    })
+                for (let ts of [default_categories, default_tags]) {
+                    for (let t of ts) {
+                        await Tag.findOne({ name: t.name }).then(async v => {
+                            let cats = (t as any).categories
+                            if (cats && cats.length) {
+                                (t as any).categories = []
+                                for (let c of cats) {
+                                    (t as any).categories.push(await Tag.findOne({name: c}))
+                                }
+                            }
+                            if (!v) {
+                                v = new Tag(t)
+                            } else {
+                                v.set(t)
+                            }
+                            return v.save()
+                        })
+                    }
                 }
             }
         },
