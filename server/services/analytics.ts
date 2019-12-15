@@ -1,6 +1,7 @@
 import mongoose from 'mongoose'
-import { Commission, Payment, Payout } from "@db/models"
+import { Commission, Payment, Payout, CommissionRate, User } from "@db/models"
 import { subMonths } from 'date-fns'
+import { decimal128ToMoneyToString } from '@utility/misc'
 
 const { ObjectId, Decimal128 } = mongoose.Types
 
@@ -438,3 +439,57 @@ export const get_completion_stats = async (user) => {
     return stats as any
 }
 
+export const update_price_stats = async (user_id) => {
+   const data = await CommissionRate.aggregate([
+    {$project: {
+        user: "$user",
+        price: "$price",
+    }},
+    {$match: {
+        user: ObjectId(user_id),
+    }},
+    {$group: {
+        _id: null,
+        min_rate_price:{ $min: "$price" },
+        max_rate_price:{ $max: "$price" },
+        avg_rate_price:{ $avg: "$price" },
+    }},
+    {$unset: ["_id"]},
+   ])
+
+   if (data.length) {
+       const user = await User.findById(user_id)
+       if (user) {
+           user.set(data[0])
+           await user.save()
+       }
+
+   }
+}
+
+export const update_delivery_time_stats =  async(user_id) => {
+    const data = await CommissionRate.aggregate([
+        {$project: {
+            user: "$user",
+            deliver_time: "$commission_deadline",
+        }},
+        {$match: {
+            user: ObjectId(user_id),
+        }},
+        {$group: {
+            _id: null,
+            min_rate_delivery_time:{ $min: "$deliver_time" },
+            max_rate_delivery_time:{ $max: "$deliver_time" },
+            avg_rate_delivery_time:{ $avg: "$deliver_time" },
+        }},
+        {$unset: ["_id"]},
+       ])
+   
+    if (data.length) {
+        const user = await User.findById(user_id)
+        if (user) {
+            user.set(data[0])
+            await user.save()
+        }
+    }
+}

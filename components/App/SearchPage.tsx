@@ -3,7 +3,7 @@ import { NextPageContext } from 'next'
 import qs from 'qs'
 
 import { OptionalAuthPage, Props as AuthProps } from '@components/App/AuthPage'
-import useSearchStore from '@store/search'
+import useSearchStore, { PRICE_RANGES } from '@store/search'
 import { NSFW_LEVEL } from '@server/constants'
 
 interface Props extends AuthProps {

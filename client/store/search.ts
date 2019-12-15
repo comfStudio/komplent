@@ -11,6 +11,13 @@ import { NSFW_LEVEL } from '@server/constants'
 
 let all_tags_identifiers_to_name = {}
 
+export const PRICE_RANGES = {
+    1: 50,
+    2: 250,
+    3: 500,
+    4: 1000,
+}
+
 export const useSearchStore = createStore(
     {
         items: [],
@@ -35,7 +42,7 @@ export const useSearchStore = createStore(
 
             if (query?.nsfw_level !== NSFW_LEVEL.level_10) {
                 q = q.notQuery('match', 'nsfw', NSFW_LEVEL.level_10)
-                
+
                 if (query?.nsfw_level !== NSFW_LEVEL.level_5) {
                     q = q.notQuery('match', 'nsfw', NSFW_LEVEL.level_5)
                 }
@@ -46,11 +53,38 @@ export const useSearchStore = createStore(
             if (!_.isEmpty(all_tags_identifiers_to_name) && tags.length) {
                 q = q.orQuery('multi_match', {
                     query: tags.join(' '),
-                    fields: ['tags.name^9'],
+                    fields: ['tags.name^2'],
                 })
             }
 
+            if (query?.delivery_time === 'short') {
+                q = q.orQuery('range', {avg_rate_delivery_time: {gte: 0, lte: 7, boost: 10}, })
+                q = q.orQuery('range', {max_rate_delivery_time: {gte: 0, lte: 7, boost: 9}, })
+                q = q.orQuery('range', {min_rate_delivery_time: {gte: 0, lte: 7, boost: 8}, })
+            } else if (query?.delivery_time === 'medium') {
+                q = q.orQuery('range', {avg_rate_delivery_time: {gte: 8, lte: 31, boost: 10}})
+                q = q.orQuery('range', {max_rate_delivery_time: {gte: 8, lte: 31, boost: 9}, })
+                q = q.orQuery('range', {min_rate_delivery_time: {gte: 8, lte: 31, boost: 8}, })
+            } else if (query?.delivery_time === 'long') {
+                q = q.orQuery('range', {avg_rate_delivery_time: {gte: 32, boost: 9}})
+                q = q.orQuery('range', {max_rate_delivery_time: {gte: 32, boost: 8}, })
+                q = q.orQuery('range', {min_rate_delivery_time: {gte: 32, boost: 10}, })
+            }
 
+            const price_range = query?.price_range
+            const price_ranges = Object.values(PRICE_RANGES)
+            price_ranges.sort((a,b) => a-b)
+            const min_price_range = price_ranges[0]
+            const max_price_range = price_ranges[price_ranges.length-1]
+
+            if (price_range && Object.keys(PRICE_RANGES).includes(price_range.toString())) {
+                const gte = PRICE_RANGES[price_range] === min_price_range ? 0 : PRICE_RANGES[price_range] === max_price_range ? PRICE_RANGES[price_range] : price_ranges[parseInt(price_range) - 2]
+                const lte = PRICE_RANGES[price_range] === max_price_range ? undefined : PRICE_RANGES[price_range] === min_price_range ? PRICE_RANGES[price_range] : price_ranges[parseInt(price_range)]
+                q = q.orQuery('range', {avg_rate_price: {gte, lte, boost: 10}, })
+                q = q.orQuery('range', {max_rate_price: {gte, lte, boost: 8}, })
+                q = q.orQuery('range', {min_rate_price: {gte, lte, boost: 8}, })
+            }
+            
             
             if (query?.nsfw_level === NSFW_LEVEL.level_0) {
                 q = q.query('match', 'nsfw', NSFW_LEVEL.level_0)

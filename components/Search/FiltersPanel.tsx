@@ -24,7 +24,7 @@ import { t } from '@app/utility/lang'
 import { ReactProps } from '@utility/props'
 import * as pages from '@utility/pages'
 import { useRouter } from 'next/router'
-import useSearchStore from '@store/search'
+import useSearchStore, { PRICE_RANGES } from '@store/search'
 import Link from 'next/link'
 import { NSFW_LEVEL, NSFWType } from '@server/constants'
 import { useUser } from '@hooks/user'
@@ -37,6 +37,7 @@ export interface FilterType {
     nsfw_level: NSFWType
     categories: any[]
     styles: any[]
+    price_range: string
 }
 
 interface FiltersItemProps {
@@ -75,22 +76,34 @@ const Category = (props: FiltersItemProps) => {
 }
 
 const Price = (props: FiltersItemProps) => {
+
+    const ranges = Object.keys(PRICE_RANGES).map(v => parseInt(v))
+    ranges.sort((a,b) => a-b)
+    const min_range = ranges[0]
+    const max_range = ranges[ranges.length-1]
+
     return (
         <FiltersItem>
             <Row>
                 <Col>
                     <Slider
-                        defaultValue={25}
-                        step={10}
+                        step={1}
                         graduated
                         progress
-                        min={5}
-                        max={50}
+                        tooltip={false}
+                        value={parseInt(props.state.price_range)}
+                        min={min_range - 1}
+                        max={max_range}
                         renderMark={mark => {
-                            if ([5, 15, 25, 50].includes(mark)) {
-                                return <span>{mark} $</span>
+                            if (PRICE_RANGES[mark]) {
+                                return <small>{mark === max_range ? '>': mark === min_range ? '<': '~'} ${PRICE_RANGES[mark]}</small>
+                            } else if (mark === (min_range - 1)) {
+                                return <small>{t`any`}</small>
                             }
                             return null
+                        }}
+                        onChange={v => {
+                            props.dispatch({price_range: v.toString()})
                         }}
                     />
                 </Col>
@@ -161,10 +174,6 @@ const Deliverability = (props: FiltersItemProps) => {
                             <Radio value="long">{t`Long`}</Radio>
                         </RadioGroup>
                     </p>
-                    <p>
-                        <label>{t`Can deliver between`}</label>
-                        <DateRangePicker block />
-                    </p>
                 </Col>
             </Row>
         </FiltersItem>
@@ -185,6 +194,7 @@ const FiltersPanel = () => {
         nsfw_level: rquery?.nsfw_level ?? (!_.isEmpty(user) && user.show_nsfw !== NSFW_LEVEL.level_0 ? user.show_nsfw : NSFW_LEVEL.level_0),
         categories: rquery?.categories ?? store.state.categories.map(v => v.identifier),
         styles: rquery?.styles ?? store.state.styles.map(v => v.identifier),
+        price_range: rquery?.price_range ?? 0,
     } 
 
     const [query_url, set_query_url] = useState(router.asPath)
@@ -247,8 +257,7 @@ const FiltersPanel = () => {
                                         dispatch({comm_status: v})
                                     }}>
                                     <Radio value="any">{t`Any`}</Radio>
-                                    <Radio value="open">{t`Open`}</Radio>
-                                    <Radio value="closed">{t`Closed`}</Radio>
+                                    <Radio value="open">{t`Currently open`}</Radio>
                                 </RadioGroup>
                             </p>
                         </Panel>
