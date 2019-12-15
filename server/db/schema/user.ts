@@ -56,6 +56,8 @@ export const user_schema = new Schema(
         ongoing_commissions_limit: { type: Number, default: 5, maxlength: 20 },
         ongoing_requests_limit: { type: Number, default: 10, maxlength: 50 },
         revisions_limit: { type: Number, default: 3 },
+        last_commissioned: {type: Date, default: null, es_indexed: true}, // last time a request was recieved
+        last_open_status: {type: Date, default: null, es_indexed: true}, // last time commissions were opened
         commission_request_message: {
             type: ObjectId,
             ref: 'Text',
@@ -118,7 +120,6 @@ export const user_schema = new Schema(
                 es_select: 'name identifier',
             },
         ],
-        last_commissions_update: Date,
         commission_info: {
             type: ObjectId,
             ref: 'CommissionStats',

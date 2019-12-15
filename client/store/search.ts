@@ -8,6 +8,7 @@ import { fetch } from '@utility/request'
 import log from '@utility/log'
 import { FilterType } from '@components/Search/FiltersPanel'
 import { NSFW_LEVEL } from '@server/constants'
+import { subDays } from 'date-fns'
 
 let all_tags_identifiers_to_name = {}
 
@@ -33,6 +34,18 @@ export const useSearchStore = createStore(
             let q = bodybuilder()
             q = q.notQuery('match', 'type', 'consumer')
             q = q.query('match', 'visibility', 'public')
+
+            // prefer creators who just opened commissions
+            q = q.orQuery('range', {last_open_status: {gte: subDays(new Date(), 1), boost: 5}, })
+            q = q.orQuery('range', {last_open_status: {gte: subDays(new Date(), 3), boost: 4.5}, })
+            q = q.orQuery('range', {last_open_status: {gte: subDays(new Date(), 7), boost: 4}, })
+            q = q.orQuery('range', {last_open_status: {gte: subDays(new Date(), 14), boost: 3.5}, })
+            q = q.orQuery('range', {last_open_status: {gte: subDays(new Date(), 30), boost: 3}, })
+
+            // prefer creators who were last commissioned a long time ago
+            q = q.orQuery('range', {last_commissioned: {lte: subDays(new Date(), 30), boost: 4}, })
+            q = q.orQuery('range', {last_commissioned: {lte: subDays(new Date(), 14), boost: 3.5}, })
+            q = q.orQuery('range', {last_commissioned: {lte: subDays(new Date(), 7), boost: 3}, })
             
             if (query?.comm_status === 'open') {
                 q = q.query('match', 'commissions_open', true)
@@ -93,7 +106,7 @@ export const useSearchStore = createStore(
             if (search_query) {
                 q = q.orQuery('multi_match', {
                     query: search_query,
-                    fields: ['username^10', 'name^5', '*'],
+                    fields: ['username^12', 'name^5', '*'],
                 })
             }
 

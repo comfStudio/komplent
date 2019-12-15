@@ -16,13 +16,21 @@ import {
 
 import { schedule_unique, schedule_now } from '@server/tasks'
 import { TASK, CommissionPhaseT, NSFW_LEVEL } from '@server/constants'
-import { CommissionPhase, Conversation, Commission, Image, Tag } from '@db/models'
+import { CommissionPhase, Conversation, Commission, Image, Tag, User } from '@db/models'
 import { update_price_stats, update_delivery_time_stats } from '@services/analytics'
 
 user_schema.pre('save', async function() {
     if (!this.name) {
         this.name = this.username
     }
+
+    if (this.commissions_open === true) {
+        let prev_user = await User.findById(this._id).lean()
+        if (prev_user && prev_user.commissions_open === false) {
+            this.last_open_status = new Date()
+        }
+    }
+
     if ([NSFW_LEVEL.level_5, NSFW_LEVEL.level_10].includes(this.nsfw)) {
         let mat = await Tag.findOne({ name: 'Mature' }).lean()
         if (mat) {
@@ -63,6 +71,12 @@ commission_schema.pre('save', async function() {
 commission_schema.post('save', async function() {
     if (this.wasNew) {
         let c
+        
+        let user = await User.findById(this.to_user)
+        if (user) {
+            user.last_commissioned = new Date()
+            user.save()
+        }
 
         if (price_is_null(this.rate.price)) {
             c = new CommissionPhase({
