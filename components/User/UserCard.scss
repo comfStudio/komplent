@@ -1,0 +1,43 @@
+$avatar-margin: -2.25em;
+
+.user-card {
+    position: relative;
+    margin: 0.8em auto;
+    @apply pt-1;
+
+    .avatar {
+        width: 4.5em;
+        height: 4.5em;
+        border-radius: 5%;
+        overflow: hidden;
+        transition: all 0.25s;
+
+        img {
+            border-radius: 5%;
+            width: inherit;
+            height: inherit;
+        }
+    }
+
+    .name {
+        width: 100%;
+        text-align: center;
+        @apply text-lg;
+        @apply pb-1;
+    }
+
+    > a:hover .name {
+        @apply text-primary;
+    }
+
+    .buttons {
+        @apply py-1;
+    }
+
+    > a:hover {
+        border: 0.1em solid;
+        @apply border-primary;
+        box-shadow: 0 4px 8px 0 rgba(152, 162, 179, 0.15), 0 2px 2px -1px rgba(152, 162, 179, 0.3);
+        transform: translateY(-2px);
+    }
+}
