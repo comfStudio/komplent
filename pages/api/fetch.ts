@@ -21,6 +21,7 @@ export default with_middleware(
                 populate,
                 lean,
                 sort,
+                skip,
                 limit,
                 count,
             } = req.json
@@ -61,6 +62,10 @@ export default with_middleware(
 
                 if (sort) {
                     qmethod = qmethod.sort(sort)
+                }
+
+                if (skip) {
+                    qmethod = qmethod.skip(skip)
                 }
 
                 if (limit) {

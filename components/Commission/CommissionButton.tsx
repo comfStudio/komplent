@@ -23,33 +23,47 @@ export const CommissionButton = ({
     let count
     if (user) {
         path = make_profile_urlpath(user)
+        count = user.commissions_open ? 1 : 0
     } else {
         const { profile_path, profile_user, slots_left } = useProfileContext()
         path = profile_path
         user = profile_user
-        count = Math.max(0, slots_left)
+        count = profile_user.commissions_open ? Math.max(0, slots_left) : 0
     }
 
     let cls = 'commission-button'
+
+    let el = <Button
+                appearance={appearance}
+                size={size}
+                className={
+                    props.className
+                        ? cls + ' ' + props.className
+                        : cls
+                }
+                {...props}>
+                {children ? children : t`Request a Commission`}
+            </Button>
+
     return (
         <>
-            {!!count && (
+            {!!count && size !== 'lg' &&
+            <Link href={`${path}/commission`}>
+                <a className="unstyled">
+                    {el}
+                </a>
+            </Link>
+            }
+            {!!count && size === 'lg' && (
                 <Link href={`${path}/commission`}>
-                    <ButtonGroup size={size}>
-                        <Button
-                            appearance={appearance}
-                            className={
-                                props.className
-                                    ? cls + ' ' + props.className
-                                    : cls
-                            }
-                            {...props}>
-                            {children ? children : t`Request a Commission`}
-                        </Button>
-                        {!!count && count < 6 && (
-                            <Button>{t`${count} slots left`}</Button>
-                        )}
-                    </ButtonGroup>
+                    <a className="unstyled">
+                        <ButtonGroup size={size}>
+                            {el}
+                            {!!count && count < 6 && (
+                                <Button>{t`${count} slots left`}</Button>
+                            )}
+                        </ButtonGroup>
+                    </a>
                 </Link>
             )}
             {!!!count && (

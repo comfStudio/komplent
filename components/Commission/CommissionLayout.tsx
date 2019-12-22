@@ -17,7 +17,7 @@ const CommissionMenu = (props: MenuProps) => {
     const user = useUser()
     const store = useCommissionStore()
     let commission = store.get_commission()
-    let is_owner = user._id === commission.from_user._id
+    let is_owner = user?._id === commission.from_user._id
 
     return (
         <Nav className="mb-5" appearance="subtle" activeKey={props.activeKey}>

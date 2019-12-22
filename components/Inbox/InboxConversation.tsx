@@ -23,6 +23,7 @@ import { formatDistanceToNow, toDate, format } from 'date-fns'
 import { useUser } from '@hooks/user'
 import { Avatar } from '@components/Profile/ProfileHeader'
 import { useMountedState } from 'react-use'
+import { EmptyPanel } from '@components/App/Empty'
 
 interface MessageProps {
     data: any
@@ -126,17 +127,19 @@ interface ConversationProps {
     messages: any[]
     conversation: any
     useStore: any
+    noHeader?: boolean
+    noBorder?: boolean
 }
 
 export const Conversation = (props: ConversationProps) => {
     const user = useUser()
-    const [messages, set_messages] = useState(props.messages.slice().reverse())
+    const [messages, set_messages] = useState(props.messages)
     const store = props.useStore()
     const mounted = useMountedState()
 
     useEffect(() => {
         if (mounted) {
-            set_messages(props.messages.slice().reverse())
+            set_messages(props.messages)
         }
     }, [props.messages])
 
@@ -149,15 +152,15 @@ export const Conversation = (props: ConversationProps) => {
     }
 
     return (
-        <Panel bordered header={<Header data={props.conversation} />}>
+        <Panel bordered={!props.noBorder} header={props.noHeader ? undefined : <Header data={props.conversation} />}>
+            {!!messages.length &&
             <ul className="messages">
-                {messages
-                    .slice(1)
-                    .slice(-5)
-                    .map(d => (
+                {messages.map(d => (
                         <Message key={d._id} user={user} data={d} />
-                    ))}
+                        ))}
             </ul>
+            }
+            {!messages.length && <EmptyPanel type="Ghost" mood="shocked" subtitle={`Send your first message`}/>}
             <MessageInput onMessage={onMessage} />
         </Panel>
     )

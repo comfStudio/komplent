@@ -60,6 +60,15 @@ export const ProfileMenu = (props: Props) => {
                                 </Nav.Item>
                             </Link>
                         )}
+                        {props.activeKey == 'commission' &&
+                        <Link href={`${profile_path}/commission`} passHref>
+                            <Nav.Item
+                                eventKey="commission"
+                                active={props.activeKey == 'commission'}>
+                                {t`Requesting a Commission`}
+                            </Nav.Item>
+                        </Link>
+                        }
                     </Nav>
                 </Container>
             </Navbar.Body>

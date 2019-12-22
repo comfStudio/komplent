@@ -1,12 +1,8 @@
 $avatar-margin: -2.25em;
 
-.user-card {
+.creator-card {
     position: relative;
     margin: 0.8em auto;
-
-    &:hover .avatar {
-        margin-top: ($avatar-margin) - 0.3;
-    }
 
     a:not(.commission-price) {
         color: unset;
@@ -16,17 +12,25 @@ $avatar-margin: -2.25em;
     .avatar {
         width: 4.5em;
         height: 4.5em;
-        border-radius: 25%;
-        position: absolute;
-        left: 0;
-        right: 0;
-        margin: $avatar-margin auto;
+        border-radius: 5%;
         overflow: hidden;
         transition: all 0.25s;
 
         img {
-            border-radius: 25%;
+            border-radius: 5%;
+            width: inherit;
+            height: inherit;
         }
+    }
+
+    .name {
+        width: 100%;
+        text-align: center;
+
+    }
+
+    &:hover .name {
+        @apply text-primary;
     }
 
     .info {
@@ -44,10 +48,18 @@ $avatar-margin: -2.25em;
             text-decoration: none;
             cursor: unset;
         }
+        
     }
 
     .tags {
         white-space: nowrap;
         overflow: hidden;
+    }
+
+    &:hover {
+        border: 0.1em solid;
+        @apply border-primary;
+        box-shadow: 0 4px 8px 0 rgba(152, 162, 179, 0.15), 0 2px 2px -1px rgba(152, 162, 179, 0.3);
+        transform: translateY(-2px);
     }
 }

@@ -6,7 +6,7 @@ import { useUpdateDatabase } from './db'
 
 export const useUser = () => {
     const store = useUserStore()
-    return store.state.current_user || {}
+    return store.state.current_user
 }
 
 export const useProfileContext = () => {

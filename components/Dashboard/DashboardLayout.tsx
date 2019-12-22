@@ -24,12 +24,9 @@ const DashboardLayout = (props: Props) => {
             header={<DashboardMenu activeKey={props.activeKey} />}>
             <GridContainer fluid>
                 <Row>
-                    <Col xs={17}>
+                    <Col xs={24}>
                         {!!logged_in && <UserTypeModal />}
                         {props.children}
-                    </Col>
-                    <Col xs={7}>
-                        <FollowingsList />
                     </Col>
                 </Row>
             </GridContainer>

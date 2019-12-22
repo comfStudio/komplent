@@ -37,7 +37,7 @@ export interface FilterType {
     nsfw_level: NSFWType
     categories: any[]
     styles: any[]
-    price_range: string
+    price_range: string | number
 }
 
 interface FiltersItemProps {
@@ -191,7 +191,7 @@ const FiltersPanel = () => {
         comm_status: rquery?.comm_status ?? 'any',
         delivery_time: rquery?.delivery_time ?? 'any',
         location: rquery?.location ?? 'anywhere',
-        nsfw_level: rquery?.nsfw_level ?? (!_.isEmpty(user) && user.show_nsfw !== NSFW_LEVEL.level_0 ? user.show_nsfw : NSFW_LEVEL.level_0),
+        nsfw_level: rquery?.nsfw_level ?? (!_.isEmpty(user) && user?.show_nsfw !== NSFW_LEVEL.level_0 ? user?.show_nsfw : NSFW_LEVEL.level_0),
         categories: rquery?.categories ?? store.state.categories.map(v => v.identifier),
         styles: rquery?.styles ?? store.state.styles.map(v => v.identifier),
         price_range: rquery?.price_range ?? 0,

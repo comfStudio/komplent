@@ -42,13 +42,16 @@ $header-container-indent: 16em;
 }
 
 #profile-header .gradient {
-    @extend .inverted-top-gradient;
     position: absolute;
-    left: 0;
-    right: 0;
-    height: 100%;
-    z-index: 2;
+    z-index: 1;
     pointer-events: none;
+    background: linear-gradient(to bottom, transparent 0%,
+    rgba(0,0,0,0.7) 100%);
+    content: "";
+    width: 100%;
+    height: 30%;
+    left: 0;
+    bottom: 0;
 }
 
 #profile-header .container .cover-image {
@@ -70,4 +73,5 @@ $header-container-indent: 16em;
     right: $header-container-indent;
     padding: 0.5em;
     padding-left: 1em;
+    z-index: 2;
 }

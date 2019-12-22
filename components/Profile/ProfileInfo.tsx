@@ -40,8 +40,6 @@ export const ProfileInfo = (props: Props) => {
     const completion_days = completion_stats?.avg_complete_days?.toFixed(2) ?? '?'
     const completion_time = completion_stats?.complete_count ? ((completion_stats.complete_count / completion_stats.total_count) * 100).toFixed(2) : '?'
     
-    const profile_name = get_profile_name(profile_user)
-
     useEffect(() => {
 
         if (profile_user) {
@@ -57,7 +55,7 @@ export const ProfileInfo = (props: Props) => {
             className={props.className ? cls + ' ' + props.className : cls}
             bordered>
             <p>
-                <ProfileNameTag name={profile_name} />
+                <ProfileNameTag />
             </p>
             <p>
                 <TagGroup
@@ -80,7 +78,7 @@ export const ProfileInfo = (props: Props) => {
                                         tags.filter(ot => t._id !== ot._id)
                                     )
                                 }}
-                                color={t.color}>
+                                color={t.color} className="subtle">
                                 {t.name}
                             </Tag>
                         )

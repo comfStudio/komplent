@@ -98,13 +98,6 @@ commission_schema.post('save', async function() {
 
         this.phases = [c]
         c.save()
-        let m = new Conversation({
-            type: 'commission',
-            subject: this.from_title,
-            users: [this.from_user, this.to_user],
-            commission: this._id,
-        })
-        m.save()
     }
 
     if (

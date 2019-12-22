@@ -20,7 +20,6 @@ class Page extends CommissionPage {
             props.commissionStoreState &&
             props.commissionStoreState.commission
         ) {
-            const convo_id = props.commissionStoreState.commission.conversation
             try {
                 commissionStoreState.active_conversation = await useCommissionStore.actions.get_conversation(
                     props.commissionStoreState.commission._id

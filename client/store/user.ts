@@ -205,6 +205,33 @@ export const useUserStore = createStore(
                 create: true,
             })
         },
+        async get_follow_count(type: 'follower' | 'followee', current_user) {
+            let f = 0
+
+            if (current_user) {
+                let q = { end: null }
+                q[type] = current_user._id
+                if (is_server()) {
+                    f = await Follow.find(q).countDocuments()
+                } else {
+                    await fetch('/api/fetch', {
+                        method: 'post',
+                        body: {
+                            model: 'Follow',
+                            method: 'find',
+                            query: q,
+                            count: true,
+                        },
+                    }).then(async r => {
+                        if (r.ok) {
+                            f = (await r.json()).data
+                        }
+                    })
+                }
+            }
+
+            return f
+        },
         async _create_defaults() {
             const default_users = [
                 {
@@ -284,18 +311,26 @@ export const useNotificationStore = createStore(
         notifications: [],
     },
     {
-        async get_notifications(current_user) {
+        async get_notifications(current_user, page = 0) {
             let f = []
 
             if (current_user) {
                 let q = { to_user: current_user._id }
-                let p = 'from_user'
-                let l = 30
+                let p = [{
+                    path: "from_user",
+                    populate: [
+                        {
+                            path: 'avatar',
+                        },
+                    ]
+                }]
+                let l = 15
                 if (is_server()) {
                     f = await Notification.find(q)
                         .populate(p)
                         .sort({ created: -1 })
                         .limit(l)
+                        .skip(l * page)
                         .lean()
                 } else {
                     await fetch('/api/fetch', {
@@ -305,6 +340,7 @@ export const useNotificationStore = createStore(
                             method: 'find',
                             query: q,
                             limit: l,
+                            skip: l * page,
                             sort: { created: -1 },
                             populate: p,
                         },
@@ -345,6 +381,13 @@ export const useNotificationStore = createStore(
 
             return f
         },
+
+        async read_notification(notif_id) {
+            return await update_db({
+                model: "Notification",
+                data: {_id: notif_id, read: new Date()}
+            })
+        }
     }
 )
 

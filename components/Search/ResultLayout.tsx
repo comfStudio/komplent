@@ -4,17 +4,15 @@ import { Grid, Col, Row, Panel, Pagination, FlexboxGrid } from 'rsuite'
 import { useRouter } from 'next/router'
 
 import CreatorCard from '@components/User/CreatorCard'
-import useSearchStore from '@store/search'
 import * as pages from '@utility/pages'
 
-export const ResultLayout = () => {
+export const ResultLayout = ({UserComponent = CreatorCard, ...props}: {size: number, count: number, page: number, items: any[], UserComponent: React.ElementType}) => {
     const router = useRouter()
-    const store = useSearchStore()
 
-    const page_count = Math.floor(store.state.count / store.state.size)
-    const current_page = store.state.page
+    const page_count = Math.floor(props.count / props.size)
+    const current_page = props.page
 
-    const on_page = p => router.push(pages.make_search_urlpath(p, store.state.size, router.query))
+    const on_page = p => router.push(pages.make_search_urlpath(p, props.size, router.query))
 
     return (
         <Panel className="h-full">
@@ -34,10 +32,10 @@ export const ResultLayout = () => {
                 <Row>
                     <Col xs={24}>
                         <FlexboxGrid>
-                            {store.state.items.map(u => {
+                            {props.items.map(u => {
                                 return (
                                     <FlexboxGrid.Item key={u._id} componentClass={Col} colspan={6} md={8}>
-                                        <CreatorCard data={u} />
+                                        <UserComponent data={u} />
                                     </FlexboxGrid.Item>
                                 )
                             })}

@@ -8,8 +8,9 @@ import { t } from '@app/utility/lang'
 
 import './NavUser.scss'
 import { useMount } from 'react-use'
-import { useNotificationStore } from '@store/user'
+import useUserStore, { useNotificationStore } from '@store/user'
 import { NoProfileContext } from '@client/context'
+import { get_profile_name } from '@utility/misc'
 
 interface Props {}
 
@@ -34,16 +35,24 @@ export const NavUserMenu = (props: UserMenuProps) => {
     const { profile_owner } = useProfileContext()
 
     const [dashboard_count, set_dashboard_count] = useState(0)
+    const [followers_count, set_followers_count] = useState(0)
+    const [followings_count, set_followings_count] = useState(0)
 
     useMount(() => {
         useNotificationStore.actions.get_notifications_count(user).then(r => {
             set_dashboard_count(r)
         })
+        useUserStore.actions.get_follow_count('followee', user).then(r => {
+            set_followers_count(r)
+        })
+        useUserStore.actions.get_follow_count('follower', user).then(r => {
+            set_followings_count(r)
+        })
     })
 
     return (
         <React.Fragment>
-            {user.type === 'creator' && 
+            {user?.type === 'creator' && 
                 <Link href={make_profile_urlpath(user)} passHref>
                     <El.Item
                         eventKey="profile"
@@ -76,12 +85,26 @@ export const NavUserMenu = (props: UserMenuProps) => {
                     {t`Messages`}
                 </El.Item>
             </Link>
-            {user.type === 'creator' &&
+            {user?.type === 'creator' &&
                 <Link href="/earnings" passHref>
                     <El.Item
                         eventKey="earnings"
                         active={props.activeKey == 'earnings'}>
                         {t`Earnings`}
+                    </El.Item>
+                </Link>
+            }
+            <Link href="/followings" passHref>
+                <El.Item eventKey="followings" active={props.activeKey == 'followings'}>
+                    {t`Followings`} <span className="muted">({followings_count})</span>
+                </El.Item>
+            </Link>
+            {user?.type === 'creator' &&
+                <Link href="/followers" passHref>
+                    <El.Item
+                        eventKey="followers"
+                        active={props.activeKey == 'followers'}>
+                        {t`Followers`} <span className="muted">({followers_count})</span>
                     </El.Item>
                 </Link>
             }
@@ -123,7 +146,7 @@ export const NavUserDropdown = (props: NavUserProps) => {
                 className="nav-user-dropdown lg:!hidden"
                 placement="bottomEnd"
                 renderTitle={NavUserAvatar}>
-                <li className="header">✦ {`${user.name || user.username}`} ✦</li>
+                <li className="header">✦ {get_profile_name(user)} ✦</li>
                 <NavUserMenu
                     element={Dropdown}
                     activeKey={props.activeKey}

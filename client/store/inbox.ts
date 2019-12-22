@@ -8,7 +8,7 @@ import { update_db } from '@client/db'
 import { conversation_schema, message_schema } from '@schema/message'
 import log from '@utility/log'
 
-export type InboxKey = 'active' | 'archive' | 'staff' | 'trash'
+export type InboxKey = 'inbox' | 'trash'
 
 export enum InboxType {
     private,
@@ -93,9 +93,10 @@ export const useInboxStore = createStore(
         ) {
             let q = bodybuilder()
             q = q.query('match', 'users', user._id.toString())
-            if (active) {
-                q = q.query('match', 'active', true)
-            }
+            q = q.sort("last_message", "desc")
+            // if (active) {
+            //     q = q.query('match', 'active', true)
+            // }
             if (trashed) {
                 q = q.query('match', 'trashed', true)
             }
@@ -105,12 +106,10 @@ export const useInboxStore = createStore(
             // q = q.notQuery("match", "type", "consumer")
 
             if (search_query) {
-                if (search_query.q) {
-                    q = q.orQuery('multi_match', {
-                        query: search_query.q,
-                        fields: ['subject^10'],
-                    })
-                }
+                q = q.query('multi_match', {
+                    query: search_query,
+                    fields: ['subject^10'],
+                })
             }
 
             q = q.from(0).size(30)
@@ -125,7 +124,6 @@ export const useInboxStore = createStore(
         ) {
             let r = []
             let q = this.parse_search_query(user, type, search_query, false, {
-                active,
                 trashed,
             })
 
@@ -161,7 +159,7 @@ export const useInboxStore = createStore(
             }
 
             if (d && d.hits && d.hits.hits) {
-                r = d.hits.hits
+                r = d.hits.hits.filter(Boolean)
             }
 
             return r
@@ -186,17 +184,16 @@ export const useInboxStore = createStore(
             }
             return u
         },
-        async get_messages(conversation_id) {
+        async get_messages(conversation_id, limit = 30) {
             let mdata = []
             let q = { conversation: conversation_id }
             let s = { created: -1 }
             let p = 'user'
-            let l = 10
             if (is_server()) {
                 mdata = await Message.find(q)
                     .populate(p)
                     .sort(s)
-                    .limit(l)
+                    .limit(limit)
                     .lean()
             } else {
                 await fetch('/api/fetch', {
@@ -206,7 +203,7 @@ export const useInboxStore = createStore(
                         query: q,
                         populate: p,
                         sort: s,
-                        limit: l,
+                        limit,
                     },
                 }).then(async r => {
                     if (r.ok) {
@@ -214,7 +211,7 @@ export const useInboxStore = createStore(
                     }
                 })
             }
-            return mdata
+            return mdata.reverse()
         },
         async new_message(
             user: any,

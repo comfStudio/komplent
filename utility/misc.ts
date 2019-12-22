@@ -100,6 +100,10 @@ export const get_profile_name = ({
     return name || username
 }
 
+export const get_profile_avatar_url = (profile) => {
+    return profile?.avatar?.paths?.[0]?.url
+}
+
 export const get_highest_nsfw_level = (levels: NSFWType[]) => {
     if (levels?.includes(NSFW_LEVEL.level_10)) return NSFW_LEVEL.level_10
     if (levels?.includes(NSFW_LEVEL.level_5)) return NSFW_LEVEL.level_5

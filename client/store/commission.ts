@@ -34,6 +34,7 @@ import { payment_schema } from '@schema/monetary'
 import log from '@utility/log'
 import { OK } from 'http-status-codes'
 import { license_schema } from '@schema/general'
+import { conversation_schema } from '@schema/message'
 
 export const useCommissionStore = createStore(
     {
@@ -46,6 +47,27 @@ export const useCommissionStore = createStore(
     {
         get_messages: useInboxStore.actions.get_messages,
         new_message: useInboxStore.actions.new_message,
+        async start_conversation() {
+            this.setState({
+                active_conversation: await update_db({
+                    model: 'Conversation',
+                    data: {
+                        type: 'commission',
+                        subject: this.state.commission.from_title,
+                        users: [this.state.commission.from_user, this.state.commission.to_user],
+                        commission: this.state.commission._id,
+                    },
+                    schema: conversation_schema,
+                    create: true,
+                    validate: true,
+                }).then(r => {
+                    if (r.status) {
+                        return r.body
+                    }
+                    return undefined
+                })
+            })
+        },
         async get_conversation(commission_id) {
             let u
             let q = {

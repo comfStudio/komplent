@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import { Panel, PanelGroup, List, Placeholder } from 'rsuite'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
+import classnames from 'classnames'
 
 import useInboxStore from '@store/inbox'
 import { useUser } from '@hooks/user'
@@ -14,16 +16,17 @@ interface InboxListItemProps {
 const InboxListItem = (props: InboxListItemProps) => {
     const user = useUser()
     const store = useInboxStore()
+    const router = useRouter()
 
     const [loading, set_loading] = useState(false)
 
-    const p_users = props.data.users.filter(v => v._id !== user._id)
+    const p_users = props.data.users.filter(v => v._id !== user?._id)
 
     return (
         <Link
-            href={make_conversation_urlpath(store.state.activeKey, props.data)}>
+            href={make_conversation_urlpath(store.state.activeKey, props.data, router.query)}>
             <a className="unstyled">
-                <List.Item>
+                <List.Item className={classnames({'!bg-gray-100': props.data._id === store.state.active_conversation._id})}>
                     {!loading && (
                         <>
                             <p>{props.data.subject}</p>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useLayoutEffect } from 'react'
 import Router from 'next/router'
-import { Grid, Row, Col, Icon, IconButton, Panel } from 'rsuite'
+import { Grid, Row, Col, Icon, IconButton, Panel, Button, Input } from 'rsuite'
 
 import {
     MainLayout,
@@ -13,7 +13,7 @@ import {
     Props as MenuProps,
 } from '@components/Profile/ProfileMenu'
 import ProfileInfo from '@components/Profile/ProfileInfo'
-import { useProfileUser, useUser } from '@hooks/user'
+import { useProfileUser, useUser, useProfileContext } from '@hooks/user'
 import { t } from '@app/utility/lang'
 import { ReactProps } from '@utility/props'
 import { useUpdateDatabase } from '@hooks/db'
@@ -26,6 +26,8 @@ import {
     guideline_types,
 } from '@server/constants'
 import { dashboard } from '@utility/pages'
+import { get_profile_name } from '@utility/misc'
+import useUserStore from '@store/user'
 
 interface LayoutProps extends ReactProps, MenuProps {
     activeKey?: string
@@ -51,12 +53,41 @@ export const ProfileLayout = (props: LayoutProps) => {
     )
 }
 
-interface ProfileNameTagProps {
-    name: string
-}
+export const ProfileNameTag = () => {
+    const { profile_user, profile_owner } = useProfileContext()
+    const store = useUserStore()
+    const current_user = store.state.current_user
 
-export const ProfileNameTag = (props: ProfileNameTagProps) => {
-    return <h3 className="profile-name text-center">{props.name}</h3>
+    
+    const [edit, set_edit] = useState(false)
+    const [can_edit, set_can_edit] = useState(false)
+    
+    useEffect(() => {
+        
+        if (profile_owner) {
+            set_can_edit(true)
+        } else if (!profile_user && current_user) {
+            set_can_edit(true)
+        }
+
+    }, [profile_owner, profile_user, current_user])
+    
+    const profile_name = get_profile_name(can_edit ? current_user : profile_user)
+
+    return (
+        <>
+            {!edit && !can_edit && <h3 className="profile-name text-center">{profile_name}</h3>}
+            {!edit && can_edit && <h3 className="profile-name text-center"><Button appearance="subtle" className="!text-2xl !whitespace-normal" onClick={ev => {ev.preventDefault(); set_edit(true)}}>{profile_name}</Button></h3>}
+            {edit && <h3 className="profile-name text-center pt-1"><form onSubmit={ev => { 
+                ev.preventDefault()
+                const name = (new FormData(ev.target as any)).get("name")
+                if (name) {
+                    store.update_user({ name })
+                    set_edit(false)
+                }
+                }}><Input defaultValue={profile_name} name="name" /></form></h3>}
+        </>
+    )
 }
 
 export const RequireOwnProfile = () => {
@@ -77,7 +108,7 @@ export const RequireCreator = () => {
     const user = useUser()
 
     useLayoutEffect(() => {
-        if (user && user.type !== 'creator') {
+        if (user && user?.type !== 'creator') {
             Router.replace(dashboard)
         }
     }, [user])
@@ -99,12 +130,15 @@ export const RequireOwnProfileInverse = () => {
     return null
 }
 
-export const FollowButton = () => {
-    const {
-        current_user,
-        profile_user,
-        context: { follow },
-    } = useProfileUser()
+export const FollowButton = ({current_user, profile_user, follow, size = "lg", className="mx-3"}: {
+    current_user: any, profile_user:any, follow:any, size: string, className: string, appearance: string
+}) => {
+    if (!follow) {
+        const p = useProfileUser()
+        current_user = p.current_user
+        profile_user = p.profile_user
+        follow = p.context.follow
+    }
     const [follow_obj, set_follow_obj] = useState(follow)
     const [loading, set_loading] = useState(false)
     const update = useUpdateDatabase()
@@ -115,8 +149,8 @@ export const FollowButton = () => {
             icon={<Icon icon="bell" />}
             appearance="default"
             color={follow_obj ? 'blue' : undefined}
-            size="lg"
-            className="mx-3"
+            size={size}
+            className={className}
             onClick={ev => {
                 ev.preventDefault()
                 set_loading(true)

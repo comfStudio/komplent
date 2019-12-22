@@ -10,7 +10,6 @@ import Line from "@rsuite/charts/lib/series/Line";
 import Bars from "@rsuite/charts/lib/series/Bars";
 import { Table } from 'rsuite';
 
-import { useUser } from '@hooks/user';
 import { t } from '@app/utility/lang'
 import { useMount } from 'react-use';
 import useEarningsStore, { usePayoutStore } from '@store/earnings';

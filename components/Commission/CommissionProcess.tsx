@@ -725,7 +725,7 @@ const CommissionProcess = () => {
 
     const is_finished = commission.finished
     const is_complete = commission.completed
-    let is_owner = user._id === commission.from_user._id
+    let is_owner = user?._id === commission.from_user._id
     let start_date = toDate(
         commission ? new Date(commission.created) : new Date()
     )
@@ -743,7 +743,7 @@ const CommissionProcess = () => {
         is_confirming = true
         if (
             latest_stage.data &&
-            latest_stage.data.confirmed.includes(user._id)
+            latest_stage.data.confirmed.includes(user?._id)
         ) {
             confirmed = true
         }

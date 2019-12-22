@@ -17,7 +17,7 @@ interface CommissionItemProps {
 const CommissionListItem = (props: CommissionItemProps) => {
     const user = useUser()
     const title =
-        user._id == props.data.from_user._id
+        user?._id === props.data.from_user._id
             ? props.data.from_title
             : props.data.to_title
             ? props.data.to_title
@@ -137,7 +137,7 @@ export const CommissionsListing = (props: CommissionsListingProps) => {
         <Grid fluid>
             <Row>
                 <ButtonToolbar className="clearfix">
-                    {user.type === 'creator' &&
+                    {user?.type === 'creator' &&
                     <ButtonGroup>
                         <Link href={pages.commissions + '?' + qs.stringify({ type: "received" })} passHref>
                             <Button active={props.listtype === 'received'} componentClass="a">{t`Received`}</Button>
@@ -157,7 +157,7 @@ export const CommissionsListing = (props: CommissionsListingProps) => {
                         <Link href={pages.commissions + '?' + qs.stringify({ type:router.query.type, completed: (!btn_state.completed).toString() })} passHref>
                             <Button active={btn_state.completed} componentClass="a">{t`Completed`}</Button>
                         </Link>
-                        {user.type !== 'creator' &&
+                        {user?.type !== 'creator' &&
                         <Link href={pages.commissions + '?' + qs.stringify({ type:router.query.type, rejected: (!btn_state.rejected).toString() })} passHref>
                             <Button active={btn_state.rejected} componentClass="a">{t`Rejected`}</Button>
                         </Link>

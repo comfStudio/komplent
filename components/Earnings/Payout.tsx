@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import { Panel, Button, Message } from "rsuite"
 import { t } from '@app/utility/lang'
 import { usePayoutStore } from '@store/earnings';
-import { decimal128ToMoneyToString } from '@utility/misc';
+import { decimal128ToMoneyToString, decimal128ToFloat } from '@utility/misc';
 import { format } from 'date-fns';
 import { OK } from 'http-status-codes';
 import { useUser } from '@hooks/user';
+import { minimumPayoutBalance } from '@server/constants';
 
 export const PayoutBalance = () => {
 
@@ -33,7 +34,7 @@ export const PayoutBalance = () => {
                 </span>
             </p>
             <p>
-                <Button appearance="primary" loading={loading} onClick={e => {
+                <Button appearance="primary" loading={loading} disabled={decimal128ToFloat(store.state.balance?.total_balance) < minimumPayoutBalance} onClick={e => {
                     e.preventDefault()
                     set_loading(true)
                     set_error(null)

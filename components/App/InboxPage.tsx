@@ -19,29 +19,26 @@ class InboxPage extends AuthPage<Props> {
             activeKey: this.activeKey,
         })
         if (props.useUserState.logged_in) {
-            let type
-
-            if (this.activeKey === 'staff') {
-                type = InboxType.staff
-            }
+            let type = (ctx.query.type as string) ?? 'commission'
 
             inboxStoreeState.conversations = await useInboxStore.actions.search_conversations(
                 props.useUserState.current_user,
-                type,
-                ctx.query,
+                type as any,
+                ctx.query.inbox_q,
                 {
-                    active: this.activeKey === 'active',
                     trashed: this.activeKey === 'trash',
                 }
             )
 
-            if (ctx.query.convo_id) {
+            let convo_id = ctx.query.convo_id ?? inboxStoreeState?.conversations?.[0]?._id
+
+            if (convo_id) {
                 try {
                     inboxStoreeState.messages = await useInboxStore.actions.get_messages(
-                        ctx.query.convo_id
+                        convo_id
                     )
                     inboxStoreeState.active_conversation = await useInboxStore.actions.get_conversation(
-                        ctx.query.convo_id as string
+                        convo_id as string
                     )
                 } catch (err) {
                     log.error(err)

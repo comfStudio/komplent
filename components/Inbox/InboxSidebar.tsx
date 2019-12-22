@@ -11,29 +11,12 @@ interface Props {
 const InboxSidebar = (props: Props) => {
     return (
         <Nav vertical appearance="subtle" activeKey={props.activeKey}>
-            <Link href="/inbox/active" passHref>
+            <Link href="/inbox" passHref>
                 <Nav.Item
-                    eventKey="active"
-                    active={props.activeKey == 'active'}
+                    eventKey="inbox"
+                    active={props.activeKey == 'inbox'}
                     icon={<Icon icon="home" />}>
-                    {t`Active`}
-                </Nav.Item>
-            </Link>
-            <Link href="/inbox/archive" passHref>
-                <Nav.Item
-                    eventKey="archive"
-                    active={props.activeKey == 'archive'}
-                    icon={<Icon icon="home" />}>
-                    {t`Archive`}
-                </Nav.Item>
-            </Link>
-            <hr />
-            <Link href="/inbox/staff" passHref>
-                <Nav.Item
-                    eventKey="staff"
-                    active={props.activeKey == 'staff'}
-                    icon={<Icon icon="home" />}>
-                    {t`Staff`}
+                    {t`Inbox`}
                 </Nav.Item>
             </Link>
             <hr />
@@ -41,7 +24,7 @@ const InboxSidebar = (props: Props) => {
                 <Nav.Item
                     eventKey="trash"
                     active={props.activeKey == 'trash'}
-                    icon={<Icon icon="home" />}>
+                    icon={<Icon icon="trash" />}>
                     {t`Trash`}
                 </Nav.Item>
             </Link>

@@ -50,11 +50,12 @@ export const make_commission_rate_urlpath = (user, rate: { _id: string }) => {
 
 export const make_conversation_urlpath = (
     activeKey: string,
-    conversation: { _id: string }
+    conversation: { _id: string },
+    query: object
 ) => {
     let url = inbox
-    url += `/${activeKey}`
-    url += '?' + qs.stringify({ convo_id: conversation._id })
+    url += activeKey === 'inbox' ? '' : `/${activeKey}`
+    url += '?' + qs.stringify({ ...query, convo_id: conversation._id.toString() })
     return url
 }
 

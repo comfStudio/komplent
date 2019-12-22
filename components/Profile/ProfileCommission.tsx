@@ -30,7 +30,6 @@ import Link from 'next/link'
 import qs from 'qs'
 import { useRouter } from 'next/router'
 import { ButtonProps } from 'rsuite/lib/Button'
-import { Cat, Ghost } from 'react-kawaii'
 import classnames from 'classnames'
 
 import { t } from '@app/utility/lang'
@@ -63,6 +62,7 @@ import MessageText from '@components/App/MessageText'
 import Upload, { UploadProps } from '@components/App/Upload'
 import debounce from 'lodash/debounce'
 import { isBefore } from 'date-fns'
+import { EmptyPanel } from '@components/App/Empty'
 
 const {
     StringType,
@@ -166,7 +166,7 @@ export const CommissionLinkCard = (props: CommissionCardProps) => {
     const user = useUser()
     let c_user = props.data.user
     let url = make_profile_urlpath(c_user)
-    if (!user || !c_user || user._id !== c_user._id) {
+    if (!user || !c_user || user?._id !== c_user?._id) {
         url = pages.make_commission_rate_urlpath(c_user, props.data)
     }
 
@@ -259,18 +259,13 @@ const commission_request_model = Schema.Model({
 
 export const CommissionsClosed = () => {
     return (
-        <CenterPanel subtitle={t`Closed for commissions`}>
-            <Cat mood="sad" className="emoji" color="rgba(0, 0, 0, 0.5)" />
-        </CenterPanel>
+        <EmptyPanel type="Cat" mood="sad" subtitle={t`Closed for commissions`}/>
     )
 }
 
 export const RequestsClosed = () => {
     return (
-        <CenterPanel
-            subtitle={t`Closed for any more requests, please try later`}>
-            <Ghost mood="sad" className="emoji" color="rgba(0, 0, 0, 0.5)" />
-        </CenterPanel>
+        <EmptyPanel type="Cat" mood="sad" subtitle={t`Closed for any more requests, please try later`}/>
     )
 }
 

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import { Grid, Row, Col, Uploader, Icon, Button } from 'rsuite'
-import { File } from 'react-kawaii'
 
 import Image from '@components/App/Image'
 import { t } from '@utility/lang'
@@ -77,7 +76,7 @@ const CommissionAssets = () => {
     const commission = store.get_commission()
     const [uploading, set_uploading] = useState(false)
 
-    let is_owner = user._id === commission.from_user._id
+    let is_owner = user?._id === commission.from_user._id
     const products = commission?.products ?? []
 
     const on_upload = debounceReduce((args: any[]) => {
@@ -107,19 +106,13 @@ const CommissionAssets = () => {
             {!commission.accepted &&
             <Row>
                 <Col xs={24}>
-                    <CenterPanel
-                        subtitle={t`Please accept the commission request to add assets`}>
-                        <File mood="sad" className="emoji" color="rgba(0, 0, 0, 0.5)" />
-                    </CenterPanel>
+                    <EmptyPanel type="File" mood="sad" subtitle={t`Please accept the commission request to add assets`}/>
                 </Col>
             </Row>}
             {!unlocked &&
             <Row>
                 <Col xs={24}>
-                    <CenterPanel
-                        subtitle={t`Assets are locked`}>
-                        <File mood="sad" className="emoji" color="rgba(0, 0, 0, 0.5)" />
-                    </CenterPanel>
+                    <EmptyPanel type="File" mood="sad" subtitle={t`Assets are locked`}/>
                     <hr/>
                 </Col>
             </Row>}

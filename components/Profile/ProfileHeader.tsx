@@ -13,6 +13,7 @@ import Upload from '@components/App/Upload'
 import { FileType } from 'rsuite/lib/Uploader'
 import useUserStore from '@store/user'
 import Image from '@components/App/Image'
+import { get_profile_avatar_url } from '@utility/misc'
 
 interface HoverImageUploadProps {
     children: any
@@ -32,7 +33,7 @@ export const Avatar = props => {
 
     return (
         <div className="avatar">
-            <Image className="avatar-image" src={(profile_user || user)?.avatar?.paths?.[0]?.url} w={"250px"} h={"250px"}/>
+            <Image className="avatar-image" src={get_profile_avatar_url(profile_user || user)} w={"250px"} h={"250px"}/>
         </div>
     )
 }
@@ -66,9 +67,7 @@ export const ProfileHeader = (props: HeaderProps) => {
                 <div id="header-container">
                     {!profile_owner && (
                         <React.Fragment>
-                            {commissions_open && (
-                                <CommissionButton className="z-10" />
-                            )}
+                            <CommissionButton className="z-10" />
                             <FollowButton />
                         </React.Fragment>
                     )}

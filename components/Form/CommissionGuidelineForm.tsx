@@ -158,7 +158,7 @@ export const CommissionGuidelineList = (props: CommissionGuidelineList) => {
                             editing={true}
                             title=""
                             onUpdate={v => {
-                                store.create_option({ user: user._id, ...v })
+                                store.update_option({ user: user?._id, ...v })
                                 set_new_option(false)
                             }}
                             onCancel={() => {

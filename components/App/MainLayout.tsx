@@ -121,7 +121,7 @@ export const MainLayout = (props: Props) => {
     )
 }
 
-interface CenterPanelProps extends ReactProps, HTMLElementProps {
+export interface CenterPanelProps extends ReactProps, HTMLElementProps {
     borderd?: boolean
     padded?: boolean | number
     title?: string

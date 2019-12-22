@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Grid, RadioGroup, Radio, SelectPicker, Button, Icon } from 'rsuite'
+import { Grid, RadioGroup, Radio, SelectPicker, Button, Icon, List, CheckboxGroup, Toggle } from 'rsuite'
 import { EditGroup, EditSection } from '.'
 
 import { t } from '@app/utility/lang'
@@ -83,6 +83,18 @@ export const UserAvatar = () => {
     )
 }
 
+export const Notifications = () => {
+    return (
+        <EditGroup>
+            <List>
+                <List.Item><Toggle/> {t`Commission updates`}</List.Item>
+                <List.Item><Toggle/> {t`Creator opens for commissions`}</List.Item>
+                <List.Item><Toggle/> {t`New follower`}</List.Item>
+            </List>
+        </EditGroup>
+    )
+}
+
 const UserSettings = () => {
     return (
         <Grid fluid>
@@ -98,7 +110,10 @@ const UserSettings = () => {
             </EditSection> */}
             <h4>{t`Integrations`}</h4>
             <EditSection>
-                
+            </EditSection>
+            <h4>{t`Email Notifications`}</h4>
+            <EditSection>
+                <Notifications/>
             </EditSection>
             <h4>{t`Account`}</h4>
             <EditSection>

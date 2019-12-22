@@ -1,6 +1,5 @@
 @import '~rsuite/lib/styles/themes/default/index.less';
 
-
 @import 'rsuite_variables.less';
 
 .@{ns}panel {
@@ -12,3 +11,42 @@
       }
       
 }
+
+.@{ns}list-item {
+  &-lg {
+    padding: 20px;
+    
+  }
+  
+  &-md {
+    padding: 13px;
+  }
+  
+  &-sm {
+    padding: 8px;
+  }
+}
+
+.tag-subtle-variant(@background-color) {
+  color: darken(@background-color, 15%);
+  background-color: unset;
+  border: 1px solid @background-color;
+}
+
+.@{ns}tag.subtle {
+  color: darken(@tag-default-background, 25%);
+  background-color: unset;
+  border: 1px solid darken(@tag-default-background, 20%);
+}
+
+.generate-spectrum-subtle-tags(@i:length(@spectrum)) when (@i>0) {
+  .generate-spectrum-subtle-tags(@i - 1);
+  @name: extract(@spectrum, @i);
+  @color: @@name;
+
+  .@{ns}tag-@{name}.subtle {
+    .tag-subtle-variant(@color);
+  }
+}
+
+.generate-spectrum-subtle-tags;

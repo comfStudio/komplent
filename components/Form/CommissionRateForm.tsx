@@ -214,7 +214,7 @@ export const RateOptions = (props: RateOptionsProps) => {
                             title=""
                             onUpdate={v => {
                                 store.update_option(
-                                    { user: user._id, ...v },
+                                    { user: user?._id, ...v },
                                     { create: true }
                                 )
                                 set_new_option(false)
@@ -302,7 +302,7 @@ const CommissionRateForm = (props: Props) => {
             }
 
             set_document({
-                user: current_user._id,
+                user: current_user?._id,
                 ...submit_value,
                 price: price_disabled ? null : submit_value.price,
                 image: upload_response?.data,
