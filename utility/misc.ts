@@ -93,6 +93,13 @@ export function promisify_es_search(model, ...args) {
     })
 }
 
+export const get_commission_title = (commission, user) => { 
+    if (typeof user === 'string') user = {_id: user};
+    if (typeof commission?.to_user === 'object') commission.to_user = commission.to_user._id;
+    if (user?._id === commission.to_user) return commission.to_title
+    return commission.from_title
+}
+
 export const get_profile_name = ({
     name = undefined,
     username = undefined,

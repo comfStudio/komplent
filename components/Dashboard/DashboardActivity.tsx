@@ -3,21 +3,46 @@ import { Panel, PanelGroup, Avatar, Button } from 'rsuite'
 import Link from 'next/link'
 import classnames from 'classnames'
 import VisibilitySensor from 'react-visibility-sensor'
+import { formatDistanceToNow } from 'date-fns'
 
 import { useNotificationStore } from '@store/user'
 import { EVENT } from '@server/constants'
 
 import { t } from '@app/utility/lang'
 import { make_profile_urlpath, make_commission_urlpath } from '@utility/pages'
-import { get_profile_name, get_profile_avatar_url } from '@utility/misc'
+import { get_profile_name, get_profile_avatar_url, get_commission_title } from '@utility/misc'
 import Image from '@components/App/Image'
 import { useUser } from '@hooks/user'
+import { fetch } from '@utility/request'
 
 import './DashboardActivity.scss'
-import { formatDistanceToNow } from 'date-fns'
 
 interface NotificationProps {
     data: any
+}
+
+const CommissionTitle = ({commission_id, user}: {commission_id: string, user: any}) => {
+    const [title, set_title] = useState(t`A commission project`)
+
+    useEffect(() => {
+        if (commission_id) {
+            await fetch('/api/fetch', {
+                method: 'post',
+                body: {
+                    model: 'Commission',
+                    method: 'findById',
+                    query: commission_id,
+                    select: "to_title from_title, to_user",
+                },
+            }).then(async r => {
+                if (r.ok) {
+                    set_title(get_commission_title((await r.json()).data, user))
+                }
+            })
+        }
+    }, [commission_id, user])
+
+    return <span>{title}</span>
 }
 
 const Notification = (props: NotificationProps) => {
@@ -74,8 +99,9 @@ const Notification = (props: NotificationProps) => {
             link_to = make_commission_urlpath({
                 _id: data.data.commission_id,
             })
-            link_el = <span>{t`A commission project`}</span>
-            content = t`has just been updated`
+            get_profile_name
+            link_el = <CommissionTitle commission_id={data.data.commission_id} user={user}/>
+            content = t`has been updated`
             break
         }
     }
