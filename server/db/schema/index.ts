@@ -1,5 +1,4 @@
 import mongoose from 'mongoose'
-import getConfig from 'next/config'
 import mongoosastic from 'mongoosastic'
 
 import { STATES } from '@server/constants'
@@ -12,7 +11,14 @@ const mongooseDefaults = require('mongoose-lean-defaults')
 const mongooseGetters = require('mongoose-lean-getters')
 const mongoosePaginate = require('mongoose-paginate')
 
-const { publicRuntimeConfig, serverRuntimeConfig } = getConfig()
+if (is_server()) {
+    mongoose.ObjectId.get(v => {
+        if (v instanceof mongoose.Types.ObjectId) {
+            v = v.toString()
+        }
+        return v
+    })
+}
 
 mongoose.plugin ? mongoose.plugin(mongooseAutopopulate) : null
 mongoose.plugin ? mongoose.plugin(mongooseVirtuals) : null

@@ -57,7 +57,7 @@ export const NavUserMenu = (props: UserMenuProps) => {
                     <El.Item
                         eventKey="profile"
                         active={props.activeKey == 'profile' && profile_owner}>
-                        {t`My Profile`}
+                        {t`My Page`}
                     </El.Item>
                 </Link>
             }

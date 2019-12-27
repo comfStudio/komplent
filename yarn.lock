@@ -10103,24 +10103,21 @@ mongoose-autopopulate@^0.9.1:
   resolved "https://registry.yarnpkg.com/mongoose-autopopulate/-/mongoose-autopopulate-0.9.1.tgz#ee497b50a40e065fb54f4be81eef3004d33c17bb"
   integrity sha512-Sh0eJXwENYtZbNBzkGyxxbcwwXeSd8Zi9QLHxLsVwwRoiYPC5qCas8+3mQcyKdWoZJOVV6rBVzS2Q1M/d+3j0g==
 
-mongoose-lean-defaults@^0.3.1:
+"mongoose-lean-defaults@https://github.com/iSplasher/mongoose-lean-defaults":
   version "0.3.1"
-  resolved "https://registry.yarnpkg.com/mongoose-lean-defaults/-/mongoose-lean-defaults-0.3.1.tgz#e60d9fd5a504df43140f12b3f13ddd236023d87d"
-  integrity sha512-LEBv7TF5X/G9LIB3wi30sQJ/dIa0mBZMRSaKVaMaXPVXBsvEqITMMsS0LH3suGHwqj+nrJdgL7ggEFT1I5XHNA==
+  resolved "https://github.com/iSplasher/mongoose-lean-defaults#86dd8d83b387ce3ce952e8904d5ff767309f086f"
   dependencies:
     mpath "^0.6.0"
 
-mongoose-lean-getters@^0.1.1:
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/mongoose-lean-getters/-/mongoose-lean-getters-0.1.1.tgz#ea3a9ab0eebc79109dc12e05368036493135a2ac"
-  integrity sha512-CLjcmO+CvumAInm6nZ6re+1o5YwkRNfvKKJ5glVWU/Xq+gcUhu9FHlox7J6YTHoDfuMYV37uwulbagc2PlO8ZA==
+"mongoose-lean-getters@https://github.com/iSplasher/mongoose-lean-getters":
+  version "0.1.2"
+  resolved "https://github.com/iSplasher/mongoose-lean-getters#13a6ee405e8dd9ff030343d7117e76008eb0ffb9"
   dependencies:
     mpath "0.5.x"
 
-mongoose-lean-virtuals@^0.5.0:
+"mongoose-lean-virtuals@https://github.com/iSplasher/mongoose-lean-virtuals":
   version "0.5.0"
-  resolved "https://registry.yarnpkg.com/mongoose-lean-virtuals/-/mongoose-lean-virtuals-0.5.0.tgz#58d4ffefb3515d52889df7d104fadba82248c93f"
-  integrity sha512-IO0KsUXpzo8uhHnUgOlj0ShfYVjVZg1txaKRq/EtQcSQxvxjfuzkQ6XIQ2TvnyftJCewFV+2kcK3lU1NJraUnQ==
+  resolved "https://github.com/iSplasher/mongoose-lean-virtuals#9dab5ae2f0c27526440171fbbebc439655b7cba5"
   dependencies:
     mpath "0.5.x"
 

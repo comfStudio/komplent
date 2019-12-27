@@ -3,7 +3,7 @@ module.exports = ({ file, options, env }) => ({
         'postcss-easy-import': {},
         tailwindcss: {},
         '@fullhuman/postcss-purgecss':
-            env === 'development'
+            env
                 ? {
                       content: [
                         './pages/**/*.{js,jsx,ts,tsx}',
@@ -13,11 +13,12 @@ module.exports = ({ file, options, env }) => ({
                       // Include any special characters you're using in this regular expression
                       defaultExtractor: content =>
                         content.match(/[A-Za-z0-9-_:!/]+/g) || [],
+                      whitelistPatternsChildren: [/^rs-/, /^py-/, /^ql-/],
                   }
                 : false,
         autoprefixer: {},
         cssnano:
-            env === 'development'
+            env === 'production'
                 ? {
                       preset: 'default',
                   }

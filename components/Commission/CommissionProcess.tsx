@@ -849,8 +849,8 @@ const CommissionProcess = () => {
     })
 
     return (
-        <NoSSR>
         <div>
+            <NoSSR>
             <CommissionSteps current={latest_idx} className="ml-5">
                 <CommissionStepItem>
                     <StepTitle date={start_date}>
@@ -1022,8 +1022,8 @@ const CommissionProcess = () => {
                     </Col>
                 </Row>
             </Grid>
+            </NoSSR>
         </div>
-        </NoSSR>
     )
 }
 

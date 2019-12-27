@@ -126,7 +126,14 @@ export function createStore<S, A extends StoreActions<Partial<S>>>(
     const useStoreHook = (initial_state?: Partial<S>) => {
         let i_state = { ...base_state, ...initial_state }
 
-        const [state, { setState }] = useMethods(methods, i_state)
+        let state, setState
+
+        if (is_server()) {
+            state = Object.assign({}, i_state)
+            setState = (s) => Object.assign(state, s)
+        } else {
+            [state, { setState }] = useMethods(methods, i_state)
+        }
 
         if (initial_state) {
             let initial_state_s = JSON.stringify(initial_state)

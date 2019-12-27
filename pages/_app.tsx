@@ -4,7 +4,7 @@ import React from 'react'
 import NProgress from 'nprogress'
 import Router from 'next/router'
 import localForage from 'localforage'
-import { Tina, TinaCMS } from 'tinacms'
+// import { Tina, TinaCMS } from 'tinacms'
 import { GitClient } from '@tinacms/git-client'
 
 import { Title } from '@components/App'
@@ -94,9 +94,9 @@ class KomplentApp extends App {
     tinacms: any
     constructor(props) {
         super(props)
-        this.tinacms = new TinaCMS()
+        // this.tinacms = new TinaCMS()
         const client = new GitClient('http://localhost:3005/___tina')
-        this.tinacms.registerApi('git', client)
+        // this.tinacms.registerApi('git', client)
     }
 
     render() {

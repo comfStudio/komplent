@@ -10,12 +10,13 @@ import { EVENT } from '@server/constants'
 
 import { t } from '@app/utility/lang'
 import { make_profile_urlpath, make_commission_urlpath } from '@utility/pages'
-import { get_profile_name, get_profile_avatar_url, get_commission_title } from '@utility/misc'
+import { get_profile_name, get_profile_avatar_url, get_commission_title, is_server } from '@utility/misc'
 import Image from '@components/App/Image'
 import { useUser } from '@hooks/user'
 import { fetch } from '@utility/request'
 
 import './DashboardActivity.scss'
+import { useMount } from 'react-use'
 
 interface NotificationProps {
     data: any
@@ -106,13 +107,7 @@ const Notification = (props: NotificationProps) => {
         }
     }
 
-    let date = t`Unknown`
-
-    try {
-        date = formatDistanceToNow(data?.created, { addSuffix: true })
-    } catch (err) {
-        date = formatDistanceToNow(new Date(), { addSuffix: true })
-    }
+    const date = formatDistanceToNow(data?.created ? new Date(data.created) : new Date(), { addSuffix: true })
 
     return (
         <Panel
