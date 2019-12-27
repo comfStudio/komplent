@@ -4,7 +4,7 @@ import { OK } from 'http-status-codes'
 
 import { with_middleware, ExApiRequest } from '@server/middleware'
 import { error_message, message } from '@utility/message'
-import { logout_user } from '@server/db'
+import { logout_user } from '@services/user'
 
 const cors = microCors({ allowMethods: ['POST', 'GET'] })
 

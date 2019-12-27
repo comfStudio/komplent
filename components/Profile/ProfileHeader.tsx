@@ -33,7 +33,7 @@ export const Avatar = props => {
 
     return (
         <div className="avatar">
-            <Image className="avatar-image" src={get_profile_avatar_url(profile_user || user)} w={"250px"} h={"250px"}/>
+            <Image className="avatar-image w-full h-full" src={get_profile_avatar_url(profile_user || user)} w={"250px"} h={"250px"}/>
         </div>
     )
 }

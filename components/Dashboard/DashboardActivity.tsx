@@ -21,12 +21,12 @@ interface NotificationProps {
     data: any
 }
 
-const CommissionTitle = ({commission_id, user}: {commission_id: string, user: any}) => {
-    const [title, set_title] = useState(t`A commission project`)
+const CommissionTitle = ({commission_id, user, className}: {commission_id: string, user: any, className?: string}) => {
+    const [title, set_title] = useState()
 
     useEffect(() => {
         if (commission_id) {
-            await fetch('/api/fetch', {
+            fetch('/api/fetch', {
                 method: 'post',
                 body: {
                     model: 'Commission',
@@ -42,7 +42,7 @@ const CommissionTitle = ({commission_id, user}: {commission_id: string, user: an
         }
     }, [commission_id, user])
 
-    return <span>{title}</span>
+    return <span className={className}>{t`The commission`} <span className="font-bold commission-title">{title}</span> {t`has been updated`}</span>
 }
 
 const Notification = (props: NotificationProps) => {
@@ -53,7 +53,7 @@ const Notification = (props: NotificationProps) => {
     const ref = useRef()
 
     let type_text = t`Unknown`
-    let content = t`Unknown`
+    let content: any = t`Unknown`
     let link_to = '#'
     const from_user = data.from_user
     const is_owner = user._id === from_user._id
@@ -100,10 +100,18 @@ const Notification = (props: NotificationProps) => {
                 _id: data.data.commission_id,
             })
             get_profile_name
-            link_el = <CommissionTitle commission_id={data.data.commission_id} user={user}/>
-            content = t`has been updated`
+            link_el = null
+            content = <CommissionTitle commission_id={data.data.commission_id} user={user}/>
             break
         }
+    }
+
+    let date = t`Unknown`
+
+    try {
+        date = formatDistanceToNow(data?.created, { addSuffix: true })
+    } catch (err) {
+        date = formatDistanceToNow(new Date(), { addSuffix: true })
     }
 
     return (
@@ -121,7 +129,7 @@ const Notification = (props: NotificationProps) => {
                 }}>
                 <div className="content">
                     <small className="header muted">
-                        <span className="type">{type_text}</span><span className="date">{formatDistanceToNow(data?.created ?? new Date(), { addSuffix: true })}</span>
+                        <span className="type">{type_text}</span><span className="date">{date}</span>
                     </small>
                     <div className="body">
                         {!!avatar_el && avatar_el}

@@ -1,28 +1,23 @@
 module.exports = ({ file, options, env }) => ({
     plugins: {
-        'postcss-import': options['postcss-import']
-            ? {
-                  resolve: options['postcss-import'].resolve,
-              }
-            : {},
+        'postcss-easy-import': {},
         tailwindcss: {},
-        autoprefixer: {},
         '@fullhuman/postcss-purgecss':
-            env === 'false'
+            env === 'development'
                 ? {
                       content: [
-                          './build/**/*.html',
-                          './pages/**/*.tsx',
-                          './components/**/*.tsx',
+                        './pages/**/*.{js,jsx,ts,tsx}',
+                        './components/**/*.{js,jsx,ts,tsx}',
                           // etc.
                       ],
                       // Include any special characters you're using in this regular expression
                       defaultExtractor: content =>
-                          content.match(/[\w-/:]+(?<!:)/g) || [],
+                        content.match(/[A-Za-z0-9-_:!/]+/g) || [],
                   }
                 : false,
+        autoprefixer: {},
         cssnano:
-            env === 'production'
+            env === 'development'
                 ? {
                       preset: 'default',
                   }

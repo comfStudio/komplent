@@ -8,14 +8,18 @@ export const iupdate = update
 
 export const is_server = () => typeof window === 'undefined'
 
-export const debounceReduce = (func, wait, combine = (acc, args) => (acc || []).concat(args)) => {
-    let allArgs; // accumulator for args across calls
+export const debounceReduce = (
+    func,
+    wait,
+    combine = (acc, args) => (acc || []).concat(args)
+) => {
+    let allArgs // accumulator for args across calls
 
-    const wrapper = debounce(() => func(allArgs), wait);
+    const wrapper = debounce(() => func(allArgs), wait)
 
     return (...args) => {
-      allArgs = combine(allArgs, [...args]);
-      wrapper();
+        allArgs = combine(allArgs, [...args])
+        wrapper()
     }
 }
 
@@ -30,7 +34,8 @@ export const decimal128ToFloat = (d: Decimal128) => {
     return n
 }
 
-export const decimal128ToPlainString = (d: Decimal128) => decimal128ToFloat(d).toString()
+export const decimal128ToPlainString = (d: Decimal128) =>
+    decimal128ToFloat(d).toString()
 
 export const decimal128ToMoney = (d: Decimal128) => {
     let n = dinero()
@@ -63,9 +68,10 @@ export const decimal128ToMoneyToString = (d: Decimal128) => {
     return moneyToString(decimal128ToMoney(d))
 }
 
-export const price_is_null = (d) => {
+export const price_is_null = d => {
     if (!d) return true
-    if (typeof d === 'object') return (d['$numberDecimal'] === null || d['$numberDecimal'] === undefined)
+    if (typeof d === 'object')
+        return d['$numberDecimal'] === null || d['$numberDecimal'] === undefined
     return false
 }
 
@@ -93,10 +99,12 @@ export function promisify_es_search(model, ...args) {
     })
 }
 
-export const get_commission_title = (commission, user) => { 
-    if (typeof user === 'string') user = {_id: user};
-    if (typeof commission?.to_user === 'object') commission.to_user = commission.to_user._id;
-    if (user?._id === commission.to_user) return commission.to_title
+export const get_commission_title = (commission, user) => {
+    if (typeof user === 'string') user = { _id: user }
+    if (typeof commission?.to_user === 'object')
+        commission.to_user = commission.to_user._id
+    if (user?._id === commission.to_user && commission.to_title)
+        return commission.to_title
     return commission.from_title
 }
 
@@ -107,7 +115,7 @@ export const get_profile_name = ({
     return name || username
 }
 
-export const get_profile_avatar_url = (profile) => {
+export const get_profile_avatar_url = profile => {
     return profile?.avatar?.paths?.[0]?.url
 }
 
@@ -115,4 +123,17 @@ export const get_highest_nsfw_level = (levels: NSFWType[]) => {
     if (levels?.includes(NSFW_LEVEL.level_10)) return NSFW_LEVEL.level_10
     if (levels?.includes(NSFW_LEVEL.level_5)) return NSFW_LEVEL.level_5
     return NSFW_LEVEL.level_0
+}
+
+export const generate_random_id = length => {
+    var result = ''
+    var characters =
+        'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+    var charactersLength = characters.length
+    for (var i = 0; i < length; i++) {
+        result += characters.charAt(
+            Math.floor(Math.random() * charactersLength)
+        )
+    }
+    return result
 }

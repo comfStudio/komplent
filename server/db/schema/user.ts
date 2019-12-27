@@ -18,7 +18,7 @@ export type CommissionProcessType = { type: CommissionPhaseType; done: boolean }
 
 export const user_schema = new Schema(
     {
-        name: { type: String, es_indexed: true },
+        name: { type: String, es_indexed: true, maxLength: 120, },
         type: {
             type: String,
             enum: ['creator', 'consumer', 'staff'],
@@ -32,13 +32,21 @@ export const user_schema = new Schema(
             es_indexed: true,
         },
         show_nsfw: { type: String, enum: nsfw_levels, default: NSFW_LEVEL.level_0 },
-        email: { type: String, unique: true, trim: true },
+        email_verified: { type: Boolean, default: false },
+        email: { type: String, lowercase: true, index: true, unique: true, trim: true },
+        oauth_google_id: { type: String, index: true, unique: true, sparse: true },
+        oauth_twitter_id: { type: String, index: true, unique: true, sparse: true },
+        oauth_pixiv_id: { type: String, index: true, unique: true, sparse: true },
+        oauth_facebook_id: { type: String, index: true, unique: true, sparse: true },
+        oauth_data: [ {type: Mixed} ],
         username: {
             type: String,
             unique: true,
+            index: true,
             trim: true,
             minLength: 3,
             maxLength: 60,
+            lowercase: true,
             es_indexed: true,
         },
         password: { type: String, minLength: 8, select: false },
@@ -225,8 +233,9 @@ user_schema.statics.check_exists = async function({ username, email }) {
 }
 
 export interface IUser extends Document {
-    username: string
-    password: string
+    username?: string
+    password?: string
+    email?: string
 }
 
 export interface IUserModel extends Model<IUser> {

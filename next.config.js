@@ -43,6 +43,8 @@ const withConfig = withNextRuntimeDotenv({
         'AWS_BUCKET_NAME',
         'PRIMUS_1_PORT',
         'PRIMUS_1_HOST',
+        'FACEBOOK_APP_SECRET',
+        'FACEBOOK_APP_ID',
         'GOOGLE_CLIENT_ID',
         'GOOGLE_CLIENT_SECRET',
         'AWS_ACCESS_KEY_ID',

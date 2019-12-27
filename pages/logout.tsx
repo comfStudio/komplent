@@ -22,6 +22,7 @@ export const Logout = () => {
 }
 
 class LogoutPage extends OptionalAuthPage {
+
     render() {
         return this.renderPage(
             <MainLayout noSidebar activeKey="logout">

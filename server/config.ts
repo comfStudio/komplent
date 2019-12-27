@@ -7,6 +7,8 @@ export const CONFIG = {
     PRIMUS_1_HOST: process.env.PRIMUS_1_HOST,
     PRIMUS_1_PORT: process.env.PRIMUS_1_PORT,
     RUNNING: process.env.RUNNING,
+    FACEBOOK_APP_ID: process.env.FACEBOOK_APP_ID,
+    FACEBOOK_APP_SECRET: process.env.FACEBOOK_APP_SECRET,
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
     AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID,

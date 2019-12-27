@@ -39,6 +39,29 @@ export const useUserStore = createStore(
         active_requests_count: 0,
     },
     {
+        update_user_token(token, redirect){
+            if (!is_server()) {
+                cookies.set({}, COOKIE_AUTH_TOKEN_KEY, token, {
+                    path: '/',
+                    maxAge: 60 * 60 * 24, // 1 day
+                })
+            }
+
+            if (redirect) {
+                Router.replace(
+                    typeof redirect === 'string'
+                        ? redirect
+                        : pages.dashboard
+                )
+            }
+
+        },
+        remove_user_token() {
+            if (!is_server()) {
+                cookies.destroy({}, COOKIE_AUTH_TOKEN_KEY)
+                console.log("removing")
+            }
+        },
         async login(data, redirect: boolean | string = false) {
             let r = await fetch('/api/login', {
                 method: 'post',
@@ -50,21 +73,9 @@ export const useUserStore = createStore(
                 let data = await r.json()
                 this.setState({ current_user: data.user, logged_in: true })
 
-                if (!is_server()) {
-                    cookies.set({}, COOKIE_AUTH_TOKEN_KEY, data.token, {
-                        path: '/',
-                        maxAge: 60 * 60 * 24, // 1 day
-                    })
-                }
+                this.update_user_token(data.token, redirect)
 
-                if (redirect) {
-                    Router.replace(
-                        typeof redirect === 'string'
-                            ? redirect
-                            : pages.dashboard
-                    )
-                }
-                return [true, null]
+                return [true, data.user]
             }
 
             return [false, (await r.json()).error]
@@ -75,9 +86,7 @@ export const useUserStore = createStore(
             })
 
             if (r.status == OK) {
-                if (!is_server()) {
-                    cookies.destroy({}, COOKIE_AUTH_TOKEN_KEY)
-                }
+                this.remove_user_token()
 
                 this.setState({ current_user: null, logged_in: false })
 
@@ -135,6 +144,21 @@ export const useUserStore = createStore(
                     { name: data.email, password: data.password },
                     redirect
                 )
+
+                return [true, null]
+            }
+
+            return [false, (await r.json()).error]
+        },
+        async finish_join(data, redirect = false) {
+            let r = await fetch('/api/join/oauth', {
+                method: 'post',
+                json: true,
+                body: data,
+            })
+
+            if (r.status == OK) {
+                this.update_user_token((await r.json()).data.token, redirect)
 
                 return [true, null]
             }

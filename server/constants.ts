@@ -174,3 +174,10 @@ export const FeeValue: Record<Fee, number> = {
 }
 
 export const minimumPayoutBalance = 5.0
+
+export enum ErrorPageType {
+    Generic,
+    Forbidden,
+    LoginNotFound,
+    LoginDuplicateEmail
+}

@@ -24,6 +24,7 @@ import { useUser } from '@hooks/user'
 import { Avatar } from '@components/Profile/ProfileHeader'
 import { useMountedState } from 'react-use'
 import { EmptyPanel } from '@components/App/Empty'
+import { OpenChat } from '@components/App/Assets'
 
 interface MessageProps {
     data: any
@@ -160,6 +161,7 @@ export const Conversation = (props: ConversationProps) => {
                         ))}
             </ul>
             }
+            {/* {!messages.length && <OpenChat/>} */}
             {!messages.length && <EmptyPanel type="Ghost" mood="shocked" subtitle={`Send your first message`}/>}
             <MessageInput onMessage={onMessage} />
         </Panel>

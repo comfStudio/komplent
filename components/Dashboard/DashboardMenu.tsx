@@ -16,7 +16,7 @@ const DashboardMenu = (props: Props) => {
                     eventKey="activity"
                     active={
                         props.activeKey == 'activity'
-                    }>{t`Notifications`}</Nav.Item>
+                    }>{t`Newsfeed`}</Nav.Item>
             </Link>
         </Nav>
     )

@@ -27,10 +27,6 @@ interface AsLoginProps {
 }
 
 const AsLoginPage = (props: AsLoginProps) => {
-    useEffect(() => {
-        Router.replace(props.requested_page, pages.login, { shallow: true })
-    }, [])
-
     return <LoginPage />
 }
 

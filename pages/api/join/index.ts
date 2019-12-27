@@ -5,7 +5,7 @@ import { BAD_REQUEST, OK } from 'http-status-codes'
 import { with_middleware, ExApiRequest } from '@server/middleware'
 import { error_message, message } from '@utility/message'
 import { User } from '@db/models'
-import { create_user } from '@server/db'
+import { create_user } from '@services/user'
 
 const cors = microCors({ allowMethods: ['POST'] })
 
@@ -22,10 +22,10 @@ export default with_middleware(
                         }))
                     ) {
                         await create_user({
-                            username: username,
-                            email: email,
-                            password: password,
-                        })
+                            username,
+                            email,
+                            password,
+                        }, {save: true})
                         res.status(OK).json(message('Joined'))
                     } else {
                         res.status(BAD_REQUEST).json(

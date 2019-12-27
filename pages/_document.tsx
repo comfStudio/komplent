@@ -20,7 +20,6 @@ class KomplentDocument extends Document {
         return (
             <Html>
                 <Head>
-                    <script src="/primus/primus.js"></script>
                 </Head>
                 <body>
                     <div

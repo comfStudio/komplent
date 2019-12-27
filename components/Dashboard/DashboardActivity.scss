@@ -49,5 +49,12 @@
         align-items: center;
         @apply pt-1;
     }
+ 
+    .commission-title {
+        overflow: hidden;
+        white-space:nowrap;
+        text-overflow:ellipsis;
+        max-width:150px;
+    }
     
 }

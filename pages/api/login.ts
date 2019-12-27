@@ -5,7 +5,7 @@ import { BAD_REQUEST, OK } from 'http-status-codes'
 import { with_middleware, ExApiRequest } from '@server/middleware'
 import { error_message, message } from '@utility/message'
 import { User } from '@db/models'
-import { login_user } from '@server/db'
+import { login_user } from '@services/user'
 
 const cors = microCors({ allowMethods: ['POST', 'OPTIONS'] })
 

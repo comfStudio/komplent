@@ -32,6 +32,24 @@ interface LoginFormProps extends HTMLElementProps {
     panel?: boolean
 }
 
+export const AuthButtons = () => (<ButtonToolbar>
+        <Link href="/api/auth/google" passHref>
+            <Button color="red" className="m-1" componentClass="a">
+                <Icon icon="google" /> Google
+            </Button>
+        </Link>
+        <Link href="/api/auth/facebook" passHref>
+            <Button color="blue" className="m-1" componentClass="a">
+                <Icon icon="facebook-official" /> Facebook
+            </Button>
+        </Link>
+        <Link href="/api/auth/twitter" passHref>
+            <Button color="cyan" className="m-1" componentClass="a">
+                <Icon icon="twitter" /> Twitter
+            </Button>
+        </Link>
+    </ButtonToolbar>)
+
 export const LoginForm = (props: LoginFormProps) => {
     const store = useUserStore()
     const [form_ref, set_form_ref] = useState(null)
@@ -46,23 +64,7 @@ export const LoginForm = (props: LoginFormProps) => {
     let form = (
         <div>
             <Divider>{t`Login with`}</Divider>
-            <ButtonToolbar>
-                <Link href="/api/auth/google" passHref>
-                    <Button color="red" className="m-1" componentClass="a">
-                        <Icon icon="google" /> Google
-                    </Button>
-                </Link>
-                <Link href="/api/auth/facebook" passHref>
-                    <Button color="blue" className="m-1" componentClass="a">
-                        <Icon icon="facebook-official" /> Facebook
-                    </Button>
-                </Link>
-                <Link href="/api/auth/twitter" passHref>
-                    <Button color="cyan" className="m-1" componentClass="a">
-                        <Icon icon="twitter" /> Twitter
-                    </Button>
-                </Link>
-            </ButtonToolbar>
+            <AuthButtons/>
             <Divider>{t`Or using your email address`}</Divider>
             <Form
                 fluid
