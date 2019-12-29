@@ -3,7 +3,7 @@ import { Icon, Nav, Dropdown, Badge } from 'rsuite'
 import Link from 'next/link'
 
 import { useUser, useProfileContext } from '@hooks/user'
-import { make_profile_urlpath } from '@utility/pages'
+import { make_profile_urlpath, get_profile_urlpart } from '@utility/pages'
 import { t } from '@app/utility/lang'
 
 import './NavUser.scss'
@@ -11,6 +11,7 @@ import { useMount } from 'react-use'
 import useUserStore, { useNotificationStore } from '@store/user'
 import { NoProfileContext } from '@client/context'
 import { get_profile_name } from '@utility/misc'
+import { useRouter } from 'next/router'
 
 interface Props {}
 
@@ -31,8 +32,9 @@ interface UserMenuProps {
 export const NavUserMenu = (props: UserMenuProps) => {
     let El = props.element
 
+    const router = useRouter()
     const user = useUser()
-    const { profile_owner } = useProfileContext()
+    const profile_owner = user.username === get_profile_urlpart(router.asPath).substring(1)
 
     const [dashboard_count, set_dashboard_count] = useState(0)
     const [followers_count, set_followers_count] = useState(0)

@@ -18,7 +18,7 @@ export const NavMenu = (props: Props) => {
     const logged_in = useLoginStatus()
 
     return (
-        <Navbar id="nav-menu">
+        <Navbar id="nav-menu" className="border-b">
             <Navbar.Header></Navbar.Header>
             <Navbar.Body className="flex flex-1 justify-center">
                 <Nav className="self-center flex-grow text-center">

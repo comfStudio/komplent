@@ -128,9 +128,9 @@ export const CommissionGuideline = () => {
                 const [gtext, set_gtext] = useState('')
 
                 return (
-                    <EditGroup key={gtype} title={titles(gtype)}>
+                    <EditGroup margin key={gtype} title={titles(gtype)}>
                         <EditSection>
-                            <List className="w-64">
+                            <List>
                                 {guidelines
                                     .filter(v => v.guideline_type === gtype)
                                     .map(({ guideline_type, value }, idx) => (

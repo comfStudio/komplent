@@ -8,6 +8,10 @@ import { ReactProps } from '@utility/props'
 import { t } from '@app/utility/lang'
 import * as pages from '@utility/pages'
 import { useUser } from '@hooks/user'
+import UserCard from '@components/User/UserCard'
+import { get_commission_title } from '@utility/misc'
+
+import './Commission.scss'
 
 interface MenuProps {
     activeKey?: string
@@ -71,38 +75,20 @@ const CommissionMenu = (props: MenuProps) => {
 interface Props extends ReactProps, MenuProps {}
 
 export const CommissionLayout = (props: Props) => {
+    const user = useUser()
     const store = useCommissionStore()
     let commission = store.get_commission()
 
     return (
         <MainLayout
             header={
-                <>
-                    <h3 className="pb-1 mb-2">
-                        <small>
-                            <Link
-                                href={pages.make_profile_urlpath(
-                                    commission.from_user
-                                )}>
-                                <Tag componentClass="a">
-                                    {commission.from_user.username}
-                                </Tag>
-                            </Link>
-                            →
-                            <Link
-                                href={pages.make_profile_urlpath(
-                                    commission.to_user
-                                )}>
-                                <Tag componentClass="a">
-                                    {commission.to_user.username}
-                                </Tag>
-                            </Link>
-                        </small>{' '}
-                        {commission.from_title}
-                    </h3>
+                <div className="commission-header">
+                    <UserCard data={user._id === commission.to_user._id ? commission.from_user : commission.to_user} bordered={false} small horizontal >
+                        <h3 className="m-0 p-0 leading-none">{get_commission_title(commission, user)}</h3>
+                    </UserCard>
                     <CommissionMenu {...props} />
-                </>
-            }>
+                </div>
+            } paddedTop>
             {props.children}
         </MainLayout>
     )

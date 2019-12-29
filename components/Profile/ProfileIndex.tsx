@@ -12,6 +12,7 @@ import { t } from '@app/utility/lang'
 import { ReviewsReel } from '@components/Profile/ProfileReviews'
 import { useProfileUser } from '@hooks/user'
 import { useDatabaseTextToHTML } from '@hooks/db'
+import UserHTMLText from '@components/App/UserHTMLText'
 
 export const ProfileIndex = () => {
     const {
@@ -31,9 +32,7 @@ export const ProfileIndex = () => {
             <GuidelineList />
             <h3>{t`About`}</h3>
             {!!!about_html && <Placeholder.Paragraph rows={8} />}
-            {!!about_html && (
-                <p dangerouslySetInnerHTML={{ __html: about_html }} />
-            )}
+            {!!about_html && <UserHTMLText html={about_html}/>}
         </Grid>
     )
 }

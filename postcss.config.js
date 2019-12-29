@@ -3,7 +3,7 @@ module.exports = ({ file, options, env }) => ({
         'postcss-easy-import': {},
         tailwindcss: {},
         '@fullhuman/postcss-purgecss':
-            env
+            env === 'production'
                 ? {
                       content: [
                         './pages/**/*.{js,jsx,ts,tsx}',

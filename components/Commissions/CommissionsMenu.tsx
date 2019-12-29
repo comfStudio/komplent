@@ -6,7 +6,7 @@ import { t } from '@app/utility/lang'
 import useUserStore from '@client/store/user'
 
 interface Props {
-    activeKey?: string
+    activeKey?: 'commissions' | 'requests'
 }
 
 const CommissionsMenu = (props: Props) => {

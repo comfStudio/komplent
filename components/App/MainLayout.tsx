@@ -112,8 +112,8 @@ export const MainLayout = (props: Props) => {
                 {props.noContainer && <Grid fluid className={'h-full !p-0'}>{layout_content}</Grid>}
                 {!props.noContainer && <PageContainer><Grid fluid className={'h-full !p-0'}>{layout_content}</Grid></PageContainer>}
             </Content>
-            <FooterLayout className="footer bg-secondary h-64">
-                <GridContainer fluid padded>
+            <FooterLayout className="footer bg-secondary h-64 ">
+                <GridContainer fluid padded className="px-5">
                     <Footer/>
                 </GridContainer>
             </FooterLayout>

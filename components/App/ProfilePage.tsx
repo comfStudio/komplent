@@ -100,7 +100,7 @@ class ProfilePage extends OptionalAuthPage<Props> {
         const profile_owner =
             props.useUserState.current_user &&
             profile_user &&
-            props.useUserState.current_user.username == profile_user.username
+            props.useUserState.current_user._id == profile_user._id
 
         let commissionRateStoreState = useCommissionRateStore.createState({})
         if (profile_user) {

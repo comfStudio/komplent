@@ -1,4 +1,5 @@
 import React, { useState, useContext } from 'react'
+import qs from 'qs'
 
 import {
     Form,
@@ -20,6 +21,7 @@ import { t } from '@app/utility/lang'
 import { LoginContext } from '@client/context'
 import useUserStore from '@client/store/user'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 
 const { StringType } = Schema.Types
 
@@ -32,23 +34,32 @@ interface LoginFormProps extends HTMLElementProps {
     panel?: boolean
 }
 
-export const AuthButtons = () => (<ButtonToolbar>
-        <Link href="/api/auth/google" passHref>
+export const AuthButtons = ({ next_page = undefined }: {next_page?: string}) => {
+
+    const router = useRouter()
+
+    next_page = next_page ? "?" + qs.stringify({ ...router.query, next: next_page }) : ""
+    
+    return (
+    <ButtonToolbar>
+        <Link href={`/api/auth/google${next_page}`} passHref>
             <Button color="red" className="m-1" componentClass="a">
                 <Icon icon="google" /> Google
             </Button>
         </Link>
-        <Link href="/api/auth/facebook" passHref>
+        <Link href={`/api/auth/facebook${next_page}`} passHref>
             <Button color="blue" className="m-1" componentClass="a">
                 <Icon icon="facebook-official" /> Facebook
             </Button>
         </Link>
-        <Link href="/api/auth/twitter" passHref>
+        <Link href={`/api/auth/twitter${next_page}`} passHref>
             <Button color="cyan" className="m-1" componentClass="a">
                 <Icon icon="twitter" /> Twitter
             </Button>
         </Link>
-    </ButtonToolbar>)
+    </ButtonToolbar>
+    )
+}
 
 export const LoginForm = (props: LoginFormProps) => {
     const store = useUserStore()

@@ -1,0 +1,62 @@
+.user-html-text {
+    @apply bg-gray-000;
+    @apply p-2;
+    @apply pb-4;
+    @apply rounded;
+
+        
+    h1 {
+        @apply text-2xl;
+        @apply font-normal;
+    }
+
+    h2 {
+        @apply text-xl;
+        @apply font-normal;
+    }
+
+    h3 {
+        @apply text-lg;
+        @apply font-normal;
+    }
+
+    h4 {
+        @apply text-base;
+        @apply font-normal;
+    }
+
+    h5 {
+        @apply text-sm;
+        @apply font-normal;
+    }
+
+    h6 {
+        @apply text-xs;
+        @apply font-normal;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        margin-bottom: 0.2em;
+        margin-top: 0.15em;
+    }
+
+    h1,
+    h2,
+    h3 {
+        padding-bottom: 0.1em;
+    }
+
+    strong {
+        @apply font-semibold;
+    }
+
+    p {
+
+    }
+
+}

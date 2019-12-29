@@ -594,14 +594,32 @@ export const useCommissionStore = createStore(
 
         async load(commission_id: string) {
             const phase_select = 'user done done_date type title data'
+
+            const p = [
+                {
+                    path: 'to_user',
+                    populate: [
+                        {
+                            path: 'avatar',
+                        },
+                    ]
+                },
+                {
+                    path: 'from_user',
+                    populate: [
+                        {
+                            path: 'avatar',
+                        },
+                    ]
+                },
+                { path: 'attachments' },
+                { path: 'phases', select: phase_select },
+                { path: 'stage', select: phase_select },
+            ]
             if (is_server()) {
                 try {
                     const r = await Commission.findById(commission_id)
-                        .populate('from_user')
-                        .populate('to_user')
-                        .populate('attachments')
-                        .populate('phases', phase_select)
-                        .populate('stage', phase_select)
+                        .populate(p)
                     return r.toJSON()
                 } catch (err) {
                     log.error(err)
@@ -615,13 +633,7 @@ export const useCommissionStore = createStore(
                         method: 'findById',
                         query: commission_id,
                         lean: false,
-                        populate: [
-                            'from_user',
-                            'to_user',
-                            'attachments',
-                            ['phases', phase_select],
-                            ['stage', phase_select],
-                        ],
+                        populate: [p],
                     },
                 }).then(async r => {
                     if (r.ok) {
@@ -729,11 +741,12 @@ export const useCommissionsStore = createStore(
             user,
             type: 'received'|'sent',
             search_query,
+            page: number,
             build = true,
             { ongoing = false, completed = false, failed = false, rejected = false, expired = false, accepted = false, not_accepted = false, active = false } = {}
         ) {
             let q = bodybuilder()
-            
+
             q = q.sort("updated", "desc")
             // q = q.sort("to_title", "asc")
             q = q.sort("from_title.keyword", "asc")
@@ -769,24 +782,70 @@ export const useCommissionsStore = createStore(
             }
 
             if (search_query) {
-                q = q.orQuery('multi_match', {
+                q = q.query('multi_match', {
                     query: search_query,
-                    fields: ['to_title^10'],
+                    fields: ['to_title', 'from_title'],
                 })
             }
 
-            q = q.from(0).size(30)
+            // TODO: use n-gram tokenizer for substring search
+
+            const limit = 30
+
+            q = q.from(page * limit).size(limit)
 
             return build ? q.build() : q
+        },
+        async query_commissions(type: 'commissions' | 'requests', user, is_creator, query, page = 0) {
+
+            let listtype = query.type ?? (is_creator ? 'received' : 'sent')
+
+            let btn_state
+
+            if (type === 'commissions') {
+                btn_state = {
+                    accepted: is_creator ? true : false,
+                    all: false,
+                    ongoing: query.ongoing === 'true',
+                    completed: query.completed === 'true',
+                    rejected: query.rejected === 'true',
+                    failed: query.failed === 'true',
+                    expired: query.expired === 'true',
+                }
+            } else if (type === 'requests') {
+                btn_state = {
+                    accepted: false,
+                    not_accepted: true,
+                    all: false,
+                    ongoing: query.active === 'true',
+                    failed: query.failed === 'true',
+                    rejected: query.rejected === 'true',
+                    expired: query.expired === 'true',
+                }
+            }
+
+            if (!Object.values(btn_state).some(Boolean)) {
+                btn_state.all = true
+            }
+
+            return await useCommissionsStore.actions.search_commissions(
+                user,
+                listtype,
+                query.commissions_q,
+                page,
+                btn_state
+            )
+
         },
         async search_commissions(
             user,
             type: 'received'|'sent',
             search_query,
+            page,
             { ongoing = false, completed = false, failed = false, rejected = false, expired = false, accepted = false, not_accepted = false, active = true } = {}
         ) {
             let r = []
-            let q = this.parse_search_query(user, type, search_query, false, {
+            let q = this.parse_search_query(user, type, search_query, page, false, {
                 ongoing,
                 completed,
                 failed,
@@ -801,7 +860,24 @@ export const useCommissionsStore = createStore(
                 hydrate: true,
                 hydrateOptions: {
                     lean: true,
-                    populate: 'to_user from_user',
+                    populate: [
+                        {
+                            path: 'to_user',
+                            populate: [
+                                {
+                                    path: 'avatar',
+                                },
+                            ]
+                        },
+                        {
+                            path: 'from_user',
+                            populate: [
+                                {
+                                    path: 'avatar',
+                                },
+                            ]
+                        }
+                    ],
                 },
             }
             let d: any

@@ -1,0 +1,20 @@
+.commission-panel-item {
+    > div {
+        @apply p-2;
+    }
+
+    .title {
+        @apply px-2;
+    }
+
+    .avatar {
+        width: 2.8em;
+        height: 2.8em;
+    }
+}
+
+.commission-header {
+    h3 {
+        line-height: 0;
+    }
+}

@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useLayoutEffect } from 'react'
 import Router from 'next/router'
-import { Grid, Row, Col, Icon, IconButton, Panel, Button, Input } from 'rsuite'
+import { Grid, Row, Col, Icon, IconButton, Panel, Button, Input, Modal, InputGroup } from 'rsuite'
 
 import {
     MainLayout,
@@ -25,9 +25,10 @@ import {
     GuidelineType,
     guideline_types,
 } from '@server/constants'
-import { dashboard } from '@utility/pages'
+import { dashboard, make_profile_urlpath } from '@utility/pages'
 import { get_profile_name } from '@utility/misc'
 import useUserStore from '@store/user'
+import * as pages from '@utility/pages'
 
 interface LayoutProps extends ReactProps, MenuProps {
     activeKey?: string
@@ -58,34 +59,56 @@ export const ProfileNameTag = () => {
     const store = useUserStore()
     const current_user = store.state.current_user
 
-    
     const [edit, set_edit] = useState(false)
     const [can_edit, set_can_edit] = useState(false)
-    
+
     useEffect(() => {
-        
         if (profile_owner) {
             set_can_edit(true)
         } else if (!profile_user && current_user) {
             set_can_edit(true)
         }
-
     }, [profile_owner, profile_user, current_user])
-    
-    const profile_name = get_profile_name(can_edit ? current_user : profile_user)
+
+    const profile_name = get_profile_name(
+        can_edit ? current_user : profile_user
+    )
 
     return (
         <>
-            {!edit && !can_edit && <h3 className="profile-name text-center">{profile_name}</h3>}
-            {!edit && can_edit && <h3 className="profile-name text-center"><Button appearance="subtle" className="!text-2xl !whitespace-normal" onClick={ev => {ev.preventDefault(); set_edit(true)}}>{profile_name}</Button></h3>}
-            {edit && <h3 className="profile-name text-center pt-1"><form onSubmit={ev => { 
-                ev.preventDefault()
-                const name = (new FormData(ev.target as any)).get("name")
-                if (name) {
-                    store.update_user({ name })
-                    set_edit(false)
-                }
-                }}><Input defaultValue={profile_name} name="name" /></form></h3>}
+            {!edit && !can_edit && (
+                <h3 className="profile-name text-center">{profile_name}</h3>
+            )}
+            {!edit && can_edit && (
+                <h3 className="profile-name text-center">
+                    <Button
+                        appearance="subtle"
+                        className="!text-2xl !whitespace-normal"
+                        onClick={ev => {
+                            ev.preventDefault()
+                            set_edit(true)
+                        }}>
+                        {profile_name}
+                    </Button>
+                </h3>
+            )}
+            {edit && (
+                <h3 className="profile-name text-center pt-1">
+                    <form
+                        onSubmit={ev => {
+                            ev.preventDefault()
+                            const name = new FormData(ev.target as any).get(
+                                'name'
+                            )
+                            if (name) {
+                                store.update_user({ name })
+                                set_edit(false)
+                            }
+                        }}>
+                        <Input defaultValue={profile_name} name="name" />
+                    </form>
+                </h3>
+            )}
         </>
     )
 }
@@ -130,9 +153,68 @@ export const RequireOwnProfileInverse = () => {
     return null
 }
 
-export const FollowButton = ({current_user, profile_user, follow, size = "lg", className="mx-3"}: {
-    current_user: any, profile_user:any, follow:any, size: string, className: string, appearance: string
-}) => {
+interface ProfileButtonProps {
+    current_user?: any
+    profile_user?: any
+    follow?: any
+    size?: any
+    className?: string
+    appearance?: any
+}
+
+export const ShareButton = ({
+    profile_user,
+    size = 'lg',
+    className = 'mx-2',
+    appearance,
+}: ProfileButtonProps) => {
+    if (!profile_user) {
+        const p = useProfileUser()
+        profile_user = p.profile_user
+    }
+
+    const [show, set_show] = useState(false)
+    const [url, set_url] = useState("")
+
+    useEffect(() => {
+        set_url(location.origin + make_profile_urlpath(profile_user))
+    }, [profile_user])
+
+    return (
+        <>
+        <Modal size="sm" show={show} onHide={() => { set_show(false)}}>
+          <Modal.Header>
+            <Modal.Title>{t`Share`}</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+              <p>
+                  <InputGroup>
+                    <InputGroup.Addon><Icon icon="globe" /></InputGroup.Addon>
+                    <Input defaultValue={url} readOnly/>
+                  </InputGroup>
+              </p>
+          </Modal.Body>
+        </Modal>
+        <IconButton
+            icon={<Icon icon="share" />}
+            appearance={appearance}
+            size={size}
+            className={className}
+            onClick={ev => {
+                ev.preventDefault()
+                set_show(true)
+            }}/>
+        </>
+    )
+}
+
+export const FollowButton = ({
+    current_user,
+    profile_user,
+    follow,
+    size = 'lg',
+    className = 'mx-3',
+}: ProfileButtonProps) => {
     if (!follow) {
         const p = useProfileUser()
         current_user = p.current_user
@@ -154,6 +236,10 @@ export const FollowButton = ({current_user, profile_user, follow, size = "lg", c
             onClick={ev => {
                 ev.preventDefault()
                 set_loading(true)
+                if (!current_user) {
+                    Router.push(pages.make_login_next_urlpath())
+                    return
+                }
                 if (follow_obj) {
                     update(
                         'Follow',
@@ -238,17 +324,21 @@ export const GuidelineList = () => {
                                 {guidelines
                                     .filter(v => v.guideline_type === gtype)
                                     .map(({ guideline_type, value }, idx) => (
-                                        <li key={idx.toString() + value}>
-                                            <Icon
-                                                icon={
-                                                    icons(guideline_type)
-                                                        .name as any
-                                                }
-                                                className={`mr-2 ${
-                                                    icons(guideline_type).color
-                                                }`}
-                                            />
+                                        <li className="flex justify-center content-center" key={idx.toString() + value}>
+                                            <div className="py-2">
+                                                <Icon
+                                                    icon={
+                                                        icons(guideline_type)
+                                                            .name as any
+                                                    }
+                                                    className={`mr-2 ${
+                                                        icons(guideline_type).color
+                                                    }`}
+                                                />
+                                            </div>
+                                            <div className="text-center border-b py-2">
                                             {value}
+                                            </div>
                                         </li>
                                     ))}
                             </ul>

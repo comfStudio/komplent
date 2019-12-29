@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { Panel, Button, Grid, Row, Col, FlexboxGrid, ButtonToolbar, IconButton, Icon } from 'rsuite'
 import Link from 'next/link'
+import classnames from 'classnames'
 
 import Image from '@components/App/Image'
 import { t } from '@app/utility/lang'
@@ -12,50 +13,78 @@ import {
     make_commission_rate_urlpath,
 } from '@utility/pages'
 import { get_profile_name, get_profile_avatar_url } from '@utility/misc'
+import { PanelProps } from 'rsuite/lib/Panel'
 
-interface Props extends HTMLElementProps {
+interface Props extends HTMLElementProps, PanelProps {
     data: any
     fluid?: boolean
+    horizontal?: boolean
+    small?: boolean
+    noLink?: boolean
+    childrenRight?: boolean
 }
 
-export const UserCard = ({ fluid = true, ...props }: Props) => {
+export const UserCard = ({ fluid = true, bordered = true, bodyFill = true, ...props }: Props) => {
 
-    const el = (
-        <Grid fluid>
-            <Row className="mb-1">
-                <Col xs={4}>
-                    <div className="avatar">
-                        <Image w={80} h={80} src={get_profile_avatar_url(props.data)} />
+    const avatar_el = <div className={classnames("avatar", {small: props.small})}>
+                        <Image w={props.small ? 40 : 80} h={props.small ? 40 : 80} src={get_profile_avatar_url(props.data)} />
                     </div>
-                </Col>
-                <Col xs={20}>
-                    <Row>
-                        <Col xs={24} className="name">
-                            {get_profile_name(props.data)} <span className="muted text-sm">(@{props.data.username})</span>
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col xs={24} className="buttons">
-                            <ButtonToolbar>
-                                <IconButton appearance="ghost" icon={<Icon icon="envelope"/>} size="sm">{t`Send Message`}</IconButton>
-                            </ButtonToolbar>
-                        </Col>
-                    </Row>
-                </Col>
-            </Row>
-        </Grid>
-    )
+
+    const name_el = <>{get_profile_name(props.data)} <span className="muted text-sm">(@{props.data.username})</span></>
+
+    const buttons_el = <ButtonToolbar className="mt-auto mb-auto pl-2 flex content-center justify-center">
+                            <IconButton appearance="ghost" icon={<Icon icon="envelope"/>} size={props.small ? "xs" : "sm"}>{t`Send Message`}</IconButton>
+                        </ButtonToolbar>
+
+    let el
+    
+    if (props.horizontal) {
+        el = <div className="flex">
+            <span>{avatar_el}</span>
+            <span className="flex ml-2 flex-1 content-center justify-center">
+                <span className="mt-auto mb-auto">
+                    {name_el}
+                </span>
+                {!props.childrenRight && <span className="flex-1 pl-2 mt-auto mb-auto">{props.children}</span>}
+                {props.childrenRight && buttons_el}
+                {props.childrenRight && <span className="flex-1 mt-auto mb-auto">{props.children}</span>}
+                {!props.childrenRight && buttons_el}
+            </span>
+        </div>
+    } else {
+        el = (
+            <Grid fluid>
+                <Row className="mb-1">
+                    <Col xs={4}>
+                        {avatar_el}
+                    </Col>
+                    <Col xs={20}>
+                        <Row>
+                            <Col xs={24} className="name">
+                                {name_el}
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col xs={24} className="buttons">
+                                {buttons_el}
+                            </Col>
+                        </Row>
+                    </Col>
+                </Row>
+            </Grid>
+        )
+    }
 
     return (
-        <Panel bordered bodyFill className={`user-card ${fluid && 'w-full'}`}>
-            {props.data.type === 'creator' &&
+        <Panel bordered = {bordered} bodyFill={bodyFill} className={classnames("user-card", {'w-full': fluid, horizontal: props.horizontal}, props.className)} {...props}>
+            {props.data.type === 'creator' && !props.noLink &&
             <Link href={make_profile_urlpath(props.data)}>
                 <a className="unstyled">
                     {el}
                 </a>
             </Link>
             }
-            {props.data.type !== 'creator' && el}
+            {(props.data.type !== 'creator' || props.noLink) && el}
         </Panel>
     )
 }

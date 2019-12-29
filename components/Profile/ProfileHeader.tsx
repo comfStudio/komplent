@@ -6,7 +6,7 @@ import { Container } from '@components/App/MainLayout'
 import { ReactProps } from '@utility/props'
 import { useProfileUser, useUser } from '@hooks/user'
 import { t } from '@app/utility/lang'
-import { FollowButton } from '.'
+import { FollowButton, ShareButton } from '.'
 import CommissionButton from '@components/Commission/CommissionButton'
 import { useHoverDirty } from 'react-use'
 import Upload from '@components/App/Upload'
@@ -69,6 +69,7 @@ export const ProfileHeader = (props: HeaderProps) => {
                         <React.Fragment>
                             <CommissionButton className="z-10" />
                             <FollowButton />
+                            <ShareButton/>
                         </React.Fragment>
                     )}
                     {props.children}

@@ -72,3 +72,12 @@ export const make_search_urlpath = (page, size, query) => {
     url += '?' + qs.stringify({...query, page, size})
     return url
 }
+
+export const make_login_next_urlpath = (next: string = undefined) => {
+    next = next ?? location.pathname + location.search
+    let url = login
+    if (next) {
+        url += '?' + qs.stringify({next})
+    }
+    return url
+}

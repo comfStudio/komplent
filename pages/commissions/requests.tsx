@@ -22,26 +22,12 @@ class RequestsPage extends CommissionsPage {
             
             listtype = ctx.query.type ?? (props.useUserState.is_creator ? 'received' : 'sent')
 
-            const btn_state = {
-                accepted: false,
-                not_accepted: true,
-                all: false,
-                ongoing: ctx.query.active === 'true',
-                failed: ctx.query.failed === 'true',
-                rejected: ctx.query.rejected === 'true',
-                expired: ctx.query.expired === 'true',
-            }
-            
-            if (!Object.values(btn_state).some(Boolean)) {
-                btn_state.all = true
-            }
-
-            commissionsStoreState.commissions = await useCommissionsStore.actions.search_commissions(
+            commissionsStoreState.commissions = await useCommissionsStore.actions.query_commissions(
+                "requests",
                 props.useUserState.current_user,
-                listtype,
-                ctx.query.q,
-                btn_state
-            )
+                props.useUserState.is_creator,
+                ctx.query
+                )
         }
 
         return {

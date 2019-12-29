@@ -10,6 +10,7 @@ import { useUser } from '@hooks/user'
 import { useMessageTextToHTML } from '@hooks/db'
 import { get_profile_name, price_is_null } from '@utility/misc'
 import PriceSuggestionForm from '@components/Form/PriceSuggestionForm'
+import UserHTMLText from '@components/App/UserHTMLText'
 
 const CommissionDescription = () => {
     const user = useUser()
@@ -77,7 +78,7 @@ const CommissionDescription = () => {
                 <Col xs={24}>
                     <h4 className="pb-1 mb-2">{t`Information`}</h4>
                     {!!!descr_html && <Placeholder.Paragraph rows={8} />}
-                    {!!descr_html && <p dangerouslySetInnerHTML={{ __html: descr_html }} />}
+                    {!!descr_html && <UserHTMLText html={descr_html} />}
                 </Col>
             </Row>
             <Row>

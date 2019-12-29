@@ -16,7 +16,6 @@ import { useUser } from '@hooks/user'
 import { fetch } from '@utility/request'
 
 import './DashboardActivity.scss'
-import { useMount } from 'react-use'
 
 interface NotificationProps {
     data: any

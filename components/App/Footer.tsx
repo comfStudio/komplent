@@ -40,7 +40,7 @@ const Footer = () => {
                     <dd>Support</dd>
                 </dl>
                 </Col>
-                <Col xsPush={6} xs={3}>
+                <Col xsPush={5} xs={3}>
                 <dl>
                     <dt><h4>{t`Follow Us`}</h4></dt>
                     <dd>Twitter</dd>

@@ -25,26 +25,12 @@ class Page extends CommissionsPage<Props> {
             
             listtype = ctx.query.type ?? (props.useUserState.is_creator ? 'received' : 'sent')
 
-            const btn_state = {
-                accepted: props.useUserState.is_creator ? true : false,
-                all: false,
-                ongoing: ctx.query.ongoing === 'true',
-                completed: ctx.query.completed === 'true',
-                rejected: ctx.query.rejected === 'true',
-                failed: ctx.query.failed === 'true',
-                expired: ctx.query.expired === 'true',
-            }
-            
-            if (!Object.values(btn_state).some(Boolean)) {
-                btn_state.all = true
-            }
-
-            commissionsStoreState.commissions = await useCommissionsStore.actions.search_commissions(
+            commissionsStoreState.commissions = await useCommissionsStore.actions.query_commissions(
+                "commissions",
                 props.useUserState.current_user,
-                listtype,
-                ctx.query.search,
-                btn_state
-            )
+                props.useUserState.is_creator,
+                ctx.query
+                )
         }
 
         return {

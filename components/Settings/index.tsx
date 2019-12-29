@@ -15,30 +15,32 @@ import {
     SelectPicker,
     InputNumber,
 } from 'rsuite'
+import classnames from 'classnames'
 
 import './Settings.scss'
 import { t } from '@app/utility/lang'
-import { ReactProps } from '@utility/props'
+import { ReactProps, HTMLElementProps } from '@utility/props'
 import MainLayout from '@components/App/MainLayout'
 import SettingsMenu from './SettingsMenu'
 
-interface EditFroupProps extends ReactProps {
+interface EditFroupProps extends ReactProps, HTMLElementProps {
     title?: string
+    margin?: boolean
 }
 
 export const EditGroup = (props: EditFroupProps) => {
     return (
-        <FormGroup className="edit-group">
+        <FormGroup className={classnames("edit-group", props.className)}>
             {!!props.title && (
-                <ControlLabel className="">{props.title}</ControlLabel>
+                <ControlLabel className={classnames({"!mb-4 block": props.margin})}>{props.title}</ControlLabel>
             )}
             {props.children}
         </FormGroup>
     )
 }
 
-export const EditSection = (props: ReactProps) => {
-    return <div className="edit-section">{props.children}</div>
+export const EditSection = (props: ReactProps & HTMLElementProps) => {
+    return <div className={classnames("edit-section", props.className)}>{props.children}</div>
 }
 
 interface Props extends ReactProps {

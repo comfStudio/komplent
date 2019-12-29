@@ -63,6 +63,7 @@ import Upload, { UploadProps } from '@components/App/Upload'
 import debounce from 'lodash/debounce'
 import { isBefore } from 'date-fns'
 import { EmptyPanel } from '@components/App/Empty'
+import UserHTMLText from '@components/App/UserHTMLText'
 
 const {
     StringType,
@@ -544,7 +545,7 @@ export const ProfileCommission = () => {
                         header={<h3>{t`Creator License`}: {selected_rate_obj.license.name}</h3>}
                         title={<h3>{t`Creator License`}: {selected_rate_obj.license.name}</h3>}
                         description={selected_rate_obj.license.description}
-                        body={<div dangerouslySetInnerHTML={{ __html: license_html }} />}
+                        body={<UserHTMLText html={license_html}/>}
                         control={<FormControl
                             name="license"
                             value="true"

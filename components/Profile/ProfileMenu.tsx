@@ -16,7 +16,7 @@ export const ProfileMenu = (props: Props) => {
     } = useProfileUser()
 
     return (
-        <Navbar className="">
+        <Navbar className="small">
             <Navbar.Body>
                 <Container>
                     <Nav activeKey={props.activeKey}>
@@ -56,7 +56,7 @@ export const ProfileMenu = (props: Props) => {
                                 <Nav.Item
                                     eventKey="edit"
                                     active={props.activeKey == 'edit'}>
-                                    {t`Edit Profile`}
+                                    {t`Edit Page`}
                                 </Nav.Item>
                             </Link>
                         )}

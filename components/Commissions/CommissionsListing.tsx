@@ -1,55 +1,21 @@
 import React, { useReducer } from 'react'
 import Link from 'next/link'
-import { List, Grid, Row, Col, Divider, Tag, ButtonToolbar, ButtonGroup, Button } from 'rsuite'
+import { List, Grid, Row, Col, Divider, Tag, ButtonToolbar, ButtonGroup, Button, PanelGroup } from 'rsuite'
+import { useRouter } from 'next/router'
 import qs from 'qs'
 
 import { useCommissionsStore } from '@client/store/commission'
+import * as pages from '@utility/pages'
 import { t } from '@utility/lang'
 import { useUser } from '@hooks/user'
 import { ReactProps } from '@utility/props'
-import * as pages from '@utility/pages'
-import { useRouter } from 'next/router'
+import { CommissionItemPanelProps, CommissionItemPanel } from '@components/Commission'
 
-interface CommissionItemProps {
-    data: any
-}
-
-const CommissionListItem = (props: CommissionItemProps) => {
-    const user = useUser()
-    const title =
-        user?._id === props.data.from_user._id
-            ? props.data.from_title
-            : props.data.to_title
-            ? props.data.to_title
-            : props.data.from_title
-
+const CommissionListItem = (props: CommissionItemPanelProps) => {
     return (
-        <Link href={pages.make_commission_urlpath({ _id: props.data._id })}>
-            <a className="unstyled">
-                <List.Item>
-                    {title}
-                    <span className="float-right">
-                        {!props.data.finished && !props.data.accepted && (
-                            <Tag color="orange">{t`On-hold`}</Tag>
-                        )}
-                        {!props.data.finished && props.data.accepted && (
-                            <Tag color="orange">{t`On-going`}</Tag>
-                        )}
-                        {props.data.finished && props.data.completed && (
-                            <Tag color="green">{t`Completed`}</Tag>
-                        )}
-                        {props.data.finished && !props.data.completed && (
-                            <Tag color="red">{t`Unsuccessful`}</Tag>
-                        )}
-                        {props.data.finished &&
-                            !props.data.completed &&
-                            props.data.expire_date && (
-                                <Tag color="yellow">{t`Expired`}</Tag>
-                            )}
-                    </span>
-                </List.Item>
-            </a>
-        </Link>
+        <List.Item className="!p-0">
+            <CommissionItemPanel {...props}/>
+        </List.Item>
     )
 }
 

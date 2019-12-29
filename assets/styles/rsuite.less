@@ -2,6 +2,8 @@
 
 @import 'rsuite_variables.less';
 
+// Panel
+
 .@{ns}panel {
     background: @panel-background-color;
 
@@ -27,6 +29,8 @@
   }
 }
 
+ // Tag
+
 .tag-subtle-variant(@background-color) {
   color: darken(@background-color, 15%);
   background-color: unset;
@@ -50,3 +54,54 @@
 }
 
 .generate-spectrum-subtle-tags;
+
+// Navbar
+
+.@{ns}navbar-nav {
+
+  // Nav item content
+  .@{ns}nav-item > .@{ns}nav-item-content {
+    line-height: @nav-item-line-height + 0.25;
+  }
+
+}
+
+.@{ns}navbar.small {
+
+  .@{ns}navbar-header {
+    height: @nav-bar-small-height;
+  }
+  
+  .@{ns}nav-item > .@{ns}nav-item-content {
+    height: @nav-bar-small-height;
+    line-height: @nav-item-line-height;
+  }
+
+}
+
+// Default Navbar
+.@{ns}navbar.@{ns}navbar-default {
+
+  .@{ns}navbar-nav .@{ns}nav-item > .@{ns}nav-item-content,
+  .@{ns}navbar-nav .@{ns}dropdown .@{ns}dropdown-toggle {
+    &:hover,
+    &:focus {
+      background-color: @nav-bar-default-hover-bg;
+      color: @nav-bar-default-hover-font-color;
+    }
+
+  }
+
+  .@{ns}input-group.@{ns}input-group-inside {
+
+    .@{ns}input {
+      height: @nav-bar-input-height;
+    }
+    
+    .@{ns}input-group-btn {
+      height: @nav-bar-input-height - 2px;
+      line-height: @nav-item-line-height + 1.1;
+    }
+
+  }
+}
