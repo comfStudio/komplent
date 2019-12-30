@@ -188,7 +188,16 @@ export const useInboxStore = createStore(
             let mdata = []
             let q = { conversation: conversation_id }
             let s = { created: -1 }
-            let p = 'user'
+            let p = [
+                {
+                    path: 'user',
+                    populate: [
+                        {
+                            path: 'avatar',
+                        },
+                    ]
+                },
+            ]
             if (is_server()) {
                 mdata = await Message.find(q)
                     .populate(p)
@@ -201,7 +210,7 @@ export const useInboxStore = createStore(
                     body: {
                         model: 'Message',
                         query: q,
-                        populate: p,
+                        populate: [p],
                         sort: s,
                         limit,
                     },

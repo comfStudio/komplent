@@ -18,13 +18,14 @@ import {
 import './InboxConversation.scss'
 import useInboxStore from '@store/inbox'
 import { t } from '@app/utility/lang'
-import { get_profile_name } from '@utility/misc'
+import { get_profile_name, get_profile_avatar_url } from '@utility/misc'
 import { formatDistanceToNow, toDate, format } from 'date-fns'
 import { useUser } from '@hooks/user'
 import { Avatar } from '@components/Profile/ProfileHeader'
 import { useMountedState } from 'react-use'
 import { EmptyPanel } from '@components/App/Empty'
 import { OpenChat } from '@components/App/Assets'
+import Image from '@components/App/Image'
 
 interface MessageProps {
     data: any
@@ -39,7 +40,7 @@ const Message = (props: MessageProps) => {
 
     return (
         <li className={`message${!owner ? ' right' : ''}`}>
-            <Avatar />
+            <Image src={get_profile_avatar_url(props.data.user)} w={50} h={50} className="avatar"/>
             <div className="body">
                 <span className="header">
                     <h4>{u_name}</h4>
