@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 
-import { Follow } from "@db/models"
+import { Follow, Commission } from "@db/models"
 
 const { ObjectId, Decimal128 } = mongoose.Types
 
@@ -66,15 +66,16 @@ export const get_top_commissioners =  async(user_id, limit = 10) => {
 }
 
 export const get_commissions_count =  async(user_id, to_user_id) => {
-   const data = await Follow.aggregate([
+   const data = await Commission.aggregate([
        {$project: {
-           follower: "$follower",
-           followee: "$followee",
-           end: "$end",
+            to_user: "$to_user",
+            from_user: "$from_user",
+            completed: "$completed",
        }},
        {$match: {
-           followee: ObjectId(user_id),
-           end: null,
+            to_user: ObjectId(to_user_id),
+            from_user: ObjectId(user_id),
+            completed: true,
        }},
        {$lookup: {
            from: "commissions",
@@ -114,12 +115,9 @@ export const get_commissions_count =  async(user_id, to_user_id) => {
            }
        },
        {$group: {
-           _id: "$follower",
-           count: { $sum: { $size: "$commissions" } },
-           follower: { $first: "$follower" }, 
-       }},
-       {$sort: { commissions : -1} },
-       {$limit: limit},
+         _id: null,
+         count:{$sum: 1},
+      }},
       ])
   
    return data

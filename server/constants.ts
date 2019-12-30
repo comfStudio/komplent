@@ -157,6 +157,10 @@ export enum AnalyticsType {
     commission_completion,
 }
 
+export enum AggregrateType {
+    user_commissions_count,
+}
+
 export const fee_types = tuple(
     'platform_payout',
     'platform_transaction',
