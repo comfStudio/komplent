@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Panel, Button, Grid, Row, Col, FlexboxGrid, ButtonToolbar, IconButton, Icon } from 'rsuite'
 import Link from 'next/link'
 import classnames from 'classnames'
+import { PanelProps } from 'rsuite/lib/Panel'
 
 import Image from '@components/App/Image'
 import { t } from '@app/utility/lang'
@@ -13,7 +14,35 @@ import {
     make_commission_rate_urlpath,
 } from '@utility/pages'
 import { get_profile_name, get_profile_avatar_url } from '@utility/misc'
-import { PanelProps } from 'rsuite/lib/Panel'
+import Tag, { TagProps } from 'rsuite/lib/Tag'
+
+export const CommissionBadge = ({data = undefined, color=undefined, ...props}: {data: any} & TagProps) => {
+    if (!data || data?.count === 0) {
+        return null
+    }
+
+    let text = t`Known`
+
+    if (data?.count > 0) {
+        if (data?.count < 3) {
+            text = t`Regular`
+            color="green"
+        } else if (data?.count < 6) {
+            text = t`Mega Regular`
+            color="blue"
+        } else {
+            text = t`Super Regular`
+            color="violet"
+        }
+
+    }
+
+    return (
+        <Tag color={color} {...props}>
+            {text}
+        </Tag>
+    )
+}
 
 interface Props extends HTMLElementProps, PanelProps {
     data: any
@@ -22,6 +51,7 @@ interface Props extends HTMLElementProps, PanelProps {
     small?: boolean
     noLink?: boolean
     childrenRight?: boolean
+    commissionCountData?: any
 }
 
 export const UserCard = ({ fluid = true, bordered = true, bodyFill = true, ...props }: Props) => {
@@ -43,7 +73,7 @@ export const UserCard = ({ fluid = true, bordered = true, bodyFill = true, ...pr
             <span>{avatar_el}</span>
             <span className="flex ml-2 flex-1 content-center justify-center">
                 <span className="mt-auto mb-auto">
-                    {name_el}
+                    {name_el} <CommissionBadge data={props.commissionCountData} className="ml-2"/>
                 </span>
                 {!props.childrenRight && <span className="flex-1 pl-2 mt-auto mb-auto">{props.children}</span>}
                 {props.childrenRight && buttons_el}

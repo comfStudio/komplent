@@ -78,47 +78,11 @@ export const get_commissions_count =  async(user_id, to_user_id) => {
             from_user: ObjectId(user_id),
             completed: true,
        }},
-       {$lookup: {
-           from: "commissions",
-           let: {
-               t_user: "$followee",
-               f_user: "$follower"
-            },
-            pipeline: [
-               {
-                  $match: {
-                     $expr: {
-                        $and: [
-                           {
-                              $eq: [
-                                 "$to_user",
-                                 "$$t_user"
-                              ]
-                           },
-                           {
-                              $eq: [
-                                 "$from_user",
-                                 "$$f_user"
-                              ]
-                           },
-                           {
-                               $eq: [
-                                  "$completed",
-                                  true
-                               ]
-                           }
-                        ]
-                     }
-                  }
-               }
-            ],
-            as: "commissions"
-           }
-       },
        {$group: {
          _id: null,
          count:{$sum: 1},
       }},
+      {$unset: ["_id"]},
       ])
   
    return data

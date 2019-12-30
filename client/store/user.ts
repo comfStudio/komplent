@@ -12,6 +12,7 @@ import { get_jwt_data, get_jwt_user } from '@server/middleware'
 import { update_db } from '@app/client/db'
 import user_schema, { user_store_schema } from '@schema/user'
 import { Follow, Tag, Notification, User, Commission } from '@db/models'
+import { get_commissions_count } from '@services/aggregates'
 
 export const fetch_user = async cookies_obj => {
     if (cookies_obj[COOKIE_AUTH_TOKEN_KEY]) {
@@ -232,6 +233,24 @@ export const useUserStore = createStore(
                 validate: true,
                 create: true,
             })
+        },
+        async get_commission_count(user_id, to_user_id) {
+            let d
+            if (is_server()) {
+                d = await get_commissions_count(user_id, to_user_id)
+            } else {
+                await fetch(pages.aggregates, {
+                    method: 'post',
+                    body: {
+                        args: [user_id, to_user_id]
+                    },
+                }).then(async r => {
+                    if (r.ok) {
+                        d = (await r.json()).data
+                    }
+                })
+            }
+            return d
         },
         async get_follow_count(type: 'follower' | 'followee', current_user) {
             let f = 0

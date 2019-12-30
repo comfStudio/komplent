@@ -14,6 +14,7 @@ export const commission_requests = '/commissions/requests'
 export const commissions = '/commissions'
 export const profile_stats = '/api/profile/stats'
 export const analytics = '/api/analytics'
+export const aggregates = '/api/aggregates'
 export const upload = '/api/upload'
 export const cdn_upload = '/api/cdn_upload'
 
