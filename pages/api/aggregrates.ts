@@ -8,22 +8,24 @@ import {
 } from '@server/middleware'
 import { AggregrateType } from '@server/constants'
 import { get_commissions_count } from '@services/aggregates'
+import { user_among } from '@utility/misc'
 
 export default with_auth_middleware(
     async (req: ExApiRequest, res: ExApiResponse) => {
         if (['post'].includes(req.method)) {
-            const { type, page, limit } = req.json
+            const { type, args } = req.json
 
             try {
                 if (type === AggregrateType.user_commissions_count) {
-                    return res.status(OK).json(data_message(await get_commissions_count(req.user, ))
+                    user_among(req.user, args)
+                    return res.status(OK).json(data_message(await get_commissions_count(...args)))
                 }
             } catch (err) {
                 return res.status(BAD_REQUEST).json(error_message(err))
             }
         
 
-            return res.status(BAD_REQUEST).json(error_message("no valid analytics type"))
+            return res.status(BAD_REQUEST).json(error_message("no valid aggregrate type"))
         }
 
 

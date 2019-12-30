@@ -137,3 +137,27 @@ export const generate_random_id = length => {
     }
     return result
 }
+
+export const user_among = (user: object | string, user_id_or_list: string | object | string[] | object[], raise_error=true) => {
+
+    if (typeof user_id_or_list === 'string') {
+        user_id_or_list = [user_id_or_list]
+    }
+
+    if (typeof user === 'object') {
+        user = (user as { _id: string })._id
+    }
+
+    if (typeof user_id_or_list === 'object') {
+        user_id_or_list = [(user_id_or_list as { _id: string })._id]
+    }
+
+    user_id_or_list = (user_id_or_list as any[]).map(v => typeof v === 'object' ? (v as { _id: string })._id : v)
+
+    const r = (user_id_or_list as string[]).includes(user)
+
+    if (!r && raise_error) {
+        throw Error("User permission error")
+    }
+    return r
+}

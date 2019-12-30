@@ -25,6 +25,8 @@ import {
     Divider,
     InputNumber,
     Modal,
+    Whisper,
+    Tooltip,
 } from 'rsuite'
 import Link from 'next/link'
 import qs from 'qs'
@@ -100,7 +102,7 @@ interface CommissionCardProps extends HTMLElementProps {
 }
 
 const CommissionCardHeader = (props: CommissionCardProps) => {
-    let { price, title, extras, negotiable, commission_deadline } = props.data
+    let { price, title, extras, description, commission_deadline } = props.data
     extras = props.extras || extras
 
     return (
@@ -108,6 +110,17 @@ const CommissionCardHeader = (props: CommissionCardProps) => {
             <span className="price">
                 {price_is_null(price) ? t`Custom` : decimal128ToMoneyToString(price)}
             </span>
+            <Whisper
+                trigger="click"
+                placement="top"
+                speaker={
+                <Tooltip>{description}</Tooltip>
+                    }
+                >
+            <span className="info">
+                <Icon icon="question2" size="lg"/>
+            </span>
+            </Whisper>
             <Row>
                 <Col xs={24}>
                     <h4 className="title inline-block">{title}</h4>

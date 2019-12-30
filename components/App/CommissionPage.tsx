@@ -17,14 +17,13 @@ class CommissionPage extends AuthPage<Props> {
     static async getInitialProps(ctx: NextPageContext) {
         const props = await super.getInitialProps(ctx)
         let error = null
-        let commissionStoreState
+        let commissionStoreState = useCommissionStore.createState({
+            commission: null,
+        })
 
         if (props.useUserState.logged_in) {
             const commission_id = ctx.query.commission_id as string
-            commissionStoreState = useCommissionStore.createState({
-                commission: null,
-                _current_user: props.useUserState.current_user,
-            })
+            commissionStoreState._current_user = props.useUserState.current_user
 
             if (commission_id) {
                 commissionStoreState.commission = await useCommissionStore.actions.load(
