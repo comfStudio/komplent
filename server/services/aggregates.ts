@@ -1,6 +1,6 @@
 import mongoose from 'mongoose'
 
-import { Follow, Commission } from "@db/models"
+import { Follow, Commission, Payment } from "@db/models"
 
 const { ObjectId, Decimal128 } = mongoose.Types
 
@@ -85,5 +85,27 @@ export const get_commissions_count =  async(user_id, to_user_id) => {
       {$unset: ["_id"]},
       ])
   
+   return data
+}
+
+
+export const get_user_total_spent_price = async(user_id, to_user_id) => {
+
+   const data = await Payment.aggregate([
+      {$project: {
+         to_user: "$to_user",
+         from_user: "$from_user",
+         price: "$price",
+      }},
+      {$match: {
+         to_user: ObjectId(to_user_id),
+         from_user: ObjectId(user_id),
+      }},
+      {$group: {
+         _id: null,
+         price:{$sum: 1},
+      }},
+   ])
+
    return data
 }

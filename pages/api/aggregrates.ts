@@ -7,7 +7,7 @@ import {
     ExApiResponse,
 } from '@server/middleware'
 import { AggregrateType } from '@server/constants'
-import { get_commissions_count } from '@services/aggregates'
+import { get_commissions_count, get_user_total_spent_price } from '@services/aggregates'
 import { user_among } from '@utility/misc'
 
 export default with_auth_middleware(
@@ -19,6 +19,9 @@ export default with_auth_middleware(
                 if (type === AggregrateType.user_commissions_count) {
                     user_among(req.user, args)
                     return res.status(OK).json(data_message(await get_commissions_count(...args)))
+                } else if (type === AggregrateType.user_spent_price) {
+                    user_among(req.user, args)
+                    return res.status(OK).json(data_message(await get_user_total_spent_price(...args)))
                 }
             } catch (err) {
                 return res.status(BAD_REQUEST).json(error_message(err))

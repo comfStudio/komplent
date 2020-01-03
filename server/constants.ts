@@ -159,6 +159,7 @@ export enum AnalyticsType {
 
 export enum AggregrateType {
     user_commissions_count,
+    user_spent_price,
 }
 
 export const fee_types = tuple(
