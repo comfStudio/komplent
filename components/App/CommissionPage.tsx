@@ -35,6 +35,18 @@ class CommissionPage extends AuthPage<Props> {
                 error = NOT_FOUND
                 ctx.res.statusCode = error
             } else {
+
+                if (useCommissionStore.actions.is_unlocked(props.useUserState.current_user, commissionStoreState.commission)) {
+                    commissionStoreState.products = await useCommissionStore.actions.load_products(
+                        commission_id
+                    )
+                }
+
+                commissionStoreState.commission_count = await useCommissionStore.actions.get_commission_count(
+                                props.useUserState.current_user._id,
+                                commissionStoreState.commission.from_user._id
+                                )
+
                 let is_owner
                 if (typeof props.useUserState.current_user._id === 'string') {
                     is_owner =

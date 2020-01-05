@@ -18,6 +18,8 @@ import { schedule_unique, schedule_now } from '@server/tasks'
 import { TASK, CommissionPhaseT, NSFW_LEVEL } from '@server/constants'
 import { CommissionPhase, Conversation, Commission, Image, Tag, User } from '@db/models'
 import { update_price_stats, update_delivery_time_stats } from '@services/analytics'
+import fairy from '@server/fairy'
+
 
 user_schema.pre('save', async function() {
     if (!this.name) {
@@ -46,6 +48,12 @@ user_schema.pre('save', async function() {
                     this.tags.unshift(expl._id)
                 }
             }
+        }
+    }
+
+    if (!this.isNew) {
+        if (this.isModified("email")) {
+            fairy.emit("user_email_changed", this, this.email)
         }
     }
 })
@@ -115,6 +123,10 @@ commission_schema.post('save', async function() {
                 to_user_id: this.to_user,
             },
         })
+    }
+
+    if (this.wasNew) {
+        fairy.emit("user_joined", this)
     }
 })
 

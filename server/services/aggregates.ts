@@ -65,47 +65,68 @@ export const get_top_commissioners =  async(user_id, limit = 10) => {
     return data
 }
 
-export const get_commissions_count =  async(user_id, to_user_id) => {
+export const get_commissions_count =  async(user_id, to_user_id: any) => {
 
-   const data = await Commission.aggregate([
-       {$project: {
-            to_user: "$to_user",
-            from_user: "$from_user",
-            completed: "$completed",
-       }},
-       {$match: {
-            to_user: ObjectId(to_user_id),
-            from_user: ObjectId(user_id),
-            completed: true,
-       }},
-       {$group: {
-         _id: null,
-         count:{$sum: 1},
-      }},
-      {$unset: ["_id"]},
-      ])
-  
+   let data: any = {}
+
+   if (!Array.isArray(to_user_id)) {
+      to_user_id = [to_user_id]
+   
+   }
+
+   for (let to_id of to_user_id) {
+      if (to_id === user_id || !to_id) continue
+      let d = await Commission.aggregate([
+          {$project: {
+               to_user: "$to_user",
+               from_user: "$from_user",
+               completed: "$completed",
+          }},
+          {$match: {
+               to_user: ObjectId(user_id),
+               from_user: ObjectId(to_id),
+               completed: true,
+          }},
+          {$group: {
+            _id: null,
+            count:{$sum: 1},
+         }},
+         {$unset: ["_id"]},
+         ])
+         data[to_id.toString()] = d?.[0]
+      }
+
    return data
 }
 
-
 export const get_user_total_spent_price = async(user_id, to_user_id) => {
 
-   const data = await Payment.aggregate([
-      {$project: {
-         to_user: "$to_user",
-         from_user: "$from_user",
-         price: "$price",
-      }},
-      {$match: {
-         to_user: ObjectId(to_user_id),
-         from_user: ObjectId(user_id),
-      }},
-      {$group: {
-         _id: null,
-         price:{$sum: 1},
-      }},
-   ])
+   let data: any = {}
+
+   if (!Array.isArray(to_user_id)) {
+      
+      to_user_id = [to_user_id]
+   }
+
+   for (let to_id of to_user_id) {
+      if (to_id === user_id || !to_id) continue
+      let d = await Payment.aggregate([
+         {$project: {
+            to_user: "$to_user",
+            from_user: "$from_user",
+            price: "$price",
+         }},
+         {$match: {
+            to_user: ObjectId(user_id),
+            from_user: ObjectId(to_id),
+         }},
+         {$group: {
+            _id: null,
+            price:{$sum: 1},
+         }},
+      ])
+      data[to_id.toString()] = d?.[0]
+   }
 
    return data
 }

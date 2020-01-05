@@ -13,6 +13,7 @@ import { update_db } from '@app/client/db'
 import user_schema, { user_store_schema } from '@schema/user'
 import { Follow, Tag, Notification, User, Commission } from '@db/models'
 import { get_commissions_count } from '@services/aggregates'
+import { update_user_creds } from '@services/user'
 
 export const fetch_user = async cookies_obj => {
     if (cookies_obj[COOKIE_AUTH_TOKEN_KEY]) {
@@ -204,6 +205,19 @@ export const useUserStore = createStore(
             }
 
             return f
+        },
+        async update_user_creds(data: object) {
+            return await fetch('/api/update_user_creds', {
+                method: 'post',
+                body: { data },
+            }).then(r => {
+                if (r.ok) {
+                    this.setState({
+                        current_user: { ...this.state.current_user, ...data },
+                    })
+                }
+                return r
+            })
         },
         async update_user(data: object) {
             let r = await update_db({

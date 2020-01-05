@@ -3,7 +3,7 @@ import { Placeholder } from 'rsuite'
 import classnames from 'classnames'
 import { HTMLElementProps } from '@utility/props'
 
-interface Props extends HTMLElementProps {
+interface Props extends HTMLElementProps, HTMLElementProps {
     w?: number | string
     h?: number | string
     fluid?: boolean
@@ -11,16 +11,17 @@ interface Props extends HTMLElementProps {
     loading?: boolean
 }
 
-export const Image = (props: Props) => {
-    let cls = classnames(props.className, { 'w-full': props.fluid })
+export const Image = ({loading, w, h, className, src, ...props}: Props) => {
+    let cls = classnames(className, { 'w-full': props.fluid, 'clickable': !!props.onClick })
 
-    return props.src ? (
-        <img className={cls} src={props.src} />
+    return src ? (
+        <img {...props} className={cls} src={src} />
     ) : (
         <Placeholder.Graph
-            active={props.loading}
-            width={props.w}
-            height={props.h}
+            {...props}
+            active={loading}
+            width={w}
+            height={h}
             className={cls}
             style={{ margin: 0 }}
         />

@@ -6,7 +6,7 @@ import { useRouter } from 'next/router'
 import CreatorCard from '@components/User/CreatorCard'
 import * as pages from '@utility/pages'
 
-export const ResultLayout = ({UserComponent = CreatorCard, ...props}: {size: number, count: number, page: number, items: any[], UserComponent: React.ElementType}) => {
+export const ResultLayout = ({UserComponent = CreatorCard, userComponentProps = undefined, ...props}: {size: number, count: number, page: number, items: any[], UserComponent: React.ElementType, userComponentProps?: object}) => {
     const router = useRouter()
 
     const page_count = Math.floor(props.count / props.size)
@@ -35,7 +35,7 @@ export const ResultLayout = ({UserComponent = CreatorCard, ...props}: {size: num
                             {props.items.map(u => {
                                 return (
                                     <FlexboxGrid.Item key={u._id} componentClass={Col} colspan={6} md={8}>
-                                        <UserComponent data={u} />
+                                        <UserComponent data={u} {...userComponentProps} />
                                     </FlexboxGrid.Item>
                                 )
                             })}

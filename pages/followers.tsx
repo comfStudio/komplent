@@ -12,7 +12,7 @@ class Page extends FollowPage {
     render() {
         return this.renderPage(
             <MainLayout activeKey="followers">
-                <FollowLayout UserComponent={UserCard} />
+                <FollowLayout UserComponent={UserCard} userComponentProps={{commissionCountData: this.props.followStoreState.commission_count}} />
             </MainLayout>
         )
     }

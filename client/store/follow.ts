@@ -3,11 +3,13 @@ import { is_server } from "@utility/misc";
 import { Follow } from "@db/models";
 import { fetch } from '@utility/request'
 import { get_top_commissioners } from '@services/aggregates'
+import useUserStore from "./user";
 
 export const useFollowStore = createStore(
     {
         items: [],
         top_commissioners: [],
+        commission_count: undefined,
         count: 0,
         size: 30,
         page: 1,
@@ -106,5 +108,6 @@ export const useFollowStore = createStore(
             f = f.map(v => v[p_key])
 
             return f
-        }
+        },
+        get_commission_count: useUserStore.actions.get_commission_count
     })

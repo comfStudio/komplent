@@ -25,6 +25,10 @@ class FollowPage extends AuthPage<Props> {
             const size = parseInt((ctx.query.size as string) ?? '30')
 
             followStoreState.items = await useFollowStore.actions.load_items(this.type, props.useUserState.current_user, page, size)
+            if (this.type === 'followee') {
+                followStoreState.commission_count = await useFollowStore.actions.get_commission_count(
+                props.useUserState.current_user._id, followStoreState.items.map(v => v._id))
+            }
 
         }
 

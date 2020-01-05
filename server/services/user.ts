@@ -32,9 +32,14 @@ export const create_user = async (data: IUser, { save = true, randomize_username
     return await update_user_creds(u, data, {save, randomize_username})
 }
 
-export const update_user_creds = async (user, data: IUser, { save = true, randomize_username = false } = {}) => {
+export const update_user_creds = async (user, data: IUser, { save = true, randomize_username = false, require_old_password = false } = {}) => {
 
     if (data.password) {
+        if (require_old_password) {
+            if (!await check_user_password(user, data.old_password || "")) {
+                throw Error("Old password does not match")
+            }
+        }
         user.password = await bcrypt.hash(data.password, CRYPTO_COST_FACTOR)
         delete data.password
     }
@@ -70,9 +75,13 @@ export const update_user_creds = async (user, data: IUser, { save = true, random
     return user
 }
 
+export const check_user_password = async(user: IUser, password) => {
+    return await bcrypt.compare(password, user.password)
+}
+
 export const login_user = async (user: IUser, password, req, res) => {
     if (user) {
-        let r = await bcrypt.compare(password, user.password)
+        let r = await check_user_password(user, password)
         if (r) {
             return login_user_without_password(user, req, res)
         }

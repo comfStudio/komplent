@@ -1,4 +1,4 @@
-import { es_index, configure, es_date_type } from '.'
+import { es_index, configure, es_date_type, optional_with_length } from '.'
 import mongoose, { Document, Model } from 'mongoose'
 import { tag_schema } from '@schema/general'
 import { comission_rate_schema } from './commission'
@@ -48,6 +48,7 @@ export const user_schema = new Schema(
             maxLength: 60,
             lowercase: true,
             es_indexed: true,
+            validate: optional_with_length(3, 60)
         },
         password: { type: String, minLength: 8, select: false },
         avatar: {

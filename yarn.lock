@@ -1908,6 +1908,11 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-10.14.22.tgz#34bcdf6b6cb5fc0db33d24816ad9d3ece22feea4"
   integrity sha512-9taxKC944BqoTVjE+UT3pQH0nHZlTvITwfsOZqyc+R3sfJuxaTtxWjfn1K2UlxyPcKHf0rnaXcVFrS9F9vf0bw==
 
+"@types/node@^12.7.2":
+  version "12.12.24"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-12.12.24.tgz#d4606afd8cf6c609036b854360367d1b2c78931f"
+  integrity sha512-1Ciqv9pqwVtW6FsIUKSZNB82E5Cu1I2bBTj1xuIHXLe/1zYLl3956Nbhg2MzSYHVfl9/rmanjbQIb7LibfCnug==
+
 "@types/prop-types@*":
   version "15.7.3"
   resolved "https://registry.yarnpkg.com/@types/prop-types/-/prop-types-15.7.3.tgz#2ab0d5da2e5815f94b0b9d4b95d1e5f243ab2ca7"
@@ -7003,6 +7008,11 @@ fsevents@~2.1.2:
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/fsevents/-/fsevents-2.1.2.tgz#4c0a1fb34bc68e543b4b82a9ec392bfbda840805"
   integrity sha512-R4wDiBwZ0KzpgOWetKDug1FZcYhqYnUYKtfZYt4mD5SBz76q0KR4Q9o7GIPamsVPGmW3EYPPJ0dOOjvx32ldZA==
+
+fslightbox-react@^1.4.7:
+  version "1.4.7"
+  resolved "https://registry.yarnpkg.com/fslightbox-react/-/fslightbox-react-1.4.7.tgz#90eb92144b0cd9a740c5b286907de264d8e23903"
+  integrity sha512-1JqRerqPXQoRugLq0++Zv4I++f7ueQf4FQZR/AvSzIrlJX6q5T+R6EQ2DNPWFBm/2Vc7ixRz9lWc1C8UzGiYyg==
 
 fstream@^1.0.0, fstream@^1.0.12:
   version "1.0.12"
@@ -15505,6 +15515,19 @@ ts-pnp@^1.1.2:
   version "1.1.4"
   resolved "https://registry.yarnpkg.com/ts-pnp/-/ts-pnp-1.1.4.tgz#ae27126960ebaefb874c6d7fa4729729ab200d90"
   integrity sha512-1J/vefLC+BWSo+qe8OnJQfWTYRS6ingxjwqmHMqaMxXMj7kFtKLgAaYW3JeX3mktjgUL+etlU8/B4VUAUI9QGw==
+
+tsargs@^1.4.0:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/tsargs/-/tsargs-1.4.0.tgz#9a61a743a16e5f461fb9bf0f2af93b5d56ea675d"
+  integrity sha512-ml6SzWtY/fg1TUiQ33ingoUQXW16moiX07nOxF/v7I1ngMUzxb0Ii1rQ1nUh3noAyPQxrYIb0GLWDjImTJ9D2Q==
+
+tsee@^1.3.0:
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/tsee/-/tsee-1.3.0.tgz#39b61d5257042078fe14a85e4a9fd90dc7673d48"
+  integrity sha512-GgslWDOWe+6m2n2yV456NH2QVHHpnZOAjIZZ5/o5olvK3NkGjYX/59/7+Ool+nNKFIiWy3mTBL5pyKv3dy5bLQ==
+  dependencies:
+    "@types/node" "^12.7.2"
+    tsargs "^1.4.0"
 
 tslib@^1.10.0, tslib@^1.8.1, tslib@^1.9.0:
   version "1.10.0"

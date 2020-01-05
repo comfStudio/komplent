@@ -57,6 +57,16 @@ export const AuthButtons = ({ next_page = undefined }: {next_page?: string}) => 
                 <Icon icon="twitter" /> Twitter
             </Button>
         </Link>
+        <Link href={`/api/auth/instagram${next_page}`} passHref>
+            <Button color="cyan" className="m-1" componentClass="a">
+                <Icon icon="instagram" /> Instagram
+            </Button>
+        </Link>
+        {/* <Link href={`/api/auth/pixiv${next_page}`} passHref>
+            <Button color="cyan" className="m-1" componentClass="a">
+                <Icon icon="pixiv" /> Pixiv
+            </Button>
+        </Link> */}
     </ButtonToolbar>
     )
 }

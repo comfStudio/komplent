@@ -48,6 +48,7 @@ export const update_db = async (params: UpdateDBParams) => {
         model: params.model,
         data: is_object ? doc : doc.toJSON(),
         populate: params.populate,
+        validate: params.validate
     }
 
     let r = await fetch('/api/update', {

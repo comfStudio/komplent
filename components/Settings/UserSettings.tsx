@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { Grid, RadioGroup, Radio, SelectPicker, Button, Icon, List, CheckboxGroup, Toggle } from 'rsuite'
+import React, { useState, useEffect } from 'react'
+import { Grid, RadioGroup, Radio, SelectPicker, Button, Icon, List, CheckboxGroup, Toggle, InputGroup, Input } from 'rsuite'
 import { EditGroup, EditSection } from '.'
 
 import { t } from '@app/utility/lang'
@@ -7,6 +7,8 @@ import useUserStore from '@store/user'
 import { getCountryNames } from '@client/dataset'
 import Upload from '@components/App/Upload'
 import { ProfileNSFWLevel } from '@components/Profile/ProfileEdit'
+import InputGroupAddon from 'rsuite/lib/InputGroup/InputGroupAddon'
+import { username_validate, email_validate, password_validate } from '@components/Form/JoinForm'
 
 export const UserType = () => {
     return (
@@ -95,6 +97,168 @@ export const Notifications = () => {
     )
 }
 
+export const Integrations = () => {
+
+    const store = useUserStore()
+
+    let auth_data = {}
+    store.state.current_user?.oauth_data?.map(v => { auth_data[v.provider] = v })
+
+    const providers = [
+        {provider: 'google', icon: <Icon icon="google"/>, name: t`Google`, linked: !!auth_data['google'], link_name: auth_data['google']?.info?.names?.[0]?.displayName},
+        {provider: 'facebook', icon: <Icon icon="facebook-official"/>, name: t`Facebook`, linked: !!auth_data['facebook'], link_name: auth_data['facebook']?.info?.name},
+        {provider: 'twitter', icon: <Icon icon="twitter"/>, name: t`Twitter`, linked: !!auth_data['twitter'], link_name: auth_data['twitter']?.info?.names?.[0]?.displayName},
+        {provider: 'instagram', icon: <Icon icon="instagram"/>, name: t`Instagram`, linked: !!auth_data['instagram'], link_name: auth_data['instagram']?.info?.names?.[0]?.displayName},
+        {provider: 'pixiv', icon: <Icon icon="globe"/>, name: t`Pixiv`, linked: !!auth_data['pixiv'], link_name: auth_data['pixiv']?.info?.names?.[0]?.displayName},
+    ]
+
+    return (
+        <EditGroup>
+            {providers.map(v => 
+                <div key={v.provider} className="mb-4">
+                    {v.icon} <span className="mr-2">{v.name}: {v.linked ? <><span className="text-primary">{v.link_name}</span> <Button appearance="ghost" size="xs">{t`Unlink`}</Button> </> : <Button appearance="ghost" size="xs">{t`Link`}</Button>}</span>
+                </div>
+            )}
+        </EditGroup>
+    )
+}
+
+export const Username = () => {
+    const store = useUserStore()
+
+    const [username, set_username] = useState(store.state.current_user?.username)
+    const [error, set_error] = useState("")
+
+    return (
+        <EditGroup margin title={t`Username` + ':'}>
+            <InputGroup className="!w-128">
+            <InputGroupAddon>@</InputGroupAddon>
+            <Input value={username} onChange={v => {
+                const r = username_validate.check(v, {})
+                set_username(v);
+                if (r.hasError) {
+                    set_error(r.errorMessage)
+                } else {
+                    set_error("")
+                }
+                }}/>
+                {!!!error && username.length > 1 && username != store.state.current_user?.username &&
+                <InputGroup.Button appearance="primary" onClick={() => {
+                    store.update_user_creds({ username }).then(r => {
+                        if (!r.ok) {
+                            set_error(t`An error occurred, try again with another username`)
+                        }
+                    }) }}>{t`Update`}</InputGroup.Button>
+                }
+            </InputGroup>
+            {error && <p className="text-red-500">{error}</p>}
+        </EditGroup>
+    )
+}
+
+export const Email = () => {
+    const store = useUserStore()
+
+    const [email, set_email] = useState(store.state.current_user?.email)
+    const [error, set_error] = useState("")
+
+
+    return (
+        <EditGroup margin title={t`Email` + ':'}>
+            <InputGroup className="!w-128">
+            <Input value={email} onChange={v => {
+                const r = email_validate.check(v, {})
+                set_email(v);
+                if (r.hasError) {
+                    set_error(r.errorMessage)
+                } else {
+                    set_error("")
+                }
+            }}/>
+                {!!!error && email.length > 1 && email != store.state.current_user?.email &&
+                <InputGroup.Button appearance="primary" onClick={() => {
+                    store.update_user_creds({ email }).then(r => {
+                        if (!r.ok) {
+                            set_error(t`An error occurred, try again with another email`)
+                        }
+                    }) }}>{t`Update`}</InputGroup.Button>
+                }
+            </InputGroup>
+            {error && <p className="text-red-500">{error}</p>}
+        </EditGroup>
+    )
+}
+
+export const Password = () => {
+    const store = useUserStore()
+
+    const [show, set_show] = useState(false)
+    const [old_password, set_old_password] = useState("")
+    const [password_1, set_password_1] = useState("")
+    const [password_2, set_password_2] = useState("")
+    const [error, set_error] = useState("")
+    const [error_3, set_error_3] = useState("")
+    const [error_2, set_error_2] = useState("")
+
+    useEffect(() => {
+        set_show(false)
+        set_password_1("")
+        set_password_2("")
+    }, [store.state.current_user?.password])
+
+    useEffect(() => {
+        if (password_1 === password_2) {
+            set_error_2("")
+        } else {
+            set_error_2(t`The two passwords do not match`)
+        }
+    }, [password_1])
+
+    useEffect(() => {
+        set_error_3("")
+    }, [password_1, password_2, old_password])
+
+    return (
+        <EditGroup margin title={t`Password` + ':'}>
+            {!show && <Button onClick={() => { set_show(true) }}>{t`Change password`}</Button>}
+            {show && <>
+                <div className="mb-2 w-128">
+                    <Input placeholder={t`Old password`} type="password" onChange={v => {
+                        set_old_password(v);
+                    }}/>
+                </div>
+                <div className="mb-2 w-128">
+                    <Input placeholder={t`New password`} type="password" value={password_2} onChange={v => {
+                        const r = password_validate.check(v, {})
+                        set_password_2(v);
+                        if (r.hasError) {
+                            set_error(r.errorMessage)
+                        } else {
+                            set_error("")
+                        }
+                    }}/>
+                </div>
+                <InputGroup className="!w-128">
+                <Input placeholder={t`Repeat new password`} type="password" value={password_1} onChange={v => {
+                    set_password_1(v);
+                }}/>
+                    {!!!error && !!!error_2 && !!!error_3 && password_1.length > 1 && old_password.length > 1 &&
+                    <InputGroup.Button appearance="primary" onClick={() => {
+                        store.update_user_creds({ password: password_1, old_password }).then(r => {
+                            if (!r.ok) {
+                                set_error_3(t`An error occurred, try again`)
+                            }
+                        }) }}>{t`Update`}</InputGroup.Button>
+                    }
+                </InputGroup>
+                {error && <p className="text-red-500">{error}</p>}
+                {error_2 && <p className="text-red-500">{error_2}</p>}
+                {error_3 && <p className="text-red-500">{error_3}</p>}
+            </>}
+        </EditGroup>
+    )
+}
+
 const UserSettings = () => {
     return (
         <Grid fluid>
@@ -110,6 +274,7 @@ const UserSettings = () => {
             </EditSection> */}
             <h4>{t`Integrations`}</h4>
             <EditSection>
+                <Integrations/>
             </EditSection>
             <h4>{t`Email Notifications`}</h4>
             <EditSection>
@@ -118,6 +283,9 @@ const UserSettings = () => {
             <h4>{t`Account`}</h4>
             <EditSection>
                 <UserType />
+                <Username/>
+                <Email/>
+                <Password/>
                 <Button
                     appearance="ghost"
                     color="red">{t`Delete account`}</Button>

@@ -25,7 +25,6 @@ const DashboardLayout = (props: Props) => {
             <GridContainer fluid>
                 <Row>
                     <Col xs={24}>
-                        {!!logged_in && <UserTypeModal />}
                         {props.children}
                     </Col>
                 </Row>

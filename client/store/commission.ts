@@ -35,6 +35,7 @@ import log from '@utility/log'
 import { OK } from 'http-status-codes'
 import { license_schema } from '@schema/general'
 import { conversation_schema } from '@schema/message'
+import useUserStore from './user'
 
 export const useCommissionStore = createStore(
     {
@@ -42,7 +43,9 @@ export const useCommissionStore = createStore(
         commission: undefined,
         stages: [] as CommissionProcessType[],
         active_conversation: undefined as any,
+        commission_count: undefined,
         messages: [],
+        products: []
     },
     {
         get_messages: useInboxStore.actions.get_messages,
@@ -592,9 +595,43 @@ export const useCommissionStore = createStore(
             return await this.update(this._end(successfully))
         },
 
+        async load_products(commission_id: string) {
+
+            const comm_select = 'products'
+            const p = "products"
+            if (is_server()) {
+                try {
+                    const r = await Commission.findById(commission_id)
+                        .populate(p).select(comm_select)
+                    return r.toJSON()?.products
+                } catch (err) {
+                    log.error(err)
+                    return null
+                }
+            } else {
+                return await fetch('/api/fetch', {
+                    method: 'post',
+                    body: {
+                        model: 'Commission',
+                        method: 'findById',
+                        query: commission_id,
+                        lean: false,
+                        populate: p,
+                        select: comm_select
+                    },
+                }).then(async r => {
+                    if (r.ok) {
+                        return (await r.json()).data?.products
+                    }
+                    return null
+                })
+            }
+        },
+
         async load(commission_id: string) {
             const phase_select = 'user done done_date type title data'
 
+            const comm_select = '-products'
             const p = [
                 {
                     path: 'to_user',
@@ -619,7 +656,7 @@ export const useCommissionStore = createStore(
             if (is_server()) {
                 try {
                     const r = await Commission.findById(commission_id)
-                        .populate(p)
+                        .populate(p).select(comm_select)
                     return r.toJSON()
                 } catch (err) {
                     log.error(err)
@@ -634,6 +671,7 @@ export const useCommissionStore = createStore(
                         query: commission_id,
                         lean: false,
                         populate: [p],
+                        select: comm_select
                     },
                 }).then(async r => {
                     if (r.ok) {
@@ -711,6 +749,22 @@ export const useCommissionStore = createStore(
 
             return p_stages
         },
+        is_unlocked(user, commission) {
+            let is_owner = user?._id === commission.from_user._id
+            let unlocked = !is_owner
+
+            if (is_owner && commission.phases.some(v => {
+                if (v.type === 'unlock' && v.done) {
+                    return true
+                }
+                return false
+                })) {
+                    unlocked = true
+            }
+
+            return unlocked
+        },
+        get_commission_count: useUserStore.actions.get_commission_count,
     }
 )
 
@@ -1030,13 +1084,15 @@ export const useCommissionRateStore = createStore(
         async get_rate(rate_id) {
             let r
             let rate_q = { _id: rate_id }
-            let p = ['extras', ['user', 'username'], 'image']
+            let p = [
+                { path: 'extras' },
+                { path: 'user', select: "username" },
+                { path: 'image' },
+            ]
 
             if (is_server()) {
                 r = CommissionRate.findOne(rate_q)
-                    .populate(p[0])
-                    .populate(p[1][0], p[1][1])
-                    .populate(p[2])
+                    .populate(p)
                     .lean()
             } else {
                 r = await fetch('/api/fetch', {
@@ -1045,7 +1101,7 @@ export const useCommissionRateStore = createStore(
                         model: 'CommissionRate',
                         query: rate_q,
                         method: 'findOne',
-                        populate: p,
+                        populate: [p],
                     },
                 }).then(async r => {
                     if (r.ok) {
@@ -1094,7 +1150,15 @@ export const useCommissionRateStore = createStore(
             let extra_option_q = { user: profile_user._id }
 
             let rate_q = { user: profile_user._id }
-            let rate_p = ['extras', ['user', 'username'], 'image', populate_license ? 'license' : undefined]
+            let rate_p = [
+                {path: 'extras'},
+                {path: 'user', select: "username"},
+                {path: 'image'},
+            ]
+
+            if (populate_license) {
+                rate_p.push({path: 'license'})
+            }
 
             if (is_server()) {
                 if (licenses) {
@@ -1115,10 +1179,7 @@ export const useCommissionRateStore = createStore(
 
                 if (rates) {
                     b = CommissionRate.find(rate_q)
-                        .populate(rate_p[0])
-                        .populate(rate_p[1][0], rate_p[1][1])
-                        .populate(rate_p[2])
-                        .populate(rate_p[3])
+                        .populate(rate_p)
                         .lean()
                         .then(d => {
                             state.rates = [...d]
@@ -1159,7 +1220,7 @@ export const useCommissionRateStore = createStore(
                         body: {
                             model: 'CommissionRate',
                             query: rate_q,
-                            populate: rate_p,
+                            populate: [rate_p],
                         },
                     }).then(async r => {
                         if (r.ok) {

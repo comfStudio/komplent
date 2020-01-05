@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Grid, Row, Col, Uploader, Icon, Button } from 'rsuite'
+import FsLightbox from 'fslightbox-react'; 
 
 import Image from '@components/App/Image'
 import { t } from '@utility/lang'
@@ -18,6 +19,7 @@ interface ProductProps {
     is_owner: boolean
     data: any
     locked?: boolean
+    onClick?: Function
 }
 
 export const Asset = (props: ProductProps) => {
@@ -48,7 +50,7 @@ export const Asset = (props: ProductProps) => {
 
     return (
         <div>
-            <Image src={data?.url} h="200px" loading={loading} />
+            <Image src={data?.url} h="200px" loading={loading} onClick={props.onClick} />
             <div className="mt-2">
                 <Button
                     href={data?.url}
@@ -76,9 +78,11 @@ const CommissionAssets = () => {
     const store = useCommissionStore()
     const commission = store.get_commission()
     const [uploading, set_uploading] = useState(false)
+    const [show_lightbox, set_show_lightbox] = useState(false)
+    const [sources, set_sources] = useState([])
 
     let is_owner = user?._id === commission.from_user._id
-    const products = commission?.products ?? []
+    const products = store.state.products ?? []
 
     const on_upload = debounceReduce((args: any[]) => {
         const d = args.map(v => v?.data).filter(Boolean)
@@ -91,16 +95,7 @@ const CommissionAssets = () => {
         }
     }, 500)
 
-    let unlocked = !is_owner
-
-    if (is_owner && commission.phases.some(v => {
-        if (v.type === 'unlock' && v.done) {
-            return true
-        }
-        return false
-        })) {
-            unlocked = true
-    }
+    let unlocked = store.is_unlocked(user, commission)
 
     return (
         <Grid fluid>
@@ -119,10 +114,20 @@ const CommissionAssets = () => {
             </Row>}
             {commission.accepted &&
             <Row>
-                {products.map(v => {
+                {!!show_lightbox && 
+                 <FsLightbox
+                 sources={ products.map( v => v?.url) }
+                 type="image" 
+                 types={ products.map( v => null) }
+                 slide={show_lightbox}
+                 openOnMount
+                 onClose = {() => set_show_lightbox(null)}
+                 /> 
+                }
+                {products.map((v, idx) => {
                     return (
                         <Col key={v._id} xs={3}>
-                            <Asset data={v} is_owner={is_owner} locked={!unlocked} />
+                            <Asset data={v} is_owner={is_owner} locked={!unlocked} onClick={(ev) => { ev.preventDefault(); set_show_lightbox(idx+1) }}/>
                         </Col>
                     )
                 })}

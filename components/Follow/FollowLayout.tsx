@@ -6,7 +6,7 @@ import ResultLayout from '@components/Search/ResultLayout'
 import { useFollowStore } from '@store/follow'
 import { HTMLElementProps } from '@utility/props'
 
-export const FollowLayout = (props: {UserComponent: React.ElementType} & HTMLElementProps) => {
+export const FollowLayout = (props: {UserComponent: React.ElementType, userComponentProps?: object} & HTMLElementProps) => {
 
     const store = useFollowStore()
 
@@ -15,7 +15,7 @@ export const FollowLayout = (props: {UserComponent: React.ElementType} & HTMLEle
             {props.children}
             <Row className="h-full">
                 <Col className="h-full" xs={24}>
-                    <ResultLayout UserComponent={props.UserComponent} size={store.state.size} count={store.state.count} page={store.state.page} items={store.state.items} />
+                    <ResultLayout UserComponent={props.UserComponent} userComponentProps={props.userComponentProps} size={store.state.size} count={store.state.count} page={store.state.page} items={store.state.items} />
                 </Col>
             </Row>
         </Grid>

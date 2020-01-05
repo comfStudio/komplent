@@ -14,7 +14,7 @@ const cors = microCors({ allowMethods: ['PUT', 'POST', 'OPTIONS'] })
 export default with_auth_middleware(
     async (req: ExApiRequest, res: ExApiResponse) => {
         try {
-            const { data, model, method, populate } = req.json
+            const { data, model, method, populate, validate } = req.json
 
             let m = mongoose.models[model]
 
@@ -56,6 +56,12 @@ export default with_auth_middleware(
                     if (code !== CREATED) {
                         doc.set(data)
                     }
+
+                    if (validate) {
+                        console.log("validating")
+                        await doc.validate().catch(r => console.log(r))
+                    }
+
                     await doc.save()
                     if (populate) {
                         let p_array = populate

@@ -28,30 +28,37 @@ import { get_profile_avatar_url } from '@utility/misc'
 
 const { StringType } = Schema.Types
 
-const model_props = {
-    username: StringType()
-        .addRule((value, data) => {
-            if (value.length < 3) return false
-            return true
-        }, t`Username must be longer than 2 characters`)
-        .addRule((value, data) => {
-            let illegal_chars = /\W/
-            if (illegal_chars.test(value)) return false
-            return true
-        }, t`Username must only contain letter, numbers and underscores`)
-        .isRequired(t`This field is required.`),
-}
+export const username_validate = StringType()
+    .addRule((value, data) => {
+        if (value.length < 3) return false
+        return true
+    }, t`Username must be longer than 2 characters`)
+    .addRule((value, data) => {
+        let illegal_chars = /\W/
+        if (illegal_chars.test(value)) return false
+        return true
+    }, t`Username must only contain letter, numbers and underscores`)
 
-const join_model = Schema.Model({
-    ...model_props,
-    password: StringType()
+export const email_validate = StringType()
+    .isEmail(t`Please enter a valid email address.`)
+    .isRequired(t`This field is required.`)
+
+export const password_validate = StringType()
     .isRequired('This field is required.')
     .addRule((value, data) => {
         if (value.length < 8) {
             return false
         }
         return true
-    }, 'Password must be longer than 7 characters'),
+    }, 'Password must be longer than 7 characters')
+
+const model_props = {
+    username: username_validate
+}
+
+const join_model = Schema.Model({
+    ...model_props,
+    password: password_validate,
     repeat_password: StringType()
         .addRule((value, data) => {
             if (value !== data.password) {
@@ -60,9 +67,7 @@ const join_model = Schema.Model({
             return true
         }, 'The two passwords do not match')
         .isRequired('This field is required.'),
-    email: StringType()
-    .isEmail(t`Please enter a valid email address.`)
-    .isRequired(t`This field is required.`),
+    email: email_validate
 })
 
 interface Props extends HTMLElementProps {

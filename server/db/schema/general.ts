@@ -41,6 +41,10 @@ export const attachment_schema = new Schema(
             type: ObjectId,
             ref: 'User',
         },
+        allowed_users: [{
+            type: ObjectId,
+            ref: 'User',
+        }]
     },
     { timestamps: { createdAt: 'created', updatedAt: 'updated' } }
 )

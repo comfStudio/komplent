@@ -58,7 +58,12 @@ module.exports = {
                   '800': '#323232',
                   '900': '#191919',
                 }
-              }
+              },
+            spacing: {
+                '72': '18rem',
+                '96': '24rem',
+                '128': '32rem',
+            },
         },
     },
     variants: variants,

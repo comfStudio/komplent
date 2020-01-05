@@ -83,7 +83,7 @@ export const CommissionLayout = (props: Props) => {
         <MainLayout
             header={
                 <div className="commission-header">
-                    <UserCard data={user._id === commission.to_user._id ? commission.from_user : commission.to_user} bordered={false} small horizontal >
+                    <UserCard noMessageButton commissionCountData={store.state.commission_count} data={user._id === commission.to_user._id ? commission.from_user : commission.to_user} bordered={false} small horizontal >
                         <h3 className="m-0 p-0 leading-none">{get_commission_title(commission, user)}</h3>
                     </UserCard>
                     <CommissionMenu {...props} />
