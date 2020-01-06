@@ -65,7 +65,6 @@ export const useUserStore = createStore(
         remove_user_token() {
             if (!is_server()) {
                 cookies.destroy({}, COOKIE_AUTH_TOKEN_KEY)
-                console.log("removing")
             }
         },
         async login(data, redirect: boolean | string = false) {
@@ -87,18 +86,17 @@ export const useUserStore = createStore(
             return [false, (await r.json()).error]
         },
         async logout(redirect = true) {
+            this.remove_user_token()
+            
             let r = await fetch('/api/logout', {
-                method: 'get',
+                method: 'post',
+                body: { redirect }
             })
 
             if (r.status == OK) {
-                this.remove_user_token()
 
                 this.setState({ current_user: null, logged_in: false })
 
-                if (redirect) {
-                    Router.replace(pages.home)
-                }
                 return [true, null]
             }
 

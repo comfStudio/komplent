@@ -210,7 +210,7 @@ export const useInboxStore = createStore(
                     body: {
                         model: 'Message',
                         query: q,
-                        populate: [p],
+                        populate: p,
                         sort: s,
                         limit,
                     },

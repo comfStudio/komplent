@@ -7,14 +7,6 @@
         margin: 0;
         padding: 0.8em;
 
-        .info {
-            position: absolute;
-            right: 0;
-            top: 0;
-            margin-right: 0.4em;
-            margin-top: 0.3em;
-        }
-
         .price {
             @apply border-primary;
             @apply text-primary;
@@ -79,4 +71,12 @@ a > .commission-card:hover,
         text-align: center;
         width: 100%;
     }
+}
+
+.commission-card-info {
+    position: absolute;
+    right: 0;
+    top: 0;
+    margin-right: 0.4em;
+    margin-top: 0.3em;
 }

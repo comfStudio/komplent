@@ -86,7 +86,7 @@ export const LoginForm = (props: LoginFormProps) => {
         <div>
             <Divider>{t`Login with`}</Divider>
             <AuthButtons/>
-            <Divider>{t`Or using your email address`}</Divider>
+            <Divider>{t`Or`}</Divider>
             <Form
                 fluid
                 className={cls}

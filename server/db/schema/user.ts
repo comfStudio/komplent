@@ -48,7 +48,7 @@ export const user_schema = new Schema(
             maxLength: 60,
             lowercase: true,
             es_indexed: true,
-            validate: optional_with_length(3, 60)
+            // validate: optional_with_length(3, 60)
         },
         password: { type: String, minLength: 8, select: false },
         avatar: {

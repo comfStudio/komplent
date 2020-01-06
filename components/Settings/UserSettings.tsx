@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import { Grid, RadioGroup, Radio, SelectPicker, Button, Icon, List, CheckboxGroup, Toggle, InputGroup, Input } from 'rsuite'
-import { EditGroup, EditSection } from '.'
+import { Grid, RadioGroup, Radio, SelectPicker, Button, Icon, List, CheckboxGroup, Toggle, InputGroup, Input, Modal } from 'rsuite'
+import { useMount } from 'react-use'
 
+import { EditGroup, EditSection } from '.'
 import { t } from '@app/utility/lang'
 import useUserStore from '@store/user'
 import { getCountryNames } from '@client/dataset'
@@ -9,6 +10,8 @@ import Upload from '@components/App/Upload'
 import { ProfileNSFWLevel } from '@components/Profile/ProfileEdit'
 import InputGroupAddon from 'rsuite/lib/InputGroup/InputGroupAddon'
 import { username_validate, email_validate, password_validate } from '@components/Form/JoinForm'
+import { fetch } from '@utility/request'
+import { oauth_window } from '@client/misc'
 
 export const UserType = () => {
     return (
@@ -101,6 +104,8 @@ export const Integrations = () => {
 
     const store = useUserStore()
 
+    const [show_pass_modal, set_show_pass_modal] = useState(false)
+
     let auth_data = {}
     store.state.current_user?.oauth_data?.map(v => { auth_data[v.provider] = v })
 
@@ -112,11 +117,47 @@ export const Integrations = () => {
         {provider: 'pixiv', icon: <Icon icon="globe"/>, name: t`Pixiv`, linked: !!auth_data['pixiv'], link_name: auth_data['pixiv']?.info?.names?.[0]?.displayName},
     ]
 
+    const link = url => {
+        oauth_window(url, location.origin, (msg) => {
+            if (msg.data === 'refresh') {
+                location.reload()
+            }
+        })
+    }
+
     return (
         <EditGroup>
+            <Modal backdrop show={show_pass_modal} onHide={() => { set_show_pass_modal(false) }}>
+                <Modal.Header> <Modal.Title>{t`Set a password before unlinking`}</Modal.Title></Modal.Header>
+                <Modal.Body>
+                    <Password show_inputs done={() => { set_show_pass_modal(false) }}/>
+                </Modal.Body>
+            </Modal>
             {providers.map(v => 
                 <div key={v.provider} className="mb-4">
-                    {v.icon} <span className="mr-2">{v.name}: {v.linked ? <><span className="text-primary">{v.link_name}</span> <Button appearance="ghost" size="xs">{t`Unlink`}</Button> </> : <Button appearance="ghost" size="xs">{t`Link`}</Button>}</span>
+                    {v.icon} 
+                    <span className="mr-2">
+                        {v.name}: {v.linked ? 
+                        <><span className="text-primary">{v.link_name}</span> <Button onClick={() => {
+                            fetch("/api/auth/unlink", {
+                                method: "post",
+                                body: { provider: v.provider }
+                            }).then(r => {
+                                if (r.ok) {
+                                    location.reload()
+                                } else {
+                                    r.json().then(d => {
+                                        if (d && d.error) {
+                                            if (d.error.includes("password")) {
+                                                set_show_pass_modal(true)
+                                            }
+                                        }
+                                    })
+                                }
+                            })
+                        }} appearance="ghost" size="xs">{t`Unlink`}</Button> </>
+                        : <Button onClick={() => {link(`/api/auth/${v.provider}`)}} appearance="ghost" size="xs">{t`Link`}</Button>}
+                    </span>
                 </div>
             )}
         </EditGroup>
@@ -189,10 +230,11 @@ export const Email = () => {
     )
 }
 
-export const Password = () => {
+export const Password = ({show_inputs = false, done}: {show_inputs?: boolean, done?: Function}) => {
     const store = useUserStore()
 
-    const [show, set_show] = useState(false)
+    const [show, set_show] = useState(show_inputs)
+    const [has_password, set_has_password] = useState(true)
     const [old_password, set_old_password] = useState("")
     const [password_1, set_password_1] = useState("")
     const [password_2, set_password_2] = useState("")
@@ -201,9 +243,14 @@ export const Password = () => {
     const [error_2, set_error_2] = useState("")
 
     useEffect(() => {
-        set_show(false)
+        set_show(show_inputs)
         set_password_1("")
         set_password_2("")
+        fetch("/api/misc", {method: 'post', body: {has_password: true}}).then(async r => {
+            if (r.ok) {
+                set_has_password((await r.json())?.data?.has_password)
+            }
+        })
     }, [store.state.current_user?.password])
 
     useEffect(() => {
@@ -222,11 +269,13 @@ export const Password = () => {
         <EditGroup margin title={t`Password` + ':'}>
             {!show && <Button onClick={() => { set_show(true) }}>{t`Change password`}</Button>}
             {show && <>
+                {has_password && 
                 <div className="mb-2 w-128">
                     <Input placeholder={t`Old password`} type="password" onChange={v => {
                         set_old_password(v);
                     }}/>
                 </div>
+                }
                 <div className="mb-2 w-128">
                     <Input placeholder={t`New password`} type="password" value={password_2} onChange={v => {
                         const r = password_validate.check(v, {})
@@ -242,11 +291,15 @@ export const Password = () => {
                 <Input placeholder={t`Repeat new password`} type="password" value={password_1} onChange={v => {
                     set_password_1(v);
                 }}/>
-                    {!!!error && !!!error_2 && !!!error_3 && password_1.length > 1 && old_password.length > 1 &&
+                    {!!!error && !!!error_2 && !!!error_3 && password_1.length > 1 && (!has_password || old_password.length > 1) &&
                     <InputGroup.Button appearance="primary" onClick={() => {
                         store.update_user_creds({ password: password_1, old_password }).then(r => {
                             if (!r.ok) {
                                 set_error_3(t`An error occurred, try again`)
+                            } else {
+                                if (done) {
+                                    done()
+                                }
                             }
                         }) }}>{t`Update`}</InputGroup.Button>
                     }

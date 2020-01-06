@@ -24,7 +24,7 @@ export default with_auth_middleware(
             const form = new formidable.IncomingForm()
             form.encoding = 'utf-8'
             form.keepExtensions = true
-            form.maxFileSize = 5 * 1024 * 1024 // 5mb
+            form.maxFileSize = 3 * 1024 * 1024 // 3mb
 
             return form.parse(req, (err, fields, files) => {
                 if (files.file && !err) {

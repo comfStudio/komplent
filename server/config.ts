@@ -1,6 +1,7 @@
 import { is_server } from '@utility/misc'
 
 export const CONFIG = {
+    URL: process.env.URL || 'http://localhost:3000',
     REDIS_URL: process.env.REDIS_URL,
     MONGODB_URL: process.env.MONGODB_URL,
     ELASTIC_URL: process.env.ELASTIC_URL,

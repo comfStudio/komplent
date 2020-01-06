@@ -9,11 +9,11 @@ import { NextPageContext } from 'next'
 import { is_server } from '@utility/misc'
 import { User } from '@db/models'
 import { fetch } from '@utility/request'
-import { ErrorPageType } from '@server/constants'
+import { MsgPageType } from '@server/constants'
 import * as pages from '@utility/pages'
 
 interface PageProps extends Props {
-    error: ErrorPageType
+    error: MsgPageType
 }
 
 class FinishJoinPage extends OptionalAuthPage<PageProps> {
@@ -55,7 +55,7 @@ class FinishJoinPage extends OptionalAuthPage<PageProps> {
         }
 
         if (!ok) {
-            error = ErrorPageType.Generic
+            error = MsgPageType.Generic
         }
 
         return { ...props, useUserState, error }
@@ -66,7 +66,7 @@ class FinishJoinPage extends OptionalAuthPage<PageProps> {
         
         if (!is_server()) {
             if (props.error != undefined) {
-                Router.replace(pages.error + '?' + qs.stringify({type: this.props.error}))
+                Router.replace(pages.message + '?' + qs.stringify({type: this.props.error}))
             }
         }
     }

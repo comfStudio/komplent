@@ -51,6 +51,7 @@ const Upload = React.forwardRef((({type = "Image", autoUpload = false, ...props}
             fluid
             className={props.fluid ? "fluid-uploader" : undefined}
             data={{user: user?._id, type, ...props.requestData}}
+            dragable
             action={pages.upload}
             ref={ref}
             accept={type === 'Image' ? "image/*" : undefined}

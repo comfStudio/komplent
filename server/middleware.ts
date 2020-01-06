@@ -4,6 +4,7 @@ import cookieSession from 'cookie-session'
 import Keygrip from 'keygrip'
 import jwt from 'jsonwebtoken'
 import with_morgan from 'micro-morgan'
+import redirect from 'micro-redirect'
 
 import cookie from 'cookie'
 
@@ -14,10 +15,13 @@ import { User } from '@db/models'
 export interface ExApiRequest extends NextApiRequest {
     user?: any
     json?: any
-    cookie(name: string, value: any, options: object)
+    session?: any
+    cookie?(name: string, value: any, options: object)
 }
 
-export interface ExApiResponse extends NextApiResponse {}
+export interface ExApiResponse extends NextApiResponse {
+    redirect?(code: number, location: string)
+}
 
 export const get_jwt_data = token => {
     try {
@@ -36,20 +40,28 @@ export const get_jwt_user = async jwt_data => {
 }
 
 export const is_logged_in = async (req, res) => {
-    if (
+    let token
+    if ((
         req.headers.authorization &&
-        req.headers.authorization.startsWith('Bearer ')
+        req.headers.authorization.startsWith('Bearer '))
     ) {
         let h = req.headers.authorization
-        let token = h.substring(7, h.length)
+        token = h.substring(7, h.length)
+    }
+
+    if (!token) {
+        token = req?.session?.jwt_token
+    }
+
+    if (token) {
         try {
             let auth_user = await get_jwt_user(get_jwt_data(token))
             if (auth_user) {
                 return auth_user
             }
         } catch (err) {}
-    } else {
     }
+    
     return null
 }
 
@@ -116,6 +128,11 @@ const set_cookie = (res, name, value, options = {}) => {
     )
 }
 
+export const with_redirect = handler => async (req, res) => {
+    res.redirect = (...args) => redirect(res, ...args)
+    return await handler(req, res)
+}
+
 export const with_cookie = handler => async (req, res) => {
     res.cookie = (name, value, options) => set_cookie(res, name, value, options)
     cookie_session(req, res)
@@ -135,6 +152,7 @@ const middlewares = (auth = false) => [
     with_first_request,
     with_json,
     with_cookie,
+    with_redirect,
     auth ? with_require_user : with_user,
     with_morgan('tiny'),
 ]

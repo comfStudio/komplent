@@ -99,10 +99,11 @@ interface CommissionCardProps extends HTMLElementProps {
     extras?: any
     selected?: boolean
     noCover?: boolean
+    link?: boolean
 }
 
 const CommissionCardHeader = (props: CommissionCardProps) => {
-    let { price, title, extras, description, commission_deadline } = props.data
+    let { price, title, extras, commission_deadline } = props.data
     extras = props.extras || extras
 
     return (
@@ -110,17 +111,6 @@ const CommissionCardHeader = (props: CommissionCardProps) => {
             <span className="price">
                 {price_is_null(price) ? t`Custom` : decimal128ToMoneyToString(price)}
             </span>
-            <Whisper
-                trigger="click"
-                placement="top"
-                speaker={
-                <Tooltip>{description}</Tooltip>
-                    }
-                >
-            <span className="info">
-                <Icon icon="question2" size="lg"/>
-            </span>
-            </Whisper>
             <Row>
                 <Col xs={24}>
                     <h4 className="title inline-block">{title}</h4>
@@ -160,23 +150,6 @@ export const CommissionCard = (props: CommissionCardProps) => {
         image_url = props.data.image.paths[0].url
     }
 
-    return (
-        <Panel
-            bodyFill
-            className={classnames(
-                'commission-card mx-auto',
-                { selected: props.selected },
-                props.className
-            )}
-            bordered>
-            <CommissionCardHeader {...props} />
-            {!props.noCover && <Image w="100%" h={250} src={image_url} />}
-            {props.selected && <span className="select-box">Selected</span>}
-        </Panel>
-    )
-}
-
-export const CommissionLinkCard = (props: CommissionCardProps) => {
     const user = useUser()
     let c_user = props.data.user
     let url = make_profile_urlpath(c_user)
@@ -184,12 +157,40 @@ export const CommissionLinkCard = (props: CommissionCardProps) => {
         url = pages.make_commission_rate_urlpath(c_user, props.data)
     }
 
+    const el = <Panel
+                bodyFill
+                className={classnames(
+                    'commission-card mx-auto',
+                    { selected: props.selected },
+                    props.className
+                )}
+                bordered>
+                <CommissionCardHeader {...props} />
+                {!props.noCover && <Image w="100%" h={250} src={image_url} />}
+                {props.selected && <span className="select-box">Selected</span>}
+            </Panel>
+
     return (
-        <Link href={url}>
-            <a>
-                <CommissionCard {...props} />
-            </a>
-        </Link>
+        <div className="inline-block relative mx-auto">
+            {/* <span className="commission-card-info">
+            <Whisper
+                trigger="hover"
+                placement="top"
+                speaker={
+                <Tooltip>{props.data.description}</Tooltip>
+                    }
+                >
+                <Icon icon="question2" size="lg"/>
+            </Whisper>
+            </span> */}
+            {props.link &&
+            <Link href={url}>
+                <a>
+                    {el}
+                </a>
+            </Link>}
+            {!props.link && el}
+        </div>
     )
 }
 
@@ -203,8 +204,8 @@ export const CommissionCardRadioGroup = () => {
         <Row gutter={16} className="commission-rates-group">
             {sort_rates_by_price(store.state.rates).map((data, index) => {
                 let el = (
-                    <Col key={data._id} xs={6}>
-                        <label title={data.title}>
+                    <Col key={data._id} xs={6} className="flex content-center">
+                        <label title={data.title} className="mx-auto">
                             <FormControl
                                 className="mb-5"
                                 type="radio"
@@ -233,14 +234,14 @@ export const CommissionTiersRow = (props: CommissionTiersRowProps) => {
         <Row gutter={16}>
             {sort_rates_by_price(store.state.rates).map((data, index) => {
                 let el = (
-                    <Col key={data._id} xs={6}>
+                    <Col key={data._id} xs={6} className="flex content-center">
                         {props.onClick && (
                             <a href="#" onClick={ev => props.onClick(data, ev)}>
                                 <CommissionCard data={data} />
                             </a>
                         )}
                         {props.link && !props.onClick && (
-                            <CommissionLinkCard data={data} />
+                            <CommissionCard link data={data} />
                         )}
                         {!props.link && !props.onClick && (
                             <CommissionCard data={data} />
@@ -253,7 +254,7 @@ export const CommissionTiersRow = (props: CommissionTiersRowProps) => {
     )
 }
 
-const commission_request_model = Schema.Model({
+const commission_request_model = {
     from_title: StringType().isRequired(t`This field is required.`)
         .addRule((value, data) => {
             if (value.length > 300) return false
@@ -268,8 +269,11 @@ const commission_request_model = Schema.Model({
     commission_rate: StringType().isRequired(t`This field is required.`),
     extras: ArrayType(),
     body: ObjectType().isRequired(t`This field is required.`),
-    tos: StringType().isRequired(t`This field is required.`),
-})
+    tos_agreement: BooleanType().addRule((value, data) => {
+        if (!value) return false
+        return true
+    }, t`This field is required.`).isRequired(t`This field is required.`),
+}
 
 export const CommissionsClosed = () => {
     return (
@@ -336,6 +340,7 @@ export const ProfileCommission = () => {
     const selected_rate = router.query.selected || ''
 
     const from_user = current_user
+    const [form_model, set_form_model] = useState()
     const [form_ref, set_form_ref] = useState(null)
     const [form_value, set_form_value] = useState({
         commission_rate: selected_rate || undefined,
@@ -392,6 +397,21 @@ export const ProfileCommission = () => {
     const license_html = useMessageTextToHTML(selected_rate_obj?.license?.body)
 
     useEffect(() => {
+        if (selected_rate_obj?.license) {
+            set_form_model(Schema.Model({
+                ...commission_request_model,
+                license_agreement: BooleanType().addRule((value, data) => {
+                    if (!value) return false
+                    return true
+                }, t`This field is required.`).isRequired(t`This field is required.`),
+            }))
+
+        } else {
+            set_form_model(Schema.Model(commission_request_model))
+        }
+    }, [selected_rate_obj?.license])
+
+    useEffect(() => {
         if (submit_value && !uploading && file_count === Object.keys(attachments).length) {
             set_submit_value(undefined)
             let data = {
@@ -428,13 +448,15 @@ export const ProfileCommission = () => {
 
     const on_upload = debounce((r) => set_uploading(r), 500)
 
+    console.log(form_value)
+
     return (
         <Form
             fluid
             method="put"
             action="/api/commission"
             formValue={form_value}
-            model={commission_request_model}
+            model={form_model}
             ref={ref => set_form_ref(ref)}
             onChange={value => set_form_value(value)}>
             <Grid fluid>
@@ -463,7 +485,7 @@ export const ProfileCommission = () => {
                                     <Checkbox onChange={(_, v) => set_suggest_price_disabled(v)}>{t`Let creator decide`}</Checkbox>
                                 </FlexboxGrid.Item>
                             </FlexboxGrid>
-                            <HelpBlock>{t`Suggest a price for this commission request.`}</HelpBlock>
+                            <HelpBlock>{t`Suggest a fair price for this commission request.`}</HelpBlock>
                         </FormGroup>
                         }
                         <RateOptions options={available_options} checkbox />
@@ -560,9 +582,9 @@ export const ProfileCommission = () => {
                         description={selected_rate_obj.license.description}
                         body={<UserHTMLText html={license_html}/>}
                         control={<FormControl
-                            name="license"
-                            value="true"
-                            required
+                            name="license_agreement"
+                            value={form_value?.license_agreement ? false : true}
+                            errorPlacement="topStart"
                             accepter={
                                 Checkbox
                             }>{t`I have read and agree to the license provided by the creator`}</FormControl>}
@@ -575,9 +597,9 @@ export const ProfileCommission = () => {
                         title={<h3>{t`Terms of Service`}</h3>}
                         description={<Placeholder.Paragraph rows={4} />}
                         control={<FormControl
-                            name="tos"
-                            value="true"
-                            required
+                            name="tos_agreement"
+                            value={form_value?.tos_agreement ? false : true}
+                            errorPlacement="topStart"
                             accepter={
                                 Checkbox
                             }>{t`I have read and agree to the terms of service`}</FormControl>}

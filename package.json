@@ -124,7 +124,7 @@
         "react-tinacms": "^0.6.1-canary.1793",
         "react-use": "^13.2.1",
         "react-visibility-sensor": "^5.1.1",
-        "rsuite": "^4.1.0",
+        "rsuite": "^4.2.0",
         "sanitize-html": "^1.20.1",
         "saslprep": "^1.0.3",
         "slate": "^0.47.8",

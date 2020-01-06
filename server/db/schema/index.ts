@@ -77,7 +77,7 @@ export const optional_with_length = (minLength, maxLength) => {
     maxLength = maxLength || Infinity;
     return {
       validator : function(value) {
-        if (value === undefined) return true;
+        if (!value) return true;
         return value.length >= minLength && value.length <= maxLength;
       },
       message : 'Optional field is shorter than the minimum allowed length (' + minLength + ') or larger than the maximum allowed length (' + maxLength + ')'

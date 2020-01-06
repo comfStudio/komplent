@@ -670,7 +670,7 @@ export const useCommissionStore = createStore(
                         method: 'findById',
                         query: commission_id,
                         lean: false,
-                        populate: [p],
+                        populate: p,
                         select: comm_select
                     },
                 }).then(async r => {
@@ -1101,7 +1101,7 @@ export const useCommissionRateStore = createStore(
                         model: 'CommissionRate',
                         query: rate_q,
                         method: 'findOne',
-                        populate: [p],
+                        populate: p,
                     },
                 }).then(async r => {
                     if (r.ok) {
@@ -1187,7 +1187,7 @@ export const useCommissionRateStore = createStore(
                 }
             } else {
                 if (licenses) {
-                    c = await fetch('/api/fetch', {
+                    c = fetch('/api/fetch', {
                         method: 'post',
                         body: {
                             model: 'License',
@@ -1201,7 +1201,7 @@ export const useCommissionRateStore = createStore(
                 }
 
                 if (options) {
-                    a = await fetch('/api/fetch', {
+                    a = fetch('/api/fetch', {
                         method: 'post',
                         body: {
                             model: 'CommissionExtraOption',
@@ -1215,12 +1215,12 @@ export const useCommissionRateStore = createStore(
                 }
 
                 if (rates) {
-                    b = await fetch('/api/fetch', {
+                    b = fetch('/api/fetch', {
                         method: 'post',
                         body: {
                             model: 'CommissionRate',
                             query: rate_q,
-                            populate: [rate_p],
+                            populate: rate_p,
                         },
                     }).then(async r => {
                         if (r.ok) {

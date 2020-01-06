@@ -36,7 +36,7 @@ export const update_user_creds = async (user, data: IUser, { save = true, random
 
     if (data.password) {
         if (require_old_password) {
-            if (!await check_user_password(user, data.old_password || "")) {
+            if (user.password && !await check_user_password(user, data.old_password || "")) {
                 throw Error("Old password does not match")
             }
         }
@@ -79,6 +79,10 @@ export const check_user_password = async(user: IUser, password) => {
     return await bcrypt.compare(password, user.password)
 }
 
+export const user_has_password = async (user_id) => {
+    return !!(await User.findById(user_id).select("+password")).password
+}
+
 export const login_user = async (user: IUser, password, req, res) => {
     if (user) {
         let r = await check_user_password(user, password)
@@ -99,6 +103,7 @@ export const login_user_without_password = async (user: IUser, req, res) => {
                 expiresIn: JWT_EXPIRATION,
             }
         )
+        req.session.jwt_token = token
         return token
     }
     return null
@@ -119,4 +124,39 @@ export const validize_username = (name) => {
         name = name.substring(0, 60)
     }
     return name.toLowerCase()
+}
+
+export const unlink_provider = async (user_id, provider) => {
+
+    let key
+
+    if (provider === 'google') {
+        key = 'oauth_google_id'
+    } else if (provider === 'facebook') {
+        key = 'oauth_facebook_id'
+    } else if (provider === 'twitter') {
+        key = 'oauth_twitter_id'
+    } else {
+        throw Error("No valid provider provided")
+    }
+
+    const user = await User.findById(user_id).select(`+password ${key} oauth_data`)
+
+    if (!user) {
+        throw Error("Invalid user")
+    }
+
+    let datas = user.oauth_data ?? []
+
+    if (!!!user.password && datas.length <= 1) {
+        throw Error("A password has not been set on this user")
+    }
+
+    user[key] = undefined
+
+    user.oauth_data = [...datas.filter(v => v.provider != provider)]
+
+    await user.save()
+
+    return true
 }
