@@ -2,15 +2,15 @@ import { NextApiRequest, NextApiResponse } from 'next'
 
 import cookieSession from 'cookie-session'
 import Keygrip from 'keygrip'
-import jwt from 'jsonwebtoken'
 import with_morgan from 'micro-morgan'
 import redirect from 'micro-redirect'
 
 import cookie from 'cookie'
 
 import { get_json } from '@utility/request'
-import { KEYS, JWT_KEY } from '@server/constants'
+import { SESSION_KEYS } from '@server/constants'
 import { User } from '@db/models'
+import { jwt_verify } from './misc'
 
 export interface ExApiRequest extends NextApiRequest {
     user?: any
@@ -25,7 +25,7 @@ export interface ExApiResponse extends NextApiResponse {
 
 export const get_jwt_data = token => {
     try {
-        return jwt.verify(token, JWT_KEY)
+        return jwt_verify(token)
     } catch (err) {}
     return {}
 }
@@ -105,7 +105,7 @@ export const cookie_session = (opts => {
     return (req, res) => originalSession(req, res, () => {})
 })({
     name: '_session',
-    keys: new Keygrip(KEYS, 'SHA384', 'base64'),
+    keys: new Keygrip(SESSION_KEYS, 'SHA384', 'base64'),
     maxAge: 1000 * 60 * 60 * 24 * 3, // 3 days
 })
 

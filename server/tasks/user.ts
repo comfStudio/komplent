@@ -1,6 +1,10 @@
 import { TASK, EVENT, TaskDataTypeMap } from '@server/constants'
-import { Event } from '@db/models'
+import { Event, User } from '@db/models'
 import log from '@utility/log'
+import { send_email, Template } from '@services/email'
+import * as pages from '@utility/pages'
+import { jwt_sign } from '@server/misc'
+import CONFIG from '@server/config'
 
 export default function(queue) {
     let r = [
@@ -56,7 +60,30 @@ export default function(queue) {
         await e.save()
     })
 
-    queue.process(TASK.activate_email, async job => {})
+    queue.process(TASK.activate_email, async job => {
+        log.debug(`processing ${TASK.activate_email}`)
+        const { user_id } = job.data as TaskDataTypeMap<
+            TASK.activate_email
+        >
+        const user = await User.findById(user_id)
+        if (!user.email_verified) {
+
+            const jwt_token = jwt_sign({
+                user_id: user._id,
+                email: user.email,
+                type: "email",
+            }, 60 * 60 * 24) // 1 day // in seconds
+
+            send_email({
+                template: Template.confirm_email,
+                to: user,
+                user,
+                locals: {
+                    confirm_url: pages.build_url(pages.confirm, {token: jwt_token})
+                }
+            })
+        }
+    })
 
     queue.process(TASK.reset_login, async job => {})
 

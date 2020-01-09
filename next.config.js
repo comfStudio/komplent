@@ -33,7 +33,7 @@ Object.entries(packagejson._moduleAliases || {}).forEach(([k, v]) => {
 })
 
 const withConfig = withNextRuntimeDotenv({
-    public: ['API_URL', 'API_KEY', 'RUNNING'],
+    public: ['API_URL', 'API_KEY', 'RUNNING', 'SESSION_KEYS'],
     server: [
         'MONGODB_URL',
         'REDIS_URL',
@@ -51,6 +51,13 @@ const withConfig = withNextRuntimeDotenv({
         'AWS_SECRET_KEY',
         'AWS_BUCKET_NAME',
         'AWS_S3_ENDPOINT',
+        'EMAIL_DOMAIN',
+        'EMAIL_HOST',
+        'EMAIL_PORT',
+        'EMAIL_SECURE',
+        'EMAIL_USER',
+        'EMAIL_PASS',
+        'JWT_KEY',
     ],
 })
 

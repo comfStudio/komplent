@@ -108,7 +108,7 @@ const handler = async (o_req, o_res, auth) => with_middleware(async (req: ExApiR
         if (email && (await User.findOne({email: email.toLowerCase()}).countDocuments())) {
             return res.redirect(302, pages.message + '?' + qs.stringify({type: MsgPageType.LoginDuplicateEmail}))
         }
-        user = await create_user({username, email, name, email_verified: true}, { save: false, randomize_username: true })
+        user = await create_user({username, email, name, email_verified: true}, { save: false, randomize_username: true, unverify_email: false })
         if (image_url) {
             user.avatar = await create_file('Image', user, image_url)
             if (!user.avatar.paths) {

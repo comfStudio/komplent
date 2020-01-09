@@ -1,5 +1,6 @@
 import { tuple, array_to_enum } from '@utility/types'
 import { string } from 'prop-types'
+import CONFIG from '@server/config'
 
 export let STATES = (global.STATES = global.STATES
     ? global.STATES
@@ -9,9 +10,9 @@ export let STATES = (global.STATES = global.STATES
           SCHEDULER_SETUP: false,
       })
 
-export const KEYS = ['key1', 'key2', 'key3']
+export const SESSION_KEYS = CONFIG.SESSION_KEYS
 
-export const JWT_KEY = 'secret1'
+export const JWT_KEY = CONFIG.JWT_KEY
 
 export const JWT_EXPIRATION = 60 * 60 * 24 // 1 day // in seconds
 
@@ -83,6 +84,8 @@ export type TaskDataTypeMap<T> = T extends TASK.followed_user
     ? { payout_id: string }
     : T extends TASK.cdn_delete
     ? { key: string }
+    : T extends TASK.activate_email
+    ? { user_id: string }
     : never
 
 export const user_events = tuple(

@@ -53,7 +53,7 @@ user_schema.pre('save', async function() {
 
     if (!this.isNew) {
         if (this.isModified("email")) {
-            fairy.emit("user_email_changed", this, this.email)
+            fairy().emit("user_email_changed", this, this.email)
         }
     }
 })
@@ -126,7 +126,7 @@ commission_schema.post('save', async function() {
     }
 
     if (this.wasNew) {
-        fairy.emit("user_joined", this)
+        _fairy.emit("user_joined", this)
     }
 })
 

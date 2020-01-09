@@ -57,7 +57,7 @@ export async function schedule<T extends TASK>({
     if (!STATES.SCHEDULER_SETUP) return
     let delay = when ? get_milli_secs(when) : undefined
     log.debug(
-        `Adding task ${task} with delay ${delay} (${when}) and data ${JSON.stringify(
+        `Adding task ${task} with delay ${delay} (${when ?? 'now'}) and data ${JSON.stringify(
             data,
             null,
             4
@@ -97,4 +97,12 @@ export async function schedule_unique<T extends TASK>({
         }
         return await schedule({ task, ...args, opts: { key, ...opts } })
     }
+}
+
+export interface ScheduleUniqueNowArgs<T extends TASK>
+    extends Omit<ScheduleUniqueArgs<T>, 'when'> {}
+
+
+export async function schedule_unique_now<T extends TASK>(args: ScheduleUniqueNowArgs<T>) {
+    return await schedule_unique({ when: undefined, ...args })
 }

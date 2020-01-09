@@ -36,6 +36,7 @@ import useEarningsStore from '@store/earnings'
 import CONFIG from '@server/config'
 import { synchronize_indexes } from '@services/search'
 import useProfileStore from '@store/profile'
+import { setup_email } from '@services/email'
 
 // Router.onRouteChangeStart = () => NProgress.start();
 // Router.onRouteChangeComplete = () => NProgress.done();
@@ -56,6 +57,7 @@ const server_initialize = async () => {
         global.initialized = true
         setup_scheduler(CONFIG.REDIS_URL)
         setup_aws()
+        setup_email({})
         await connect(CONFIG.MONGODB_URL)
         if (STATES.MONGODB_CONNECTED) {
             synchronize_indexes()

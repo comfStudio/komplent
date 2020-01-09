@@ -1,4 +1,5 @@
 import qs from 'qs'
+import CONFIG from '@server/config'
 
 export const dashboard = '/dashboard'
 export const home = '/'
@@ -17,6 +18,7 @@ export const analytics = '/api/analytics'
 export const aggregates = '/api/aggregates'
 export const upload = '/api/upload'
 export const cdn_upload = '/api/cdn_upload'
+export const confirm = '/confirm'
 
 export const make_profile_id = user => {
     return `@${user.username}`
@@ -81,4 +83,13 @@ export const make_login_next_urlpath = (next: string = undefined) => {
         url += '?' + qs.stringify({next})
     }
     return url
+}
+
+export const build_url = (urlpath, query = {}) => {
+    let u = CONFIG.URL + urlpath
+    let s = qs.stringify(query)
+    if (s) {
+        u += '?' + qs.stringify(query)
+    }
+    return u
 }

@@ -1,4 +1,9 @@
+import getConfig from 'next/config'
 import { is_server } from '@utility/misc'
+
+const {
+    publicRuntimeConfig: { SESSION_KEYS },  // Available both client and server side
+  } = getConfig()
 
 export const CONFIG = {
     URL: process.env.URL || 'http://localhost:3000',
@@ -16,6 +21,15 @@ export const CONFIG = {
     AWS_SECRET_KEY: process.env.AWS_SECRET_KEY,
     AWS_BUCKET_NAME: process.env.AWS_BUCKET_NAME,
     AWS_S3_ENDPOINT: process.env.AWS_S3_ENDPOINT,
+    EMAIL_SENDGRID: process.env.EMAIL_SENDGRID === 'true',
+    EMAIL_DOMAIN: process.env.EMAIL_DOMAIN,
+    EMAIL_HOST: process.env.EMAIL_HOST,
+    EMAIL_PORT: process.env.EMAIL_PORT ? parseInt(process.env.EMAIL_PORT) : undefined,
+    EMAIL_SECURE: process.env.EMAIL_SECURE === 'true',
+    EMAIL_USER: process.env.EMAIL_USER,
+    EMAIL_PASS: process.env.EMAIL_PASS,
+    JWT_KEY: process.env.JWT_KEY,
+    SESSION_KEYS: SESSION_KEYS?.split(','),
 }
 
 export default CONFIG

@@ -1,6 +1,9 @@
+import jwt from 'jsonwebtoken'
+
 import { is_server } from '@utility/misc'
 import { Text } from '@db/models'
 import { fetch } from '@utility/request'
+import { JWT_EXPIRATION, JWT_KEY } from './constants'
 
 export const fetch_database_text = async (id: string) => {
     if (id) {
@@ -19,4 +22,19 @@ export const fetch_database_text = async (id: string) => {
             })
         }
     }
+}
+
+export const jwt_sign = (data, expiresIn = JWT_EXPIRATION) => {
+    return jwt.sign(
+        data,
+        JWT_KEY,
+        {
+            algorithm: 'HS256',
+            expiresIn: expiresIn,
+        }
+    )
+}
+
+export const jwt_verify = token => {
+    return jwt.verify(token, JWT_KEY)
 }

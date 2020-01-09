@@ -1,3 +1,4 @@
+import crypto from 'crypto'
 import update from 'immutability-helper'
 import { Decimal128 } from 'bson'
 import dinero from 'dinero.js'
@@ -160,4 +161,8 @@ export const user_among = (user: object | string, user_id_or_list: string | obje
         throw Error("User permission error")
     }
     return r
+}
+
+export const generate_unique_token = async (length = 20) => {
+    return (await crypto.randomBytes(length)).toString("hex")
 }

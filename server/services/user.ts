@@ -1,5 +1,4 @@
 import mongoose from 'mongoose'
-import jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs'
 
 import { User } from '@db/models'
@@ -10,8 +9,12 @@ import {
     JWT_EXPIRATION,
     CRYPTO_COST_FACTOR,
     STATES,
+    TASK,
 } from '@server/constants'
 import { generate_random_id } from '@utility/misc'
+import fairy from '@server/fairy'
+import { schedule_unique, schedule_unique_now } from '@server/tasks'
+import { jwt_sign } from '@server/misc'
 
 export async function connect(MONGODB_URL) {
     console.log(MONGODB_URL)
@@ -27,12 +30,12 @@ export async function connect(MONGODB_URL) {
     }
 }
 
-export const create_user = async (data: IUser, { save = true, randomize_username = false } = {}) => {
+export const create_user = async (data: IUser, { save = true, randomize_username = false, unverify_email = true } = {}) => {
     let u = new User()
-    return await update_user_creds(u, data, {save, randomize_username})
+    return await update_user_creds(u, data, {save, randomize_username, unverify_email})
 }
 
-export const update_user_creds = async (user, data: IUser, { save = true, randomize_username = false, require_old_password = false } = {}) => {
+export const update_user_creds = async (user, data: IUser, { save = true, randomize_username = false, require_old_password = false, unverify_email = true } = {}) => {
 
     if (data.password) {
         if (require_old_password) {
@@ -57,7 +60,7 @@ export const update_user_creds = async (user, data: IUser, { save = true, random
     }
 
     if (data.email) {
-        if (user.email && (user.email !== data.email.toLowerCase())) {
+        if (user.email && (user.email !== data.email.toLowerCase()) && unverify_email) {
             // eslint-disable-next-line
             user.email_verified = false
         }
@@ -83,6 +86,22 @@ export const user_has_password = async (user_id) => {
     return !!(await User.findById(user_id).select("+password")).password
 }
 
+export const verify_user_email = async (user_id, old_email = undefined, only_if_unverified = false) => {
+    const user = await User.findById(user_id).select("email email_verified")
+    if (!user) {
+        throw Error(`User ${user_id} not found`)
+    }
+    if (only_if_unverified && user.email_verified) {
+        throw Error(`User ${user_id} already has a verified email`)
+    }
+    if (old_email && user.email !== old_email) {
+        throw Error(`User old email mismatch during verification`)
+    }
+    user.email_verified = true
+    await user.save()
+    return true
+}
+
 export const login_user = async (user: IUser, password, req, res) => {
     if (user) {
         let r = await check_user_password(user, password)
@@ -95,15 +114,9 @@ export const login_user = async (user: IUser, password, req, res) => {
 
 export const login_user_without_password = async (user: IUser, req, res) => {
     if (user && req && res) {
-        const token = jwt.sign(
-            { username: user.username, user_id: user._id },
-            JWT_KEY,
-            {
-                algorithm: 'HS256',
-                expiresIn: JWT_EXPIRATION,
-            }
-        )
+        const token = jwt_sign({ username: user.username, user_id: user._id })
         req.session.jwt_token = token
+        fairy().emit("user_logged_in", user)
         return token
     }
     return null
@@ -111,7 +124,12 @@ export const login_user_without_password = async (user: IUser, req, res) => {
 
 export const logout_user = async (req, res) => {
     if (req && res) {
-        cookie_session(req, res)
+        if (!req.session) {
+            cookie_session(req, res)
+        }
+        if (req.user) {
+            fairy().emit("user_logged_out", req.user)
+        }
         req.session = null
     }
 }
@@ -159,4 +177,25 @@ export const unlink_provider = async (user_id, provider) => {
     await user.save()
 
     return true
+}
+
+export const configure_fairy_handlers = () => {
+    
+    fairy()?.on("user_joined", user => {
+        if (!user.email_verified) {
+            schedule_unique_now({ key: user._id, task: TASK.activate_email, data: { user_id: user._id } })
+        }
+    })
+    
+    fairy()?.on("user_email_changed", (user, email) => {
+        if (!user.email_verified) {
+            schedule_unique_now({ key: user._id, task: TASK.activate_email, data: { user_id: user._id } })
+        }
+    })
+
+}
+
+if (global?.store && !global?.store?.user_fairy_handlers) {
+    configure_fairy_handlers()
+    global.store.user_fairy_handlers = true
 }

@@ -1,0 +1,37 @@
+<mjml>
+  <mj-head>
+    <mj-attributes>
+      <mj-preview>Komplent</mj-preview>
+      <mj-title>Komplent</mj-title>
+      <mj-class name="blue" color="blue" />
+      <mj-class name="primary" color="#F45E43" />
+      <mj-class name="bg-primary" background-color="#F45E43" />
+      <mj-class name="bd-primary" border-color="#F45E43" />
+      <mj-class name="small" font-size="12px" />
+      <mj-class name="big" font-size="20px" />
+      <mj-class name="title" font-size="35px" />
+      <mj-all font-family="Helvetica" font-size="14px" />
+    </mj-attributes>
+  </mj-head>
+  <mj-body>
+    <mj-section>
+      <mj-column>
+        <mj-text mj-class="primary title" align="center">Komplent</mj-text>
+        <mj-divider mj-class="bd-primary"></mj-divider>
+        <mj-text mj-class="big primary" align="center">Hi @{{user.username}}!</mj-text>
+        <mj-text mj-class="big primary" align="center">You've just signed up, or changed your email address at Komplent!</mj-text>
+        <mj-text mj-class="primary" align="center">We need you to confirm this action.</mj-text>
+        <mj-button mj-class="bg-primary" color="white" href="{{ confirm_url }}">
+          Confirm
+        </mj-button>
+        <mj-text mj-class="primary" align="center">Button doesn't work? Then use this link: </mj-text>
+        <mj-text mj-class="primary small" align="center"><a href="{{ confirm_url }}" target="_blank">{{ confirm_url }}</a></mj-text>
+      </mj-column>
+    </mj-section>
+    <mj-section>
+      <mj-column>
+        <mj-divider mj-class="bd-primary"></mj-divider>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

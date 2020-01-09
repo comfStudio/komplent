@@ -55,6 +55,7 @@ export const user_schema = new Schema(
             type: ObjectId,
             ref: 'Image',
         },
+        last_login: { type: Date, default: null },
         country: { type: String, es_indexed: true },
         description: String,
         socials: [{ url: String, name: String }],
