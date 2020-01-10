@@ -55,6 +55,7 @@ export const setup_email = ({host = CONFIG.EMAIL_HOST, port = CONFIG.EMAIL_PORT,
 }
 
 export enum Template {
+  recover_login = "recover_login",
   confirm_email = "confirm_email"
 }
 

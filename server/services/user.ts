@@ -37,17 +37,22 @@ export const create_user = async (data: IUser, { save = true, randomize_username
 
 export const update_user_creds = async (user, data: IUser, { save = true, randomize_username = false, require_old_password = false, unverify_email = true } = {}) => {
 
-    if (data.password) {
+    let _data = {...data}
+
+    if (_data.password) {
         if (require_old_password) {
-            if (user.password && !await check_user_password(user, data.old_password || "")) {
+            if (user.password && !await check_user_password(user, _data.old_password || "")) {
                 throw Error("Old password does not match")
             }
         }
-        user.password = await bcrypt.hash(data.password, CRYPTO_COST_FACTOR)
-        delete data.password
+        // eslint-disable-next-line
+        user.password = await bcrypt.hash(_data.password, CRYPTO_COST_FACTOR)
+        // eslint-disable-next-line
+        user.password_change_date = new Date()
+        delete _data.password
     }
 
-    if (data.username) {
+    if (_data.username) {
         user.username = data.username
         if (randomize_username) {
             if (!user.username || (user.username && (await User.findOne({username:user.username}).countDocuments()))) {
@@ -56,20 +61,20 @@ export const update_user_creds = async (user, data: IUser, { save = true, random
                 user.username = (prefix + generate_random_id(prefix ? 4 : 10)).toLowerCase()
             }
         }
-        delete data.username
+        delete _data.username
     }
 
-    if (data.email) {
-        if (user.email && (user.email !== data.email.toLowerCase()) && unverify_email) {
+    if (_data.email) {
+        if (user.email && (user.email !== _data.email.toLowerCase()) && unverify_email) {
             // eslint-disable-next-line
             user.email_verified = false
         }
         // eslint-disable-next-line
-        user.email = data.email
-        delete data.email
+        user.email = _data.email
+        delete _data.email
     }
 
-    user.set(data)
+    user.set(_data)
 
     if (save) {
         await user.save()
@@ -114,7 +119,7 @@ export const login_user = async (user: IUser, password, req, res) => {
 
 export const login_user_without_password = async (user: IUser, req, res) => {
     if (user && req && res) {
-        const token = jwt_sign({ username: user.username, user_id: user._id })
+        const token = jwt_sign({ username: user.username, user_id: user._id, password_change_date: user.password_change_date.getTime() })
         req.session.jwt_token = token
         fairy().emit("user_logged_in", user)
         return token
@@ -179,18 +184,27 @@ export const unlink_provider = async (user_id, provider) => {
     return true
 }
 
+export const send_activate_email = user => {
+    if (!user.email_verified) {
+        schedule_unique_now({ key: user._id, task: TASK.activate_email, data: { user_id: user._id } })
+        return true
+    }
+    return false
+}
+
+export const send_recover_email = user => {
+    schedule_unique_now({ key: user._id, task: TASK.reset_login, data: { user_id: user._id } })
+    return true
+}
+
 export const configure_fairy_handlers = () => {
     
     fairy()?.on("user_joined", user => {
-        if (!user.email_verified) {
-            schedule_unique_now({ key: user._id, task: TASK.activate_email, data: { user_id: user._id } })
-        }
+        send_activate_email(user)
     })
     
     fairy()?.on("user_email_changed", (user, email) => {
-        if (!user.email_verified) {
-            schedule_unique_now({ key: user._id, task: TASK.activate_email, data: { user_id: user._id } })
-        }
+        send_activate_email(user)
     })
 
 }

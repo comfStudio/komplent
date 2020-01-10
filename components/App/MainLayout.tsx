@@ -23,6 +23,7 @@ import { useUser } from '@hooks/user'
 import { get_user_room_id } from '@utility/request'
 import MatureContent from './MatureContent'
 import Footer from './Footer'
+import VerifyEmailPanel from '@components/User/VerifyEmail'
 
 interface Props extends ReactProps {
     activeKey?: string
@@ -39,6 +40,7 @@ interface Props extends ReactProps {
 export const MainLayout = (props: Props) => {
     const logged_in = useLoginStatus()
     const user = useUser()
+    const email_verified = user ? user.email_verified : true
 
     useMount(() => {
         if (!is_server()) {
@@ -109,6 +111,7 @@ export const MainLayout = (props: Props) => {
                 <NavMenu activeKey={props.activeKey} />
             </Header>
             <Content className="content">
+                {!email_verified && <VerifyEmailPanel bordered className="container mx-auto w-256 mt-4"/>}
                 {props.noContainer && <Grid fluid className={'h-full !p-0'}>{layout_content}</Grid>}
                 {!props.noContainer && <PageContainer><Grid fluid className={'h-full !p-0'}>{layout_content}</Grid></PageContainer>}
             </Content>
@@ -122,7 +125,7 @@ export const MainLayout = (props: Props) => {
 }
 
 export interface CenterPanelProps extends ReactProps, HTMLElementProps {
-    borderd?: boolean
+    bordered?: boolean
     padded?: boolean | number
     title?: string
     subtitle?: string
@@ -135,7 +138,7 @@ export const CenterPanel = (props: CenterPanelProps) => {
     }
 
     return (
-        <Panel bordered={props.borderd} className={classnames(cls)}>
+        <Panel bordered={props.bordered} className={classnames(cls)}>
             {props.title && <div className="text-4xl muted">{props.title}</div>}
             {props.children}
             {props.subtitle && (

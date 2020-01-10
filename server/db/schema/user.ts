@@ -50,6 +50,7 @@ export const user_schema = new Schema(
             es_indexed: true,
             // validate: optional_with_length(3, 60)
         },
+        password_change_date: { type: Date, default: Date.now },
         password: { type: String, minLength: 8, select: false },
         avatar: {
             type: ObjectId,
@@ -224,11 +225,11 @@ user_schema.virtual('rates', {
 
 user_schema.statics.check_exists = async function({ username, email }) {
     if (username) {
-        const r = await this.exists({ username: username })
+        const r = await this.exists({ username: username.toLowerCase() })
         if (r) return true
     }
     if (email) {
-        const r = await this.exists({ email: email })
+        const r = await this.exists({ email: email.toLowerCase() })
         if (r) return true
     }
     return false
@@ -238,6 +239,8 @@ export interface IUser extends Document {
     username?: string
     password?: string
     email?: string
+    name?: string
+    password_change_date?: Date
 }
 
 export interface IUserModel extends Model<IUser> {

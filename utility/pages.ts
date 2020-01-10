@@ -17,8 +17,10 @@ export const profile_stats = '/api/profile/stats'
 export const analytics = '/api/analytics'
 export const aggregates = '/api/aggregates'
 export const upload = '/api/upload'
+export const misc = '/api/misc'
 export const cdn_upload = '/api/cdn_upload'
 export const confirm = '/confirm'
+export const recover = '/recover'
 
 export const make_profile_id = user => {
     return `@${user.username}`

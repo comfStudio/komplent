@@ -213,6 +213,13 @@ export const useUserStore = createStore(
                     this.setState({
                         current_user: { ...this.state.current_user, ...data },
                     })
+
+                    r.json().then(j => {
+                        if (j.data.token) {
+                            this.update_user_token(j.data.token, false)
+                        }
+                    })
+                    
                 }
                 return r
             })

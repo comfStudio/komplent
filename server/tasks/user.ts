@@ -85,7 +85,27 @@ export default function(queue) {
         }
     })
 
-    queue.process(TASK.reset_login, async job => {})
+    queue.process(TASK.reset_login, async job => {
+        log.debug(`processing ${TASK.reset_login}`)
+        const { user_id } = job.data as TaskDataTypeMap<
+            TASK.reset_login
+        >
+        const user = await User.findById(user_id)
+        const jwt_token = jwt_sign({
+            user_id: user._id,
+            password_change_date: user.password_change_date.getTime(),
+            type: "recover",
+        }, 60 * 60 * 24) // 1 day // in seconds
+
+        send_email({
+            template: Template.recover_login,
+            to: user,
+            user,
+            locals: {
+                confirm_url: pages.build_url(pages.recover, {token: jwt_token})
+            }
+        })
+    })
 
     return r
 }

@@ -40,7 +40,7 @@ class DashboardPage extends Component<{ type: ConfirmType }> {
                 }
 
             } catch (err) {
-                log.error(`Error occurred during confirm page: ${err.message}`)
+                log.warn(`Error occurred during confirm page: ${err.message}`)
             }
         }
 

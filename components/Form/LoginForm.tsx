@@ -98,7 +98,7 @@ export const LoginForm = (props: LoginFormProps) => {
                 onSubmit={e => e.preventDefault()}
                 onChange={value => set_form_value(value)}>
                 <FormGroup>
-                    <ControlLabel>{t`Email address or Username`}</ControlLabel>
+                    <ControlLabel>{t`Email address or username`}</ControlLabel>
                     <FormControl name="name" accepter={Input} required />
                 </FormGroup>
                 <FormGroup>
@@ -143,12 +143,17 @@ export const LoginForm = (props: LoginFormProps) => {
                         <Message type="error" description={login_error} />
                     )}
                 </FormGroup>
-                <div>
+                <p>
                     {`Don't have an account yet?`}
                     <Link href="/join">
                         <a className="ml-1">{t`Join`}</a>
                     </Link>
-                </div>
+                </p>
+                <p>
+                    <Link href="/recover">
+                        <a>{t`Forgot your password?`}</a>
+                    </Link>
+                </p>
             </Form>
         </div>
     )

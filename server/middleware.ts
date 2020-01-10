@@ -31,12 +31,17 @@ export const get_jwt_data = token => {
 }
 
 export const get_jwt_user = async jwt_data => {
+    let user
     if (jwt_data.user_id) {
-        return await User.findById(jwt_data.user_id)
+        user = await User.findById(jwt_data.user_id)
             .populate('settings')
             .populate('avatar')
             .lean()
+        if (user.password_change_date.getTime() !== jwt_data.password_change_date) {
+            user = null
+        }
     }
+    return user
 }
 
 export const is_logged_in = async (req, res) => {

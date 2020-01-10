@@ -1,6 +1,5 @@
 import { BAD_REQUEST, OK, CREATED, NOT_FOUND } from 'http-status-codes'
 import microCors from 'micro-cors'
-import mongoose, { Document } from 'mongoose'
 
 import { error_message, data_message } from '@utility/message'
 import {
@@ -8,7 +7,7 @@ import {
     ExApiRequest,
     ExApiResponse,
 } from '@server/middleware'
-import { update_user_creds } from '@services/user'
+import { update_user_creds, login_user_without_password } from '@services/user'
 import { User } from '@db/models'
 
 const cors = microCors({ allowMethods: ['PUT', 'POST', 'OPTIONS'] })
@@ -18,9 +17,20 @@ export default with_auth_middleware(
         try {
             const { data } = req.json
 
-            const user = await update_user_creds(await User.findById(req.user._id).select("+password email username"), data, {randomize_username: false, require_old_password: true})
+            let r = {
+                user: undefined,
+                token: undefined
+            }
 
-            res.status(OK).json(data_message(user.toJSON()))
+            r.user = await update_user_creds(await User.findById(req.user._id).select("+password email username"), data, {randomize_username: false, require_old_password: true})
+            
+            if (data.password) {
+                r.token = await login_user_without_password(r.user, req, res)
+            }
+            
+            r.user = r.user.toJSON()
+
+            res.status(OK).json(data_message(r))
 
         } catch (err) {
             res.status(BAD_REQUEST).json(error_message(err.message))
