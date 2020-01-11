@@ -27,7 +27,7 @@ const ErrorPage = () => {
             err_text = t`Not found`
             break
         case MsgPageType.LoginDuplicateEmail:
-            err_text = t`An existing user is already associated with the email associated with this login`
+            err_text = t`An existing user is already associated with the email associated with this provider`
             break
         default:
             err_text = t`Error`
