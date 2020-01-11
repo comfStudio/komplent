@@ -1,68 +1,53 @@
 import React from 'react';
-import { Cat, Ghost, Backpack, CreditCard, File, IceCream, Mug, Planet, SpeechBubble } from 'react-kawaii'
 import { CenterPanel, CenterPanelProps } from './MainLayout';
+import { HTMLElementProps } from '@utility/props';
 
 interface EmptyProps {
-    type?: 'undraw_accept_request'
-    | 'undraw_accept_terms'
-    | 'undraw_android'
-    | 'undraw_around_the_world'
-    | 'undraw_art'
-    | 'undraw_artist'
-    | 'undraw_begin_chat'
-    | 'undraw_blank_canvas'
-    | 'undraw_cancel'
-    | 'undraw_completed'
-    | 'undraw_confirmation'
-    | 'undraw_connected_world'
-    | 'undraw_contact_us'
-    | 'undraw_deliveries'
-    | 'undraw_Devices'
-    | 'undraw_discount'
-    | 'undraw_download'
-    | 'undraw_elements'
-    | 'undraw_fingerprint'
-    | 'undraw_following'
-    | 'undraw_hire'
-    | 'undraw_interaction_design'
-    | 'undraw_investing'
-    | 'undraw_in_progress'
-    | 'undraw_making_art'
-    | 'undraw_notify'
-    | 'undraw_organize_photos'
-    | 'undraw_page_not_found'
-    | 'undraw_payments'
-    | 'undraw_personal_settings'
-    | 'undraw_profile_data'
-    | 'undraw_questions'
-    | 'undraw_security'
-    | 'undraw_server_down'
-    | 'undraw_setup_wizard'
-    | 'undraw_stripe_payments'
-    | 'undraw_team_page'
-    | 'undraw_update'
-    | 'undraw_upgrade'
-    | 'undraw_upload_image'
-    mood: 'sad' | 'shocked' | 'happy' | 'blissful' | 'lovestruck' | 'excited' | 'ko'
-    color?: string
+    type?: 'accept_request'
+    | 'accept_terms'
+    | 'android'
+    | 'around_the_world'
+    | 'art'
+    | 'artist'
+    | 'begin_chat'
+    | 'blank_canvas'
+    | 'cancel'
+    | 'completed'
+    | 'confirmation'
+    | 'connected_world'
+    | 'contact_us'
+    | 'deliveries'
+    | 'Devices'
+    | 'discount'
+    | 'download'
+    | 'elements'
+    | 'fingerprint'
+    | 'following'
+    | 'hire'
+    | 'interaction_design'
+    | 'investing'
+    | 'in_progress'
+    | 'making_art'
+    | 'notify'
+    | 'organize_photos'
+    | 'page_not_found'
+    | 'payments'
+    | 'personal_settings'
+    | 'profile_data'
+    | 'questions'
+    | 'security'
+    | 'server_down'
+    | 'setup_wizard'
+    | 'stripe_payments'
+    | 'team_page'
+    | 'update'
+    | 'upgrade'
+    | 'upload_image'
 }
 
-export const Empty = ({type = 'Cat', color = "rgba(0, 0, 0, 0.5)", ...props}: EmptyProps) => {
-    const El = {
-        Cat,
-        Ghost,
-        Backpack,
-        CreditCard,
-        File,
-        IceCream,
-        Mug,
-        Planet,
-        SpeechBubble,
-    }[type]
-
-
-
-    return (<El mood={props.mood} className="emoji" color={color} />);
+export const Empty = ({type = 'art', className = "m-auto", ...props}: EmptyProps & HTMLElementProps) => {
+    const el = require(`@assets/images/illust/${type}.svg`)
+    return (<img src={el} className={className} {...props} />);
 };
 
 interface EmptyPanelProps extends EmptyProps, CenterPanelProps {

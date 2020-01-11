@@ -277,13 +277,13 @@ const commission_request_model = {
 
 export const CommissionsClosed = () => {
     return (
-        <EmptyPanel type="Cat" mood="sad" subtitle={t`Closed for commissions`}/>
+        <EmptyPanel type="notify" subtitle={t`Closed for commissions`}/>
     )
 }
 
 export const RequestsClosed = () => {
     return (
-        <EmptyPanel type="Cat" mood="sad" subtitle={t`Closed for any more requests, please try later`}/>
+        <EmptyPanel type="notify" subtitle={t`Closed for any more requests, please try later`}/>
     )
 }
 

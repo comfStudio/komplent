@@ -14,6 +14,7 @@ import { update_db } from '@client/db'
 import { debounceReduce } from '@utility/misc'
 import { fetch } from '@utility/request'
 import { OK } from 'http-status-codes'
+import { useMount } from 'react-use';
 
 interface ProductProps {
     is_owner: boolean
@@ -81,7 +82,12 @@ const CommissionAssets = () => {
     const [show_lightbox, set_show_lightbox] = useState(false)
     const [sources, set_sources] = useState([])
 
-    let is_owner = user?._id === commission.from_user._id
+    const [ is_owner, set_is_owner ] = useState(true)
+
+    useMount(() => {
+        set_is_owner(user?._id === commission.from_user._id)
+    })
+    
     const products = store.state.products ?? []
 
     const on_upload = debounceReduce((args: any[]) => {
@@ -102,13 +108,13 @@ const CommissionAssets = () => {
             {!commission.accepted &&
             <Row>
                 <Col xs={24}>
-                    <EmptyPanel type="File" mood="sad" subtitle={t`Please accept the commission request to add assets`}/>
+                    <EmptyPanel type="confirmation" subtitle={t`Please accept the commission request to add assets`}/>
                 </Col>
             </Row>}
             {!unlocked &&
             <Row>
                 <Col xs={24}>
-                    <EmptyPanel type="File" mood="sad" subtitle={t`Assets are locked`}/>
+                    <EmptyPanel type="security" subtitle={t`Assets are locked`}/>
                     <hr/>
                 </Col>
             </Row>}

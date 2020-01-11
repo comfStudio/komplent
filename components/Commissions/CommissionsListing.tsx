@@ -10,6 +10,7 @@ import { t } from '@utility/lang'
 import { useUser } from '@hooks/user'
 import { ReactProps } from '@utility/props'
 import { CommissionItemPanelProps, CommissionItemPanel } from '@components/Commission'
+import { EmptyPanel } from '@components/App/Empty'
 
 const CommissionListItem = (props: CommissionItemPanelProps) => {
     return (
@@ -30,6 +31,7 @@ export const CommissionList = (props: CommissionListProps) => {
 
     return (
         <List hover bordered>
+            {!props.data.length && <EmptyPanel type="blank_canvas"/>}
             {props.data.map(d => <CommissionListItem key={d._id} data={d} />)}
         </List>
     )

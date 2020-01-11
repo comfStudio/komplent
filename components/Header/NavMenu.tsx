@@ -32,10 +32,10 @@ export const NavMenu = (props: Props) => {
                             {t`How It Works`}
                         </Nav.Item>
                     </Link> */}
-                    <Link href="/discover" passHref>
+                    <Link href="/search" passHref>
                         <Nav.Item
-                            eventKey="discover"
-                            active={props.activeKey == 'discover'}>
+                            eventKey="search"
+                            active={props.activeKey == 'search'}>
                             {t`Explore creators`}
                         </Nav.Item>
                     </Link>

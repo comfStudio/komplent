@@ -21,6 +21,8 @@ export const misc = '/api/misc'
 export const cdn_upload = '/api/cdn_upload'
 export const confirm = '/confirm'
 export const recover = '/recover'
+export const followers = '/followers'
+export const followings = '/followings'
 
 export const make_profile_id = user => {
     return `@${user.username}`
@@ -74,6 +76,11 @@ export const make_commission_urlpath = (commission_object: { _id: string }) => {
 
 export const make_search_urlpath = (page, size, query) => {
     let url = search
+    url += '?' + qs.stringify({...query, page, size})
+    return url
+}
+
+export const make_follow_urlpath = (url, page, size, query) => {
     url += '?' + qs.stringify({...query, page, size})
     return url
 }

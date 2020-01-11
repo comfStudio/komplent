@@ -23,6 +23,10 @@
         padding: 0;
         padding-bottom: 1.8em;
     }
+
+    > div {
+        box-shadow: none;
+    }
 }
 
 #main-layout {

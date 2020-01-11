@@ -4,6 +4,7 @@ import MainLayout from '@components/App/MainLayout'
 import FollowLayout from '@components/Follow/FollowLayout'
 import FollowPage, { TypeKey } from '@components/App/FollowPage'
 import CreatorCard from '@components/User/CreatorCard'
+import * as pages from '@utility/pages'
 
 class Page extends FollowPage {
 
@@ -12,7 +13,7 @@ class Page extends FollowPage {
     render() {
         return this.renderPage(
             <MainLayout activeKey="followings">
-                <FollowLayout UserComponent = {CreatorCard} />
+                <FollowLayout url={pages.followings} UserComponent = {CreatorCard} />
             </MainLayout>
         )
     }

@@ -6,17 +6,18 @@ import { useRouter } from 'next/router'
 import CreatorCard from '@components/User/CreatorCard'
 import * as pages from '@utility/pages'
 
-export const ResultLayout = ({UserComponent = CreatorCard, userComponentProps = undefined, ...props}: {size: number, count: number, page: number, items: any[], UserComponent: React.ElementType, userComponentProps?: object}) => {
+export const ResultLayout = ({UserComponent = CreatorCard, userComponentProps = undefined, ...props}: { on_page?: Function, children?: any, size: number, count: number, page: number, items: any[], UserComponent: React.ElementType, userComponentProps?: object}) => {
     const router = useRouter()
 
     const page_count = Math.floor(props.count / props.size)
     const current_page = props.page
 
-    const on_page = p => router.push(pages.make_search_urlpath(p, props.size, router.query))
+    const on_page = props.on_page ?? (p => router.push(pages.make_search_urlpath(p, props.size, router.query)))
 
     return (
         <Panel className="h-full">
             <Grid fluid className="h-full">
+                {!!props.items.length && 
                 <Row className="text-center">
                     <Pagination
                         onSelect={on_page}
@@ -28,7 +29,7 @@ export const ResultLayout = ({UserComponent = CreatorCard, userComponentProps = 
                         prev
                         ellipsis
                     />
-                </Row>
+                </Row>}
                 <Row>
                     <Col xs={24}>
                         <FlexboxGrid>
@@ -39,9 +40,11 @@ export const ResultLayout = ({UserComponent = CreatorCard, userComponentProps = 
                                     </FlexboxGrid.Item>
                                 )
                             })}
+                            {props.children}
                         </FlexboxGrid>
                     </Col>
                 </Row>
+                {!!props.items.length && 
                 <Row className="text-center">
                     <Pagination
                         onSelect={on_page}
@@ -53,7 +56,7 @@ export const ResultLayout = ({UserComponent = CreatorCard, userComponentProps = 
                         prev
                         ellipsis
                     />
-                </Row>
+                </Row>}
             </Grid>
         </Panel>
     )

@@ -15,6 +15,7 @@ import { t } from '@app/utility/lang'
 import NewConvoModal from './NewConvoModal'
 import useInboxStore, { InboxKey } from '@store/inbox'
 import * as pages from '@utility/pages'
+import Empty from '@components/App/Empty'
 
 interface Props {
     activeKey?: InboxKey
@@ -60,7 +61,7 @@ const InboxLayout = (props: Props) => {
                 </Row>
                 <hr />
                 <Row>
-                    <Col xsPush={3} xs={21} className="clearfix mb-2">
+                    <Col xsPush={1} xs={23} className="clearfix mb-2">
                         <ButtonGroup>
                             <Link href={pages.inbox + '?' + qs.stringify({ type:'commission' })} passHref>
                                 <Button active={btn_state.commission} componentClass="a">{t`Commission`}</Button>
@@ -77,17 +78,15 @@ const InboxLayout = (props: Props) => {
                 <Row>
                     <Col xs={24}>
                         <FlexboxGrid>
-                            <FlexboxGrid.Item componentClass={Col} xs={3}>
-                                <InboxSidebar activeKey={props.activeKey} />
-                            </FlexboxGrid.Item>
-                            <FlexboxGrid.Item className="!flex-grow" colspan={21} componentClass={Col} xs={6}>
+                            <FlexboxGrid.Item className="!flex-grow" colspan={22} componentClass={Col} xs={7}>
                                 <InboxList />
                             </FlexboxGrid.Item>
-                            {!!store.state.active_conversation &&
-                            <FlexboxGrid.Item componentClass={Col} xs={15}>
-                                <InboxConversation />
+                            <FlexboxGrid.Item componentClass={Col} xs={17}>
+                                {!!store.state.active_conversation &&
+                                    <InboxConversation />
+                                }
+                                {!store.state.active_conversation && <Empty type="begin_chat"/>}
                             </FlexboxGrid.Item>
-                            }
                         </FlexboxGrid>
                     </Col>
                 </Row>

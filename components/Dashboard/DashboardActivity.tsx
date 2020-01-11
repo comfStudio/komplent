@@ -16,6 +16,7 @@ import { useUser } from '@hooks/user'
 import { fetch } from '@utility/request'
 
 import './DashboardActivity.scss'
+import { EmptyPanel } from '@components/App/Empty'
 
 interface NotificationProps {
     data: any
@@ -150,6 +151,7 @@ const DashboardActivity = () => {
     return (
         <>
         <PanelGroup>
+            {!store.state.notifications.length && <EmptyPanel type="deliveries"/>}
             {store.state.notifications.map(d => {
                 return <Notification key={d._id} data={d} />
             })}

@@ -163,7 +163,7 @@ export const Conversation = (props: ConversationProps) => {
             </ul>
             }
             {/* {!messages.length && <OpenChat/>} */}
-            {!messages.length && <EmptyPanel type="Ghost" mood="shocked" subtitle={`Send your first message`}/>}
+            {!messages.length && <EmptyPanel type="begin_chat" subtitle={`Send your first message`}/>}
             <MessageInput onMessage={onMessage} />
         </Panel>
     )
