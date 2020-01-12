@@ -12,6 +12,7 @@ import useUserStore, { useNotificationStore } from '@store/user'
 import { NoProfileContext } from '@client/context'
 import { get_profile_name } from '@utility/misc'
 import { useRouter } from 'next/router'
+import useInboxStore from '@store/inbox'
 
 interface Props {}
 
@@ -39,6 +40,7 @@ export const NavUserMenu = (props: UserMenuProps) => {
     const [dashboard_count, set_dashboard_count] = useState(0)
     const [followers_count, set_followers_count] = useState(0)
     const [followings_count, set_followings_count] = useState(0)
+    const [message_count, set_message_count] = useState(0)
 
     useMount(() => {
         useNotificationStore.actions.get_notifications_count(user).then(r => {
@@ -49,6 +51,9 @@ export const NavUserMenu = (props: UserMenuProps) => {
         })
         useUserStore.actions.get_follow_count('follower', user).then(r => {
             set_followings_count(r)
+        })
+        useInboxStore.actions.get_messages_unread_count(user._id).then(r => {
+            set_message_count(r)
         })
     })
 
@@ -69,9 +74,7 @@ export const NavUserMenu = (props: UserMenuProps) => {
                     active={props.activeKey == 'dashboard'}>
                     <span>
                         {t`Dashboard`}
-                        {dashboard_count ? (
-                            <Badge className="ml-2" content={dashboard_count} />
-                        ) : null}
+                        {!!dashboard_count && <Badge className="ml-2" content={dashboard_count} />}
                     </span>
                 </El.Item>
             </Link>
@@ -84,7 +87,10 @@ export const NavUserMenu = (props: UserMenuProps) => {
             </Link>
             <Link href="/inbox" passHref>
                 <El.Item eventKey="inbox" active={props.activeKey == 'inbox'}>
-                    {t`Messages`}
+                    <span>
+                        {t`Messages`}
+                        {!!message_count && <Badge className="ml-2"/>}
+                    </span>
                 </El.Item>
             </Link>
             {user?.type === 'creator' &&

@@ -88,9 +88,13 @@ export const useInboxStore = createStore(
             user,
             type: InboxType,
             search_query,
+            page = 0,
             build = true,
             { active = false, trashed = false } = {}
         ) {
+
+            const limit = 30
+
             let q = bodybuilder()
             q = q.query('match', 'users', user._id.toString())
             q = q.sort("last_message", "desc")
@@ -112,7 +116,7 @@ export const useInboxStore = createStore(
                 })
             }
 
-            q = q.from(0).size(30)
+            q = q.from(page * limit).size(limit)
 
             return build ? q.build() : q
         },
@@ -120,10 +124,10 @@ export const useInboxStore = createStore(
             user,
             type: InboxType,
             search_query,
-            { active = false, trashed = false } = {}
+            { active = false, trashed = false, page = 0 } = {}
         ) {
             let r = []
-            let q = this.parse_search_query(user, type, search_query, false, {
+            let q = this.parse_search_query(user, type, search_query, page, false, {
                 trashed,
             })
 
@@ -131,7 +135,17 @@ export const useInboxStore = createStore(
                 hydrate: true,
                 hydrateOptions: {
                     lean: true,
-                    populate: 'commission users',
+                    populate: [
+                        { path: "commission"},
+                        {
+                        path: 'users',
+                        populate: [
+                            {
+                                path: 'avatar',
+                            },
+                        ]
+                    },
+                ]
                 },
             }
             let d: any
@@ -184,10 +198,53 @@ export const useInboxStore = createStore(
             }
             return u
         },
-        async get_messages(conversation_id, limit = 30) {
+        async get_messages_unread_count(current_user_id) {
+            let q = { users_read: { "$ne": current_user_id } }
+            let u
+            if (is_server()) {
+                u = await Message.find(q).countDocuments()
+            } else {
+                await fetch('/api/fetch', {
+                    method: 'post',
+                    body: {
+                        model: 'Message',
+                        query: q,
+                        count: true,
+                    },
+                }).then(async r => {
+                    if (r.ok) {
+                        u = (await r.json()).data
+                    }
+                })
+            }
+            return u
+        },
+        async get_conversation_read_status(conversation_id, current_user_id) {
+            let q = { conversation: conversation_id, users_read: { "$ne": current_user_id } }
+            let u
+            if (is_server()) {
+                throw Error("not implemented")
+            } else {
+                await fetch('/api/fetch', {
+                    method: 'post',
+                    body: {
+                        model: 'Message',
+                        query: q,
+                        count: true,
+                    },
+                }).then(async r => {
+                    if (r.ok) {
+                        u = (await r.json()).data
+                    }
+                })
+            }
+            return u
+        },
+        async get_messages(conversation_id, {page = 0, limit = 15} = {}) {
             let mdata = []
             let q = { conversation: conversation_id }
             let s = { created: -1 }
+            let skip = limit * page
             let p = [
                 {
                     path: 'user',
@@ -202,6 +259,7 @@ export const useInboxStore = createStore(
                 mdata = await Message.find(q)
                     .populate(p)
                     .sort(s)
+                    .skip(skip)
                     .limit(limit)
                     .lean()
             } else {
@@ -212,6 +270,7 @@ export const useInboxStore = createStore(
                         query: q,
                         populate: p,
                         sort: s,
+                        skip,
                         limit,
                     },
                 }).then(async r => {
@@ -220,7 +279,7 @@ export const useInboxStore = createStore(
                     }
                 })
             }
-            return mdata.reverse()
+            return mdata
         },
         async new_message(
             user: any,
@@ -241,7 +300,14 @@ export const useInboxStore = createStore(
                 schema: message_schema,
                 create: true,
                 validate: true,
-                populate: 'user',
+                populate: {
+                    path: 'user',
+                    populate: [
+                        {
+                            path: 'avatar',
+                        },
+                    ]
+                },
                 ...params,
             })
             if (r.status) {
@@ -251,6 +317,30 @@ export const useInboxStore = createStore(
             }
 
             return r
+        },
+        async mark_message_read(user: any, message: any, { params = undefined } = {}) {
+            let users_read = message.users_read
+            if (!users_read.includes(user._id)) {
+                let d = {
+                    _id: message._id,
+                    users_read: [user._id, ...users_read],
+                }
+    
+                let r = await update_db({
+                    model: 'Message',
+                    data: d,
+                    schema: message_schema,
+                    create: false,
+                    validate: true,
+                    ...params,
+                })
+                if (r.status) {
+                    return r.body.data
+                }
+    
+                return r
+            }
+            return null
         },
     }
 )

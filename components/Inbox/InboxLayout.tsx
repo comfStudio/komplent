@@ -64,13 +64,13 @@ const InboxLayout = (props: Props) => {
                     <Col xsPush={1} xs={23} className="clearfix mb-2">
                         <ButtonGroup>
                             <Link href={pages.inbox + '?' + qs.stringify({ type:'commission' })} passHref>
-                                <Button active={btn_state.commission} componentClass="a">{t`Commission`}</Button>
+                                <Button appearance={btn_state.commission ? "primary" : "ghost"} active={btn_state.commission} componentClass="a">{t`Commission`}</Button>
                             </Link>
                             <Link href={pages.inbox + '?' + qs.stringify({ type:'private' })} passHref>
-                                <Button active={btn_state.private} componentClass="a">{t`Personal`}</Button>
+                                <Button appearance={btn_state.private ? "primary" : "ghost"} active={btn_state.private} componentClass="a">{t`Personal`}</Button>
                             </Link>
                             <Link href={pages.inbox + '?' + qs.stringify({ type:'staff' })} passHref>
-                                <Button active={btn_state.staff} componentClass="a">{t`Staff`}</Button>
+                                <Button appearance={btn_state.staff ? "primary" : "ghost"} active={btn_state.staff} componentClass="a">{t`Staff`}</Button>
                             </Link>
                         </ButtonGroup>
                     </Col>

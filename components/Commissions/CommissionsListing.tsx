@@ -117,24 +117,24 @@ export const CommissionsListing = (props: CommissionsListingProps) => {
                     }
                     <ButtonGroup className="float-right">
                         <Link  href={pages.commissions + '?' + qs.stringify({ type:router.query.type, all: true })} passHref>
-                            <Button active={btn_state.all} componentClass="a">{t`All`}</Button>
+                            <Button appearance={btn_state.all ? "primary" : "ghost"} active={btn_state.all} componentClass="a">{t`All`}</Button>
                         </Link>
                         <Link href={pages.commissions + '?' + qs.stringify({ type:router.query.type, ongoing: (!btn_state.ongoing).toString() })} passHref>
-                            <Button active={btn_state.ongoing} componentClass="a">{t`On-going`}</Button>
+                            <Button appearance={btn_state.ongoing ? "primary" : "ghost"} active={btn_state.ongoing} componentClass="a">{t`On-going`}</Button>
                         </Link>
                         <Link href={pages.commissions + '?' + qs.stringify({ type:router.query.type, completed: (!btn_state.completed).toString() })} passHref>
-                            <Button active={btn_state.completed} componentClass="a">{t`Completed`}</Button>
+                            <Button appearance={btn_state.completed ? "primary" : "ghost"} active={btn_state.completed} componentClass="a">{t`Completed`}</Button>
                         </Link>
                         {user?.type !== 'creator' &&
                         <Link href={pages.commissions + '?' + qs.stringify({ type:router.query.type, rejected: (!btn_state.rejected).toString() })} passHref>
-                            <Button active={btn_state.rejected} componentClass="a">{t`Rejected`}</Button>
+                            <Button appearance={btn_state.rejected ? "primary" : "ghost"} active={btn_state.rejected} componentClass="a">{t`Rejected`}</Button>
                         </Link>
                         }
                         <Link href={pages.commissions + '?' + qs.stringify({ type:router.query.type, failed: (!btn_state.failed).toString() })} passHref>
-                            <Button active={btn_state.failed} componentClass="a">{t`Failed`}</Button>
+                            <Button appearance={btn_state.failed ? "primary" : "ghost"} active={btn_state.failed} componentClass="a">{t`Failed`}</Button>
                         </Link>
                         <Link href={pages.commissions + '?' + qs.stringify({ type:router.query.type, expired: (!btn_state.expired).toString() })} passHref>
-                            <Button active={btn_state.expired} componentClass="a">{t`Expired`}</Button>
+                            <Button appearance={btn_state.expired ? "primary" : "ghost"} active={btn_state.expired} componentClass="a">{t`Expired`}</Button>
                         </Link>
                     </ButtonGroup>
                 </ButtonToolbar>

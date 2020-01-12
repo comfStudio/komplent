@@ -6,7 +6,7 @@ import { t } from '@app/utility/lang'
 import useUserStore from '@client/store/user'
 
 interface Props {
-    activeKey?: 'commissions' | 'requests'
+    activeKey?: 'commissions' | 'requests' | 'assets'
 }
 
 const CommissionsMenu = (props: Props) => {
@@ -27,6 +27,13 @@ const CommissionsMenu = (props: Props) => {
                     {t`Commissions`} <Badge content={active_comm_count} />
                 </Nav.Item>
             </Link>
+            <Link href="/assets" passHref>
+                <Nav.Item
+                    eventKey="assets"
+                    active={props.activeKey == 'assets'}>
+                    {t`Assets`}
+                </Nav.Item>
+            </Link>
             {store.state.current_user.type === 'creator' && (
                 <>
                     <Link href="/commissions/requests" passHref>
@@ -41,6 +48,7 @@ const CommissionsMenu = (props: Props) => {
                     </Link>
                 </>
             )}
+
         </Nav>
     )
 }

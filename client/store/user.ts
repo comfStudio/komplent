@@ -11,7 +11,7 @@ import { COOKIE_AUTH_TOKEN_KEY, AnalyticsType } from '@server/constants'
 import { get_jwt_data, get_jwt_user } from '@server/middleware'
 import { update_db } from '@app/client/db'
 import user_schema, { user_store_schema } from '@schema/user'
-import { Follow, Tag, Notification, User, Commission } from '@db/models'
+import { Follow, Tag, Notification, User, Commission, Message } from '@db/models'
 import { get_commissions_count } from '@services/aggregates'
 import { update_user_creds } from '@services/user'
 
@@ -453,7 +453,8 @@ export const useNotificationStore = createStore(
                 model: "Notification",
                 data: {_id: notif_id, read: new Date()}
             })
-        }
+        },
+
     }
 )
 

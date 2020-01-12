@@ -1,4 +1,30 @@
 $avatar-size: 3.5em;
+$max-height: 60vh;
+
+.conversation-list {
+    overflow-y: auto;
+    max-height: $max-height + 10;
+}
+
+.message-list {
+
+    .messages {
+        overflow-y: auto;
+        max-height: $max-height;
+    }
+}
+
+.convo-header {
+    .metadata::before {
+        content: '';
+        width: 0.6em;
+        height: 0.6em;
+        border-radius: 7px;
+        background: rgba(0, 0, 0, 0.2);
+        display: inline-block;
+        margin: 0 0.7em;
+    }
+}
 
 .message {
     margin: 2em 1em;
@@ -42,6 +68,7 @@ $avatar-size: 3.5em;
             small {
                 color: rgba(0, 0, 0, 0.4);
             }
+
         }
     }
 
@@ -90,5 +117,25 @@ $avatar-size: 3.5em;
         .body::after {
             left: initial;
         }
+    }
+
+    &.unread {
+
+        .body {
+            @apply border-primary;
+        }
+
+        .header {
+
+            small {
+                @apply text-primary;
+            }
+    
+            small::before {
+                @apply bg-primary;
+            }
+            
+        }
+
     }
 }

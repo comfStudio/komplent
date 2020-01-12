@@ -13,7 +13,7 @@ import useUserStore from '@store/user'
 import { t } from '@app/utility/lang'
 
 interface Props extends ReactProps {
-    activeKey?: 'commissions' | 'requests'
+    activeKey?: 'commissions' | 'requests' | 'assets'
 }
 
 const CommissionsLayout = (props: Props) => {
