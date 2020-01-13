@@ -25,7 +25,7 @@ import MatureContent from './MatureContent'
 import Footer from './Footer'
 import VerifyEmailPanel from '@components/User/VerifyEmail'
 
-interface Props extends ReactProps {
+export interface MainLayoutProps extends ReactProps {
     activeKey?: string
     pageProps?: object
     noSidebar?: boolean
@@ -37,7 +37,7 @@ interface Props extends ReactProps {
     noContentPadded?: boolean
 }
 
-export const MainLayout = (props: Props) => {
+export const MainLayout = (props: MainLayoutProps) => {
     const logged_in = useLoginStatus()
     const user = useUser()
     const email_verified = user ? user.email_verified : true

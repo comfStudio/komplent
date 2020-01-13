@@ -7,15 +7,14 @@ export default function Page(props) {
 }
 
 Page.getInitialProps = function(ctx: NextPageContext) {
-    const { slug } = ctx.query
+    const slug = "terms-and-conditions"
     let content = require(`./${slug}.json`)
 
     return {
         slug: slug,
-        fileRelativePath: `pages/blog/${slug}.json`,
+        fileRelativePath: `pages/${slug}.json`,
         title: content.title,
         subtitle: content.subtitle,
-        updated: content.updated,
         body: content.body,
     }
 }
