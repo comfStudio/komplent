@@ -4,7 +4,7 @@ import React from 'react'
 import NProgress from 'nprogress'
 import Router from 'next/router'
 import localForage from 'localforage'
-// import { Tina, TinaCMS } from 'tinacms'
+import { Tina, TinaCMS } from 'tinacms'
 import { GitClient } from '@tinacms/git-client'
 
 import { Title } from '@components/App'
@@ -37,6 +37,8 @@ import CONFIG from '@server/config'
 import { synchronize_indexes } from '@services/search'
 import useProfileStore from '@store/profile'
 import { setup_email } from '@services/email'
+import { create_tag_defaults } from '@services/tag'
+import { create_user_defaults } from '@services/user'
 
 // Router.onRouteChangeStart = () => NProgress.start();
 // Router.onRouteChangeComplete = () => NProgress.done();
@@ -61,8 +63,8 @@ const server_initialize = async () => {
         await connect(CONFIG.MONGODB_URL)
         if (STATES.MONGODB_CONNECTED) {
             synchronize_indexes()
-            await useTagStore.actions._create_defaults()
-            await useUserStore.actions._create_defaults()
+            await create_tag_defaults()
+            await create_user_defaults()
             await setup_streams()
         }
     }
@@ -96,9 +98,9 @@ class KomplentApp extends App {
     tinacms: any
     constructor(props) {
         super(props)
-        // this.tinacms = new TinaCMS()
-        const client = new GitClient('http://localhost:3005/___tina')
-        // this.tinacms.registerApi('git', client)
+        this.tinacms = new TinaCMS()
+        const tina_client = new GitClient('http://localhost:3510/___tina')
+        this.tinacms.registerApi('git', tina_client)
     }
 
     render() {
@@ -108,14 +110,12 @@ class KomplentApp extends App {
         const getLayout = page => page
 
         return (
-            // <Tina cms={this.tinacms} position={"overlay"}>
-            <>
+            <Tina cms={this.tinacms} position={"overlay"}>
                 <Title>Komplent</Title>
                 <StoreProvider>
                     {getLayout(<Component {...pageProps} />)}
                 </StoreProvider>
-            </>
-            // </Tina>
+            </Tina>
         )
     }
 }

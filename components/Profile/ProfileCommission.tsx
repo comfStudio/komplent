@@ -171,7 +171,7 @@ export const CommissionCard = (props: CommissionCardProps) => {
             </Panel>
 
     return (
-        <div className="inline-block relative mx-auto">
+        <div className="block relative mx-auto">
             {/* <span className="commission-card-info">
             <Whisper
                 trigger="hover"

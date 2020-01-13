@@ -188,7 +188,9 @@ export const Conversation = (props: ConversationProps) => {
     const message_top = useRef(null)
 
     const scroll_to_bottom = (behavior = "smooth") => {
-        message_top.current.scrollIntoView({ behavior, block: 'nearest' })
+        if (message_top.current) {
+            message_top.current.scrollIntoView({ behavior, block: 'nearest' })
+        }
     }
 
     useEffect(() => {
@@ -207,6 +209,7 @@ export const Conversation = (props: ConversationProps) => {
         if (r.status) {
             set_messages([r.body.data, ...messages])
             scroll_to_bottom()
+            store.setState({conversations: [store.state.conversations.filter(v => v._id === props.conversation._id)[0], ...store.state.conversations.filter(v => v._id !== props.conversation._id)]})
         }
         return r
     }

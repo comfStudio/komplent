@@ -44,12 +44,30 @@
             "console": "integratedTerminal",
             "restart": true,
             "timeout": 250000
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Next: Tina",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": [
+                "run-script",
+                "tina"
+            ],
+            "skipFiles": [
+                "node_modules/**/*.js",
+                "lib/**/*.js"
+              ],
+            "port": 9229,
+            "console": "integratedTerminal",
+            "restart": true,
+            "timeout": 250000
         }
     ],
     "compounds": [
         {
             "name": "Next: Full",
-            "configurations": ["Next: Node", "Next: Firefox"]
+            "configurations": ["Next: Node", "Next: Tina", "Next: Firefox"]
         }
     ]
 }

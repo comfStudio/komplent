@@ -228,10 +228,7 @@ export const useSearchStore = createStore(
 
             let data = []
             
-            let tag_q = {categories: {
-                $type: 'array', $ne: [],
-                $elemMatch: {$in: category_ids}
-            }, special: false}
+            let tag_q = {categories: { $in : category_ids }, special: false}
 
             if (is_server()) {
                 try {

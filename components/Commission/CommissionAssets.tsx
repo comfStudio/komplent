@@ -105,7 +105,7 @@ const CommissionAssets = () => {
 
     return (
         <Grid fluid>
-            {!commission.accepted &&
+            {!commission.accepted && !is_owner &&
             <Row>
                 <Col xs={24}>
                     <EmptyPanel type="confirmation" subtitle={t`Please accept the commission request to add assets`}/>

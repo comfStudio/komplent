@@ -197,6 +197,28 @@ export const send_recover_email = user => {
     return true
 }
 
+export const create_user_defaults = async () => {
+    const default_users = [
+        {
+            name: 'staff',
+            username: 'staff',
+            visibility: 'hidden',
+            type: 'staff',
+            email: 'staff@komplent.com',
+            password: 'staff@komplent.com',
+        },
+    ]
+
+    for (let t of default_users) {
+        await User.findOne({ username: t.username }).then(v => {
+            if (!v) {
+                let d = new User(t)
+                d.save()
+            }
+        })
+    }
+}
+
 export const configure_fairy_handlers = () => {
     
     fairy()?.on("user_joined", user => {

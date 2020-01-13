@@ -19,6 +19,7 @@ import { TASK, CommissionPhaseT, NSFW_LEVEL } from '@server/constants'
 import { CommissionPhase, Conversation, Commission, Image, Tag, User } from '@db/models'
 import { update_price_stats, update_delivery_time_stats } from '@services/analytics'
 import fairy from '@server/fairy'
+import { message_schema } from './message'
 
 
 user_schema.pre('save', async function() {
@@ -55,6 +56,10 @@ user_schema.pre('save', async function() {
         if (this.isModified("email")) {
             fairy().emit("user_email_changed", this, this.email)
         }
+    }
+
+    if (this.wasNew) {
+        fairy().emit("user_joined", this)
     }
 })
 
@@ -125,9 +130,6 @@ commission_schema.post('save', async function() {
         })
     }
 
-    if (this.wasNew) {
-        _fairy.emit("user_joined", this)
-    }
 })
 
 commission_phase_schema.pre('save', async function() {
@@ -205,4 +207,10 @@ comission_rate_schema.post('remove', async function() {
 
     update_price_stats(this.user)
     update_delivery_time_stats(this.user)
+})
+
+message_schema.pre('save', async function() {
+    if (this.isNew) {
+        Conversation.findByIdAndUpdate(this.conversation, { last_message: new Date() })
+    }
 })

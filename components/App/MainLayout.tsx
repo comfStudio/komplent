@@ -111,7 +111,7 @@ export const MainLayout = (props: Props) => {
                 <NavMenu activeKey={props.activeKey} />
             </Header>
             <Content className="content">
-                {!email_verified && <VerifyEmailPanel bordered className="container mx-auto w-256 mt-4"/>}
+                {!email_verified && <VerifyEmailPanel bordered className="container mx-auto w-256 mt-4 mb-2"/>}
                 {props.noContainer && <Grid fluid className={'h-full !p-0'}>{layout_content}</Grid>}
                 {!props.noContainer && <PageContainer><Grid fluid className={'h-full !p-0'}>{layout_content}</Grid></PageContainer>}
             </Content>
