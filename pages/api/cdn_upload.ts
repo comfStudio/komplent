@@ -24,14 +24,14 @@ export default with_auth_middleware(
             const form = new formidable.IncomingForm()
             form.encoding = 'utf-8'
             form.keepExtensions = true
-            form.maxFileSize = 3 * 1024 * 1024 // 3mb
+            form.maxFileSize = 3 * 10 * 1024 * 1024 // 3mb
 
             return form.parse(req, (err, fields, files) => {
                 if (files.file && !err) {
                     const filestream = fs.createReadStream(files.file.path)
                     upload_file(filestream, path.basename(files.file.path)).then(r => {
                         r.Location
-                        res.status(OK).json(data_message({ url: r.Location, key: r.Key }))
+                        res.status(OK).json(data_message({ url: r.Location, name: files.file.name, key: r.Key }))
                     }).catch(r => {
                         log.error(r)
                         return res

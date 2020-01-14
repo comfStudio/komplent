@@ -450,8 +450,6 @@ export const ProfileCommission = () => {
 
     const on_upload = debounce((r) => set_uploading(r), 500)
 
-    console.log(form_value)
-
     return (
         <Form
             fluid
@@ -561,6 +559,7 @@ export const ProfileCommission = () => {
                                 <FlexboxGrid.Item className="!p-0">
                                     <FormControl
                                         name="anonymous"
+                                        defaultChecked={current_user?.anonymous}
                                         value={form_value?.anonymous ? false : true}
                                         accepter={Checkbox}
                                     >
@@ -568,7 +567,7 @@ export const ProfileCommission = () => {
                                     </FormControl>
                                 </FlexboxGrid.Item>
                             </FlexboxGrid>
-                            <HelpBlock>{t`Your name will be hidden to the creator`}</HelpBlock>
+                            <HelpBlock>{t`Your name will be hidden from the creator`}</HelpBlock>
                         </FormGroup>
                     </Col>
                 </Row>

@@ -375,8 +375,15 @@ export const useCommissionStore = createStore(
         },
 
         async delete_product(_id) {
-            const r = await update_db({model: "Attachment", data:{_id}, delete: true})
-            this.update({products: this.get_commission().products.filter(v => v._id !== _id)})
+            let r = await fetch('/api/asset', {
+                method: 'delete',
+                body: { commission_id: this.state.commission._id, asset_ids: [_id] },
+            })
+
+            if (r.ok) {
+                this.setState({products: this.state.products.filter(v => v._id != _id)})
+            }
+
             return r
         },
 

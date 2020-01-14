@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import { Grid, Row, Col, Uploader, Icon, Button, Panel, IconButton } from 'rsuite'
+import { Grid, Row, Col, Uploader, Icon, Button, Panel, IconButton, Message } from 'rsuite'
 import FsLightbox from 'fslightbox-react'; 
 import classnames from 'classnames'
+import ImgExts from 'image-extensions'
 
 import Image from '@components/App/Image'
 import { t } from '@utility/lang'
@@ -33,8 +34,23 @@ export const Asset = (props: ProductProps) => {
     const [ delete_loading, set_delete_loading ] = useState(false)
     const [ data, set_data ] = useState(typeof props.data === 'string' ? undefined : props.data )
     const [ loading, set_loading ] = useState(false)
+    const [ icon, set_icon ] = useState("file-o")
 
     useEffect(() => {
+
+        if (props.data) {
+            if (props.data.name) {
+                let ext = [...ImgExts]
+                let n = props.data.name.toLowerCase()
+                while (ext.length) {
+                    if (n.endsWith(ext.pop())) {
+                        ext = []
+                        set_icon("file-image-o")
+                    }
+                }   
+            }
+        }
+
         if (!props.locked && typeof props.data === 'string') {
             set_loading(true)
             fetch('/api/fetch', {
@@ -53,9 +69,9 @@ export const Asset = (props: ProductProps) => {
     }, [props.data])
 
     return (
-        <Panel bordered bodyFill className={classnames(props.className)}>
+        <Panel bordered bodyFill className={classnames(props.className, "hover:bg-gray-100 cursor-pointer")} onClick={props.onClick}>
             <div className="flex content-center w-full h-12">
-                <Icon className="muted self-center " icon="file-o" size="3x"/>
+                <Icon className="muted self-center " icon={icon as any} size="3x"/>
                 <span className="flex-grow mx-4 self-center truncate">{data?.name}</span>
                 <span className="self-center p-3 flex">
                     <IconButton
@@ -87,23 +103,22 @@ const CommissionAssets = () => {
     const [uploading, set_uploading] = useState(false)
     const [show_lightbox, set_show_lightbox] = useState(false)
     const [sources, set_sources] = useState([])
+    const [ unlocked_to_owner, set_unlocked_to_owner ] = useState(false)
 
     const [ is_owner, set_is_owner ] = useState(true)
 
     useMount(() => {
         set_is_owner(user?._id === commission.from_user._id)
+        set_unlocked_to_owner(store.is_unlocked(commission.from_user, commission))
     })
     
     const products = store.state.products ?? []
 
     const on_upload = debounceReduce((args: any[]) => {
         const d = args.map(v => v?.data).filter(Boolean)
-        if (d.length) {
-            store.update({products: [...commission.products, ...d]}).finally(() => {
-                set_uploading(false)
-            })
-        } else {
-            set_uploading(false)
+        set_uploading(false)
+        if (d) {
+            store.setState({products: [...d, ...store.state.products]})
         }
     }, 500)
 
@@ -111,6 +126,16 @@ const CommissionAssets = () => {
 
     return (
         <Grid fluid>
+            <Row>
+                <Col xs={24} className="mb-4">
+                    {!unlocked_to_owner && !is_owner &&
+                    <Message type="info" description={t`Assets are locked and cannot be accessed by the client.`}/>
+                    }
+                    {unlocked_to_owner && !is_owner &&
+                    <Message type="success" description={t`Assets are unlocked and can be accessed by the client.`}/>
+                    }
+                </Col>
+            </Row>
             {!commission.accepted && !is_owner &&
             <Row>
                 <Col xs={24}>
@@ -126,7 +151,7 @@ const CommissionAssets = () => {
             </Row>}
             {commission.accepted && !is_owner &&
             <Row>
-                <Col xs={24} key="add" className="text-center">
+                <Col xs={24} key="add" className="text-center mb-2">
                     <div className="w-128 h-32 m-auto">
                         <Upload action={pages.asset_upload} requestData={{commission_id: commission._id}} autoUpload hideFileList multiple listType="picture-text" fluid type="Attachment"
                         onError={() => set_uploading(false)}

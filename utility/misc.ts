@@ -141,23 +141,31 @@ export const generate_random_id = length => {
 
 export const user_among = (user: object | string, user_id_or_list: string | object | string[] | object[], raise_error=true) => {
 
-    if (typeof user_id_or_list === 'string') {
-        user_id_or_list = [user_id_or_list]
+    let err = false
+    let r = false
+
+    if (user && !user_id_or_list) {
+        err = true
     }
 
-    if (typeof user === 'object') {
-        user = (user as { _id: string })._id
+    if (!err) {
+        
+            if (typeof user_id_or_list === 'string' || !Array.isArray(user_id_or_list)) {
+                user_id_or_list = [user_id_or_list]
+            }
+        
+            if (typeof user === 'object') {
+                user = (user as { _id: string })._id
+            }
+
+            user_id_or_list = (user_id_or_list as any[]).map(v => typeof v === 'object' ? (v as { _id: string })._id : v)
+
+        
+            r = (user_id_or_list as string[]).includes(user)
+
     }
 
-    if (typeof user_id_or_list === 'object') {
-        user_id_or_list = [(user_id_or_list as { _id: string })._id]
-    }
-
-    user_id_or_list = (user_id_or_list as any[]).map(v => typeof v === 'object' ? (v as { _id: string })._id : v)
-
-    const r = (user_id_or_list as string[]).includes(user)
-
-    if (!r && raise_error) {
+    if (err || (!r && raise_error)) {
         throw Error("User permission error")
     }
     return r
