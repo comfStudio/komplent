@@ -273,6 +273,7 @@ const commission_request_model = {
         if (!value) return false
         return true
     }, t`This field is required.`).isRequired(t`This field is required.`),
+    anonymous: BooleanType(),
 }
 
 export const CommissionsClosed = () => {
@@ -344,6 +345,7 @@ export const ProfileCommission = () => {
     const [form_ref, set_form_ref] = useState(null)
     const [form_value, set_form_value] = useState({
         commission_rate: selected_rate || undefined,
+        anonymous: current_user?.anonymous
     } as any)
     const [error, set_error] = useState(null)
     const [loading, set_loading] = useState(false)
@@ -553,6 +555,20 @@ export const ProfileCommission = () => {
                                 </FlexboxGrid.Item>
                             </FlexboxGrid>
                             <HelpBlock>{t`Set a deadline if you need your request done by a certain date.`}</HelpBlock>
+                        </FormGroup>
+                        <FormGroup>
+                            <FlexboxGrid fluid className="!p-0">
+                                <FlexboxGrid.Item className="!p-0">
+                                    <FormControl
+                                        name="anonymous"
+                                        value={form_value?.anonymous ? false : true}
+                                        accepter={Checkbox}
+                                    >
+                                        {t`Commission anonymously`}
+                                    </FormControl>
+                                </FlexboxGrid.Item>
+                            </FlexboxGrid>
+                            <HelpBlock>{t`Your name will be hidden to the creator`}</HelpBlock>
                         </FormGroup>
                     </Col>
                 </Row>

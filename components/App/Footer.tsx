@@ -3,6 +3,7 @@ import { Row, Col } from 'rsuite';
 
 import { t } from '@app/utility/lang'
 import * as pages from '@utility/pages'
+import Link from 'next/link';
 
 const Footer = () => {
     return (
@@ -54,9 +55,8 @@ const Footer = () => {
                 <Col xs={24}>
                     <ul className="text-white footer-list">
                         <li className="text-gray-300">© Komplent 2019</li>
-                        <li>Terms of Use</li>
-                        <li>Privacy Policy</li>
-                        <li>Copyright</li>
+                        <li><Link href="/terms-and-conditions"><a>Terms of Use</a></Link></li>
+                        <li><Link href="/privacy-policy"><a>Privacy Policy</a></Link></li>
                     </ul>
                 </Col>
             </Row>

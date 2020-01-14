@@ -29,6 +29,7 @@ import { dashboard, make_profile_urlpath } from '@utility/pages'
 import { get_profile_name } from '@utility/misc'
 import useUserStore from '@store/user'
 import * as pages from '@utility/pages'
+import { CreatorHeadMeta } from '@components/App/Misc'
 
 interface LayoutProps extends ReactProps, MenuProps {
     activeKey?: string
@@ -46,6 +47,7 @@ export const ProfileLayout = (props: LayoutProps) => {
                     <ProfileMenu {...props} />
                 </>
             }>
+            <CreatorHeadMeta/>
             <ProfileInfo className="float-right" />
             <PanelContainer fluid flex>
                 {props.children}

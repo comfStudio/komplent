@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Component } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { useCMS, useLocalForm, useWatchFormValues } from 'tinacms'
 
@@ -7,6 +7,10 @@ import { t } from '@app/utility/lang'
 import { formatDistanceToNow } from 'date-fns'
 
 import './Blog.scss'
+
+export class TinaPage<T = undefined> extends Component<T> {
+  static TINA = true
+}
 
 export const Blog = (props: {title: string, subtitle: string, updated: string, fileRelativePath: string}) => {
     // grab the instance of the CMS to access the registered git API

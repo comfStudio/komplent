@@ -59,6 +59,7 @@ export const user_schema = new Schema(
         last_login: { type: Date, default: null },
         country: { type: String, es_indexed: true },
         description: String,
+        anonymous: { type: Boolean, default: false },
         socials: [{ url: String, name: String }],
         notice_visible: { type: Boolean, default: false },
         notice: { type: String, maxLength: 250 },

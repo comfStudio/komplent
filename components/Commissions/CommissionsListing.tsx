@@ -11,6 +11,7 @@ import { useUser } from '@hooks/user'
 import { ReactProps } from '@utility/props'
 import { CommissionItemPanelProps, CommissionItemPanel } from '@components/Commission'
 import { EmptyPanel } from '@components/App/Empty'
+import { ToggleButton } from '@components/App/Misc'
 
 const CommissionListItem = (props: CommissionItemPanelProps) => {
     return (
@@ -58,16 +59,16 @@ export const RequestListing = () => {
             <ButtonToolbar className="clearfix">
                     <ButtonGroup className="float-right">
                         <Link  href={pages.commission_requests + '?' + qs.stringify({ type:router.query.type, all: true })} passHref>
-                            <Button active={btn_state.all} componentClass="a">{t`All`}</Button>
+                            <ToggleButton active={btn_state.all} componentClass="a">{t`All`}</ToggleButton>
                         </Link>
                         <Link href={pages.commission_requests + '?' + qs.stringify({ type:router.query.type, active: (!btn_state.active).toString() })} passHref>
-                            <Button active={btn_state.active} componentClass="a">{t`Active`}</Button>
+                            <ToggleButton active={btn_state.active} componentClass="a">{t`Queued`}</ToggleButton>
                         </Link>
                         <Link href={pages.commission_requests + '?' + qs.stringify({ type:router.query.type, rejected: (!btn_state.rejected).toString() })} passHref>
-                            <Button active={btn_state.rejected} componentClass="a">{t`Rejected`}</Button>
+                            <ToggleButton active={btn_state.rejected} componentClass="a">{t`Rejected`}</ToggleButton>
                         </Link>
                         <Link href={pages.commission_requests + '?' + qs.stringify({ type:router.query.type, expired: (!btn_state.expired).toString() })} passHref>
-                            <Button active={btn_state.expired} componentClass="a">{t`Expired`}</Button>
+                            <ToggleButton active={btn_state.expired} componentClass="a">{t`Expired`}</ToggleButton>
                         </Link>
                     </ButtonGroup>
                 </ButtonToolbar>
@@ -108,33 +109,33 @@ export const CommissionsListing = (props: CommissionsListingProps) => {
                     {user?.type === 'creator' &&
                     <ButtonGroup>
                         <Link href={pages.commissions + '?' + qs.stringify({ type: "received" })} passHref>
-                            <Button active={props.listtype === 'received'} componentClass="a">{t`Received`}</Button>
+                            <ToggleButton active={props.listtype === 'received'} componentClass="a">{t`Received`}</ToggleButton>
                         </Link>
                         <Link href={pages.commissions + '?' + qs.stringify({ type: "sent" })} passHref>
-                            <Button active={props.listtype === 'sent'} componentClass="a">{t`Sent`}</Button>
+                            <ToggleButton active={props.listtype === 'sent'} componentClass="a">{t`Sent`}</ToggleButton>
                         </Link>
                     </ButtonGroup>
                     }
                     <ButtonGroup className="float-right">
                         <Link  href={pages.commissions + '?' + qs.stringify({ type:router.query.type, all: true })} passHref>
-                            <Button appearance={btn_state.all ? "primary" : "ghost"} active={btn_state.all} componentClass="a">{t`All`}</Button>
+                            <ToggleButton  active={btn_state.all} componentClass="a">{t`All`}</ToggleButton>
                         </Link>
                         <Link href={pages.commissions + '?' + qs.stringify({ type:router.query.type, ongoing: (!btn_state.ongoing).toString() })} passHref>
-                            <Button appearance={btn_state.ongoing ? "primary" : "ghost"} active={btn_state.ongoing} componentClass="a">{t`On-going`}</Button>
+                            <ToggleButton active={btn_state.ongoing} componentClass="a">{t`Active`}</ToggleButton>
                         </Link>
                         <Link href={pages.commissions + '?' + qs.stringify({ type:router.query.type, completed: (!btn_state.completed).toString() })} passHref>
-                            <Button appearance={btn_state.completed ? "primary" : "ghost"} active={btn_state.completed} componentClass="a">{t`Completed`}</Button>
+                            <ToggleButton active={btn_state.completed} componentClass="a">{t`Completed`}</ToggleButton>
                         </Link>
                         {user?.type !== 'creator' &&
                         <Link href={pages.commissions + '?' + qs.stringify({ type:router.query.type, rejected: (!btn_state.rejected).toString() })} passHref>
-                            <Button appearance={btn_state.rejected ? "primary" : "ghost"} active={btn_state.rejected} componentClass="a">{t`Rejected`}</Button>
+                            <ToggleButton active={btn_state.rejected} componentClass="a">{t`Rejected`}</ToggleButton>
                         </Link>
                         }
                         <Link href={pages.commissions + '?' + qs.stringify({ type:router.query.type, failed: (!btn_state.failed).toString() })} passHref>
-                            <Button appearance={btn_state.failed ? "primary" : "ghost"} active={btn_state.failed} componentClass="a">{t`Failed`}</Button>
+                            <ToggleButton active={btn_state.failed} componentClass="a">{t`Failed`}</ToggleButton>
                         </Link>
                         <Link href={pages.commissions + '?' + qs.stringify({ type:router.query.type, expired: (!btn_state.expired).toString() })} passHref>
-                            <Button appearance={btn_state.expired ? "primary" : "ghost"} active={btn_state.expired} componentClass="a">{t`Expired`}</Button>
+                            <ToggleButton active={btn_state.expired} componentClass="a">{t`Expired`}</ToggleButton>
                         </Link>
                     </ButtonGroup>
                 </ButtonToolbar>

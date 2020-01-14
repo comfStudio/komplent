@@ -49,6 +49,15 @@ const CommissionMenu = (props: MenuProps) => {
                     active={props.activeKey == 'inbox'}>{t`Messages`}</Nav.Item>
             </Link>
             <Link
+                href={pages.commission + `/${commission._id}/drafts`}
+                passHref>
+                <Nav.Item
+                    eventKey="drafts"
+                    active={
+                        props.activeKey == 'drafts'
+                    }>{t`Drafts`}</Nav.Item>
+            </Link>
+            <Link
                 href={pages.commission + `/${commission._id}/assets`}
                 passHref>
                 <Nav.Item

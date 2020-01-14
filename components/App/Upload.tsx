@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
+import classnames from 'classnames'
 import { Uploader, Icon } from 'rsuite';
 import { get_authorization_header } from '@utility/request';
 import * as pages from '@utility/pages'
@@ -9,9 +10,12 @@ import { ReactProps, HTMLElementProps } from '@utility/props';
 
 export interface UploadProps extends ReactProps {
     fluid?: boolean
+    action?: string
+    className?: string
     defaultData?: any
     requestData?: object
     type?: "Image" | "Attachment"
+    listType?: "picture" | "picture-text" | "text"
     multiple?: boolean
     autoUpload?: boolean
     hideFileList?: boolean
@@ -21,7 +25,7 @@ export interface UploadProps extends ReactProps {
     onError?: (reason, file: FileType) => void
 }
 
-const Upload = React.forwardRef((({type = "Image", autoUpload = false, ...props}: UploadProps = {}, ref) => {
+const Upload = React.forwardRef((({type = "Image", listType = "picture", autoUpload = false, ...props}: UploadProps = {}, ref) => {
 
     const [default_filelist, set_default_filelist] = useState([])
     const [filelist, set_filelist] = useState([])
@@ -44,18 +48,18 @@ const Upload = React.forwardRef((({type = "Image", autoUpload = false, ...props}
         }
     }, [props.defaultData])
 
-    const el = props.children ? props.children : <button type="button"><Icon icon={props.multiple ? "file" : "camera-retro"} size="lg" /></button>
+    const el = props.children ? props.children : <button type="button"><Icon icon={props.multiple ? "file-upload" : "camera-retro"} size="lg" /></button>
 
     return (
         <Uploader
             fluid
-            className={props.fluid ? "fluid-uploader" : undefined}
+            className={classnames({"fluid-uploader": props.fluid}, props.className)}
             data={{user: user?._id, type, ...props.requestData}}
             dragable
-            action={pages.upload}
+            action={props.action ?? pages.upload}
             ref={ref}
             accept={type === 'Image' ? "image/*" : undefined}
-            listType="picture"
+            listType={listType}
             fileList={filelist.length ? filelist : default_filelist}
             autoUpload={autoUpload}
             multiple={props.multiple}

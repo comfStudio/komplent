@@ -39,6 +39,7 @@ import useProfileStore from '@store/profile'
 import { setup_email } from '@services/email'
 import { create_tag_defaults } from '@services/tag'
 import { create_user_defaults } from '@services/user'
+import { StandardHeadMeta } from '@components/App/Misc'
 
 // Router.onRouteChangeStart = () => NProgress.start();
 // Router.onRouteChangeComplete = () => NProgress.done();
@@ -109,14 +110,15 @@ class KomplentApp extends App {
         //const getLayout = Component.prototype instanceof Page ? Component.getLayout : (page => page)
         const getLayout = page => page
 
-        return (
-            <Tina cms={this.tinacms} position={"overlay"}>
-                <Title>Komplent</Title>
-                <StoreProvider>
-                    {getLayout(<Component {...pageProps} />)}
-                </StoreProvider>
-            </Tina>
-        )
+        const content = (<>
+            <Title>Komplent</Title>
+            <StandardHeadMeta/>
+            <StoreProvider>
+                {getLayout(<Component {...pageProps} />)}
+            </StoreProvider>
+            </>)
+
+        return (Component as any)?.TINA ? <Tina cms={this.tinacms} position={"overlay"}>{content}</Tina> : content
     }
 }
 

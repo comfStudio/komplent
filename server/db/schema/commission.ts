@@ -26,6 +26,7 @@ export const commission_schema = new Schema(
         commission_process: [Mixed],
         commission_deadline: { type: Number, es_indexed: true },
         revisions_limit: Number,
+        anonymous: { type: Boolean, default: false },
         queue_index: {type: Number, default: 0, es_indexed: true},
         rate: {
             type: Mixed,
@@ -60,6 +61,12 @@ export const commission_schema = new Schema(
             },
         ],
         products: [
+            {
+                type: ObjectId,
+                ref: 'Attachment',
+            },
+        ],
+        drafts: [
             {
                 type: ObjectId,
                 ref: 'Attachment',

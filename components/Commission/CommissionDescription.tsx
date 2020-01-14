@@ -35,6 +35,7 @@ const CommissionDescription = () => {
                         text={<span>{t`is requesting a commission from`} <span className="name">{get_profile_name(commission.to_user)}</span></span>}>
                         <CommissionCard
                             noCover
+                            className="mt-4"
                             data={commission.rate}
                             extras={commission.extras}
                         />

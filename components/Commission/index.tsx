@@ -51,10 +51,10 @@ export const CommissionItemPanel = (props: CommissionItemPanelProps) => {
                         </span>
                         <span>
                             {!props.data.finished && !props.data.accepted && (
-                                <Tag color="orange">{t`On-hold`}</Tag>
+                                <Tag color="violet">{t`Queued`}</Tag>
                             )}
                             {!props.data.finished && props.data.accepted && (
-                                <Tag color="orange">{t`On-going`}</Tag>
+                                <Tag color="blue">{t`Active`}</Tag>
                             )}
                             {props.data.finished && props.data.completed && (
                                 <Tag color="green">{t`Completed`}</Tag>
@@ -65,7 +65,7 @@ export const CommissionItemPanel = (props: CommissionItemPanelProps) => {
                             {props.data.finished &&
                                 !props.data.completed &&
                                 props.data.expire_date && (
-                                    <Tag color="yellow">{t`Expired`}</Tag>
+                                    <Tag color="orange">{t`Expired`}</Tag>
                                 )}
                         </span>
                     </div>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Grid, RadioGroup, Radio, SelectPicker, Button, Icon, List, CheckboxGroup, Toggle, InputGroup, Input, Modal } from 'rsuite'
+import { Grid, RadioGroup, Radio, SelectPicker, Button, Icon, List, CheckboxGroup, Toggle, InputGroup, Input, Modal, Checkbox } from 'rsuite'
 import { useMount } from 'react-use'
 
 import { EditGroup, EditSection } from '.'
@@ -43,8 +43,7 @@ export const Location = () => {
                 }))}
                 defaultValue={ct}
                 onSelect={v => store.update_user({ country: v })}
-                className="ml-2"
-                style={{ width: 300 }}
+                className="ml-2 w-96"
             />
         </EditGroup>
     )
@@ -69,7 +68,18 @@ export const Theme = () => {
 export const Currency = () => {
     return (
         <EditGroup title={t`Currency` + ':'}>
-            <SelectPicker data={[]} className="ml-2" style={{ width: 300 }} />
+            <SelectPicker data={[]} className="ml-2 w-64" />
+        </EditGroup>
+    )
+}
+
+export const CommissionAnonymously = () => {
+
+    const store = useUserStore()
+
+    return (
+        <EditGroup>
+            <Checkbox defaultChecked={store.state.current_user.anonymous} onChange={(_, v) => store.update_user({anonymous: v})}>{t`Always commission anonymously`}</Checkbox>
         </EditGroup>
     )
 }
@@ -320,6 +330,7 @@ const UserSettings = () => {
                 <UserAvatar/>
                 <Location />
                 <ProfileNSFWLevel text={t`Show mature content`} key='show_nsfw' only_show />
+                <CommissionAnonymously/>
             </EditSection>
             {/* <h4>{t`Site`}</h4>
             <EditSection>

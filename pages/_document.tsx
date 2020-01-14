@@ -3,6 +3,7 @@
 import React, { useEffect } from 'react'
 import Document, { Html, Head, Main, NextScript } from 'next/document'
 import sprite from 'svg-sprite-loader/runtime/sprite.build'
+import { DefaultHeadMeta } from '@components/App/Misc'
 
 class KomplentDocument extends Document {
     static async getInitialProps(ctx) {
@@ -20,6 +21,7 @@ class KomplentDocument extends Document {
         return (
             <Html>
                 <Head>
+                    <DefaultHeadMeta/>
                 </Head>
                 <body>
                     <div

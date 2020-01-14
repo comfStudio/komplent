@@ -16,6 +16,7 @@ import NewConvoModal from './NewConvoModal'
 import useInboxStore, { InboxKey } from '@store/inbox'
 import * as pages from '@utility/pages'
 import Empty from '@components/App/Empty'
+import { ToggleButton } from '@components/App/Misc'
 
 interface Props {
     activeKey?: InboxKey
@@ -64,13 +65,13 @@ const InboxLayout = (props: Props) => {
                     <Col xsPush={1} xs={23} className="clearfix mb-2">
                         <ButtonGroup>
                             <Link href={pages.inbox + '?' + qs.stringify({ type:'commission' })} passHref>
-                                <Button appearance={btn_state.commission ? "primary" : "ghost"} active={btn_state.commission} componentClass="a">{t`Commission`}</Button>
+                                <ToggleButton active={btn_state.commission} componentClass="a">{t`Commission`}</ToggleButton>
                             </Link>
                             <Link href={pages.inbox + '?' + qs.stringify({ type:'private' })} passHref>
-                                <Button appearance={btn_state.private ? "primary" : "ghost"} active={btn_state.private} componentClass="a">{t`Personal`}</Button>
+                                <ToggleButton active={btn_state.private} componentClass="a">{t`Personal`}</ToggleButton>
                             </Link>
                             <Link href={pages.inbox + '?' + qs.stringify({ type:'staff' })} passHref>
-                                <Button appearance={btn_state.staff ? "primary" : "ghost"} active={btn_state.staff} componentClass="a">{t`Staff`}</Button>
+                                <ToggleButton active={btn_state.staff} componentClass="a">{t`Staff`}</ToggleButton>
                             </Link>
                         </ButtonGroup>
                     </Col>

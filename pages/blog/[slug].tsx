@@ -1,12 +1,10 @@
 import React from 'react'
 import { NextPageContext } from 'next'
-import { Blog } from '@components/App/Blog'
+import { Blog, TinaPage } from '@components/App/Blog'
 
-export default function Page(props) {
-  return <Blog {...props}/>
-}
+export default class Page extends TinaPage {
 
-Page.getInitialProps = function(ctx: NextPageContext) {
+  static async getInitialProps(ctx: NextPageContext) {
     const { slug } = ctx.query
     let content = require(`./${slug}.json`)
 
@@ -18,4 +16,9 @@ Page.getInitialProps = function(ctx: NextPageContext) {
         updated: content.updated,
         body: content.body,
     }
+  }
+
+  render() {
+    return <Blog {...this.props}/>
+  }
 }

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import { Grid, Row, Col, Uploader, Icon, Button } from 'rsuite'
+import { Grid, Row, Col, Uploader, Icon, Button, Panel, IconButton } from 'rsuite'
 import FsLightbox from 'fslightbox-react'; 
+import classnames from 'classnames'
 
 import Image from '@components/App/Image'
 import { t } from '@utility/lang'
@@ -14,11 +15,13 @@ import { update_db } from '@client/db'
 import { debounceReduce } from '@utility/misc'
 import { fetch } from '@utility/request'
 import { OK } from 'http-status-codes'
-import { useMount } from 'react-use';
+import { useMount } from 'react-use'
+import * as pages from '@utility/pages'
 
 interface ProductProps {
     is_owner: boolean
     data: any
+    className?: string
     locked?: boolean
     onClick?: Function
 }
@@ -50,27 +53,30 @@ export const Asset = (props: ProductProps) => {
     }, [props.data])
 
     return (
-        <div>
-            <Image src={data?.url} h="200px" loading={loading} onClick={props.onClick} />
-            <div className="mt-2">
-                <Button
-                    href={data?.url}
-                    disabled={props.locked}
-                    componentClass="a"
-                    appearance="primary"
-                    block
-                    size="sm">{t`Download`}</Button>
-                {!props.is_owner && !commission.finished && (
-                    <Button
-                        appearance="ghost"
-                        block
-                        loading={delete_loading}
-                        size="sm"
-                        onClick={() => {set_delete_loading(true); store.delete_product(data?._id).finally(() => { set_delete_loading(false) })}}
-                        >{t`Delete`}</Button>
-                )}
+        <Panel bordered bodyFill className={classnames(props.className)}>
+            <div className="flex content-center w-full h-12">
+                <Icon className="muted self-center " icon="file-o" size="3x"/>
+                <span className="flex-grow mx-4 self-center truncate">{data?.name}</span>
+                <span className="self-center p-3 flex">
+                    <IconButton
+                        icon={<Icon icon="file-download" />}
+                        href={data?.url}
+                        disabled={props.locked}
+                        componentClass="a"
+                        appearance="primary"
+                        size="sm"/>
+                    {!props.is_owner && !commission.finished && (
+                        <IconButton
+                            icon={<Icon icon="close" />}
+                            loading={delete_loading}
+                            className="mx-3"
+                            size="sm"
+                            onClick={() => {set_delete_loading(true); store.delete_product(data?._id).finally(() => { set_delete_loading(false) })}}
+                            />
+                    )}
+                </span>
             </div>
-        </div>
+        </Panel>
     )
 }
 
@@ -118,6 +124,27 @@ const CommissionAssets = () => {
                     <hr/>
                 </Col>
             </Row>}
+            {commission.accepted && !is_owner &&
+            <Row>
+                <Col xs={24} key="add" className="text-center">
+                    <div className="w-128 h-32 m-auto">
+                        <Upload action={pages.asset_upload} requestData={{commission_id: commission._id}} autoUpload hideFileList multiple listType="picture-text" fluid type="Attachment"
+                        onError={() => set_uploading(false)}
+                        onChange={() => set_uploading(true)}
+                        onUpload={(r, f) => {
+                            on_upload(r)
+                        }}>
+                            <div>
+                                <p>
+                                {t`Click or drag files to this area to upload`}
+                                </p>
+                                <Icon icon={uploading ? "circle-o-notch" : "file-upload"} size="lg" spin={uploading} />
+                            </div>
+                        </Upload>
+                    </div>
+                </Col>
+            </Row>
+            }
             {commission.accepted &&
             <Row>
                 {!!show_lightbox && 
@@ -132,27 +159,11 @@ const CommissionAssets = () => {
                 }
                 {products.map((v, idx) => {
                     return (
-                        <Col key={v._id} xs={3}>
-                            <Asset data={v} is_owner={is_owner} locked={!unlocked} onClick={(ev) => { ev.preventDefault(); set_show_lightbox(idx+1) }}/>
+                        <Col key={v._id} xs={12}>
+                            <Asset className="my-3" data={v} is_owner={is_owner} locked={!unlocked} onClick={(ev) => { ev.preventDefault(); set_show_lightbox(idx+1) }}/>
                         </Col>
                     )
                 })}
-                {!is_owner && (
-                    <Col xs={2} key="add">
-                        <div className="text-center">
-                            <Upload autoUpload hideFileList multiple type="Attachment"
-                            onError={() => set_uploading(false)}
-                            onChange={() => set_uploading(true)}
-                            onUpload={(r, f) => {
-                                on_upload(r)                                
-                            }}>
-                                <button>
-                                    <Icon icon={uploading ? "circle-o-notch" : "plus"} size="lg" spin={uploading} />
-                                </button>
-                            </Upload>
-                        </div>
-                    </Col>
-                )}
             </Row>
             }
         </Grid>

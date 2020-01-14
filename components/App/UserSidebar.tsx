@@ -42,7 +42,7 @@ const UserSidebar = (props: Props) => {
                     <Col
                         xs={user.type === 'creator' ? 12 : 24}
                         className="text-center stat-info">
-                        <Link href={pages.commissions}>
+                        <Link href={pages.commissions + '?ongoing=true'}>
                             <a className="unstyled">
                                 <strong className="text-primary">
                                     {active_comm_count}
@@ -53,7 +53,7 @@ const UserSidebar = (props: Props) => {
                     </Col>
                     {user.type === 'creator' && (
                         <Col xs={12} className="text-center stat-info">
-                            <Link href={pages.commission_requests}>
+                            <Link href={pages.commission_requests + '?active=true'}>
                                 <a className="unstyled">
                                     <strong className="text-primary">
                                         {store.state.active_requests_count}
