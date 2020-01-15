@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useCommissionStore } from '@client/store/commission'
 import { Grid, Row, Col, Placeholder, List, Icon, Message } from 'rsuite'
 import { PanelContainer } from '@components/App/MainLayout'
@@ -11,10 +11,14 @@ import { useMessageTextToHTML } from '@hooks/db'
 import { get_profile_name, price_is_null } from '@utility/misc'
 import PriceSuggestionForm from '@components/Form/PriceSuggestionForm'
 import UserHTMLText from '@components/App/UserHTMLText'
+import Upload from '@components/App/Upload'
+import { debounceReduce } from '@utility/misc'
 
 const CommissionDescription = () => {
     const user = useUser()
     const store = useCommissionStore()
+
+    const [uploading, set_uploading] = useState(false)
 
     let commission = store.get_commission()
 
@@ -24,6 +28,14 @@ const CommissionDescription = () => {
     let descr_html = useMessageTextToHTML(commission.body)
 
     const custom_price = price_is_null(commission.rate.price)
+
+    const on_upload = debounceReduce((args: any[]) => {
+        const d = args.map(v => v?.data).filter(Boolean)
+        set_uploading(false)
+        if (d) {
+            store.setState({products: [...d, ...store.state.products]})
+        }
+    }, 500)
 
     return (
         <Grid fluid>
@@ -86,6 +98,25 @@ const CommissionDescription = () => {
                 <Col xs={24}>
                     <h4 className="pb-1 mb-2">{t`Attachments`}</h4>
                     <PanelContainer bordered>
+                        {is_owner &&
+                        <div className="w-128 h-32 m-auto">
+                            <Upload requestData={{commission_id: commission._id, extra_data: {allowed_users: [commission.to_user._id, commission.from_user._id]}}}
+                                autoUpload hideFileList multiple listType="picture-text" fluid type="Attachment"
+                            onError={() => set_uploading(false)}
+                            onChange={() => set_uploading(true)}
+                            onUpload={(r, f) => {
+                                on_upload(r)
+                            }}>
+                                <div>
+                                    <p>
+                                    {t`Click or drag files to this area to upload`}
+                                    </p>
+                                    <Icon icon={uploading ? "circle-o-notch" : "file-upload"} size="lg" spin={uploading} />
+                                </div>
+                            </Upload>
+                        </div>
+                        }
+                        
                         <List hover>
                             {commission.attachments.map(v => {
                                 return (

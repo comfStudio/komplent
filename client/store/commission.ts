@@ -387,7 +387,20 @@ export const useCommissionStore = createStore(
             return r
         },
 
-        async confirm_sketches() {
+        async delete_draft(_id) {
+            let r = await fetch('/api/asset', {
+                method: 'delete',
+                body: { commission_id: this.state.commission._id, asset_ids: [_id], key: "drafts" },
+            })
+
+            if (r.ok) {
+                this.update({drafts: this.state.commission.drafts.filter(v => v._id != _id)})
+            }
+
+            return r
+        },
+
+        async confirm_drafts() {
             await this.exhaust_revisions()
             let r = await this.next_phase()
             this.refresh()
@@ -656,6 +669,7 @@ export const useCommissionStore = createStore(
                         },
                     ]
                 },
+                { path: 'drafts' },
                 { path: 'attachments' },
                 { path: 'phases', select: phase_select },
                 { path: 'stage', select: phase_select },
@@ -757,7 +771,7 @@ export const useCommissionStore = createStore(
             return p_stages
         },
         is_unlocked(user, commission) {
-            let is_owner = user?._id === commission.from_user._id
+            let is_owner = user?._id.toString() === commission.from_user._id.toString()
             let unlocked = !is_owner
 
             if (is_owner && commission.phases.some(v => {

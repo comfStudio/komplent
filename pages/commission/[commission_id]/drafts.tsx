@@ -2,13 +2,13 @@ import React from 'react'
 
 import CommissionPage from '@components/App/CommissionPage'
 import CommissionLayout from '@components/Commission/CommissionLayout'
-import CommissionAssets from '@components/Commission/CommissionAssets'
+import { CommissionDrafts } from '@components/Commission/CommissionAssets'
 
 class Page extends CommissionPage {
     render() {
         return this.renderPage(
             <CommissionLayout activeKey="drafts">
-                <CommissionAssets />
+                <CommissionDrafts />
             </CommissionLayout>
         )
     }

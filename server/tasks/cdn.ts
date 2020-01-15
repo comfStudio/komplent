@@ -18,16 +18,13 @@ export default function(queue) {
             TASK.cdn_upload
         >
         const set_name = name ? false : true
-        if (!name) {
-            name = path.basename(local_path)
-        }
 
         if (fs.existsSync(local_path)) {
             const filestream = fs.createReadStream(local_path)
             let r
 
             try {
-                r = await upload_file(filestream, name)
+                r = await upload_file(filestream, path.basename(local_path))
             } finally {
                 filestream.destroy()
             }

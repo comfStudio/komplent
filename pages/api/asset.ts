@@ -13,8 +13,8 @@ export default with_auth_middleware(
     async (req: ExApiRequest, res: ExApiResponse) => {
         if (['delete'].includes(req.method)) {
             try {
-                const { commission_id, asset_ids } = req.json
-                return res.status(OK).json(data_message(await remove_commission_asset(req.user, commission_id, asset_ids)))
+                const { commission_id, asset_ids, key } = req.json
+                return res.status(OK).json(data_message(await remove_commission_asset(req.user, commission_id, asset_ids, key)))
 
             } catch (err) {
                 return res.status(BAD_REQUEST).json(error_message(err.message ?? err))

@@ -16,6 +16,7 @@ import {
     Tag,
 } from 'rsuite'
 import classnames from 'classnames'
+import Link from 'next/link'
 
 import './InboxConversation.scss'
 import useInboxStore from '@store/inbox'
@@ -29,6 +30,7 @@ import { EmptyPanel } from '@components/App/Empty'
 import { OpenChat } from '@components/App/Assets'
 import Image from '@components/App/Image'
 import { useRouter } from 'next/router'
+import * as pages from '@utility/pages'
 
 interface MessageProps {
     data: any
@@ -135,6 +137,7 @@ const Header = (props: HeaderProps) => {
     const subject = props.data ? props.data.subject : ''
     let date = toDate(props.data ? new Date(props.data.created) : new Date())
 
+    const [commission_id, set_commission_id] = useState("")
     const [tag, set_tag] = useState({ text: "", color: ""})
 
     useEffect(() => {
@@ -143,7 +146,10 @@ const Header = (props: HeaderProps) => {
                 set_tag({ text: t`Personal`, color: "blue"})
                 break;
             case "commission":
-                set_tag({ text: t`Commission`, color: "red"})
+                {
+                    set_tag({ text: t`Commission`, color: "red"})
+                    set_commission_id(props.data.commission)
+                }
                 break;
             case "staff":
                 set_tag({ text: t`Staff`, color: "violet"})
@@ -164,6 +170,11 @@ const Header = (props: HeaderProps) => {
                 <span className="metadata">
                     {formatDistanceToNow(date, { addSuffix: true })}
                 </span>
+                {!!commission_id &&
+                <span className="metadata">
+                    <Link href={pages.commission + `/${commission_id}`}><Button appearance="primary" size="xs" componentClass="a">{t`Go to commission`}</Button></Link>
+                </span>
+                }
             </p>
         </div>
     )

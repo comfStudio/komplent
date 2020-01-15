@@ -28,7 +28,9 @@ export const add_commission_asset = async (user, commission, file) => {
 
 }
 
-export const remove_commission_asset = async (user, commission_id: string, asset_ids: string[]) => {
+export const remove_commission_asset = async (user, commission_id: string, asset_ids: string[], key=undefined) => {
+
+    key = key ?? "products"
 
     const commission = await Commission.findById(commission_id)
 
@@ -39,9 +41,9 @@ export const remove_commission_asset = async (user, commission_id: string, asset
     user_among(user, commission.to_user)
 
     for (let aid of asset_ids) {
-        if (commission.products.includes(aid)) {
+        if (commission[key].includes(aid)) {
             await Attachment.findByIdAndDelete(aid)
-            commission.products.remove(aid)
+            commission[key].remove(aid)
         } else {
             throw Error("permission error")
         }

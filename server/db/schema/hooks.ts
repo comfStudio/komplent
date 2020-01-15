@@ -16,7 +16,7 @@ import {
 
 import { schedule_unique, schedule_now } from '@server/tasks'
 import { TASK, CommissionPhaseT, NSFW_LEVEL } from '@server/constants'
-import { CommissionPhase, Conversation, Commission, Image, Tag, User } from '@db/models'
+import { CommissionPhase, Conversation, Commission, Image, Tag, User, Attachment } from '@db/models'
 import { update_price_stats, update_delivery_time_stats } from '@services/analytics'
 import fairy from '@server/fairy'
 import { message_schema } from './message'
@@ -79,6 +79,14 @@ commission_schema.pre('save', async function() {
     if (this.isNew || (this.isModified('commission_deadline') && this._id)) {
         this._changed_commission_deadline = true
     }
+
+    if (this.finished && this.drafts.length) {
+        for (let d of this.drafts) {
+            Attachment.findByIdAndDelete(d)
+        }
+        this.drafts = []
+    }
+
 })
 
 commission_schema.post('save', async function() {

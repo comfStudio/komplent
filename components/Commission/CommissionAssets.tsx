@@ -24,6 +24,8 @@ interface ProductProps {
     data: any
     className?: string
     locked?: boolean
+    attachment?: boolean
+    draft?: boolean
     onClick?: Function
 }
 
@@ -69,10 +71,12 @@ export const Asset = (props: ProductProps) => {
     }, [props.data])
 
     return (
-        <Panel bordered bodyFill className={classnames(props.className, "hover:bg-gray-100 cursor-pointer")} onClick={props.onClick}>
+        <Panel bordered bodyFill className={classnames(props.className, "hover:bg-gray-100 cursor-pointer")}>
             <div className="flex content-center w-full h-12">
-                <Icon className="muted self-center " icon={icon as any} size="3x"/>
-                <span className="flex-grow mx-4 self-center truncate">{data?.name}</span>
+                <span className="flex-grow flex" onClick={props.onClick}>
+                    <Icon className="muted self-center " icon={icon as any} size="3x"/>
+                    <span className="flex-grow mx-4 self-center truncate">{data?.name}</span>
+                </span>
                 <span className="self-center p-3 flex">
                     <IconButton
                         icon={<Icon icon="file-download" />}
@@ -87,7 +91,18 @@ export const Asset = (props: ProductProps) => {
                             loading={delete_loading}
                             className="mx-3"
                             size="sm"
-                            onClick={() => {set_delete_loading(true); store.delete_product(data?._id).finally(() => { set_delete_loading(false) })}}
+                            onClick={(e) => {
+                                e.preventDefault()
+                                set_delete_loading(true);
+                                if (props.attachment) {
+                                    store.delete_attachment(data?._id).finally(() => { set_delete_loading(false) })
+                                }
+                                else if (props.draft) {
+                                    store.delete_draft(data?._id).finally(() => { set_delete_loading(false) })
+                                } else {
+                                    store.delete_product(data?._id).finally(() => { set_delete_loading(false) })
+                                }
+                            }}
                             />
                     )}
                 </span>
@@ -96,7 +111,7 @@ export const Asset = (props: ProductProps) => {
     )
 }
 
-const CommissionAssets = () => {
+export const CommissionAssets = () => {
     const user = useUser()
     const store = useCommissionStore()
     const commission = store.get_commission()
@@ -196,3 +211,89 @@ const CommissionAssets = () => {
 }
 
 export default CommissionAssets
+
+export const CommissionDrafts = () => {
+    const user = useUser()
+    const store = useCommissionStore()
+    const commission = store.get_commission()
+    const [uploading, set_uploading] = useState(false)
+    const [show_lightbox, set_show_lightbox] = useState(false)
+    const [sources, set_sources] = useState([])
+
+    const [ is_owner, set_is_owner ] = useState(true)
+
+    useMount(() => {
+        set_is_owner(user?._id === commission.from_user._id)
+    })
+    
+    const drafts = commission.drafts ?? []
+
+    const on_upload = debounceReduce((args: any[]) => {
+        const d = args.map(v => v?.data).filter(Boolean)
+        set_uploading(false)
+        if (d) {
+            console.log(d)
+            store.update({drafts: [...d, ...commission.drafts]})
+        }
+    }, 500)
+
+    let finished = commission.finished
+
+    return (
+        <Grid fluid>
+            <Row>
+                <Col xs={24} className="mb-4">
+                    <Message type="warning" description={t`Draft items are temporary and will be removed when the commission ends`}/>
+                </Col >
+            </Row>
+            {!is_owner &&
+            <Row>
+                {finished && 
+                <Col xs={24} className="mb-4">
+                    <Message type="warning" description={t`This commission has finished`}/>
+                </Col >
+                }
+                {!finished &&
+                <Col xs={24} key="add" className="text-center mb-2">
+                    <div className="w-128 h-32 m-auto">
+                        <Upload requestData={{commission_id: commission._id, extra_data: {allowed_users: [commission.to_user._id, commission.from_user._id]}}}
+                            autoUpload hideFileList multiple listType="picture-text" fluid type="Attachment"
+                        onError={() => set_uploading(false)}
+                        onChange={() => set_uploading(true)}
+                        onUpload={(r, f) => {
+                            on_upload(r)
+                        }}>
+                            <div>
+                                <p>
+                                {t`Click or drag files to this area to upload`}
+                                </p>
+                                <Icon icon={uploading ? "circle-o-notch" : "file-upload"} size="lg" spin={uploading} />
+                            </div>
+                        </Upload>
+                    </div>
+                </Col>
+                }
+            </Row>
+            }
+            <Row>
+                {!!show_lightbox && 
+                 <FsLightbox
+                 sources={ drafts.map( v => v?.url) }
+                 type="image" 
+                 types={ drafts.map( v => null) }
+                 slide={show_lightbox}
+                 openOnMount
+                 onClose = {() => set_show_lightbox(null)}
+                 /> 
+                }
+                {drafts.map((v, idx) => {
+                    return (
+                        <Col key={v._id} xs={12}>
+                            <Asset className="my-3" draft data={v} is_owner={is_owner} locked={false} onClick={(ev) => { ev.preventDefault(); set_show_lightbox(idx+1) }}/>
+                        </Col>
+                    )
+                })}
+            </Row>
+        </Grid>
+    )
+}

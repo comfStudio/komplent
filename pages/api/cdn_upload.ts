@@ -11,6 +11,7 @@ import {
 } from '@server/middleware'
 import log from '@utility/log'
 import { upload_file } from '@services/aws'
+import { Image, Attachment } from '@db/models'
 
 export const config = {
     api: {
@@ -24,14 +25,15 @@ export default with_auth_middleware(
             const form = new formidable.IncomingForm()
             form.encoding = 'utf-8'
             form.keepExtensions = true
-            form.maxFileSize = 3 * 10 * 1024 * 1024 // 3mb
+            form.maxFileSize = 30 * 10 * 1024 * 1024 // 3mb
 
             return form.parse(req, (err, fields, files) => {
                 if (files.file && !err) {
                     const filestream = fs.createReadStream(files.file.path)
-                    upload_file(filestream, path.basename(files.file.path)).then(r => {
-                        r.Location
-                        res.status(OK).json(data_message({ url: r.Location, name: files.file.name, key: r.Key }))
+                    upload_file(filestream, path.basename(files.file.path)).then(async r => {
+
+                        res.status(OK).json(data_message({ url: r.Location, key: r.Key, name: files.file.name }))
+
                     }).catch(r => {
                         log.error(r)
                         return res
@@ -47,6 +49,6 @@ export default with_auth_middleware(
             })
         }
 
-        return res.status(METHOD_NOT_ALLOWED).json(error_message(''))
+        return res.status(METHOD_NOT_ALLOWED).json(error_message('method not allowed'))
     }
 )

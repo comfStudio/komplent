@@ -13,7 +13,7 @@ import { useCommissionStore } from '@client/store/commission'
 import { t } from '@utility/lang'
 import { capitalizeFirstLetter, decimal128ToMoneyToString, price_is_null } from '@utility/misc'
 import { useUser } from '@hooks/user'
-import { ButtonToolbar, Button, Grid, Row, Col, Icon } from 'rsuite'
+import { ButtonToolbar, Button, Grid, Row, Col, Icon, Modal } from 'rsuite'
 import * as pages from '@utility/pages'
 import { CommissionPhaseType } from '@server/constants'
 import { CommissionProcessType } from '@schema/user'
@@ -76,10 +76,10 @@ const PendingApproval = (props: ProcessProps) => {
             {show_panel && (
                 <StepPanel>
                     {props.is_owner && !commission.accepted && (
-                        <p>{t`Waiting for approval from ${to_name}.`}</p>
+                        <p>{t`Waiting for approval from @${to_name}.`}</p>
                     )}
                     {props.is_owner && commission.accepted && (
-                        <p>{t`Request was approved by ${to_name}.`}</p>
+                        <p>{t`Request was approved by @${to_name}.`}</p>
                     )}
                     {!props.is_owner && commission.accepted && (
                         <p>{t`You approved of this commission request.`}</p>
@@ -132,10 +132,10 @@ const PendingPayment = (props: ProcessProps) => {
                         <p>{t`Payment was cancelled.`}</p>
                     )}
                     {!props.is_owner && done && (
-                        <p>{t`Payment was received from ${from_name}.`}</p>
+                        <p>{t`Payment was received from @${from_name}.`}</p>
                     )}
                     {!commission.finished && !props.is_owner && !done && (
-                        <p>{t`Waiting for payment from ${from_name}.`}</p>
+                        <p>{t`Waiting for payment from @${from_name}.`}</p>
                     )}
                     {props.is_owner && done && (
                         <p>{t`You sent your payment.`}</p>
@@ -207,7 +207,7 @@ const RevisionButton = () => {
     )
 }
 
-const PendingSketch = (props: ProcessProps) => {
+const PendingDraft = (props: ProcessProps) => {
     const [accept_loading, set_accept_loading] = useState(false)
     const [skip_loading, set_skip_loading] = useState(false)
 
@@ -217,8 +217,7 @@ const PendingSketch = (props: ProcessProps) => {
     const to_name = commission ? commission.to_user.username : ''
     const done = props.data ? props.data.done : false
 
-    const count = 1
-    //const count = commission && commission.products ? commission.products.length : 0
+    const count = commission && commission.drafts ? commission.drafts.length : 0
     let revisions_count = store.get_stage_count('revision')
 
     const show_panel = !props.hidden || props.active
@@ -226,7 +225,7 @@ const PendingSketch = (props: ProcessProps) => {
     return (
         <CommissionStepItem {...props}>
             <StepTitle onClick={props.onClick} date={props.done_date}>
-                {props.hidden || done ? t`Initial sketch` : t`Pending sketch`}
+                {props.hidden || done ? t`Initial draft` : t`Pending drafts`}
             </StepTitle>
             {show_panel && (
                 <StepPanel>
@@ -235,18 +234,18 @@ const PendingSketch = (props: ProcessProps) => {
                         props.is_owner &&
                         !commission.finished &&
                         !!!count && (
-                            <p>{t`Waiting on ${to_name} to provide a sketch.`}</p>
+                            <p>{t`Waiting on @${to_name} to provide a draft.`}</p>
                         )}
                     {!done && !props.is_owner && !commission.finished && (
                         <div>
                             {!!count && (
                                 <React.Fragment>
-                                    <p>{t`You have added ${count} sketches.`}</p>
+                                    <p>{t`You have added ${count} draft items.`}</p>
                                 </React.Fragment>
                             )}
                             {!!!count && (
                                 <React.Fragment>
-                                    <p>{t`Please upload the sketches in the Drafts tab.`}</p>
+                                    <p>{t`Please upload the draft in the Drafts tab.`}</p>
                                 </React.Fragment>
                             )}
                         </div>
@@ -254,7 +253,9 @@ const PendingSketch = (props: ProcessProps) => {
                     {!done && !commission.finished && (
                         <ButtonToolbar>
                             {!!!props.is_owner && (
-                                <Button appearance="primary">{t`Upload`}</Button>
+                                <Link href={pages.commission + `/${commission._id}/drafts`}>
+                                    <Button appearance="primary" componentClass="a">{t`Upload a Draft`}</Button>
+                                </Link>
                             )}
                             <Button
                                 appearance="default"
@@ -266,14 +267,14 @@ const PendingSketch = (props: ProcessProps) => {
                                         .next_phase()
                                         .then(() => { store.refresh() })
                                         .then(() => set_skip_loading(false))
-                                }}>{t`Skip`}</Button>
+                                }}>{ count ? t`Done` : t`Skip`}</Button>
                         </ButtonToolbar>
                     )}
                     {!done && props.is_owner && !commission.finished && (
                         <div>
                             {!!count && (
                                 <React.Fragment>
-                                    <p>{t`Waiting for you to confirm the sketches.`}</p>
+                                    <p>{t`Waiting for you to confirm the drafts.`}</p>
                                     <p>
                                         <ButtonToolbar>
                                             <Button
@@ -283,7 +284,7 @@ const PendingSketch = (props: ProcessProps) => {
                                                     ev.preventDefault()
                                                     set_accept_loading(true)
                                                     store
-                                                        .confirm_sketches()
+                                                        .confirm_drafts()
                                                         .then(() =>
                                                             set_accept_loading(
                                                                 false
@@ -333,7 +334,7 @@ const Revision = (props: ProcessProps) => {
                 <StepPanel>
                     {done && <p>{t`Changed were requested.`}</p>}
                     {!done && !props.is_owner && !to_confirmed && (
-                        <p>{t`${name} is asking for changes.`}</p>
+                        <p>{t`@${name} is asking for changes.`}</p>
                     )}
                     {!done && !commission.finished && (
                         <>
@@ -344,7 +345,7 @@ const Revision = (props: ProcessProps) => {
                                 <p>{t`Please wait for the requested changes to be completed.`}</p>
                             )}
                             {!props.is_owner && to_confirmed && (
-                                <p>{t`Please wait for ${name} to confirm the changes.`}</p>
+                                <p>{t`Please wait for @${name} to confirm the changes.`}</p>
                             )}
                             {props.is_owner && to_confirmed && (
                                 <p>{t`Waiting for you to confirm the requested changes.`}</p>
@@ -413,7 +414,7 @@ const PendingProduct = (props: ProcessProps) => {
                         <p>{t`You have added ${count} asset(s).`}</p>
                     )}
                     {!done && !!!count && props.is_owner && (
-                        <p>{t`Waiting on ${name} to finish the commission request.`}</p>
+                        <p>{t`Waiting on @${name} to finish the commission request.`}</p>
                     )}
                     {!done && !commission.finished && (
                         <>
@@ -478,7 +479,7 @@ const Cancelled = (props: ProcessProps) => {
                 <span className="float-right">
                     <Icon className="text-red-300" icon="close" size="4x" />
                 </span>
-                <p>{t`Commission request was cancelled by ${name}.`}</p>
+                <p>{t`Commission request was cancelled by @${name}.`}</p>
             </StepPanel>
         </CommissionStepItem>
     )
@@ -719,6 +720,7 @@ const CommissionProcess = () => {
     const store = useCommissionStore()
     let commission = store.get_commission()
 
+    const [confirm_cancel, set_confirm_cancel] = useState(false)
     const [cancel_loading, set_cancel_loading] = useState(false)
     const [complete_loading, set_complete_loading] = useState(false)
     const [selected, set_selected] = useState('')
@@ -793,7 +795,7 @@ const CommissionProcess = () => {
                     }
                     case 'pending_sketch': {
                         unvisited_phases.push(
-                            <PendingSketch
+                            <PendingDraft
                                 key={idx}
                                 hidden
                                 data={null}
@@ -885,7 +887,7 @@ const CommissionProcess = () => {
                             El = PendingApproval
                             break
                         case 'pending_sketch':
-                            El = PendingSketch
+                            El = PendingDraft
                             break
                         case 'revision':
                             El = Revision
@@ -945,11 +947,11 @@ const CommissionProcess = () => {
                 <Row>
                     <Col xs={12}>
                         <ButtonToolbar>
-                            {!is_finished && is_owner && (
+                            {/* {!is_finished && is_owner && (
                                 <Button
                                     disabled={latest_stage.type === 'complete'}
                                     appearance="default">{t`Nudge`}</Button>
-                            )}
+                            )} */}
                             {!is_finished && (
                                 <CompleteButton
                                     onRevoke={ev => {
@@ -987,6 +989,18 @@ const CommissionProcess = () => {
                                         appearance="primary">{t`Add Asset`}</Button>
                                 </Link>
                             )}
+                            {!is_owner && !is_finished && (
+                                <Link
+                                    href={
+                                        pages.commission +
+                                        `/${commission._id}/drafts`
+                                    }
+                                    passHref>
+                                    <Button
+                                        componentClass="a"
+                                        appearance="default">{t`Add Draft`}</Button>
+                                </Link>
+                            )}
                             {is_owner && is_complete && (
                                 <Link
                                     href={
@@ -1002,20 +1016,40 @@ const CommissionProcess = () => {
                         </ButtonToolbar>
                     </Col>
                     <Col xsOffset={9} xs={3}>
+                        <Modal show={confirm_cancel} onHide={ev => set_confirm_cancel(false)}>
+                            <Modal.Header>
+                                <Modal.Title>{t`Cancel the commission?`}</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>
+                                {t`Are you sure you want to cancel the commission?`}
+                            </Modal.Body>
+                            <Modal.Footer>
+                                <Button onClick={ev => {
+                                        ev.preventDefault()
+                                        set_cancel_loading(true)
+                                        store
+                                            .cancel()
+                                            .then(() => {
+                                                set_cancel_loading(false)
+                                                set_confirm_cancel(false)
+                                            }
+                                            )
+                                    }} loading={cancel_loading} appearance="primary">
+                                {t`Yes, cancel`}
+                                </Button>
+                                <Button onClick={ev => set_confirm_cancel(false)} appearance="subtle">
+                                {t`No`}
+                                </Button>
+                            </Modal.Footer>
+                        </Modal>
                         <ButtonToolbar>
                             {!is_finished && (
                                 <Button
                                     className="ml-3"
                                     color="red"
-                                    loading={cancel_loading}
                                     onClick={ev => {
                                         ev.preventDefault()
-                                        set_cancel_loading(true)
-                                        store
-                                            .cancel()
-                                            .then(() =>
-                                                set_cancel_loading(false)
-                                            )
+                                        set_confirm_cancel(true)
                                     }}>{t`Cancel request`}</Button>
                             )}
                         </ButtonToolbar>

@@ -106,6 +106,8 @@ export const notification_schema = new Schema(
     { timestamps: { createdAt: 'created', updatedAt: 'updated' } }
 )
 
+notification_schema.index({created: 1},{expireAfterSeconds: 14 * 60 * 60 * 24}); // 14 days
+
 configure(notification_schema)
 
 export const text_schema = new Schema(
