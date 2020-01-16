@@ -6,7 +6,6 @@ import {
     user_schema,
     user_store_schema,
     commission_stats_schema,
-    gallery_schema,
     follow_schema,
     IUser,
     IUserModel,
@@ -20,6 +19,7 @@ import {
     event_schema,
     notification_schema,
     text_schema,
+    gallery_schema,
     license_schema,
 } from '@schema/general'
 import {

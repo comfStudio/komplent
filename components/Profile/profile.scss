@@ -53,12 +53,13 @@
     }
 }
 
-a > .commission-card:hover {
+a > .commission-card:hover, .commission-card.link:hover {
     cursor: pointer;
 }
 
 a > .commission-card:hover,
 .commission-card.selected,
+.commission-card.link:hover,
 .commission-rates-group label input:checked + .commission-card {
     border: 0.1em solid;
     @apply border-primary;
@@ -79,4 +80,13 @@ a > .commission-card:hover,
     top: 0;
     margin-right: 0.4em;
     margin-top: 0.3em;
+
+    img {
+        object-fit: cover;
+    }
+}
+
+.gallery {
+    max-width: 20rem;
+    max-height: 16rem;
 }

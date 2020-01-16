@@ -119,6 +119,7 @@ export const ProfileInfo = (props: Props) => {
                         : t`Unknown`}
                 </p>
             </p>
+            {!!profile_user.socials.length &&
             <p>
                 <strong>{t`Follow me on`}:</strong>
                 <p>
@@ -159,6 +160,7 @@ export const ProfileInfo = (props: Props) => {
                     </ul>
                 </p>
             </p>
+            }
             <div className="text-center">
                 <Button appearance="subtle" size="sm">{t`Report`}</Button>
             </div>

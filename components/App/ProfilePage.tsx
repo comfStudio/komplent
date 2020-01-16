@@ -12,8 +12,9 @@ import { is_server } from '@utility/misc'
 import { useCommissionRateStore } from '@client/store/commission'
 import { fetch } from '@utility/request'
 import useUserStore from '@store/user'
+import { useGalleryStore } from '@store/profile'
 
-interface Props extends AuthProps {
+export interface Props extends AuthProps {
     error: number | null
     profile_id: string
     profile_user: IUser
@@ -23,6 +24,7 @@ interface Props extends AuthProps {
     requests_count: number
     follow: any
     commissionRateStoreState: object
+    galleryStoreState: object
 }
 
 class ProfilePage extends OptionalAuthPage<Props> {
@@ -109,6 +111,12 @@ class ProfilePage extends OptionalAuthPage<Props> {
             )
         }
 
+        let galleryStoreState = useGalleryStore.createState({})
+
+        if (profile_user) {
+            galleryStoreState.galleries = await useGalleryStore.actions.load_items(profile_user)
+        }
+
         let follow = null
         if (props.useUserState.current_user) {
             follow = await useUserStore.actions.get_follow(
@@ -126,6 +134,7 @@ class ProfilePage extends OptionalAuthPage<Props> {
             slots_left,
             requests_count,
             commissionRateStoreState,
+            galleryStoreState,
             follow,
             ...props,
         }
@@ -137,23 +146,25 @@ class ProfilePage extends OptionalAuthPage<Props> {
         }
 
         return (
-            <useCommissionRateStore.Provider
-                initialState={this.props.commissionRateStoreState}>
-                <ProfileContext.Provider
-                    value={{
-                        profile_id: this.props.profile_id,
-                        profile_user: this.props.profile_user,
-                        profile_path: this.props.profile_path,
-                        profile_owner: this.props.profile_owner,
-                        commissions_open: this.props.profile_user
-                            .commissions_open,
-                        slots_left: this.props.slots_left,
-                        requests_count: this.props.requests_count,
-                        follow: this.props.follow,
-                    }}>
-                    {super.renderPage(children)}
-                </ProfileContext.Provider>
-            </useCommissionRateStore.Provider>
+            <useGalleryStore.Provider initialState={this.props.galleryStoreState}>
+                <useCommissionRateStore.Provider
+                    initialState={this.props.commissionRateStoreState}>
+                    <ProfileContext.Provider
+                        value={{
+                            profile_id: this.props.profile_id,
+                            profile_user: this.props.profile_user,
+                            profile_path: this.props.profile_path,
+                            profile_owner: this.props.profile_owner,
+                            commissions_open: this.props.profile_user
+                                .commissions_open,
+                            slots_left: this.props.slots_left,
+                            requests_count: this.props.requests_count,
+                            follow: this.props.follow,
+                        }}>
+                        {super.renderPage(children)}
+                    </ProfileContext.Provider>
+                </useCommissionRateStore.Provider>
+            </useGalleryStore.Provider>
         )
     }
 }

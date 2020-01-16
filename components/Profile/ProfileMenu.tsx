@@ -27,7 +27,6 @@ export const ProfileMenu = (props: Props) => {
                                 {t`Summary`}
                             </Nav.Item>
                         </Link>
-                        {profile_owner &&
                         <Link href={`${profile_path}/gallery`} passHref>
                             <Nav.Item
                                 eventKey="gallery"
@@ -35,7 +34,6 @@ export const ProfileMenu = (props: Props) => {
                                 {t`Gallery`}
                             </Nav.Item>
                         </Link>
-                        }
                         {/* <Link href={`${profile_path}/recommendations`} passHref>
                             <Nav.Item eventKey="recommendations" active={props.activeKey=='recommendations'}>
                                 {t`Recommendations`}

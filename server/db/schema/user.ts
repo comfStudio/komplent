@@ -248,19 +248,6 @@ export interface IUserModel extends Model<IUser> {
     check_exists(param: object): boolean
 }
 
-export const gallery_schema = new Schema(
-    {
-        image: {
-            type: ObjectId,
-            ref: 'Image',
-        },
-        url: String,
-    },
-    { timestamps: { createdAt: 'created', updatedAt: 'updated' } }
-)
-
-configure(gallery_schema)
-
 export const follow_schema = new Schema(
     {
         follower: {

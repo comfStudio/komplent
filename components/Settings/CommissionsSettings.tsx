@@ -375,13 +375,6 @@ export const Rates = () => {
 
     return (
         <React.Fragment>
-            {!show_new_rate && (
-                <Button
-                    onClick={ev => {
-                        ev.preventDefault()
-                        set_show_new_rate(true)
-                    }}>{t`Add new rate`}</Button>
-            )}
             {show_new_rate && (
                 <EditGroup>
                     <CommissionRateForm
@@ -397,6 +390,11 @@ export const Rates = () => {
             <EditGroup>
                 <Grid fluid>
                     <CommissionTiersRow
+                        addPlaceholder={!show_new_rate}
+                        onAddClick={ev => {
+                            ev.preventDefault()
+                            set_show_new_rate(true)
+                        }}
                         onClick={(data, ev) => {
                             ev.preventDefault()
                             set_edit_rate(data)

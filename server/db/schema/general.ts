@@ -106,7 +106,7 @@ export const notification_schema = new Schema(
     { timestamps: { createdAt: 'created', updatedAt: 'updated' } }
 )
 
-notification_schema.index({created: 1},{expireAfterSeconds: 14 * 60 * 60 * 24}); // 14 days
+notification_schema.index({created: 1},{expireAfterSeconds: 30 * 60 * 60 * 24}); // 30 days
 
 configure(notification_schema)
 
@@ -137,3 +137,19 @@ export const license_schema = new Schema(
 )
 
 configure(license_schema)
+
+export const gallery_schema = new Schema(
+    {
+        image: {
+            type: ObjectId,
+            ref: 'Image',
+        },
+        user: {
+            type: ObjectId,
+            ref: 'User',
+        },
+    },
+    { timestamps: { createdAt: 'created', updatedAt: 'updated' } }
+)
+
+configure(gallery_schema)

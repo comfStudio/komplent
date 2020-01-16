@@ -387,6 +387,19 @@ export const useCommissionStore = createStore(
             return r
         },
 
+        async delete_attachment(_id) {
+            let r = await fetch('/api/asset', {
+                method: 'delete',
+                body: { commission_id: this.state.commission._id, asset_ids: [_id], key: "attachments" },
+            })
+
+            if (r.ok) {
+                this.update({attachments: this.state.commission.attachments.filter(v => v._id != _id)})
+            }
+
+            return r
+        },
+
         async delete_draft(_id) {
             let r = await fetch('/api/asset', {
                 method: 'delete',

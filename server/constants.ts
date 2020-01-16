@@ -48,6 +48,7 @@ export enum TASK {
     user_commission_status_changed = 'user_commission_status_changed',
     user_notice_changed = 'user_notice_changed',
     followed_user = 'followed_user',
+    gallery_upload = 'gallery_upload',
     cdn_upload = 'cdn_upload',
     cdn_delete = 'cdn_delete',
 }
@@ -80,6 +81,8 @@ export type TaskDataTypeMap<T> = T extends TASK.followed_user
     ? { user_id: string }
     : T extends TASK.cdn_upload
     ? { file_id: string; local_path: string; name: string | undefined, type: "Image" | "Attachment" }
+    : T extends TASK.gallery_upload
+    ? { gallery_id: string; local_path: string; name: string }
     : T extends TASK.payout_user
     ? { payout_id: string }
     : T extends TASK.cdn_delete

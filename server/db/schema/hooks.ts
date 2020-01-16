@@ -7,6 +7,7 @@ import {
 import {
     image_schema,
     attachment_schema,
+    gallery_schema,
 } from '@schema/general'
 import {
     commission_schema,
@@ -55,6 +56,12 @@ user_schema.pre('save', async function() {
     if (!this.isNew) {
         if (this.isModified("email")) {
             fairy().emit("user_email_changed", this, this.email)
+        }
+    }
+
+    if (this.commissions_open) {
+        if (!this.email_verified) {
+            this.commissions_open = false
         }
     }
 
@@ -188,6 +195,13 @@ image_schema.post('remove', async function() {
 attachment_schema.post('remove', async function() {
     if (this.key) {
         schedule_now({ task: TASK.cdn_delete, data: { key: this.key } })
+    }
+})
+
+gallery_schema.post('remove', async function() {
+    if (this.image) {
+        const im = await Image.findById(this.image)
+        if (im) im.remove()
     }
 })
 

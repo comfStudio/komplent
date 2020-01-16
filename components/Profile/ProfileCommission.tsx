@@ -37,7 +37,7 @@ import classnames from 'classnames'
 import { t } from '@app/utility/lang'
 import { HTMLElementProps, ReactProps } from '@utility/props'
 
-import './ProfileCommission.scss'
+import './profile.scss'
 import Image from '@components/App/Image'
 import { useProfileContext, useProfileUser, useUser } from '@hooks/user'
 import { GuidelineList } from '@app/components/Profile'
@@ -144,6 +144,34 @@ const CommissionCardHeader = (props: CommissionCardProps) => {
     )
 }
 
+export const CommissionCardAddPlaceholder = (props: {onClick?: any}) => {
+    return (
+        <Panel
+            bodyFill
+            className={classnames(
+                'commission-card mx-auto link',
+            )}
+            onClick={props.onClick}
+            bordered>
+            <Grid fluid className="header">
+                <span className="price">
+                    <Icon icon="plus"/>
+                </span>
+                <Row>
+                    <Col xs={24}>
+                        <h4 className="title inline-block muted">{t`Add rate`}</h4>
+                    </Col>
+                </Row>
+            </Grid>
+            <div className="h-64 flex content-center justify-center muted bg-gray-100">
+                <span className="self-center">
+                    <Icon size="4x" icon="plus"/>
+                </span>
+            </div>
+        </Panel>
+    )
+}
+
 export const CommissionCard = (props: CommissionCardProps) => {
     let image_url
     if (props.data?.image?.paths?.length) {
@@ -157,6 +185,8 @@ export const CommissionCard = (props: CommissionCardProps) => {
         url = pages.make_commission_rate_urlpath(c_user, props.data)
     }
 
+    const extras = props.extras || props.data.extras
+
     const el = <Panel
                 bodyFill
                 className={classnames(
@@ -167,6 +197,25 @@ export const CommissionCard = (props: CommissionCardProps) => {
                 bordered>
                 <CommissionCardHeader {...props} />
                 {!props.noCover && <Image w="100%" h={250} src={image_url} />}
+                {/* <div className="extras">
+                    {extras.map(
+                        (
+                            {
+                                title: extra_title,
+                                price: extra_price,
+                                _id: extra_id,
+                            },
+                            index
+                        ) => (
+                            <p key={extra_id}>
+                                <small className="extra">
+                                    + {decimal128ToMoneyToString(extra_price)} -{' '}
+                                    {extra_title}
+                                </small>
+                            </p>
+                        )
+                    )}
+                </div> */}
                 {props.selected && <span className="select-box">Selected</span>}
             </Panel>
 
@@ -225,6 +274,9 @@ export const CommissionCardRadioGroup = () => {
 
 interface CommissionTiersRowProps {
     link?: boolean
+    settingsPlaceholder?: boolean
+    addPlaceholder?: boolean
+    onAddClick?: any
     onClick?: (data, ev) => void
 }
 
@@ -232,6 +284,20 @@ export const CommissionTiersRow = (props: CommissionTiersRowProps) => {
     const store = useCommissionRateStore()
     return (
         <Row gutter={16}>
+            {props.settingsPlaceholder && !store.state.rates.length &&
+            <Col xs={6} className="flex content-center">
+            <Link href={pages.commission_settings}>
+                <a>
+                <CommissionCardAddPlaceholder/>
+                </a>
+            </Link>
+            </Col>
+            }
+            {props.addPlaceholder &&
+            <Col xs={6} className="flex content-center">
+                <CommissionCardAddPlaceholder onClick={props.onAddClick}/>
+            </Col>
+            }
             {sort_rates_by_price(store.state.rates).map((data, index) => {
                 let el = (
                     <Col key={data._id} xs={6} className="flex content-center">

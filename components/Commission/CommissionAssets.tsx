@@ -20,10 +20,10 @@ import { useMount } from 'react-use'
 import * as pages from '@utility/pages'
 
 interface ProductProps {
-    is_owner: boolean
     data: any
     className?: string
     locked?: boolean
+    deletable?: boolean
     attachment?: boolean
     draft?: boolean
     onClick?: Function
@@ -85,7 +85,7 @@ export const Asset = (props: ProductProps) => {
                         componentClass="a"
                         appearance="primary"
                         size="sm"/>
-                    {!props.is_owner && !commission.finished && (
+                    {props.deletable && (
                         <IconButton
                             icon={<Icon icon="close" />}
                             loading={delete_loading}
@@ -200,7 +200,7 @@ export const CommissionAssets = () => {
                 {products.map((v, idx) => {
                     return (
                         <Col key={v._id} xs={12}>
-                            <Asset className="my-3" data={v} is_owner={is_owner} locked={!unlocked} onClick={(ev) => { ev.preventDefault(); set_show_lightbox(idx+1) }}/>
+                            <Asset className="my-3" data={v} deletable={!is_owner && !commission.finished} locked={!unlocked} onClick={(ev) => { ev.preventDefault(); set_show_lightbox(idx+1) }}/>
                         </Col>
                     )
                 })}
@@ -232,7 +232,6 @@ export const CommissionDrafts = () => {
         const d = args.map(v => v?.data).filter(Boolean)
         set_uploading(false)
         if (d) {
-            console.log(d)
             store.update({drafts: [...d, ...commission.drafts]})
         }
     }, 500)
@@ -289,7 +288,7 @@ export const CommissionDrafts = () => {
                 {drafts.map((v, idx) => {
                     return (
                         <Col key={v._id} xs={12}>
-                            <Asset className="my-3" draft data={v} is_owner={is_owner} locked={false} onClick={(ev) => { ev.preventDefault(); set_show_lightbox(idx+1) }}/>
+                            <Asset className="my-3" draft data={v} deletable={!is_owner} locked={false} onClick={(ev) => { ev.preventDefault(); set_show_lightbox(idx+1) }}/>
                         </Col>
                     )
                 })}

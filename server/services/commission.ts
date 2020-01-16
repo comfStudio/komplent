@@ -38,7 +38,7 @@ export const remove_commission_asset = async (user, commission_id: string, asset
         throw Error("no commission found")
     }
 
-    user_among(user, commission.to_user)
+    user_among(user, key === 'attachments' ? commission.from_user : commission.to_user)
 
     for (let aid of asset_ids) {
         if (commission[key].includes(aid)) {

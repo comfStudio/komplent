@@ -22,6 +22,7 @@ import {
     Popover,
     Icon,
     InputGroup,
+    Message,
 } from 'rsuite'
 
 import { t } from '@app/utility/lang'
@@ -86,12 +87,15 @@ export const ProfileCoverAvatar = () => {
 export const CommissionStatus = () => {
     const store = useUserStore()
     const user = store.state.current_user
+    const [email_verified, set_email_verified] = useState(true)
 
     const value = user.commissions_open ? 'open' : 'closed'
+
 
     return (
         <React.Fragment>
             <EditGroup>
+                {!user.email_verified && <Message className="mb-4" type="warning" description={t`Your email needs to be verified`}/>}
                 <span className="mr-2">{t`Commission Status`}: </span>
                 <RadioGroup
                     name="commission_status"
@@ -112,7 +116,7 @@ export const CommissionStatus = () => {
                             })
                         }
                     }}>
-                    <Radio value="open">{t`Open`}</Radio>
+                    <Radio disabled={!user.email_verified} value="open">{t`Open`}</Radio>
                     <Radio value="closed">{t`Closed`}</Radio>
                 </RadioGroup>
             </EditGroup>

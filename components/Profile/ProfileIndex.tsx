@@ -27,7 +27,7 @@ export const ProfileIndex = () => {
                 <Message type="info" description={profile_user.notice} />
             )}
             <h3>{t`Commission Rates`}</h3>
-            <CommissionTiersRow link={commissions_open && !profile_owner} />
+            <CommissionTiersRow settingsPlaceholder link={commissions_open && !profile_owner} />
             <hr />
             <GuidelineList />
             <h3>{t`About`}</h3>

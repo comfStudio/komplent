@@ -8,8 +8,7 @@ import {
     ExApiResponse,
 } from '@server/middleware'
 import log from '@utility/log'
-import { Commission } from '@db/models'
-import { add_commission_asset } from '@services/commission'
+import { add_gallery } from '@services/general'
 
 export const config = {
     api: {
@@ -23,26 +22,16 @@ export default with_auth_middleware(
             const form = new formidable.IncomingForm()
             form.encoding = 'utf-8'
             form.keepExtensions = true
-            form.maxFileSize = 500 * 10 * 1024 * 1024 // 50mb
+            form.maxFileSize = 30 * 10 * 1024 * 1024 // 3mb
 
             return form.parse(req, async (err, fields, files) => {
                 try {
                     if (err) {
                         throw Error(err)
                     }
-                    if (!fields.commission_id) {
-                        throw Error("a commission id is required")
-                    }
-
-                    const commission = await Commission.findById(fields.commission_id)
-
-                    if (!commission) {
-                        throw Error("no commission found")
-                    }
-
                     if (files.file) {
 
-                        add_commission_asset(req.user, commission, files.file).then(r => {
+                        add_gallery(req.user, files.file, fields.extra_data).then(r => {
                             return res.status(OK).json(data_message(r))
                         }).catch(err => {
                             log.error(err)

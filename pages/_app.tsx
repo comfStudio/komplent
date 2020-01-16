@@ -35,7 +35,7 @@ import useInboxStore from '@store/inbox'
 import useEarningsStore from '@store/earnings'
 import CONFIG from '@server/config'
 import { synchronize_indexes } from '@services/search'
-import useProfileStore from '@store/profile'
+import useProfileStore, { useGalleryStore } from '@store/profile'
 import { setup_email } from '@services/email'
 import { create_tag_defaults } from '@services/tag'
 import { create_user_defaults } from '@services/user'
@@ -82,7 +82,9 @@ export const StoreProvider = (props: ReactProps) => {
                                 <useInboxStore.Provider>
                                     <useEarningsStore.Provider>
                                         <useProfileStore.Provider>
-                                        {props.children}
+                                            <useGalleryStore.Provider>
+                                                {props.children}
+                                            </useGalleryStore.Provider>
                                         </useProfileStore.Provider>
                                     </useEarningsStore.Provider>
                                 </useInboxStore.Provider>

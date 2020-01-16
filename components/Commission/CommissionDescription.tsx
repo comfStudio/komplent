@@ -1,6 +1,8 @@
-import React, { useState } from 'react'
-import { useCommissionStore } from '@client/store/commission'
+import React, { useState, useEffect } from 'react'
+import FsLightbox from 'fslightbox-react'; 
 import { Grid, Row, Col, Placeholder, List, Icon, Message } from 'rsuite'
+
+import { useCommissionStore } from '@client/store/commission'
 import { PanelContainer } from '@components/App/MainLayout'
 import { t } from '@utility/lang'
 import { ApprovalButtons } from './CommissionProcess'
@@ -13,16 +15,18 @@ import PriceSuggestionForm from '@components/Form/PriceSuggestionForm'
 import UserHTMLText from '@components/App/UserHTMLText'
 import Upload from '@components/App/Upload'
 import { debounceReduce } from '@utility/misc'
+import { Asset } from './CommissionAssets'
 
 const CommissionDescription = () => {
     const user = useUser()
     const store = useCommissionStore()
 
+    const [is_owner, set_is_owner] = useState(undefined)
     const [uploading, set_uploading] = useState(false)
+    const [show_lightbox, set_show_lightbox] = useState(false)
 
     let commission = store.get_commission()
 
-    let is_owner = user._id === commission.from_user._id
     const current_user_id = is_owner ? commission.from_user._id : commission.to_user._id
 
     let descr_html = useMessageTextToHTML(commission.body)
@@ -33,9 +37,13 @@ const CommissionDescription = () => {
         const d = args.map(v => v?.data).filter(Boolean)
         set_uploading(false)
         if (d) {
-            store.setState({products: [...d, ...store.state.products]})
+            store.update({attachments: [...d, ...commission.attachments]})
         }
     }, 500)
+
+    useEffect(() => {
+        set_is_owner(user._id === commission.from_user._id)
+    }, [commission])
 
     return (
         <Grid fluid>
@@ -43,8 +51,8 @@ const CommissionDescription = () => {
                 <Col xs={24}>
                     <UserInfoCard
                         notBodyFill
-                        data={commission.from_user}
-                        text={<span>{t`is requesting a commission from`} <span className="name">{get_profile_name(commission.to_user)}</span></span>}>
+                        data={is_owner === true ? commission.to_user : commission.from_user}
+                        text={<span>{is_owner === true ? t`has been requested a commission from` : t`is requesting a commission from you`}</span>}>
                         <CommissionCard
                             noCover
                             className="mt-4"
@@ -62,7 +70,7 @@ const CommissionDescription = () => {
                             user={commission.suggested_price_user === commission.to_user._id ? commission.to_user : commission.from_user}
                             price={commission.suggested_price}/>
                         </>}
-                        {!is_owner && (
+                        {is_owner === false && (
                             <div>
                                 <hr />
                                 {!commission.accepted && !commission.finished && (
@@ -98,7 +106,7 @@ const CommissionDescription = () => {
                 <Col xs={24}>
                     <h4 className="pb-1 mb-2">{t`Attachments`}</h4>
                     <PanelContainer bordered>
-                        {is_owner &&
+                        {is_owner === true &&
                         <div className="w-128 h-32 m-auto">
                             <Upload requestData={{commission_id: commission._id, extra_data: {allowed_users: [commission.to_user._id, commission.from_user._id]}}}
                                 autoUpload hideFileList multiple listType="picture-text" fluid type="Attachment"
@@ -116,20 +124,27 @@ const CommissionDescription = () => {
                             </Upload>
                         </div>
                         }
-                        
-                        <List hover>
-                            {commission.attachments.map(v => {
-                                return (
-                                    <a href={v.url} className="unstyled" key={v._id}>
-                                    <List.Item>
-                                        <div className="pl-2">
-                                            <Icon icon="file" className="mr-2"/> {v.name}
-                                        </div>
-                                    </List.Item>
-                                    </a>
-                                )
-                            })}
-                        </List>
+                        <Grid fluid>
+                            <Row>
+                                {!!show_lightbox && 
+                                <FsLightbox
+                                sources={ commission.attachments.map( v => v?.url) }
+                                type="image" 
+                                types={ commission.attachments.map( v => null) }
+                                slide={show_lightbox}
+                                openOnMount
+                                onClose = {() => set_show_lightbox(null)}
+                                /> 
+                                }
+                                {commission.attachments.map((v, idx) => {
+                                    return (
+                                        <Col key={v._id} xs={12}>
+                                            <Asset className="my-3" attachment data={v} deletable={is_owner} locked={false} onClick={(ev) => { ev.preventDefault(); set_show_lightbox(idx+1) }}/>
+                                        </Col>
+                                    )
+                                })}
+                            </Row>
+                        </Grid>
                     </PanelContainer>
                 </Col>
             </Row>
