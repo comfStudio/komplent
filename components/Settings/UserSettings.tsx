@@ -122,9 +122,9 @@ export const Integrations = () => {
     const providers = [
         {provider: 'google', icon: <Icon icon="google"/>, name: t`Google`, linked: !!auth_data['google'], link_name: auth_data['google']?.info?.names?.[0]?.displayName},
         {provider: 'facebook', icon: <Icon icon="facebook-official"/>, name: t`Facebook`, linked: !!auth_data['facebook'], link_name: auth_data['facebook']?.info?.name},
-        {provider: 'twitter', icon: <Icon icon="twitter"/>, name: t`Twitter`, linked: !!auth_data['twitter'], link_name: auth_data['twitter']?.info?.names?.[0]?.displayName},
-        {provider: 'instagram', icon: <Icon icon="instagram"/>, name: t`Instagram`, linked: !!auth_data['instagram'], link_name: auth_data['instagram']?.info?.names?.[0]?.displayName},
-        {provider: 'pixiv', icon: <Icon icon="globe"/>, name: t`Pixiv`, linked: !!auth_data['pixiv'], link_name: auth_data['pixiv']?.info?.names?.[0]?.displayName},
+        {provider: 'twitter', icon: <Icon icon="twitter"/>, name: t`Twitter`, linked: !!auth_data['twitter'], link_name: auth_data['twitter']?.info?.screen_name ? `${auth_data['twitter']?.info?.name} (@${auth_data['twitter']?.info?.screen_name})` : undefined},
+        // {provider: 'instagram', icon: <Icon icon="instagram"/>, name: t`Instagram`, linked: !!auth_data['instagram'], link_name: auth_data['instagram']?.info?.names?.[0]?.displayName},
+        // {provider: 'pixiv', icon: <Icon icon="globe"/>, name: t`Pixiv`, linked: !!auth_data['pixiv'], link_name: auth_data['pixiv']?.info?.names?.[0]?.displayName},
     ]
 
     const link = url => {

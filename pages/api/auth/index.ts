@@ -5,8 +5,8 @@ import CONFIG from '@server/config'
 
 
 import microAuthFacebook from 'microauth-facebook'
-import microAuthTwitter from 'microauth-twitter'
 import microAuthGoogle from '@server/external/microauth_google'
+import microAuthTwitter from '@server/external/microauth_twitter'
 import log from '@utility/log'
 import { User } from '@db/models'
 import * as pages from '@utility/pages'
@@ -22,10 +22,9 @@ const get_oauth_urls = (app: string) => ({
   })
 
 const twitterOptions = {
-    clientId: 'client_id',
-    clientSecret: 'client_secret',
+    consumerKey: CONFIG.TWITTER_CONSUMER_KEY,
+    consumerSecret: CONFIG.TWITTER_CONSUMER_SECRET,
     ...get_oauth_urls('twitter'),
-    scope: 'identity.basic,identity.team,identity.avatar',
 }
 
 const facebookOptions = {
@@ -68,6 +67,10 @@ const handler = async (o_req, o_res, auth) => with_middleware(async (req: ExApiR
     let email
     let name
     let image_url
+    let cover_url
+    let email_verified = true
+    let description
+    let socials = []
 
     if (auth.result.provider === 'google') {
         key = 'oauth_google_id'
@@ -84,8 +87,25 @@ const handler = async (o_req, o_res, auth) => with_middleware(async (req: ExApiR
         email = auth.result.info.email
         image_url = auth.result.info?.picture?.data?.url
     } else if (auth.result.provider === 'twitter') {
-        console.log(auth)
-        return
+        key= 'oauth_twitter_id'
+        oauth_id = auth.result.info.id_str
+        username = auth.result.info?.screen_name
+        name = auth.result.info?.name ?? auth.result.info?.screen_name
+        if (auth.result.info.description) {
+            description = auth.result.info.description
+        }
+        if (auth.result.info.email) {
+            email = auth.result.info.email
+        } else {
+            email_verified = null
+        }
+        if (auth.result.info.profile_use_background_image) {
+            cover_url = auth.result.info?.profile_image_url_https
+        }
+        if (!auth.result.info.default_profile_image) {
+            image_url = auth.result.info?.profile_image_url_https
+        }
+        socials.push({ url: `https://twitter.com/${username}`, name: `@${username}` })
     }
     
     const oauth_key: any = {}
@@ -108,8 +128,13 @@ const handler = async (o_req, o_res, auth) => with_middleware(async (req: ExApiR
         if (email && (await User.findOne({email: email.toLowerCase()}).countDocuments())) {
             return res.redirect(302, pages.message + '?' + qs.stringify({type: MsgPageType.LoginDuplicateEmail}))
         }
-        user = await create_user({username, email, name, email_verified: true}, { save: false, randomize_username: true, unverify_email: false })
-        if (image_url) {
+        user = await create_user({username, email, name, email_verified}, { save: false, randomize_username: true, unverify_email: false })
+        if (description) {
+            if (!user.profile_body) {
+                user.profile_body = description
+            }
+        }
+        if (image_url && !user.avatar) {
             user.avatar = await create_file('Image', user, image_url)
             if (!user.avatar.paths) {
                 user.avatar.paths = []
@@ -117,6 +142,27 @@ const handler = async (o_req, o_res, auth) => with_middleware(async (req: ExApiR
             user.avatar.paths.push({url: image_url, key: image_url})
             await user.avatar.save()
         }
+        if (cover_url && !user.profile_cover) {
+            user.profile_cover = await create_file('Image', user, cover_url)
+            if (!user.profile_cover.paths) {
+                user.profile_cover.paths = []
+            }
+            user.profile_cover.paths.push({url: image_url, key: image_url})
+            await user.profile_cover.save()
+        }
+    }
+
+    if (socials.length) {
+        if (!user.socials) {
+            user.socials = []
+        }
+
+        for (let s of socials) {
+            if (!user.socials.map(v => v.url.toLowerCase()).includes(s.url.toLowerCase())) {
+                user.socials = [...user.socials, s]
+            }
+        }
+
     }
 
     let datas = user.oauth_data ?? []

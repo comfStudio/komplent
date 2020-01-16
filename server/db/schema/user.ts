@@ -33,7 +33,10 @@ export const user_schema = new Schema(
         },
         show_nsfw: { type: String, enum: nsfw_levels, default: NSFW_LEVEL.level_0 },
         email_verified: { type: Boolean, default: false },
-        email: { type: String, lowercase: true, index: true, unique: true, trim: true },
+        email: { type: String, lowercase: true, index: {
+            unique: true,
+            partialFilterExpression: {email: {$type: "string"}}
+          }, trim: true },
         oauth_google_id: { type: String, index: true, unique: true, sparse: true },
         oauth_twitter_id: { type: String, index: true, unique: true, sparse: true },
         oauth_pixiv_id: { type: String, index: true, unique: true, sparse: true },

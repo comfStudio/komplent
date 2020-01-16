@@ -49,7 +49,7 @@ export const update_user_creds = async (user, data: IUser, { save = true, random
         user.password = await bcrypt.hash(_data.password, CRYPTO_COST_FACTOR)
         // eslint-disable-next-line
         user.password_change_date = new Date()
-        delete _data.password
+        delete data.password
     }
 
     if (_data.username) {
@@ -61,7 +61,7 @@ export const update_user_creds = async (user, data: IUser, { save = true, random
                 user.username = (prefix + generate_random_id(prefix ? 4 : 10)).toLowerCase()
             }
         }
-        delete _data.username
+        delete data.username
     }
 
     if (_data.email) {
@@ -71,7 +71,11 @@ export const update_user_creds = async (user, data: IUser, { save = true, random
         }
         // eslint-disable-next-line
         user.email = _data.email
-        delete _data.email
+        delete data.email
+    }
+
+    if (data.email_verified === null) {
+        delete data.email_verified
     }
 
     user.set(_data)
