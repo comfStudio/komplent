@@ -7,7 +7,7 @@ import { Image } from '@components/App/Image'
 import { GridContainer } from '@components/App/MainLayout'
 import { HTMLElementProps } from '@app/utility/props'
 import Upload from '@components/App/Upload'
-import { debounceReduce } from '@utility/misc'
+import { debounceReduce, get_image_url } from '@utility/misc'
 import { t } from '@utility/lang'
 import { useProfileUser } from '@hooks/user'
 import * as pages from '@utility/pages'
@@ -17,12 +17,14 @@ import './profile.scss'
 const Gallery = (props: {data: any, user?: any, profile_owner?: boolean, store: any, onClick?: any}) => {
     const [loading, set_loading] = useState(false)
 
-    const src = props.data?.image?.paths?.[0]?.url
+    const src = get_image_url(props.data?.image, "thumb")
 
     return (
-        <Panel bordered bodyFill className={classnames("gallery", {"cursor-pointer": !!props.onClick})} onClick={props.onClick}>
-            {!!src && <Image src={src} w={250} h={200} />}
-            {!src && <p className="p-10 text-lg muted">{t`Processing...`}</p>}
+        <Panel bordered bodyFill className={classnames("gallery", {"cursor-pointer": !!props.onClick})}>
+            <div onClick={props.onClick}>
+                {!!src && <Image src={src} w={250} h={200} />}
+                {!src && <p className="p-10 text-lg muted">{t`Processing...`}</p>}
+            </div>
             {props.profile_owner &&
             <Button color="red" size="xs" loading={loading} onClick={() => {
                 set_loading(true)
@@ -46,7 +48,7 @@ export const GalleryList = () => {
         <FlexboxGrid>
             {!!show_lightbox && 
                 <FsLightbox
-                sources={ store.state.galleries.map( v => v.image?.paths?.[0]?.url) }
+                sources={ store.state.galleries.map( v => get_image_url(v.image, "big")) }
                 type="image"
                 types={ store.state.galleries.map( v => null) }
                 slide={show_lightbox}

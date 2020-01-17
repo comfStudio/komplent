@@ -174,3 +174,13 @@ export const user_among = (user: object | string, user_id_or_list: string | obje
 export const generate_unique_token = async (length = 20) => {
     return (await crypto.randomBytes(length)).toString("hex")
 }
+
+export const get_image_url = (image_data, size: undefined | 'thumb' | 'small' | 'medium' | 'big' | 'original' = undefined) => {
+    for (let s of image_data?.paths ?? []) {
+        if (size && s.size === size) {
+            return s.url
+        } else if (!size) {
+            return s
+        }
+    }
+}

@@ -7,13 +7,13 @@ import { Image, Attachment, Gallery } from '@db/models'
 import { upload_file } from './aws'
 import { user_among } from '@utility/misc'
 
-export const create_file = async (type: "Image" | "Attachment", user: any, path: string, name: string = undefined, extra_data = {}) => {
+export const create_file = async (type: "Image" | "Attachment", user: any, path: string, name: string = undefined, {extra_data = {}, upload_type = undefined}) => {
     const d = { name, user, ...extra_data }
     const obj = type === 'Image' ? new Image(d) : type === 'Attachment' ? new Attachment(d) : undefined
     await obj.save()
     schedule_now({
         task: TASK.cdn_upload,
-        data: { file_id: obj._id, local_path: path, name: name, type },
+        data: { file_id: obj._id, local_path: path, name: name, type, upload_type },
     })
     return obj
 }

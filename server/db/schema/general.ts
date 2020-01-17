@@ -17,7 +17,7 @@ export const image_schema = new Schema(
                 url: String,
                 size: {
                     type: String,
-                    enum: ['thumb', 'big', 'original'],
+                    enum: ['thumb', 'small', 'medium', 'big', 'original'],
                     default: 'original',
                 },
             },

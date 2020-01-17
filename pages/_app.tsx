@@ -28,6 +28,7 @@ import {
 import '@assets/styles/imports.scss'
 import '@assets/styles/rsuite.less'
 import '@assets/styles/common.scss'
+
 import { setup_streams } from '@db/streams'
 import { Page } from '@components/App/Page'
 import { STATES } from '@server/constants'
@@ -40,7 +41,6 @@ import { setup_email } from '@services/email'
 import { create_tag_defaults } from '@services/tag'
 import { create_user_defaults } from '@services/user'
 import { StandardHeadMeta } from '@components/App/Misc'
-
 // Router.onRouteChangeStart = () => NProgress.start();
 // Router.onRouteChangeComplete = () => NProgress.done();
 // Router.onRouteChangeError = () => NProgress.done();

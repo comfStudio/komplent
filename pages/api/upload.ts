@@ -26,7 +26,7 @@ export default with_auth_middleware(
 
             return form.parse(req, (err, fields, files) => {
                 if (files.file && !err) {
-                    create_file(fields.type, fields.user, files.file.path, files.file.name, fields.extra_data)
+                    create_file(fields.type, fields.user, files.file.path, files.file.name, {extra_data: fields.extra_data, upload_type: fields.extra_data})
                         .then(im => {
                             return res
                                 .status(OK)

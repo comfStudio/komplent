@@ -28,6 +28,14 @@ export enum TaskPriority {
     LOWEST = 20,
 }
 
+export enum UploadType {
+    Generic,
+    ProfileCover,
+    ProfilePicture,
+    Gallery,
+    CommissionRate,
+}
+
 export type KEYS_TO_TYPE<T> = {
     readonly [P in keyof T]: T[P]
 }
@@ -80,7 +88,7 @@ export type TaskDataTypeMap<T> = T extends TASK.followed_user
     : T extends TASK.reset_login
     ? { user_id: string }
     : T extends TASK.cdn_upload
-    ? { file_id: string; local_path: string; name: string | undefined, type: "Image" | "Attachment" }
+    ? { file_id: string; local_path: string; name: string | undefined, type: "Image" | "Attachment", upload_type: UploadType }
     : T extends TASK.gallery_upload
     ? { gallery_id: string; local_path: string; name: string }
     : T extends TASK.payout_user
