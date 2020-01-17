@@ -10,8 +10,9 @@ import {
     ExApiResponse,
 } from '@server/middleware'
 import log from '@utility/log'
-import { upload_file } from '@services/aws'
+import { upload_file, generate_image_sizes } from '@services/aws'
 import { Image, Attachment } from '@db/models'
+import { UploadType } from '@server/constants'
 
 export const config = {
     api: {
@@ -25,14 +26,29 @@ export default with_auth_middleware(
             const form = new formidable.IncomingForm()
             form.encoding = 'utf-8'
             form.keepExtensions = true
-            form.maxFileSize = 30 * 10 * 1024 * 1024 // 3mb
+            form.maxFileSize = 3 * 1024 * 1024 // 3mb
 
             return form.parse(req, (err, fields, files) => {
                 if (files.file && !err) {
-                    const filestream = fs.createReadStream(files.file.path)
-                    upload_file(filestream, path.basename(files.file.path)).then(async r => {
+                    let p
+                    let filestream
+                    console.log(fields)
+                    if (fields.type === 'Image') {
+                        p = generate_image_sizes(files.file.path, {type: UploadType.Generic, name: files.file.name, upload: true})
+                    } else {
+                        filestream = fs.createReadStream(files.file.path)
+                        p = upload_file(filestream, path.basename(files.file.path))
+                    }
 
-                        res.status(OK).json(data_message({ url: r.Location, key: r.Key, name: files.file.name }))
+                    p.then(async r => {
+
+                        if (Array.isArray(r)) {
+                            r = r[0].data
+                        } else {
+                            r = { url: r.Location, key: r.Key }
+                        }
+
+                        res.status(OK).json(data_message({...r, name: files.file.name }))
 
                     }).catch(r => {
                         log.error(r)
@@ -40,7 +56,9 @@ export default with_auth_middleware(
                             .status(BAD_REQUEST)
                             .json(error_message(r))
                     }).finally(() => {
-                        filestream.destroy()
+                        if (filestream) {
+                            filestream.destroy()
+                        }
                     })
 
                 } else {

@@ -13,7 +13,7 @@ import Upload from '@components/App/Upload'
 import { FileType } from 'rsuite/lib/Uploader'
 import useUserStore from '@store/user'
 import Image from '@components/App/Image'
-import { get_profile_avatar_url } from '@utility/misc'
+import { get_profile_avatar_url, get_image_url } from '@utility/misc'
 
 interface HoverImageUploadProps {
     children: any
@@ -46,7 +46,7 @@ export const Cover = props => {
 
     return (
         <div className="cover">
-            <Image className="cover-image" src={profile_user?.profile_cover?.paths?.[0]?.url} w={"1500px"} h={"500px"}/>
+            <Image className="cover-image" src={get_image_url(profile_user?.profile_cover, "big")} w={"1500px"} h={"500px"}/>
         </div>
     )
 }

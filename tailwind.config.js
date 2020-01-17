@@ -9,6 +9,17 @@ Object.entries(variants).forEach(([k, v]) => {
 
 module.exports = {
     theme: {
+        screens: {
+            bs: '0px',
+            xs: '576px',
+            sm: '736px',
+            md: '980px',
+            lg: '1280px',
+            xl: '1690px',
+            tablet: '640px',
+            laptop: '1024px',
+            desktop: '1280px',
+        },
         colors: {
             primary: '#eb425e',
             secondary: {
@@ -103,15 +114,4 @@ module.exports = {
             })
         },
     ],
-    screens: {
-        bs: '0px',
-        xs: '576px',
-        sm: '736px',
-        md: '980px',
-        lg: '1280px',
-        xl: '1690px',
-        tablet: '640px',
-        laptop: '1024px',
-        desktop: '1280px',
-    },
 }

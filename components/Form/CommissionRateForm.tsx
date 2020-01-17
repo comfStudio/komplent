@@ -49,6 +49,7 @@ import * as pages from '@utility/pages'
 import { get_authorization_header } from '@utility/request'
 import Upload from '@components/App/Upload'
 import { LicenseList } from './LicenseForm'
+import { UploadType } from '@server/constants'
 
 const {
     StringType,
@@ -402,7 +403,7 @@ const CommissionRateForm = (props: Props) => {
             </FormGroup>
             <FormGroup>
                 <h5>{t`Cover`}</h5>
-                <Upload ref={uploader} defaultData={props.defaultData} type="Image"
+                <Upload ref={uploader} defaultData={props.defaultData} type="Image" uploadType={UploadType.CommissionRate}
                 onChange={set_filelist} onUpload={r => {set_upload_response(r); set_uploading(false)}}/>
             </FormGroup>
             <FormGroup>

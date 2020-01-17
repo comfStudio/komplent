@@ -1,0 +1,1 @@
+export const html_image_accept_types = "image/jpeg, image/webp, image/png"

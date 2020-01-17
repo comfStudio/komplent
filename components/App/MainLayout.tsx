@@ -83,7 +83,7 @@ export const MainLayout = (props: MainLayoutProps) => {
     if (logged_in && !props.noSidebar) {
         layout_content = (
             <Row className="h-full !m-0">
-                <Col className="sm:hidden md:block h-full" xs={4} lg={4}>
+                <Col className="bs:hidden lg:block h-full" xs={4} lg={4}>
                     <UserSidebar activeKey={props.activeKey} />
                 </Col>
                 <Col

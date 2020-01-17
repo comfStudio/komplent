@@ -117,7 +117,8 @@ export const get_profile_name = ({
 }
 
 export const get_profile_avatar_url = profile => {
-    return profile?.avatar?.paths?.[0]?.url
+
+    return get_image_url(profile?.avatar, "icon")
 }
 
 export const get_highest_nsfw_level = (levels: NSFWType[]) => {
@@ -175,7 +176,7 @@ export const generate_unique_token = async (length = 20) => {
     return (await crypto.randomBytes(length)).toString("hex")
 }
 
-export const get_image_url = (image_data, size: undefined | 'thumb' | 'small' | 'medium' | 'big' | 'original' = undefined) => {
+export const get_image_url = (image_data, size: undefined | 'icon' | 'thumb' | 'small' | 'medium' | 'big' | 'original' = undefined) => {
     for (let s of image_data?.paths ?? []) {
         if (size && s.size === size) {
             return s.url

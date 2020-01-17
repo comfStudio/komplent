@@ -22,11 +22,11 @@ export default with_auth_middleware(
             const form = new formidable.IncomingForm()
             form.encoding = 'utf-8'
             form.keepExtensions = true
-            form.maxFileSize = 200 * 1024 * 1024 // 20mb
+            form.maxFileSize = 10 * 1024 * 1024 // 10mb
 
             return form.parse(req, (err, fields, files) => {
                 if (files.file && !err) {
-                    create_file(fields.type, fields.user, files.file.path, files.file.name, {extra_data: fields.extra_data, upload_type: fields.extra_data})
+                    create_file(fields.type, fields.user, files.file.path, files.file.name, {extra_data: fields.extra_data, upload_type: fields.upload_type})
                         .then(im => {
                             return res
                                 .status(OK)

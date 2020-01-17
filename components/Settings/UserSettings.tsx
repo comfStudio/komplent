@@ -12,6 +12,7 @@ import InputGroupAddon from 'rsuite/lib/InputGroup/InputGroupAddon'
 import { username_validate, email_validate, password_validate } from '@components/Form/JoinForm'
 import { fetch } from '@utility/request'
 import { oauth_window } from '@client/misc'
+import { UploadType } from '@server/constants'
 
 export const UserType = () => {
     return (
@@ -90,7 +91,7 @@ export const UserAvatar = () => {
     const [avatar_changed, set_avatar_changed] = useState(false)
 
     return (
-        <Upload autoUpload hideFileList onUpload={(res) => {
+        <Upload autoUpload hideFileList uploadType={UploadType.ProfilePicture} onUpload={(res) => {
                     store.update_user({avatar: res?.data}).then(r => set_avatar_changed(r.status))
                 }}>
                     {avatar_changed ? <Button><Icon icon="check" size="3x"/></Button> : <Button>{t`Avatar`}</Button>}

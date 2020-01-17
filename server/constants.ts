@@ -29,11 +29,11 @@ export enum TaskPriority {
 }
 
 export enum UploadType {
-    Generic,
-    ProfileCover,
-    ProfilePicture,
-    Gallery,
-    CommissionRate,
+    Generic = "Generic",
+    ProfileCover = "ProfileCover",
+    ProfilePicture = "ProfilePicture",
+    Gallery = "Gallery",
+    CommissionRate = "CommissionRate",
 }
 
 export type KEYS_TO_TYPE<T> = {

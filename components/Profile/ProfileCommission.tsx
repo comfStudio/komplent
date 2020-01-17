@@ -53,6 +53,7 @@ import {
     decimal128ToMoneyToString,
     decimal128ToPlainString,
     price_is_null,
+    get_image_url,
 } from '@utility/misc'
 import * as pages from '@utility/pages'
 import { make_profile_urlpath } from '@utility/pages'
@@ -173,10 +174,7 @@ export const CommissionCardAddPlaceholder = (props: {onClick?: any}) => {
 }
 
 export const CommissionCard = (props: CommissionCardProps) => {
-    let image_url
-    if (props.data?.image?.paths?.length) {
-        image_url = props.data.image.paths[0].url
-    }
+    let image_url = get_image_url(props.data?.image, "small")
 
     const user = useUser()
     let c_user = props.data.user
@@ -196,7 +194,13 @@ export const CommissionCard = (props: CommissionCardProps) => {
                 )}
                 bordered>
                 <CommissionCardHeader {...props} />
-                {!props.noCover && <Image w="100%" h={250} src={image_url} />}
+                {!props.noCover && (!!image_url || !props.data?.image) &&  <Image w="100%" h={250} src={image_url} />}
+                {!props.noCover && !image_url && props.data?.image &&
+                <div className="h-64 flex content-center justify-center muted bg-gray-100">
+                    <span className="self-center">
+                        {t`Processing`}
+                    </span>
+                </div>}
                 {/* <div className="extras">
                     {extras.map(
                         (

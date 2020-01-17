@@ -10,6 +10,7 @@ import { fetch } from '@utility/request'
 import 'quill/dist/quill.snow.css'
 import 'quill/dist/quill.bubble.css'
 import { OK } from 'http-status-codes'
+import { html_image_accept_types } from '@client/helpers'
 const Quill = is_server() ? undefined : require('quill')
 const imageDropAndPaste = is_server()
     ? undefined
@@ -45,7 +46,7 @@ function toolbar_img_handler() {
     if (fileInput == null) {
         fileInput = document.createElement('input');
         fileInput.setAttribute('type', 'file');
-        fileInput.setAttribute('accept', 'image/png, image/gif, image/jpeg, image/bmp, image/x-icon');
+        fileInput.setAttribute('accept', html_image_accept_types);
         fileInput.classList.add('ql-image');
         fileInput.addEventListener('change', () => {
             const files = fileInput.files;
@@ -57,6 +58,7 @@ function toolbar_img_handler() {
 
             const formData = new FormData();
             formData.append('file', files[0]);
+            formData.append("type", "Image")
 
             upload_image(formData, range, this.quill).then(() => {
                 fileInput.value = '';
@@ -68,7 +70,10 @@ function toolbar_img_handler() {
 }
 
 function image_drop_handler(data_url, type) {
-    if (!type) type = 'image/png'
+
+    if (!html_image_accept_types.split(",").map(t => t.trim()).includes(type)) {
+        return
+    }
 
     const range = this.quill.getSelection(true);
    
@@ -81,6 +86,7 @@ function image_drop_handler(data_url, type) {
     var formData = new FormData()
     formData.append('filename', filename)
     formData.append('file', blob)
+    formData.append("type", "Image")
 
     upload_image(formData, range, this.quill)
   }

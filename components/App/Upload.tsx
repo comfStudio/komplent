@@ -7,6 +7,8 @@ import { FileType } from 'rsuite/lib/Uploader';
 import { useUser } from '@hooks/user';
 import { is_server } from '@utility/misc';
 import { ReactProps, HTMLElementProps } from '@utility/props';
+import { UploadType } from 'aws-sdk/clients/devicefarm';
+import { html_image_accept_types } from '@client/helpers';
 
 export interface UploadProps extends ReactProps {
     fluid?: boolean
@@ -17,6 +19,7 @@ export interface UploadProps extends ReactProps {
     type?: "Image" | "Attachment"
     listType?: "picture" | "picture-text" | "text"
     multiple?: boolean
+    uploadType?: UploadType
     autoUpload?: boolean
     hideFileList?: boolean
     onChange?: (filelist: FileType[]) => void
@@ -54,11 +57,11 @@ const Upload = React.forwardRef((({type = "Image", listType = "picture", autoUpl
         <Uploader
             fluid
             className={classnames({"fluid-uploader": props.fluid}, props.className)}
-            data={{user: user?._id, type, ...props.requestData}}
+            data={{user: user?._id, type, ...props.requestData, upload_type: props.uploadType}}
             dragable
             action={props.action ?? pages.upload}
             ref={ref}
-            accept={type === 'Image' ? "image/*" : undefined}
+            accept={type === 'Image' ? html_image_accept_types : undefined}
             listType={listType}
             fileList={filelist.length ? filelist : default_filelist}
             autoUpload={autoUpload}

@@ -61,18 +61,21 @@ export const delete_file = async key => {
     }
 }
 
-export const generate_image_sizes = async (path: string, {sizes = ["thumb", "medium", "small", "big", "original"], upload = true, name = "", type = undefined as UploadType}) => {
+export const generate_image_sizes = async (path: string, {sizes = ["icon", "thumb", "medium", "small", "big", "original"], upload = true, name = "", type = undefined as UploadType}) => {
     let filebuffer: Buffer
 
     if (name) {
         log.debug(`Generating image sizes for ${name}`)
     }
     switch (type) {
+        case UploadType.Generic:
+            sizes = ["medium"]
+            break;
         case UploadType.Gallery:
             sizes = ["thumb", "medium", "small", "big"]
             break;
         case UploadType.ProfilePicture:
-            sizes = ["thumb", "small"]
+            sizes = ["icon"]
             break;
         case UploadType.ProfileCover:
             sizes = ["medium", "big"]
@@ -92,6 +95,9 @@ export const generate_image_sizes = async (path: string, {sizes = ["thumb", "med
 
         if (!width && !height) {
             log.debug("width and height are null, will not resize")
+            if (typeof buffer === 'string') {
+                return sharp(buffer).toBuffer()
+            }
             return buffer
         }
         
@@ -113,7 +119,7 @@ export const generate_image_sizes = async (path: string, {sizes = ["thumb", "med
 
     }
 
-    const gen = async (size, width, height, opts) => {
+    const gen = async (size, width, height, opts, push = true) => {
 
         log.debug(`generating image size: ${size}`)
         
@@ -143,7 +149,11 @@ export const generate_image_sizes = async (path: string, {sizes = ["thumb", "med
             filebuffer = r.buffer
         }
 
-        results.push(r)
+        if (push) {
+            results.push(r)
+        }
+
+        return r
     }
 
     if (sizes.includes("original")) {
@@ -166,20 +176,31 @@ export const generate_image_sizes = async (path: string, {sizes = ["thumb", "med
         await gen("thumb", 250, 300, { fit: "cover" })
     }
 
+    if (sizes.includes("icon")) {
+        await gen("icon", 100, 100, { fit: "cover" })
+    }
+
+    let any
+
     if (!generated) {
-        if (sizes.includes("any")) {
-            await gen("any", null, null, { fit: "inside" })
-        }
+        any = await gen("any", null, null, { fit: "inside" }, false)
     }
 
     for (let i = 0; i < results.length; i++) {
         let r = results[i]
-        if (r.stream === null) {
-            if (results[i+1]) {
+        if (r.buffer === null) {
+            if (results[i+1] && results[i+1].data) {
                 r.data = {...results[i+1].data}
                 r.data.size = r.size
-            } else if (results[i-1]) {
+            }
+
+            if (!r.data && results[i-1] && results[i-1].data) {
                 r.data = {...results[i-1].data}
+                r.data.size = r.size
+            }
+
+            if (!r.data && any) {
+                r.data = {...any.data}
                 r.data.size = r.size
             }
         }

@@ -10,16 +10,20 @@ import './NavUser.scss'
 import { useMount } from 'react-use'
 import useUserStore, { useNotificationStore } from '@store/user'
 import { NoProfileContext } from '@client/context'
-import { get_profile_name } from '@utility/misc'
+import { get_profile_name, get_image_url } from '@utility/misc'
 import { useRouter } from 'next/router'
 import useInboxStore from '@store/inbox'
+import Image from '@components/App/Image'
 
 interface Props {}
 
 const NavUserAvatar = (props: Props) => {
+    const user = useUser()
+    const url = get_image_url(user.avatar, "icon")
     return (
         <Nav.Item key="login" id="nav-user" {...props}>
-            <Icon icon="user" size="2x" />
+            {!!url && <Image className="avatar" src={url}/>}
+            {!!!url && <Icon icon="user" size="2x" />}
         </Nav.Item>
     )
 }
@@ -153,7 +157,7 @@ export const NavUserDropdown = (props: NavUserProps) => {
             <Dropdown
                 className="nav-user-dropdown lg:!hidden"
                 placement="bottomEnd"
-                renderTitle={NavUserAvatar}>
+                renderTitle={() => <NavUserAvatar/>}>
                 <li className="header">✦ {get_profile_name(user)} ✦</li>
                 <NavUserMenu
                     element={Dropdown}
