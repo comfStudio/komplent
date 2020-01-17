@@ -11,15 +11,18 @@ interface FairyProps extends DefaultEventMap {
 
 export let _fairy: EventEmitter<FairyProps> = global?.store?.fairy
 
-if (!_fairy) {
-    _fairy = new EventEmitter<FairyProps>()
-    const o_emit = _fairy.emit
-    _fairy.emit = (...args) => {log.debug(`Emitted ${args[0]} event`); return o_emit(...args)}
-    if (global.store) {
-        global.store.fairy = _fairy
+export const fairy = () => (global?.store?.fairy as EventEmitter<FairyProps>)
+
+export const configure_fairy = () => {
+    log.info("Configured fairy")
+    if (!_fairy) {
+        _fairy = new EventEmitter<FairyProps>()
+        const o_emit = _fairy.emit
+        _fairy.emit = (...args) => {log.debug(`Emitted ${args[0]} event`); return o_emit(...args)}
+        if (global.store) {
+            global.store.fairy = _fairy
+        }
     }
 }
-
-export const fairy = () => (global?.store?.fairy as EventEmitter<FairyProps>)
 
 export default fairy

@@ -139,6 +139,7 @@
         "saslprep": "^1.0.3",
         "sharp": "^0.24.0",
         "slate": "^0.47.8",
+        "stripe": "^8.3.0",
         "styled-components": "^4.4.1",
         "svg-sprite-loader": "^4.1.2",
         "tailwindcss": "^1.1.3",

@@ -39,8 +39,9 @@ import { synchronize_indexes } from '@services/search'
 import useProfileStore, { useGalleryStore } from '@store/profile'
 import { setup_email } from '@services/email'
 import { create_tag_defaults } from '@services/tag'
-import { create_user_defaults } from '@services/user'
+import { create_user_defaults, configure_user_fairy_handlers } from '@services/user'
 import { StandardHeadMeta } from '@components/App/Misc'
+import { configure_fairy } from '@server/fairy'
 // Router.onRouteChangeStart = () => NProgress.start();
 // Router.onRouteChangeComplete = () => NProgress.done();
 // Router.onRouteChangeError = () => NProgress.done();
@@ -68,6 +69,8 @@ const server_initialize = async () => {
             await create_user_defaults()
             await setup_streams()
         }
+        configure_fairy()
+        configure_user_fairy_handlers()
     }
 }
 

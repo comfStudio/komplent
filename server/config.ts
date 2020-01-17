@@ -2,7 +2,7 @@ import getConfig from 'next/config'
 import { is_server } from '@utility/misc'
 
 const {
-    publicRuntimeConfig: { SESSION_KEYS },  // Available both client and server side
+    publicRuntimeConfig,  // Available both client and server side
   } = getConfig()
 
 export const CONFIG = {
@@ -31,7 +31,7 @@ export const CONFIG = {
     EMAIL_USER: process.env.EMAIL_USER,
     EMAIL_PASS: process.env.EMAIL_PASS,
     JWT_KEY: process.env.JWT_KEY,
-    SESSION_KEYS: SESSION_KEYS?.split(','),
+    SESSION_KEYS: publicRuntimeConfig?.SESSION_KEYS?.split(','),
 }
 
 export default CONFIG

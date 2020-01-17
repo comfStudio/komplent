@@ -32,7 +32,7 @@ const CommissionMenu = (props: MenuProps) => {
                     eventKey="description"
                     active={
                         props.activeKey == 'description'
-                    }>{t`Description`}</Nav.Item>
+                    }>{t`Overview`}</Nav.Item>
             </Link>
             <Link
                 href={pages.commission + `/${commission._id}/timeline`}

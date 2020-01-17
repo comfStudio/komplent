@@ -1,5 +1,7 @@
 @import '~@assets/styles/variables.scss';
 
+/* purgecss start ignore */
+
 @import url('https://fonts.googleapis.com/css?family=Quicksand:600&display=swap&subset=latin-ext');
 // @import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro&display=swap');
 
@@ -85,6 +87,26 @@ h3 {
     padding-bottom: 0.15em;
 }
 
+dd {
+    margin-left: 0;
+    margin-bottom: 10px;
+}
+
+dl {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+a {
+    @apply text-primary;
+    text-decoration: none;
+}
+
+hr {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
 hr.line {
     overflow: hidden;
     text-align: center;
@@ -136,3 +158,6 @@ hr.small {
 .clickable {
     cursor: pointer;
 }
+
+
+/* purgecss end ignore */

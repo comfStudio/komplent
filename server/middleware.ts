@@ -110,7 +110,7 @@ export const cookie_session = (opts => {
     return (req, res) => originalSession(req, res, () => {})
 })({
     name: '_session',
-    keys: new Keygrip(SESSION_KEYS, 'SHA384', 'base64'),
+    keys: SESSION_KEYS && SESSION_KEYS.length ? new Keygrip(SESSION_KEYS, 'SHA384', 'base64') : ["1", "2", "3"],
     maxAge: 1000 * 60 * 60 * 24 * 3, // 3 days
 })
 

@@ -49,7 +49,7 @@ export const update_user_creds = async (user, data: IUser, { save = true, random
         user.password = await bcrypt.hash(_data.password, CRYPTO_COST_FACTOR)
         // eslint-disable-next-line
         user.password_change_date = new Date()
-        delete data.password
+        delete _data.password
     }
 
     if (_data.username) {
@@ -61,7 +61,7 @@ export const update_user_creds = async (user, data: IUser, { save = true, random
                 user.username = (prefix + generate_random_id(prefix ? 4 : 10)).toLowerCase()
             }
         }
-        delete data.username
+        delete _data.username
     }
 
     if (_data.email) {
@@ -71,11 +71,11 @@ export const update_user_creds = async (user, data: IUser, { save = true, random
         }
         // eslint-disable-next-line
         user.email = _data.email
-        delete data.email
+        delete _data.email
     }
 
     if (data.email_verified === null) {
-        delete data.email_verified
+        delete _data.email_verified
     }
 
     user.set(_data)
@@ -223,7 +223,7 @@ export const create_user_defaults = async () => {
     }
 }
 
-export const configure_fairy_handlers = () => {
+export const configure_user_fairy_handlers = () => {
     
     fairy()?.on("user_joined", user => {
         send_activate_email(user)
@@ -233,9 +233,4 @@ export const configure_fairy_handlers = () => {
         send_activate_email(user)
     })
 
-}
-
-if (global?.store && !global?.store?.user_fairy_handlers) {
-    configure_fairy_handlers()
-    global.store.user_fairy_handlers = true
 }
