@@ -119,7 +119,7 @@ const CommissionCardHeader = (props: CommissionCardProps) => {
             </Row>
             <Row>
                 <Col xs={24} className="text-center">
-                    <span className="muted">{t`Delivery ~ ${commission_deadline} days`}</span>
+                    <span className="muted">{t`Est. delivery ~ ${commission_deadline} days`}</span>
                 </Col>
             </Row>
             <Row className="extra-row">
@@ -403,7 +403,7 @@ const LicensePanel = (props: LicensePanelProps) => {
 export const ProfileCommission = () => {
     const router = useRouter()
 
-    const { profile_user, current_user } = useProfileUser()
+    const { profile_user, current_user, context: { profile_path } } = useProfileUser()
     const commission_message_html = useDatabaseTextToHTML(
         profile_user?.commission_request_message
     )
@@ -418,6 +418,7 @@ export const ProfileCommission = () => {
         anonymous: current_user?.anonymous
     } as any)
     const [error, set_error] = useState(null)
+    const [show_success_modal, set_show_success_modal] = useState(null)
     const [loading, set_loading] = useState(false)
     const [deadline_disabled, set_deadline_disabled] = useState(false)
     const [suggest_price_disabled, set_suggest_price_disabled] = useState(false)
@@ -506,10 +507,7 @@ export const ProfileCommission = () => {
                 .then(r => {
                     set_loading(false)
                     if (r.status) {
-                        router.push(
-                            pages.commission +
-                                `/${r.body.data._id}`
-                        )
+                        set_show_success_modal(r.body.data._id)
                     } else {
                         set_error(r.body.error)
                     }
@@ -531,11 +529,13 @@ export const ProfileCommission = () => {
             onChange={value => set_form_value(value)}>
             <Grid fluid>
                 <h2>{t`Create a new commission request`}</h2>
+                <HelpBlock>{t`Choose a commission rate`}</HelpBlock>
+                <hr className="invisible small" />
                 <CommissionCardRadioGroup />
                 <hr className="invisible" />
                 <Row>
                     {(!!available_options.length || custom_price) &&
-                    <Panel bordered header={<h4>{t`Extra Options`}</h4>}>
+                    <Panel bordered header={<h4>{t`Additional Options`}</h4>}>
                         {custom_price &&
                         <FormGroup>
                             <ControlLabel>
@@ -558,6 +558,7 @@ export const ProfileCommission = () => {
                             <HelpBlock>{t`Suggest a fair price for this commission request.`}</HelpBlock>
                         </FormGroup>
                         }
+                        <HelpBlock className="mb-1">{t`Choosing additional options will add to the total price`}</HelpBlock>
                         <RateOptions options={available_options} checkbox />
                     </Panel>
                     }
@@ -699,6 +700,7 @@ export const ProfileCommission = () => {
                         {!!error && <hr />}
                     </Col>
                 </Row>
+                
                 <Row>
                     <Col xs={10}>
                         <TotalPriceDisplay>
@@ -707,6 +709,21 @@ export const ProfileCommission = () => {
                         </TotalPriceDisplay>
                     </Col>
                     <Col xs={4} xsPush={10}>
+                        <Modal show={!!show_success_modal} onHide={ev => router.push(profile_path)}>
+                            <Modal.Header>
+                                <Modal.Title>{t`Success`}</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>
+                                {t`The commission was created successfully!`}
+                            </Modal.Body>
+                            <Modal.Footer>
+                                <Link href={pages.commission + `/${show_success_modal}`}>
+                                    <Button componentClass="a" appearance="primary">
+                                    {t`Go to commission`}
+                                    </Button>
+                                </Link>
+                            </Modal.Footer>
+                        </Modal>
                         <Button
                             type="submit"
                             appearance="primary"

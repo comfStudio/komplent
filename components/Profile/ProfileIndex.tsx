@@ -7,9 +7,9 @@ import {
     CommissionTiersRow,
 } from '@app/components/Profile/ProfileCommission'
 import { GuidelineList } from '@app/components/Profile'
+import { GalleryCarousel } from '@app/components/Profile/ProfileGallery'
 
 import { t } from '@app/utility/lang'
-import { ReviewsReel } from '@components/Profile/ProfileReviews'
 import { useProfileUser } from '@hooks/user'
 import { useDatabaseTextToHTML } from '@hooks/db'
 import UserHTMLText from '@components/App/UserHTMLText'
@@ -28,8 +28,11 @@ export const ProfileIndex = () => {
             )}
             <h3>{t`Commission Rates`}</h3>
             <CommissionTiersRow settingsPlaceholder link={commissions_open && !profile_owner} />
-            <hr />
+            <hr className="invisible" />
             <GuidelineList />
+            <hr className="small invisible" />
+            <GalleryCarousel/>
+            <hr className="small invisible" />
             <h3>{t`About`}</h3>
             {!!!about_html && <Placeholder.Paragraph rows={8} />}
             {!!about_html && <UserHTMLText html={about_html}/>}

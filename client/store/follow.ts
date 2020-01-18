@@ -35,6 +35,9 @@ export const useFollowStore = createStore(
                     {
                         path: 'avatar',
                     },
+                    {
+                        path: 'profile_cover',
+                    },
                 ]
             }
 

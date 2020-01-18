@@ -13,6 +13,7 @@ import { useProfileUser } from '@hooks/user'
 import * as pages from '@utility/pages'
 import { useGalleryStore } from '@store/profile'
 import './profile.scss'
+import MultiCarousel from '@components/App/MultiCarousel';
 
 const Gallery = (props: {data: any, user?: any, profile_owner?: boolean, store: any, onClick?: any}) => {
     const [loading, set_loading] = useState(false)
@@ -62,6 +63,38 @@ export const GalleryList = () => {
                 </FlexboxGrid.Item>
             ))}
         </FlexboxGrid>
+    )
+}
+
+export const GalleryCarousel = () => {
+    
+    const { current_user, context: { profile_owner }} = useProfileUser()
+    const [show_lightbox, set_show_lightbox] = useState(false)
+
+    const store = useGalleryStore()
+
+    const galleries = store.state.galleries.slice(0, 4)
+
+    return (
+        <>
+         {!!show_lightbox && 
+                <FsLightbox
+                sources={ galleries.map( v => get_image_url(v.image, "big")) }
+                type="image"
+                types={ galleries.map( v => null) }
+                slide={show_lightbox}
+                openOnMount
+                onClose = {() => set_show_lightbox(null)}
+                /> 
+            }
+        <MultiCarousel visibleSlides={3} naturalSlideHeight={100} naturalSlideWidth={125}>
+            {galleries.map((g, idx) => (
+                <div key={g._id}>
+                    <Gallery data={g} user={current_user} store={store} profile_owner={profile_owner} onClick={() => { set_show_lightbox(idx+1) }} />
+                </div>
+            ))}
+        </MultiCarousel>
+        </>
     )
 }
 

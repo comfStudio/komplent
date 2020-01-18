@@ -24,7 +24,7 @@ export const ProfileMenu = (props: Props) => {
                             <Nav.Item
                                 eventKey="index"
                                 active={props.activeKey == 'index'}>
-                                {t`Summary`}
+                                {t`Overview`}
                             </Nav.Item>
                         </Link>
                         <Link href={`${profile_path}/gallery`} passHref>

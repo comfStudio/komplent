@@ -34,8 +34,8 @@ export const ProfileInfo = (props: Props) => {
     const [completion_stats, set_completion_stats] = useState({} as any)
 
     let cls = 'w-64'
-    const approval_days = approval_stats?.avg_accept_days?.toFixed(2) ?? '?'
-    const approval_time = approval_stats?.accepted_count ? ((approval_stats.accepted_count / approval_stats.total_count) * 100).toFixed(2) : '?'
+    const acceptance_days = approval_stats?.avg_accept_days?.toFixed(2) ?? '?'
+    const acceptance_time = approval_stats?.accepted_count ? ((approval_stats.accepted_count / approval_stats.total_count) * 100).toFixed(2) : '?'
 
     const completion_days = completion_stats?.avg_complete_days?.toFixed(2) ?? '?'
     const completion_time = completion_stats?.complete_count ? ((completion_stats.complete_count / completion_stats.total_count) * 100).toFixed(2) : '?'
@@ -92,12 +92,12 @@ export const ProfileInfo = (props: Props) => {
                     <table className="w-full">
                         <tbody>
                             <tr className="border-t border-b">
-                                <td>{t`Approval rate`}:</td>
-                                <td>{approval_time}%</td>
+                                <td>{t`Acceptance rate`}:</td>
+                                <td>{acceptance_time}%</td>
                             </tr>
                             <tr className="border-t border-b">
-                                <td>{t`Approval time`}:</td>
-                                <td>{t`${approval_days} days`}</td>
+                                <td>{t`Acceptance time`}:</td>
+                                <td> {t`${acceptance_days} days`}</td>
                             </tr>
                             <tr className="border-t border-b">
                                 <td>{t`Completion rate`}:</td>

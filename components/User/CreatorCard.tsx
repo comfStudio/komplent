@@ -12,7 +12,7 @@ import {
     make_profile_urlpath,
     make_commission_rate_urlpath,
 } from '@utility/pages'
-import { decimal128ToMoneyToString, get_profile_name, get_profile_avatar_url } from '@utility/misc'
+import { decimal128ToMoneyToString, get_profile_name, get_profile_avatar_url, get_image_url } from '@utility/misc'
 import Tag from '@components/Profile/Tag'
 import CommissionButton from '@components/Commission/CommissionButton'
 import { ProfileContext } from '@client/context'
@@ -35,47 +35,37 @@ export const CreatorCard = ({ fluid = true, ...props }: Props) => {
                 <a className="unstyled">
                     <Grid fluid>
                         <Row>
-                            <Col xs={8} className="!p-0">
+                            <Col xs={24} className="!p-0 cover-container mb-2">
                                 <Image
                                     fluid
-                                    className="inline-block"
-                                    h={100}
-                                />
-                            </Col>
-                            <Col xs={8} className="!p-0">
-                                <Image
-                                    fluid
-                                    className="inline-block"
-                                    h={100}
-                                />
-                            </Col>
-                            <Col xs={8} className="!p-0">
-                                <Image
-                                    fluid
-                                    className="inline-block"
+                                    className="inline-block cover"
+                                    src={get_image_url(props.data.profile_cover, "small")}
                                     h={100}
                                 />
                             </Col>
                         </Row>
                         <Row>
                             {!!rates.length &&
-                            <Col className="font-light mb-2 w-full text-center">
-                                {
-                                    rates.map(r => {
-                                        return (
-                                            <Link
-                                                key={r._id}
-                                                href={make_commission_rate_urlpath(
-                                                    props.data,
-                                                    r
-                                                )}>
-                                                <a className="commission-price">
-                                                    {r.price === null ? t`Custom` : decimal128ToMoneyToString(r.price)}
-                                                </a>
-                                            </Link>
-                                        )
-                                    })
-                                }
+                            <Col className="font-light mb-2 flex px-2">
+                                <span className="muted">{t`Rates:`}</span>
+                                <span className="flex-grow text-center">
+                                    {
+                                        rates.map(r => {
+                                            return (
+                                                <Link
+                                                    key={r._id}
+                                                    href={make_commission_rate_urlpath(
+                                                        props.data,
+                                                        r
+                                                    )}>
+                                                    <a className="commission-price">
+                                                        {r.price === null ? t`Custom` : decimal128ToMoneyToString(r.price)}
+                                                    </a>
+                                                </Link>
+                                            )
+                                        })
+                                    }
+                                </span>
                             </Col>
                             }
                         </Row>

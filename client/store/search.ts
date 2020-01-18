@@ -150,7 +150,7 @@ export const useSearchStore = createStore(
                 hydrate: true,
                 hydrateOptions: {
                     lean: true,
-                    populate: 'rates tags settings avatar',
+                    populate: 'rates tags settings avatar profile_cover',
                 },
             }
             let d: any

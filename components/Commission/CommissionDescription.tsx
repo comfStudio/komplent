@@ -52,7 +52,7 @@ const CommissionDescription = () => {
                     <UserInfoCard
                         notBodyFill
                         data={is_owner === true ? commission.to_user : commission.from_user}
-                        text={<span>{is_owner === true ? t`has been requested a commission from` : t`is requesting a commission from you`}</span>}>
+                        text={<span>{is_owner === true ? t`has been requested a commission from you` : t`is requesting a commission from you`}</span>}>
                         <CommissionCard
                             noCover
                             className="mt-4"

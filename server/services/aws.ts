@@ -78,7 +78,7 @@ export const generate_image_sizes = async (path: string, {sizes = ["icon", "thum
             sizes = ["icon"]
             break;
         case UploadType.ProfileCover:
-            sizes = ["medium", "big"]
+            sizes = ["thumb", "small", "medium", "big"]
             break;
         case UploadType.CommissionRate:
         sizes = ["thumb", "small"]
