@@ -89,7 +89,7 @@ export const GalleryCarousel = () => {
             }
         <MultiCarousel visibleSlides={3} naturalSlideHeight={100} naturalSlideWidth={125}>
             {galleries.map((g, idx) => (
-                <div key={g._id}>
+                <div key={g._id} className="px-2">
                     <Gallery data={g} user={current_user} store={store} profile_owner={profile_owner} onClick={() => { set_show_lightbox(idx+1) }} />
                 </div>
             ))}

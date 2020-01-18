@@ -31,8 +31,8 @@ export const ProfileIndex = () => {
             <hr className="invisible" />
             <GuidelineList />
             <hr className="small invisible" />
+            <h3>{t`Preview`}</h3>
             <GalleryCarousel/>
-            <hr className="small invisible" />
             <h3>{t`About`}</h3>
             {!!!about_html && <Placeholder.Paragraph rows={8} />}
             {!!about_html && <UserHTMLText html={about_html}/>}
