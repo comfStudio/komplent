@@ -65,7 +65,7 @@ export const useCommissionStore = createStore(
                     validate: true,
                 }).then(r => {
                     if (r.status) {
-                        return r.body
+                        return r.body.data
                     }
                     return undefined
                 })
@@ -88,6 +88,7 @@ export const useCommissionStore = createStore(
                     }
                 })
             }
+
             return u && u.length ? u[0] : null
         },
         get_commission() {

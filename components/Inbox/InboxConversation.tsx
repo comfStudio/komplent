@@ -220,7 +220,9 @@ export const Conversation = (props: ConversationProps) => {
         if (r.status) {
             set_messages([r.body.data, ...messages])
             scroll_to_bottom()
-            store.setState({conversations: [store.state.conversations.filter(v => v._id === props.conversation._id)[0], ...store.state.conversations.filter(v => v._id !== props.conversation._id)]})
+            if (store.state.conversations !== undefined) {
+                store.setState({conversations: [store.state.conversations.filter(v => v._id === props.conversation._id)[0], ...store.state.conversations.filter(v => v._id !== props.conversation._id)]})
+            }
         }
         return r
     }
