@@ -198,8 +198,11 @@ export const useInboxStore = createStore(
             }
             return u
         },
-        async get_messages_unread_count(current_user_id) {
-            let q = { users_read: { "$ne": current_user_id } }
+        async get_conversation_unread_count(current_user_id, type = undefined) {
+            let q: any = { users: current_user_id,  last_message_seen_by: { "$ne": current_user_id } }
+            if (type) {
+                q = {...q, type}
+            }
             let u
             if (is_server()) {
                 u = await Message.find(q).countDocuments()
@@ -207,7 +210,7 @@ export const useInboxStore = createStore(
                 await fetch('/api/fetch', {
                     method: 'post',
                     body: {
-                        model: 'Message',
+                        model: 'Conversation',
                         query: q,
                         count: true,
                     },
@@ -220,7 +223,7 @@ export const useInboxStore = createStore(
             return u
         },
         async get_conversation_read_status(conversation_id, current_user_id) {
-            let q = { conversation: conversation_id, users_read: { "$ne": current_user_id } }
+            let q = { _id: conversation_id, last_message_seen_by: { "$ne": current_user_id } }
             let u
             if (is_server()) {
                 throw Error("not implemented")
@@ -228,7 +231,7 @@ export const useInboxStore = createStore(
                 await fetch('/api/fetch', {
                     method: 'post',
                     body: {
-                        model: 'Message',
+                        model: 'Conversation',
                         query: q,
                         count: true,
                     },
@@ -314,6 +317,13 @@ export const useInboxStore = createStore(
                 this.setState({
                     message: [r.body.data, ...this.state.messages],
                 })
+                update_db({
+                    model: 'Conversation',
+                    data: { _id: this.state.active_conversation, last_message_seen_by: [...d.users_read] },
+                    schema: conversation_schema,
+                    create: false,
+                    validate: true
+                })
             }
 
             return r
@@ -325,6 +335,16 @@ export const useInboxStore = createStore(
                     _id: message._id,
                     users_read: [user._id, ...users_read],
                 }
+
+                if (this.state.active_conversation.last_message <= message.created) {
+                    update_db({
+                        model: 'Conversation',
+                        data: { _id: this.state.active_conversation, last_message_seen_by: [...d.users_read] },
+                        schema: conversation_schema,
+                        create: false,
+                        validate: true
+                    })
+                }
     
                 let r = await update_db({
                     model: 'Message',
@@ -335,6 +355,7 @@ export const useInboxStore = createStore(
                     ...params,
                 })
                 if (r.status) {
+
                     return r.body.data
                 }
     

@@ -6,6 +6,7 @@ import useUserStore from '@store/user'
 import { useUpdateDatabase } from '@hooks/db'
 import { text_schema } from '@schema/general'
 interface MessageTextProps {
+    id?: string
     message_key?: string
     placeholder?: string
     maxLength?: number
@@ -51,6 +52,7 @@ export const MessageText = ({maxLength = 3500, ...props}: MessageTextProps) => {
 
     return (
         <TextEditor
+            id={props.id}
             defaultDelta={
                 props.message_key ? (user[props.message_key]
                     ? user[props.message_key].data

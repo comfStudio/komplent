@@ -36,6 +36,12 @@ export const conversation_schema = new Schema(
             default: Date.now,
             ...es_date_type
         },
+        last_message_seen_by: [
+            {
+                type: ObjectId,
+                ref: 'User',
+            },
+        ],
         users: [
             {
                 type: ObjectId,

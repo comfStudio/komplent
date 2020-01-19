@@ -23,6 +23,7 @@ import {
     Icon,
     InputGroup,
     Message,
+    HelpBlock,
 } from 'rsuite'
 
 import { t } from '@app/utility/lang'
@@ -116,8 +117,8 @@ export const CommissionStatus = () => {
                             })
                         }
                     }}>
-                    <Radio disabled={!user.email_verified} value="open">{t`Open`}</Radio>
-                    <Radio value="closed">{t`Closed`}</Radio>
+                    <Radio id="commission_open" disabled={!user.email_verified} value="open">{t`Open`}</Radio>
+                    <Radio id="commission_closed" value="closed">{t`Closed`}</Radio>
                 </RadioGroup>
             </EditGroup>
         </React.Fragment>
@@ -138,15 +139,23 @@ export const ProfileVisiblity = () => {
                 onChange={async v => {
                     let r = await store.update_user({ visibility: v })
                 }}>
-                <Radio value="public">{t`Public`}</Radio>
-                <Radio value="private">{t`Private`}</Radio>
-                <Radio value="hidden">{t`Hidden`}</Radio>
+                <Radio id="profile_public" value="public">{t`Public`}</Radio>
+                <Radio id="profile_private" value="private">
+                    {t`Private`}{' '}
+                    <Whisper
+                        speaker={<Popover title={t`Private`}>{t`Your profile will only be accessible through a link`}</Popover>}
+                        placement="top"
+                        trigger="focus">
+                        <IconButton size="xs" icon={<Icon icon="question2" />} />
+                    </Whisper>
+                </Radio>
+                <Radio id="profile_hidden" value="hidden">{t`Hidden`}</Radio>
             </RadioGroup>
         </EditGroup>
     )
 }
 
-export const ProfileNSFWLevel = ({key = 'nsfw', ...props}: { text: string, key: 'nsfw' | 'show_nsfw', only_show: boolean }) => {
+export const ProfileNSFWLevel = ({key = 'nsfw', ...props}: { text?: string, key?: 'nsfw' | 'show_nsfw', only_show?: boolean, help?: string }) => {
     const store = useUserStore()
 
     const popover = (title, content) => (
@@ -171,15 +180,15 @@ export const ProfileNSFWLevel = ({key = 'nsfw', ...props}: { text: string, key: 
                 onChange={async v => {
                     let r = await store.update_user({ nsfw: props.only_show ? undefined : v, show_nsfw: v })
                 }}>
-                <Radio value={NSFW_LEVEL.level_0}>{t`None`}</Radio>
-                <Radio value={NSFW_LEVEL.level_5}>
+                <Radio id="mature_none" value={NSFW_LEVEL.level_0}>{t`None`}</Radio>
+                <Radio id="mature_moderate"  value={NSFW_LEVEL.level_5}>
                     {t`Moderate`}{' '}
                     {popover(
                         t`Moderate`,
                         <p>{t`Moderate Not-Safe-For-Work level`}</p>
                     )}
                 </Radio>
-                <Radio value={NSFW_LEVEL.level_10}>
+                <Radio id="mature_explicit" value={NSFW_LEVEL.level_10}>
                     {t`Explicit`}{' '}
                     {popover(
                         t`Explicit`,
@@ -187,6 +196,9 @@ export const ProfileNSFWLevel = ({key = 'nsfw', ...props}: { text: string, key: 
                     )}
                 </Radio>
             </RadioGroup>
+            {!!props.help &&
+            <HelpBlock className="my-2">{props.help}</HelpBlock>
+            }
         </EditGroup>
     )
 }
@@ -203,7 +215,7 @@ export const Notice = () => {
     return (
         <React.Fragment>
             <EditGroup>
-                <span className="mr-2">{t`Public Message Visibility`}: </span>
+                <span className="mr-2">{t`Status Message Visibility`}: </span>
                 <RadioGroup
                     name="notice_visible"
                     inline
@@ -228,8 +240,8 @@ export const Notice = () => {
                                 }
                             })
                     }}>
-                    <Radio value="visible">{t`Visible`}</Radio>
-                    <Radio value="hidden">{t`Hidden`}</Radio>
+                    <Radio id="status_visible" value="visible">{t`Visible`}</Radio>
+                    <Radio id="status_hidden" value="hidden">{t`Hidden`}</Radio>
                 </RadioGroup>
                 {value === 'visible' && (
                     <Button
@@ -248,6 +260,8 @@ export const Notice = () => {
                         className="ml-2"
                         size="sm">{t`Update`}</Button>
                 )}
+                
+            <HelpBlock className="my-2">{t`Display a public message on your profile`}</HelpBlock>
             </EditGroup>
             {value === 'visible' && (
                 <EditGroup>
@@ -256,6 +270,7 @@ export const Notice = () => {
                             set_notice_text(v)
                             set_updated(false)
                         }}
+                        id="status_text"
                         defaultValue={notice_text}
                         rows={3}
                         placeholder={t`Maximum of 250 words`}
@@ -324,6 +339,7 @@ export const Socials = () => {
     const form_el = (name, set_name, url, set_url, on_submit) => (
         <form className="w-64" onSubmit={on_submit}>
             <Input
+                id="social_name"
                 className="my-2"
                 placeholder={t`Name`}
                 value={name}
@@ -333,6 +349,7 @@ export const Socials = () => {
             <InputGroup size="sm" className="my-2">
                 <InputGroup.Addon> @</InputGroup.Addon>
                 <Input
+                    id="social_url"
                     className="my-2"
                     placeholder={t`URL`}
                     value={url}
@@ -341,6 +358,7 @@ export const Socials = () => {
             </InputGroup>
             <Button
                 type="submit"
+                id="social_submit"
                 className="mb-2 float-right"
                 size="sm">{t`Add`}</Button>
         </form>
@@ -363,7 +381,7 @@ export const Socials = () => {
                                         socials: [...new_data],
                                     })
                                 }}>
-                                <Icon className="mr-2" icon="minus-circle" />
+                                <Icon className="mr-2 social_item_delete" icon="minus-circle" />
                             </a>
                             {name} - <span className="muted">{url}</span>
                         </List.Item>
@@ -392,6 +410,7 @@ export const Socials = () => {
                     )}
                 {!add_new && (
                     <Button
+                        id="new_social"
                         size="sm"
                         onClick={() => set_add_new(true)}>{t`New`}</Button>
                 )}
@@ -411,14 +430,14 @@ export const ProfileEdit = () => {
                 {/* <Sections/> */}
                 {/* <ProfileColor/> */}
                 {/* <Tags/> */}
-                <ProfileNSFWLevel text={t`Mature content`} />
+                <ProfileNSFWLevel text={t`Mature content`} help={t`Do you create NSFW content?`} />
                 <span>{t`Change Cover & Avatar:`}</span>
                 <ProfileCoverAvatar/>
                 <Socials />
             </EditSection>
             <h4>{t`About`}</h4>
             <EditSection>
-                <MessageText message_key="about" maxLength={1000} />
+                <MessageText id="profile_about" message_key="about" maxLength={1000} />
             </EditSection>
         </Grid>
     )
