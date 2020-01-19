@@ -12,7 +12,7 @@ import InboxList from '@components/Inbox/InboxList'
 import InboxConversation from '@components/Inbox/InboxConversation'
 
 import { t } from '@app/utility/lang'
-import NewConvoModal from './NewConvoModal'
+import NewConvoModal, { NewMessageButton } from './NewConvoModal'
 import useInboxStore, { InboxKey } from '@store/inbox'
 import * as pages from '@utility/pages'
 import Empty from '@components/App/Empty'
@@ -33,10 +33,20 @@ const InboxLayout = (props: Props) => {
     const [unread_per_convo_count, set_unread_per_convo_count] = useState(0)
     const [unread_staff_convo_count, set_unread_staff_convo_count] = useState(0)
 
+    let type = router.query.type
+
+    if (!type) {
+        if (store.state.active_conversation) {
+            type = store.state.active_conversation.type
+        } else {
+            type = "commission"
+        }
+    }
+
     const btn_state = {
-        commission: router.query.type === 'commission' || router.query.type === undefined,
-        staff: router.query.type === 'staff',
-        private: router.query.type === 'private',
+        commission: type === 'commission',
+        staff: type === 'staff',
+        private: type === 'private',
     }
 
     useEffect(() => {
@@ -49,31 +59,14 @@ const InboxLayout = (props: Props) => {
         store.get_conversation_unread_count(user._id, "staff").then(r => {
             set_unread_staff_convo_count(r)
         })
-    }, [router.query.type])
-
-    const [show, set_show] = useState(false)
+    }, [type])
 
     return (
         <MainLayout activeKey="inbox">
-            {show && (
-                <NewConvoModal
-                    show={show}
-                    onClose={() => {
-                        set_show(false)
-                    }}
-                />
-            )}
             <Grid fluid className="mt-2">
                 <Row>
                     <Col xs={4}>
-                        <Button
-                            appearance="primary"
-                            onClick={ev => {
-                                ev.preventDefault()
-                                set_show(true)
-                            }}>
-                            <Icon icon="plus" /> {t`New conversation`}
-                        </Button>
+                        <NewMessageButton/>
                     </Col>
                     <Col xs={20}>
                         <InboxSearch />

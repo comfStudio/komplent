@@ -14,6 +14,7 @@ import { FileType } from 'rsuite/lib/Uploader'
 import useUserStore from '@store/user'
 import Image from '@components/App/Image'
 import { get_profile_avatar_url, get_image_url } from '@utility/misc'
+import { NewMessageButton } from '@components/Inbox/NewConvoModal'
 
 interface HoverImageUploadProps {
     children: any
@@ -55,7 +56,8 @@ interface HeaderProps extends ReactProps {}
 
 export const ProfileHeader = (props: HeaderProps) => {
     const {
-        context: { profile_owner, commissions_open },
+        current_user,
+        context: { profile_owner, commissions_open, profile_id },
     } = useProfileUser()
 
     return (
@@ -68,6 +70,10 @@ export const ProfileHeader = (props: HeaderProps) => {
                     {!profile_owner && (
                         <React.Fragment>
                             <CommissionButton className="z-10" />
+                            {!!current_user &&
+                            <NewMessageButton appearance="default" icon={<Icon icon="envelope-o"/>} size="lg" className="ml-3 mr-1" defaultValue={{reciepient: profile_id}}>
+                                {t`Send Message`}
+                            </NewMessageButton>}
                             <FollowButton />
                             <ShareButton/>
                         </React.Fragment>

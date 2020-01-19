@@ -17,11 +17,10 @@ import {
 
 import { schedule_unique, schedule_now } from '@server/tasks'
 import { TASK, CommissionPhaseT, NSFW_LEVEL } from '@server/constants'
-import { CommissionPhase, Conversation, Commission, Image, Tag, User, Attachment } from '@db/models'
+import { CommissionPhase, Conversation, Commission, Image, Tag, User, Attachment, Follow } from '@db/models'
 import { update_price_stats, update_delivery_time_stats } from '@services/analytics'
 import fairy from '@server/fairy'
-import { message_schema } from './message'
-
+import { message_schema, conversation_schema } from './message'
 
 user_schema.pre('save', async function() {
     if (!this.name) {
@@ -232,6 +231,12 @@ comission_rate_schema.post('remove', async function() {
 })
 
 message_schema.pre('save', async function() {
+    if (this.isNew) {
+        Conversation.findByIdAndUpdate(this.conversation, { last_message: new Date() })
+    }
+})
+
+conversation_schema.pre('save', async function() {
     if (this.isNew) {
         Conversation.findByIdAndUpdate(this.conversation, { last_message: new Date() })
     }

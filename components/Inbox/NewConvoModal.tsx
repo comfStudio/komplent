@@ -11,11 +11,17 @@ import {
     InputGroup,
     Message,
     HelpBlock,
+    Icon,
+    IconButton,
 } from 'rsuite'
+import { useRouter } from 'next/router'
+
 import { t } from '@app/utility/lang'
 import useUserStore from '@store/user'
 import useInboxStore from '@store/inbox'
 import { useUser } from '@hooks/user'
+import { make_conversation_urlpath } from '@utility/pages'
+import { ButtonProps } from 'rsuite/lib/Button'
 
 const {
     StringType,
@@ -37,16 +43,18 @@ const new_convo_model = Schema.Model({
 
 interface NewConvoModalProps {
     show?: boolean
+    defaultValue?: object
     onClose?: () => void
 }
 
 const NewConvoModal = (props: NewConvoModalProps) => {
     const store = useInboxStore()
     const user = useUser()
+    const router = useRouter()
 
     const [loading, set_loading] = useState(false)
     const [form_ref, set_form_ref] = useState(null)
-    const [form_value, set_form_value] = useState()
+    const [form_value, set_form_value] = useState(props.defaultValue ?? {})
     const [error, set_error] = useState(null)
 
     return (
@@ -80,6 +88,7 @@ const NewConvoModal = (props: NewConvoModalProps) => {
                             <FormControl
                                 fluid
                                 name="reciepient"
+                                defaultValue={props.defaultValue?.reciepient}
                                 accepter={Input}
                                 type="text"
                                 required
@@ -110,15 +119,25 @@ const NewConvoModal = (props: NewConvoModalProps) => {
                                         )
                                     ) {
                                         try {
-                                            await store.new_conversation(
+                                            const r = await store.new_conversation(
                                                 user,
                                                 form_value.subject,
                                                 { to: form_value.reciepient }
                                             )
 
-                                            if (props.onClose) {
-                                                props.onClose()
+                                            if (r.status) {
+                                                router.push(make_conversation_urlpath("inbox", r.body.data))
+                                                if (props.onClose) {
+                                                    props.onClose()
+                                                }
+                                            } else {
+                                                if (r.body.error.includes("user only receives messages")) {
+                                                    set_error(t`Reciepient has set limits on received messages`)
+                                                } else {
+                                                    set_error(t`Unknown error`)
+                                                }
                                             }
+
                                         } catch (err) {
                                             set_error(err.message)
                                         }
@@ -139,3 +158,33 @@ const NewConvoModal = (props: NewConvoModalProps) => {
 }
 
 export default NewConvoModal
+
+export const NewMessageButton = ({appearance = "primary", icon=<Icon icon="plus" />, onClick = undefined, defaultValue = undefined, ...props}: ButtonProps & { defaultValue?: object }) => {
+
+    const [show, set_show] = useState(false)
+
+    return (
+        <>
+        <NewConvoModal
+                    defaultValue={defaultValue}
+                    show={show}
+                    onClose={() => {
+                        set_show(false)
+                    }}
+                />
+        <IconButton
+            appearance={appearance}
+            icon={icon}
+            onClick={ev => {
+                ev.preventDefault()
+                set_show(true)
+            }}
+            {...props}>
+            {props.children}
+            {!props.children &&
+            t`New conversation`
+            }
+        </IconButton>
+        </>    
+    )
+}

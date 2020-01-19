@@ -77,10 +77,11 @@ export const useInboxStore = createStore(
                 ...params,
             })
             if (r.status) {
-                this.setState({
-                    conversations: [r.body.data, ...this.state.conversations],
-                    active_conversation: r.body.data,
-                })
+                // this.setState({
+                //     conversations: [r.body.data, ...this.state.conversations],
+                //     messages: [],
+                //     active_conversation: r.body.data,
+                // })
             }
             return r
         },

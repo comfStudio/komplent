@@ -12,6 +12,12 @@ import {
     Row,
     Col,
     Placeholder,
+    RadioGroup,
+    Radio,
+    Whisper,
+    IconButton,
+    Popover,
+    HelpBlock,
 } from 'rsuite'
 
 import { EditGroup, EditSection } from '.'
@@ -368,6 +374,54 @@ export const CommissionProcess = (props: CommissionProcessProps) => {
     )
 }
 
+export const ReceiveMessage = () => {
+    const store = useUserStore()
+
+    const popover = (title, content) => (
+        <Whisper
+            speaker={<Popover title={title}>{content}</Popover>}
+            placement="top"
+            trigger="focus">
+            <IconButton size="xs" icon={<Icon icon="question2" />} />
+        </Whisper>
+    )
+
+    return (
+        <EditGroup>
+            <span className="mr-2">{t`Receive messages from`}: </span>
+            <RadioGroup
+                name="messages_from"
+                inline
+                appearance="picker"
+                defaultValue={
+                    store.state.current_user.messages_from
+                }
+                onChange={async v => {
+                    let r = await store.update_user({ messages_from: v })
+                }}>
+                <Radio id="message_everyone"  value="everyone">
+                    {t`Everyone`}{' '}
+                </Radio>
+                <Radio id="message_followers"  value="followers">
+                    {t`Followers`}{' '}
+                    {popover(
+                        t`Followers`,
+                        <p>{t`Only your followers can message you`}</p>
+                    )}
+                </Radio>
+                <Radio id="message_commissioners"  value="commissioners">
+                    {t`Commissioners`}{' '}
+                    {popover(
+                        t`Commissioners`,
+                        <p>{t`Only your clients can message you`}</p>
+                    )}
+                </Radio>
+            </RadioGroup>
+            <HelpBlock className="my-2">{t`Who can message you?`}</HelpBlock>
+        </EditGroup>
+    )
+}
+
 export const Rates = () => {
     const [show_new_rate, set_show_new_rate] = useState(false)
 
@@ -426,6 +480,12 @@ export const CommissionAcceptMessage = () => {
 const CommissionsSettings = () => {
     return (
         <Grid fluid>
+            
+            <h4>{t`General`}</h4>
+            <EditSection>
+                <ReceiveMessage/>
+            </EditSection>
+            
             <h4>{t`Rates`}</h4>
             <EditSection>
                 <Rates />

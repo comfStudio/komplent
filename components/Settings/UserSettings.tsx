@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Grid, RadioGroup, Radio, SelectPicker, Button, Icon, List, CheckboxGroup, Toggle, InputGroup, Input, Modal, Checkbox } from 'rsuite'
+import { Grid, RadioGroup, Radio, SelectPicker, Button, Icon, List, CheckboxGroup, Toggle, InputGroup, Input, Modal, Checkbox, Whisper, Popover, IconButton, HelpBlock } from 'rsuite'
 import { useMount } from 'react-use'
 
 import { EditGroup, EditSection } from '.'
@@ -13,6 +13,7 @@ import { username_validate, email_validate, password_validate } from '@component
 import { fetch } from '@utility/request'
 import { oauth_window } from '@client/misc'
 import { UploadType } from '@server/constants'
+import { useUser } from '@hooks/user'
 
 export const UserType = () => {
     return (
@@ -324,6 +325,7 @@ export const Password = ({show_inputs = false, done}: {show_inputs?: boolean, do
 }
 
 const UserSettings = () => {
+
     return (
         <Grid fluid>
             <h4>{t`General`}</h4>

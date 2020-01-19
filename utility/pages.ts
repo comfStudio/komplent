@@ -64,7 +64,7 @@ export const make_commission_rate_urlpath = (user, rate: { _id: string }) => {
 export const make_conversation_urlpath = (
     activeKey: string,
     conversation: { _id: string },
-    query: object
+    query: object = undefined
 ) => {
     let url = inbox
     url += activeKey === 'inbox' ? '' : `/${activeKey}`

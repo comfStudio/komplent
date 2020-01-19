@@ -8,6 +8,7 @@ import {
     ExApiRequest,
     ExApiResponse,
 } from '@server/middleware'
+import { create_conversation } from '@services/message'
 
 const cors = microCors({ allowMethods: ['PUT', 'POST', 'OPTIONS'] })
 
@@ -38,9 +39,21 @@ export default with_auth_middleware(
                         : error_message('failed to delete')
                 )
             } else {
+
                 let doc: Document = null
 
-                if (req.method == 'put') {
+                const create = req.method === 'put'
+
+                if (create) {
+
+                    code = CREATED
+
+                    if (model === 'Conversation') {
+                        doc = await create_conversation(req.user, data)
+                    }
+                }
+
+                if (req.method === 'put') {
                     if (data._id) {
                         doc = await m.findById(data._id)
                     }
@@ -58,7 +71,6 @@ export default with_auth_middleware(
                     }
 
                     if (validate) {
-                        console.log("validating")
                         await doc.validate().catch(r => console.log(r))
                     }
 

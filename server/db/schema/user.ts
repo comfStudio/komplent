@@ -109,6 +109,11 @@ export const user_schema = new Schema(
             default: 'private',
             es_indexed: true,
         },
+        messages_from: {
+            type: String,
+            enum: ['everyone', 'followers', 'commissioners'],
+            default: 'everyone',
+        },
         commission_guidelines: [
             {
                 guideline_type: {

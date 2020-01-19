@@ -19,8 +19,43 @@ class InboxPage extends AuthPage<Props> {
             activeKey: this.activeKey,
         })
         if (props.useUserState.logged_in) {
-            let type = (ctx.query.type as string) ?? 'commission'
+            let type = (ctx.query.type as string)
+            let convo_id = ctx.query.convo_id
 
+            const get_convo = async (c_id) => {
+                if (c_id) {
+                    try {
+                        inboxStoreeState.messages = await useInboxStore.actions.get_messages(
+                            c_id
+                        )
+                        inboxStoreeState.active_conversation = await useInboxStore.actions.get_conversation(
+                            c_id as string
+                        )
+                    } catch (err) {
+                        log.error(err)
+                        inboxStoreeState.active_conversation = undefined
+                    }
+                } else {
+                    inboxStoreeState.active_conversation = undefined
+                }
+            }
+
+            if (!type) {
+                if (inboxStoreeState.active_conversation) {
+                    type = inboxStoreeState.active_conversation.type
+                } else {
+                    if (convo_id) {
+                        await get_convo(convo_id)
+                    }
+                    if (inboxStoreeState.active_conversation) {
+                        type = inboxStoreeState.active_conversation.type
+                    } else {
+                        type = "commission"
+                    }
+                }
+            }
+
+            // eslint-disable-next-line
             inboxStoreeState.conversations = await useInboxStore.actions.search_conversations(
                 props.useUserState.current_user,
                 type as any,
@@ -30,22 +65,11 @@ class InboxPage extends AuthPage<Props> {
                 }
             )
 
-            let convo_id = ctx.query.convo_id ?? inboxStoreeState?.conversations?.[0]?._id
-
-            if (convo_id) {
-                try {
-                    inboxStoreeState.messages = await useInboxStore.actions.get_messages(
-                        convo_id
-                    )
-                    inboxStoreeState.active_conversation = await useInboxStore.actions.get_conversation(
-                        convo_id as string
-                    )
-                } catch (err) {
-                    log.error(err)
-                    inboxStoreeState.active_conversation = undefined
+            if (!inboxStoreeState.active_conversation) {
+                convo_id = inboxStoreeState?.conversations?.[0]?._id
+                if (convo_id) {
+                    await get_convo(convo_id)
                 }
-            } else {
-                inboxStoreeState.active_conversation = undefined
             }
         }
 
