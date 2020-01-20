@@ -68,6 +68,7 @@ export const user_schema = new Schema(
         notice: { type: String, maxLength: 250 },
         profile_color: String,
         display_currency: String,
+        request_expire_deadline: { type: Number, default: 30, },
         ongoing_commissions_limit: { type: Number, default: 5, maxlength: 20 },
         ongoing_requests_limit: { type: Number, default: 10, maxlength: 50 },
         revisions_limit: { type: Number, default: 3 },

@@ -42,6 +42,7 @@ import { create_tag_defaults } from '@services/tag'
 import { create_user_defaults, configure_user_fairy_handlers } from '@services/user'
 import { StandardHeadMeta } from '@components/App/Misc'
 import { configure_fairy } from '@server/fairy'
+import { configure_commission_fairy_handlers } from '@services/commission'
 // Router.onRouteChangeStart = () => NProgress.start();
 // Router.onRouteChangeComplete = () => NProgress.done();
 // Router.onRouteChangeError = () => NProgress.done();
@@ -71,6 +72,7 @@ const server_initialize = async () => {
         }
         configure_fairy()
         configure_user_fairy_handlers()
+        configure_commission_fairy_handlers()
     }
 }
 

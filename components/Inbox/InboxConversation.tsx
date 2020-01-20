@@ -144,6 +144,7 @@ const Header = (props: HeaderProps) => {
         switch (props.data.type) {
             case "private":
                 set_tag({ text: t`Personal`, color: "blue"})
+                set_commission_id("")
                 break;
             case "commission":
                 {
@@ -153,6 +154,7 @@ const Header = (props: HeaderProps) => {
                 break;
             case "staff":
                 set_tag({ text: t`Staff`, color: "violet"})
+                set_commission_id("")
                 break;
             default:
                 break;

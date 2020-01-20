@@ -15,7 +15,7 @@ import {
     commission_phase_schema,
 } from '@schema/commission'
 
-import { schedule_unique, schedule_now } from '@server/tasks'
+import { schedule_unique, schedule_now, schedule } from '@server/tasks'
 import { TASK, CommissionPhaseT, NSFW_LEVEL } from '@server/constants'
 import { CommissionPhase, Conversation, Commission, Image, Tag, User, Attachment, Follow } from '@db/models'
 import { update_price_stats, update_delivery_time_stats } from '@services/analytics'
@@ -55,6 +55,9 @@ user_schema.pre('save', async function() {
     if (!this.isNew) {
         if (this.isModified("email")) {
             fairy().emit("user_email_changed", this, this.email)
+        }
+        if (this.isModified("request_expire_deadline")) {
+            fairy().emit("user_request_expire_deadline_changed", this, this.request_expire_deadline)
         }
     }
 

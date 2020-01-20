@@ -52,6 +52,7 @@ export enum TASK {
     reset_login = 'reset_login',
     commission_refund = 'commission_refund',
     commission_deadline = 'commission_deadline',
+    commission_request_deadline = 'commission_request_deadline',
     commission_phase_updated = 'commission_phase_updated',
     user_commission_status_changed = 'user_commission_status_changed',
     user_notice_changed = 'user_notice_changed',
@@ -71,6 +72,8 @@ export type TaskDataTypeMap<T> = T extends TASK.followed_user
     ? { commission: any; phase: any }
     : T extends TASK.commission_deadline
     ? { to_user_id: string; from_user_id: string; commission: any }
+    : T extends TASK.commission_request_deadline
+    ? { commission_id: string }
     : T extends TASK.commission_phase_updated
     ? {
           user_id: string

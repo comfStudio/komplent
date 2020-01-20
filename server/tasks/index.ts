@@ -77,6 +77,16 @@ export async function schedule_now<T extends TASK>(args: ScheduleNowArgs<T>) {
     return await schedule({ when: undefined, ...args })
 }
 
+export async function remove_unique_task<T extends TASK>(task: T, key: Bull.JobId) {
+    let job = await scheduler[task].getJob(get_id(task, key))
+    if (job) {
+        await job.discard()
+        await job.remove()
+        return true
+    }
+    return false
+}
+
 export interface ScheduleUniqueArgs<T extends TASK>
     extends Omit<ScheduleArgs<T>, 'opts'> {
     key: Bull.JobId
@@ -90,11 +100,7 @@ export async function schedule_unique<T extends TASK>({
     ...args
 }: ScheduleUniqueArgs<T>) {
     if (key && STATES.SCHEDULER_SETUP) {
-        let prev_job = await scheduler[task].getJob(get_id(task, key))
-        if (prev_job) {
-            await prev_job.discard()
-            await prev_job.remove()
-        }
+        await remove_unique_task(task, key)
         return await schedule({ task, ...args, opts: { key, ...opts } })
     }
 }

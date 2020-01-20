@@ -47,7 +47,7 @@ const Deadline = () => {
 
     const update = useCallback(
         debounce((v: number, ev) => {
-            store.update({ commission_deadline: v })
+            store.update({ commission_deadline: Math.round(v) })
         }, 400),
         []
     )
@@ -58,6 +58,7 @@ const Deadline = () => {
             <div className="w-32">
                 <InputNumber
                     defaultValue={commission.commission_deadline}
+                    min={0}
                     postfix={t`days`}
                     onChange={update}
                 />
@@ -71,7 +72,7 @@ export const CommissionLimit = () => {
 
     const update = useCallback(
         debounce((v: number, ev) => {
-            store.update_user({ ongoing_commissions_limit: v })
+            store.update_user({ ongoing_commissions_limit: Math.round(v) })
         }, 400),
         []
     )
@@ -83,6 +84,7 @@ export const CommissionLimit = () => {
                     defaultValue={
                         store.state.current_user.ongoing_commissions_limit
                     }
+                    min={1}
                     onChange={update}
                 />
             </div>
@@ -95,7 +97,7 @@ export const CommissionRequestLimit = () => {
 
     const update = useCallback(
         debounce((v: number, ev) => {
-            store.update_user({ ongoing_requests_limit: v })
+            store.update_user({ ongoing_requests_limit: Math.round(v) })
         }, 400),
         []
     )
@@ -107,6 +109,7 @@ export const CommissionRequestLimit = () => {
                     defaultValue={
                         store.state.current_user.ongoing_requests_limit
                     }
+                    min={1}
                     onChange={update}
                 />
             </div>
@@ -461,6 +464,33 @@ export const Rates = () => {
     )
 }
 
+
+const RequestLimitDeadline = () => {
+    const store = useUserStore()
+
+    const update = useCallback(
+        debounce((v: number, ev) => {
+            store.update_user({ request_expire_deadline: Math.round(v) })
+        }, 400),
+        []
+    )
+
+    return (
+        <EditGroup>
+            <span className="mr-2">{t`Auto-decline requests in`}: </span>
+            <div className="w-32">
+                <InputNumber
+                    defaultValue={store.state.current_user.request_expire_deadline}
+                    min={0}
+                    postfix={t`days`}
+                    onChange={update}
+                />
+            </div>
+            <HelpBlock className="mt-1">{t`Commission requests will automatically be declined`}</HelpBlock>
+        </EditGroup>
+    )
+}
+
 export const CommissionMessage = () => {
     return (
         <EditGroup>
@@ -484,8 +514,9 @@ const CommissionsSettings = () => {
             <h4>{t`General`}</h4>
             <EditSection>
                 <ReceiveMessage/>
+                <RequestLimitDeadline/>
             </EditSection>
-            
+
             <h4>{t`Rates`}</h4>
             <EditSection>
                 <Rates />

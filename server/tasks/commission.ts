@@ -113,5 +113,19 @@ export default function(queue) {
         }
     })
 
+    queue.process(TASK.commission_request_deadline, async job => {
+        log.debug(`processing ${TASK.commission_request_deadline}`)
+        const {
+            commission_id,
+        } = job.data as TaskDataTypeMap<TASK.commission_request_deadline>
+
+        const comm = await Commission.findById(commission_id)
+
+        if (!comm.finished && !comm.accepted) {
+            // TODO: expire commission
+        }
+
+    })
+
     return r
 }

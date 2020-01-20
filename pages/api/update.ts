@@ -9,6 +9,7 @@ import {
     ExApiResponse,
 } from '@server/middleware'
 import { create_conversation } from '@services/message'
+import { create_commission } from '@services/commission'
 
 const cors = microCors({ allowMethods: ['PUT', 'POST', 'OPTIONS'] })
 
@@ -50,6 +51,8 @@ export default with_auth_middleware(
 
                     if (model === 'Conversation') {
                         doc = await create_conversation(req.user, data)
+                    } else if (model === 'Commission') {
+                        doc = await create_commission(req.user, data)
                     }
                 }
 

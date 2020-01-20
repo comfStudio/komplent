@@ -4,6 +4,7 @@ import log from '@utility/log'
 
 interface FairyProps extends DefaultEventMap {
     user_email_changed: (user: IUser, email: string) => void,
+    user_request_expire_deadline_changed: (user: IUser, new_deadline: number) => void,
     user_joined: (user: IUser) => void,
     user_logged_in: (user: IUser) => void,
     user_logged_out: (user: IUser) => void,
