@@ -50,12 +50,12 @@ export const NavUserMenu = (props: UserMenuProps) => {
         useNotificationStore.actions.get_notifications_count(user).then(r => {
             set_dashboard_count(r)
         })
-        useUserStore.actions.get_follow_count('followee', user).then(r => {
-            set_followers_count(r)
-        })
-        useUserStore.actions.get_follow_count('follower', user).then(r => {
-            set_followings_count(r)
-        })
+        // useUserStore.actions.get_follow_count('followee', user).then(r => {
+        //     set_followers_count(r)
+        // })
+        // useUserStore.actions.get_follow_count('follower', user).then(r => {
+        //     set_followings_count(r)
+        // })
         useInboxStore.actions.get_conversation_unread_count(user._id).then(r => {
             set_unread_convo_count(r)
         })
@@ -108,7 +108,7 @@ export const NavUserMenu = (props: UserMenuProps) => {
             }
             <Link href="/followings" passHref>
                 <El.Item eventKey="followings" active={props.activeKey == 'followings'}>
-                    {t`Followings`} <span className="muted">({followings_count})</span>
+                    {t`Followings`}
                 </El.Item>
             </Link>
             {user?.type === 'creator' &&
@@ -116,7 +116,7 @@ export const NavUserMenu = (props: UserMenuProps) => {
                     <El.Item
                         eventKey="followers"
                         active={props.activeKey == 'followers'}>
-                        {t`Followers`} <span className="muted">({followers_count})</span>
+                        {t`Followers`}
                     </El.Item>
                 </Link>
             }

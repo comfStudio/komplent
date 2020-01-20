@@ -69,9 +69,9 @@ export type TASK_T = KEYS_TO_TYPE<typeof tasks>
 export type TaskDataTypeMap<T> = T extends TASK.followed_user
     ? { user_id: string; followee: any }
     : T extends TASK.commission_refund
-    ? { commission: any; phase: any }
+    ? { commission_id: string; phase: any }
     : T extends TASK.commission_deadline
-    ? { to_user_id: string; from_user_id: string; commission: any }
+    ? { to_user_id: string; from_user_id: string; commission_id: string }
     : T extends TASK.commission_request_deadline
     ? { commission_id: string }
     : T extends TASK.commission_phase_updated

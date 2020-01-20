@@ -832,7 +832,7 @@ export const useCommissionsStore = createStore(
             search_query,
             page: number,
             build = true,
-            { ongoing = false, completed = false, failed = false, rejected = false, expired = false, accepted = false, not_accepted = false, active = false } = {}
+            { ongoing = false, completed = false, failed = false, rejected = false, expired = false, accepted = false, not_accepted = false } = {}
         ) {
             let q = bodybuilder()
 

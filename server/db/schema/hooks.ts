@@ -66,7 +66,9 @@ user_schema.pre('save', async function() {
             this.commissions_open = false
         }
     }
+})
 
+user_schema.post('save', async function() {
     if (this.wasNew) {
         fairy().emit("user_joined", this)
     }
@@ -140,7 +142,7 @@ commission_schema.post('save', async function() {
             key: this._id.toString(),
             when: `${this.commission_deadline} days`,
             data: {
-                commission: this.toJSON(),
+                commission_id: this._id,
                 from_user_id: this.from_user,
                 to_user_id: this.to_user,
             },
@@ -173,7 +175,7 @@ commission_phase_schema.post('save', async function() {
                 task: TASK.commission_refund,
                 key: comm._id.toString(),
                 when: '5 minutes',
-                data: { commission: comm.toJSON(), phase: this.toJSON() },
+                data: { commission_id: comm._id, phase: this.toJSON() },
             })
         }
         if (this.done) {

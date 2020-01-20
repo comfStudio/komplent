@@ -5,9 +5,10 @@ import { Commission, CommissionPhase, Payment, Attachment } from "@db/models"
 import { decimal128ToFloat, user_among } from "@utility/misc"
 import { upload_file } from '@services/aws'
 import log from '@utility/log'
-import { schedule_unique, remove_unique_task } from '@server/tasks'
+import { schedule_unique, remove_unique_task, schedule_unique_now } from '@server/tasks'
 import { TASK } from '@server/constants'
 import fairy from '@server/fairy'
+import { addDays } from 'date-fns'
 
 export const add_commission_asset = async (user, commission, file) => {
 
@@ -110,16 +111,26 @@ export const accept_commission_price = async (commission_id) => {
 
 }
 
-const schedule_expire_deadline = (commission_id: string, deadline: number) => {
-    if (deadline) {
-        return schedule_unique({
-            task: TASK.commission_request_deadline,
-            key: commission_id.toString(),
-            when: `${deadline} days`,
-            data: {
-                commission_id,
-            },
-        })
+const schedule_expire_deadline = (commission_id: string, created: Date, deadline: number) => {
+    if (deadline && deadline > 0) {
+        if (addDays(created, deadline) < (new Date())) {
+            return schedule_unique_now({
+                task: TASK.commission_request_deadline,
+                key: commission_id.toString(),
+                data: {
+                    commission_id,
+                },
+            })
+        } else {
+            return schedule_unique({
+                task: TASK.commission_request_deadline,
+                key: commission_id.toString(),
+                when: `${deadline} days`,
+                data: {
+                    commission_id,
+                },
+            })
+        }
     } else {
         remove_unique_task(TASK.commission_request_deadline, commission_id)
     }
@@ -131,17 +142,17 @@ export const create_commission = async (from_user, data: any) => {
 
     await c.save()
 
-    schedule_expire_deadline(c._id, from_user.request_expire_deadline)
+    schedule_expire_deadline(c._id, c.created, from_user.request_expire_deadline)
 
     return c
 }
 
 export const update_requests_expire_deadline = async (user_id: string, new_deadline: number) => {
 
-    const requests = await Commission.find({to_user: user_id, finished: false, accepted: false}).select("_id").lean()
+    const requests = await Commission.find({to_user: user_id, finished: false, accepted: false}).select("_id created").lean()
 
     requests.forEach(c => {
-        schedule_expire_deadline(c._id, new_deadline)
+        schedule_expire_deadline(c._id, c.created, new_deadline)
     });
 
 }

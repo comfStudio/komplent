@@ -14,6 +14,7 @@ export default function(queue) {
         TASK.commission_phase_updated,
         TASK.commission_refund,
         TASK.commission_deadline,
+        TASK.commission_request_deadline,
     ].reduce((a, v) => {
         let d = { ...a }
         d[v] = queue
@@ -39,24 +40,24 @@ export default function(queue) {
 
     queue.process(TASK.commission_refund, async job => {
         log.debug(`processing ${TASK.commission_refund}`)
-        const { commission, phase } = job.data as TaskDataTypeMap<
+        const { commission_id, phase } = job.data as TaskDataTypeMap<
             TASK.commission_refund
         >
 
-        const comm = await Commission.findById(commission._id)
-        if (comm && comm.refunding) {
+        const commission = await Commission.findById(commission_id)
+        if (commission && commission.refunding) {
             const stage = await CommissionPhase.findById(phase._id)
             stage.done = true
 
-            comm.refunding = false
-            comm.refunded = true
+            commission.refunding = false
+            commission.refunded = true
             // end
-            if (!comm.finished) {
-                comm.finished = true
-                comm.completed = false
-                comm.end_date = new Date()
+            if (!commission.finished) {
+                commission.finished = true
+                commission.completed = false
+                commission.end_date = new Date()
             }
-            comm.save()
+            commission.save()
             stage.save()
         }
     })
@@ -64,29 +65,29 @@ export default function(queue) {
     queue.process(TASK.commission_deadline, async job => {
         log.debug(`processing ${TASK.commission_deadline}`)
         const {
-            commission,
+            commission_id,
             from_user_id,
             to_user_id,
         } = job.data as TaskDataTypeMap<TASK.commission_deadline>
 
-        const comm = await Commission.findById(commission._id)
+        const commission = await Commission.findById(commission_id)
 
         let unlocked = false
 
-        let done_stages: CommissionProcessType[] = comm.phases.filter(
+        let done_stages: CommissionProcessType[] = commission.phases.filter(
             v => v.done
         )
         if (done_stages.filter(v => v.type == CommissionPhaseT.unlock).length) {
             unlocked = true
         }
 
-        if (comm && !comm.finished && !comm.refunding) {
+        if (commission && !commission.finished && !commission.refunding) {
             const d = new Date()
 
             // add expire phase
             let expire_phase = new CommissionPhase({
                 type: CommissionPhaseT.expire,
-                commission: comm._id,
+                commission: commission._id,
                 done: true,
                 done_date: d,
                 data: { commission_deadline: commission.commission_deadline },
@@ -95,16 +96,16 @@ export default function(queue) {
             expire_phase.save()
 
             // end
-            comm.finished = true
-            comm.completed = false
-            comm.end_date = d
-            comm.expire_date = d
-            comm.save()
+            commission.finished = true
+            commission.completed = false
+            commission.end_date = d
+            commission.expire_date = d
+            commission.save()
 
-            if (comm.payments.length && !comm.refunded && !unlocked) {
+            if (commission.payments.length && !commission.refunded && !unlocked) {
                 let refund_phase = new CommissionPhase({
                     type: CommissionPhaseT.refund,
-                    commission: comm._id,
+                    commission: commission._id,
                     done: false,
                     user: to_user_id,
                 })

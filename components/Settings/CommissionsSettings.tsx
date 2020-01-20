@@ -486,7 +486,7 @@ const RequestLimitDeadline = () => {
                     onChange={update}
                 />
             </div>
-            <HelpBlock className="mt-1">{t`Commission requests will automatically be declined`}</HelpBlock>
+            <HelpBlock className="mt-1">{t`Your current commission requests will automatically be declined if they have passed the given limit`}</HelpBlock>
         </EditGroup>
     )
 }

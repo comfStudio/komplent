@@ -80,6 +80,7 @@ export async function schedule_now<T extends TASK>(args: ScheduleNowArgs<T>) {
 export async function remove_unique_task<T extends TASK>(task: T, key: Bull.JobId) {
     let job = await scheduler[task].getJob(get_id(task, key))
     if (job) {
+        log.debug(`Removing task ${task} with key ${key}`)
         await job.discard()
         await job.remove()
         return true
