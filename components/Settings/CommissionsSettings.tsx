@@ -18,6 +18,8 @@ import {
     IconButton,
     Popover,
     HelpBlock,
+    Badge,
+    Tag,
 } from 'rsuite'
 
 import { EditGroup, EditSection } from '.'
@@ -225,6 +227,22 @@ export const CommissionGuideline = () => {
     )
 }
 
+export const CountTagEdit = ({value, onChange, min = 0}: {value?: number, min?: number, onChange?: (v: number, event: any) => void}) => {
+
+    const [edit, set_edit] = useState(false)
+
+    return (
+        edit ?
+        <Tag color="blue">{t`Count`}: <form onSubmit={ev => {ev.preventDefault(); console.log(edit); set_edit(false) }}><InputNumber min={min} size="xs" className="w-4" value={value} onChange={onChange}/></form></Tag>
+        :
+        (
+        <a href="#" onClick={ev => {ev.stopPropagation(); ev.preventDefault(); set_edit(true)}} className="z-10 ml-2">
+            <Tag color="blue">{t`Count`}: {value}</Tag>
+        </a>
+        )
+    )
+}
+
 interface CommissionProcessProps {
     commission?: boolean
 }
@@ -242,34 +260,54 @@ export const CommissionProcess = (props: CommissionProcessProps) => {
         user = user_store.state.current_user
         def_stages = user.commission_process
     }
+    const [stages_limit, set_stages_limit] = useState({})
+    const [stages_minimum, set_stages_minimum] = useState({})
+    const [dirty, set_dirty] = useState(false)
     const [stages, set_stages] = useState(def_stages)
     const prev_stages = useRef(stages)
 
     const get_name = (v: CommissionPhaseType) => {
         switch (v) {
             case 'pending_approval':
-                return t`Approval`
+                return t`Commission is approved`
             case 'pending_sketch':
-                return t`Initial Sketch`
+                return t`Creator provides a draft`
             case 'pending_payment':
-                return t`Request Payment`
+                return t`Client should pay`
             case 'pending_product':
-                return t`Commission Product`
+                return t`Creator provides assets`
             case 'revision':
-                return t`Allow Revision`
+                return t`Client can ask for revisions`
             case 'complete':
-                return t`Commission Complete`
+                return t`Commission is completed`
             case 'unlock':
-                return t`Unlock Product Access`
+                return t`Client access to assets is unlocked`
+        }
+    }
+
+    const get_help = (v: CommissionPhaseType) => {
+        switch (v) {
+            case 'pending_approval':
+                return t`Commission is approved`
+            case 'pending_sketch':
+                return t`Creator provides a draft`
+            case 'pending_payment':
+                return t`Client should pay`
+            case 'pending_product':
+                return t`Creator provides assets`
+            case 'revision':
+                return t`Client can ask for revisions`
+            case 'complete':
+                return t`Commission is completed`
+            case 'unlock':
+                return t`Client access to assets is unlocked`
         }
     }
 
     const collections = useCommissionStore.actions.get_stages_collections()
 
-    const mounted = useMountedState()
-
-    const update = debounce(data => {
-        data = useCommissionStore.actions.process_stages(data)
+    const update = async data => {
+        data = await useCommissionStore.actions.process_stages(data)
         if (
             !(
                 data.length === prev_stages.current.length &&
@@ -277,28 +315,27 @@ export const CommissionProcess = (props: CommissionProcessProps) => {
             )
         ) {
             prev_stages.current = data
+            set_stages(data)
             if (props.commission) {
                 comm_store.update({ commission_process: data })
             } else {
                 user_store.update_user({ commission_process: data })
             }
         }
-    }, 500)
+        set_dirty(false)
+    }
 
-    useEffect(() => {
-        if (mounted) {
-            update(stages)
-        }
-    }, [stages])
-
-    const handleSortEnd = ({ oldIndex, newIndex }) => {
+    const handleSortEnd = async ({ oldIndex, newIndex }) => {
         const move_data = stages.splice(oldIndex, 1)
         const new_data = [...stages]
         new_data.splice(newIndex, 0, move_data[0])
-        set_stages(useCommissionStore.actions.process_stages(new_data))
+        set_stages(useCommissionStore.actions.process_stages_collections(new_data))
+        set_dirty(true)
     }
 
-    const stages_limit = useCommissionStore.actions.get_stages_limits()
+    useEffect(() => {
+        useCommissionStore.actions.get_stages_limits().then(r => {set_stages_minimum(r.limit); set_stages_minimum(r.minimum)})
+    }, [props.commission])
 
     const addable_stages: CommissionPhaseType[] = [
         CommissionPhaseT.pending_payment,
@@ -309,6 +346,7 @@ export const CommissionProcess = (props: CommissionProcessProps) => {
 
     return (
         <EditGroup>
+            <HelpBlock className="mb-4">{t`Design how the commission process should proceed`}</HelpBlock>
             {accepted && (
                 <Message
                     className="mb-2"
@@ -326,24 +364,46 @@ export const CommissionProcess = (props: CommissionProcessProps) => {
                                     stages.filter(i => i.type === v).length >=
                                         stages_limit[v]
                                 }
-                                onClick={() => {
+                                onClick={async () => {
+                                    let d
+                                    switch (v) {
+                                        case CommissionPhaseT.revision:
+                                            d = { type: v, done: false, count: 1 }
+                                            break;
+                                    
+                                        default:
+                                            d = { type: v, done: false }
+                                            break;
+                                    }
                                     set_stages(
-                                        useCommissionStore.actions.process_stages(
+                                        useCommissionStore.actions.process_stages_collections(
                                             [
                                                 ...stages,
-                                                { type: v, done: false },
+                                                d,
                                             ]
                                         )
                                     )
+                                    set_dirty(true)
                                 }}>
                                 <Icon className="mr-1" icon="plus" />
                                 {get_name(v)}
+                                <Whisper
+                                    placement="top"
+                                    trigger="focus"
+                                    speaker={
+                                        <Popover title={get_name(v)}>
+                                            <p>{get_help(v)}</p>
+                                        </Popover>
+                                    }
+                                    >
+                                    <a href="#" onClick={ev => {ev.stopPropagation(); ev.preventDefault()}} className="ml-2 unstyled"><Icon size="lg" icon="question2"/></a>
+                                    </Whisper>
                             </Button>
                         </span>
                     ))}
                 </List.Item>
             </List>
-            <List className="w-64" sortable onSort={handleSortEnd}>
+            <List className="w-128" sortable onSort={handleSortEnd}>
                 {stages.map((v, idx) => (
                     <List.Item
                         index={idx}
@@ -365,14 +425,25 @@ export const CommissionProcess = (props: CommissionProcessProps) => {
                                     let s = stages.slice()
                                     s.splice(idx, 1)
                                     set_stages(s)
+                                    set_dirty(true)
                                 }}>
                                 <Icon className="mr-2" icon="minus-circle" />
                             </a>
                         )}
-                        {get_name(v.type)}
+                        {`${idx+1}. `} {get_name(v.type)}
+                        {v.count !== undefined && <CountTagEdit value={v.count} onChange={n => {
+                            const s = [...stages]
+                            s.splice(idx, 1, {...v, count: n})
+                            set_stages(s)
+                            set_dirty(true)
+                        }}/> }
                     </List.Item>
                 ))}
             </List>
+            {<Button className="mt-2" appearance={dirty ? "primary" : "default"} disabled={!dirty} onClick={() => {
+                set_dirty(false)
+                update(stages)
+            }}>{t`Update`}</Button>}
         </EditGroup>
     )
 }
@@ -528,7 +599,7 @@ const CommissionsSettings = () => {
                 <EditGroup>
                     <RateOptionsForm />
                 </EditGroup>
-                <h5>{t`Custom Licenses`}</h5>
+                <h5>{t`Custom Agreements`}</h5>
                 <EditGroup>
                     <LicenseForm />
                 </EditGroup>

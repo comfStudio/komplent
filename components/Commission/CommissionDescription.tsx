@@ -73,6 +73,8 @@ const CommissionDescription = () => {
                         {is_owner === false && (
                             <div>
                                 <hr />
+                                <Message type="info" description={t`The commission process cannot be changed once the commission has been accepted. Make sure to review the process in Options.`} />
+                                <hr />
                                 {!commission.accepted && !commission.finished && (
                                     <>
                                         {custom_price && <Message className="mb-2" type="warning" description={t`Cannot approve request before a price has been decided`}/>}

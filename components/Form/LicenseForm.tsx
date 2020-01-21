@@ -87,7 +87,7 @@ const LicenseModal = (props: LicenseModalProps) => {
                 ref={ref => set_form_ref(ref)}
                 onChange={value => set_form_value(value)}>
                 <Modal.Header>
-                    <Modal.Title>{t`Create a new license`}</Modal.Title>
+                    <Modal.Title>{t`Create a new agreement`}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <FormGroup>
@@ -101,14 +101,14 @@ const LicenseModal = (props: LicenseModalProps) => {
                             {t`Description`}:
                         </ControlLabel>
                         <FormControl componentClass="textarea" rows={4} maxLength={255} fluid name="description"/>
-                        <HelpBlock>{t`A short TLDR version of your license`}</HelpBlock>
+                        <HelpBlock>{t`A short TLDR version of your agreement`}</HelpBlock>
                     </FormGroup>
                     <FormGroup>
                         <ControlLabel>
                             {t`Body`}:
                         </ControlLabel>
                         <FormControl accepter={MessageText} maxLength={8000} name="body"/>
-                        <HelpBlock>{t`The full version of your license`}</HelpBlock>
+                        <HelpBlock>{t`The full version of your agreement`}</HelpBlock>
                     </FormGroup>
                 </Modal.Body>
                 <Modal.Footer>
@@ -189,7 +189,7 @@ export const LicenseList = (props: LicenseListProps) => {
                             onClick={ev => {
                                 ev.preventDefault()
                                 set_new_license(true)
-                            }}>{t`Add new license`}</Button>
+                            }}>{t`Add new agreement`}</Button>
                     </List.Item>
                 )}
             </FormControl>

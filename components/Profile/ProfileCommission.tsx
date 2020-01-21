@@ -27,6 +27,7 @@ import {
     Modal,
     Whisper,
     Tooltip,
+    Popover,
 } from 'rsuite'
 import Link from 'next/link'
 import qs from 'qs'
@@ -104,7 +105,7 @@ interface CommissionCardProps extends HTMLElementProps {
 }
 
 const CommissionCardHeader = (props: CommissionCardProps) => {
-    let { price, title, extras, commission_deadline } = props.data
+    let { price, title, description, extras, commission_deadline } = props.data
     extras = props.extras || extras
 
     return (
@@ -112,6 +113,19 @@ const CommissionCardHeader = (props: CommissionCardProps) => {
             <span className="price">
                 {price_is_null(price) ? t`Custom` : decimal128ToMoneyToString(price)}
             </span>
+            {!!description &&
+            <Whisper
+            placement="top"
+            trigger="focus"
+            speaker={
+                <Popover title={title}>
+                    <p>{description}</p>
+                </Popover>
+            }
+            >
+            <a href="#" onClick={ev => {ev.stopPropagation(); ev.preventDefault()}} className="commission-card-info"><Icon size="lg" icon="question2"/></a>
+            </Whisper>
+            }
             <Row>
                 <Col xs={24}>
                     <h4 className="title inline-block">{title}</h4>
@@ -225,17 +239,6 @@ export const CommissionCard = (props: CommissionCardProps) => {
 
     return (
         <div className="block relative mx-auto">
-            {/* <span className="commission-card-info">
-            <Whisper
-                trigger="hover"
-                placement="top"
-                speaker={
-                <Tooltip>{props.data.description}</Tooltip>
-                    }
-                >
-                <Icon icon="question2" size="lg"/>
-            </Whisper>
-            </span> */}
             {props.link &&
             <Link href={url}>
                 <a>
@@ -625,7 +628,7 @@ export const ProfileCommission = () => {
                             </FlexboxGrid>
                             <HelpBlock>{t`Set a deadline if you need your request done by a certain date.`}</HelpBlock>
                         </FormGroup>
-                        <FormGroup>
+                        {/* <FormGroup>
                             <FlexboxGrid fluid className="!p-0">
                                 <FlexboxGrid.Item className="!p-0">
                                     <FormControl
@@ -639,7 +642,7 @@ export const ProfileCommission = () => {
                                 </FlexboxGrid.Item>
                             </FlexboxGrid>
                             <HelpBlock>{t`Your name will be hidden from the creator`}</HelpBlock>
-                        </FormGroup>
+                        </FormGroup> */}
                     </Col>
                 </Row>
                 <Row>

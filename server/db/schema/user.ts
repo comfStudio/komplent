@@ -14,7 +14,7 @@ const { Schema } = mongoose
 
 const { ObjectId, Decimal128, Mixed } = mongoose.Schema.Types
 
-export type CommissionProcessType = { type: CommissionPhaseType; done: boolean }
+export type CommissionProcessType = { type: CommissionPhaseType; done: boolean, count?: number }
 
 export const user_schema = new Schema(
     {
@@ -92,9 +92,9 @@ export const user_schema = new Schema(
                 { type: CommissionPhaseT.pending_approval, done: false },
                 { type: CommissionPhaseT.pending_sketch, done: false },
                 { type: CommissionPhaseT.revision, done: false, count: 3 },
+                { type: CommissionPhaseT.pending_payment, done: false },
                 { type: CommissionPhaseT.pending_product, done: false },
                 { type: CommissionPhaseT.revision, done: false, count: 3 },
-                { type: CommissionPhaseT.pending_payment, done: false },
                 { type: CommissionPhaseT.unlock, done: false },
                 { type: CommissionPhaseT.complete, done: false },
             ],

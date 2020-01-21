@@ -6,9 +6,184 @@ import { decimal128ToFloat, user_among } from "@utility/misc"
 import { upload_file } from '@services/aws'
 import log from '@utility/log'
 import { schedule_unique, remove_unique_task, schedule_unique_now } from '@server/tasks'
-import { TASK } from '@server/constants'
+import { TASK, CommissionPhaseT, CommissionPhaseType } from '@server/constants'
 import fairy from '@server/fairy'
 import { addDays } from 'date-fns'
+import { CommissionProcessType } from '@schema/user'
+
+function _get_stage_index(stage_type: CommissionPhaseType, stages: CommissionProcessType[], {skip_first = 0, reversed = false} = {}) {
+    let skipped = 0
+    if (reversed) {
+        for (let idx = stages.length - 1; idx > 0; idx--) {
+            if (stages[idx].type === stage_type) {
+                if (skip_first && skip_first < skipped) {
+                    skipped++
+                    continue
+                }
+                return idx
+            }
+        }
+    } else {
+        for (let idx = 0; idx < stages.length; idx++) {
+            if (stages[idx].type === stage_type) {
+                if (skip_first && skip_first < skipped) {
+                    skipped++
+                    continue
+                }
+                return idx
+            }
+        }
+    }
+    return null
+}
+
+export const get_stages_limits = (user) => {
+    let limit = {}
+    limit[CommissionPhaseT.pending_approval] = 1
+    limit[CommissionPhaseT.pending_sketch] = Number.POSITIVE_INFINITY
+    limit[CommissionPhaseT.revision] = Number.POSITIVE_INFINITY
+    limit[CommissionPhaseT.pending_payment] = Number.POSITIVE_INFINITY
+    limit[CommissionPhaseT.pending_product] = Number.POSITIVE_INFINITY
+    limit[CommissionPhaseT.unlock] = 1
+    limit[CommissionPhaseT.complete] = 1
+
+    let minimum = {}
+    minimum[CommissionPhaseT.pending_approval] = 1
+    minimum[CommissionPhaseT.pending_sketch] = 0
+    minimum[CommissionPhaseT.revision] = 0
+    minimum[CommissionPhaseT.pending_payment] = 0
+    minimum[CommissionPhaseT.pending_product] = 1
+    minimum[CommissionPhaseT.unlock] = 1
+    minimum[CommissionPhaseT.complete] = 1
+
+    return {limit, minimum}
+}
+
+export const process_commission_stages = (user, stages: CommissionProcessType[]) => {
+    log.debug(`Processing commission stages: ${stages.map(v => v.type)}`)
+    const { limit, minimum } = get_stages_limits(user)
+
+    let p_stages: CommissionProcessType[] = []
+
+    // make sure the the stages don't surpass the limits
+
+    let c_limit = {}
+    stages.forEach(v => {
+        if (!v.type) {
+            return
+        }
+
+        if (c_limit[v.type]) {
+            if (c_limit[v.type] >= limit[v.type]) {
+                return
+            }
+        }
+
+        if (c_limit[v.type]) {
+            c_limit[v.type]++
+        } else {
+            c_limit[v.type] = 1
+        }
+        p_stages.push(v)
+    })
+
+    log.debug(`Removed redundant commission stages: ${p_stages.map(v => v.type)}`)
+
+    // add missing
+
+    for (let key in minimum) {
+        const min = minimum[key]
+
+        if (min && (!c_limit[key] || c_limit[key] < min)) {
+            switch (key) {
+                case CommissionPhaseT.pending_approval:
+                    p_stages.unshift({ type: CommissionPhaseT.pending_approval, done: false })
+                    break;
+
+                case CommissionPhaseT.pending_product: {
+                    const phase = { type: CommissionPhaseT.pending_product, done: false }
+                    // add after first draft
+                    const draft_idx = _get_stage_index(CommissionPhaseT.pending_sketch, p_stages)
+                    if (draft_idx !== null) {
+                        p_stages.splice(draft_idx+1, 0, phase)
+                        break
+                    }
+                    // add after approval
+                    const approval_idx = _get_stage_index(CommissionPhaseT.pending_approval, p_stages)
+                    if (approval_idx !== null) {
+                        p_stages.splice(approval_idx+1, 0, phase)
+                        break
+                    }
+
+                    // add at front
+                    p_stages.unshift(phase)
+                    break
+                }
+
+                case CommissionPhaseT.unlock: {
+                    const phase = { type: CommissionPhaseT.unlock, done: false }
+                    const complete_idx = _get_stage_index(CommissionPhaseT.complete, p_stages)
+                    if (complete_idx !== null) {
+                        p_stages.splice(complete_idx, 0, phase)
+                    } else {
+                        p_stages.push(phase)
+                    }
+                    break
+                }
+
+                case CommissionPhaseT.complete:
+                    p_stages.push({ type: CommissionPhaseT.complete, done: false })
+                    break
+            
+                default:
+                    break;
+            }
+        }
+    }
+
+    log.debug(`Added required commission stages: ${p_stages.map(v => v.type)}`)
+
+    // move around
+
+    function remove_duplicate(vtype: CommissionPhaseType) {
+        const v_idx = _get_stage_index(vtype, p_stages)
+        if (!v_idx != null) {
+            // remove if two types are next to each other
+            if (p_stages?.[v_idx+1]?.type === vtype) {
+                p_stages.splice(v_idx, 1)
+                return true
+            }
+        }
+    }
+
+    let no_duplicate_types = [
+        CommissionPhaseT.revision,
+        CommissionPhaseT.pending_product,
+        CommissionPhaseT.pending_sketch,
+        CommissionPhaseT.pending_payment
+    ]
+
+    while (no_duplicate_types.length) {
+        if (!remove_duplicate(no_duplicate_types[0])) {
+            no_duplicate_types.shift()
+        }
+    }
+
+    const last_asset_idx = _get_stage_index(CommissionPhaseT.pending_product, p_stages, {reversed: true})
+    const last_draft_idx = _get_stage_index(CommissionPhaseT.pending_sketch, p_stages, {reversed: true})
+
+    // make sure asset is always in front of draft
+    if (last_asset_idx != null && last_draft_idx != null) {
+        if (last_draft_idx > last_asset_idx) {
+            const v = p_stages.splice(last_draft_idx, 1)[0]
+            p_stages.splice(last_asset_idx, 0, v)
+        }
+    }
+
+    log.debug(`Moved around commission stages: ${p_stages.map(v => v.type)}`)
+
+    return p_stages
+}
 
 export const add_commission_asset = async (user, commission, file) => {
 

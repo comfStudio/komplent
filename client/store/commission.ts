@@ -717,16 +717,21 @@ export const useCommissionStore = createStore(
             }
         },
 
-        get_stages_limits() {
-            let limit = {}
-            limit[CommissionPhaseT.pending_approval] = 1
-            limit[CommissionPhaseT.pending_sketch] = Number.POSITIVE_INFINITY
-            limit[CommissionPhaseT.revision] = Number.POSITIVE_INFINITY
-            limit[CommissionPhaseT.pending_payment] = 1
-            limit[CommissionPhaseT.pending_product] = Number.POSITIVE_INFINITY
-            limit[CommissionPhaseT.unlock] = 1
-            limit[CommissionPhaseT.complete] = 1
-            return limit
+        async get_stages_limits() {
+            let r = await fetch('/api/commission/info', {
+                method: 'post',
+                body: { stages_limit: true },
+            })
+            if (r.status === OK) {
+                const limits = (await r.json()).data
+                for (const key in limits.limit) {
+                    if (limits.limit[key] === null) {
+                        limits.limit[key] = Number.POSITIVE_INFINITY
+                    }
+                }
+                return limits
+            }
+            return {}
         },
 
         get_stages_collections() {
@@ -749,27 +754,20 @@ export const useCommissionStore = createStore(
             return cols
         },
 
-        process_stages(stages: CommissionProcessType[]) {
-            const limit = useCommissionStore.actions.get_stages_limits()
+        async process_stages(stages: CommissionProcessType[]) {
 
-            let p_stages: CommissionProcessType[] = []
-
-            let c_limit = {}
-            stages.forEach(v => {
-                if (c_limit[v.type]) {
-                    if (c_limit[v.type] >= limit[v.type]) {
-                        return
-                    }
-                }
-
-                if (c_limit[v.type]) {
-                    c_limit[v.type]++
-                } else {
-                    c_limit[v.type] = 1
-                }
-                p_stages.push(v)
+            let r = await fetch('/api/commission/process', {
+                method: 'post',
+                body: { process_stages: true, data: { stages } },
             })
-
+            if (r.status === OK) {
+                const p_stages = (await r.json()).data
+                return p_stages
+            }
+            return stages
+        },
+        process_stages_collections(stages: CommissionProcessType[]) {
+            const p_stages = [...stages]
             const cols = useCommissionStore.actions.get_stages_collections()
 
             p_stages.sort((a, b) => {

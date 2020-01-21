@@ -333,7 +333,7 @@ const UserSettings = () => {
                 <UserAvatar/>
                 <Location />
                 <ProfileNSFWLevel text={t`Show mature content`} key='show_nsfw' only_show />
-                <CommissionAnonymously/>
+                {/* <CommissionAnonymously/> */}
             </EditSection>
             {/* <h4>{t`Site`}</h4>
             <EditSection>

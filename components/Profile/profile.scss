@@ -51,6 +51,15 @@
         width: 100%;
         font-weight: 600;
     }
+
+    .commission-card-info {
+        position: absolute;
+        display: block;
+        right: 0;
+        top: 0;
+        margin-right: 0.3em;
+        margin-top: 0.2em;
+    }
 }
 
 a > .commission-card:hover, .commission-card.link:hover {
@@ -71,18 +80,6 @@ a > .commission-card:hover,
     label input {
         text-align: center;
         width: 100%;
-    }
-}
-
-.commission-card-info {
-    position: absolute;
-    right: 0;
-    top: 0;
-    margin-right: 0.4em;
-    margin-top: 0.3em;
-
-    img {
-        object-fit: cover;
     }
 }
 
