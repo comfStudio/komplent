@@ -12,7 +12,7 @@ export class TinaPage<T = undefined> extends Component<T> {
   static TINA = true
 }
 
-export const Blog = (props: {title: string, subtitle: string, updated: string, fileRelativePath: string}) => {
+export const Blog = (props: {title: string, subtitle: string, updated: string, fileRelativePath: string, body: string}) => {
     // grab the instance of the CMS to access the registered git API
 let cms = useCMS()
 
@@ -24,6 +24,9 @@ let [post, form] = useLocalForm({
   // starting values for the post object
   initialValues: {
     title: props.title,
+    subtitle: props.subtitle,
+    updated: props.updated,
+    body: props.body,
   },
 
   // field definition
@@ -84,7 +87,6 @@ return (
 }
 
 export const Markdown = ({data}: {data: string}) => {
-
     return (
         <ReactMarkdown source={data}/>
     )

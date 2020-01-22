@@ -17,7 +17,7 @@ export default with_auth_middleware(
         try {
             const { commission_id, payment_phase_id } = req.json
 
-            const r = await pay_commission(commission_id, payment_phase_id)
+            const r = await pay_commission(req.user, commission_id, payment_phase_id)
 
             res.status(OK).json(data_message(r))
 

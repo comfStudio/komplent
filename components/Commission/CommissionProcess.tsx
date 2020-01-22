@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { formatDistanceToNow, format, addDays } from 'date-fns'
 import { toDate } from 'date-fns-tz'
 import Link from 'next/link'
@@ -218,7 +218,6 @@ const PendingDraft = (props: ProcessProps) => {
     const done = props.data ? props.data.done : false
 
     const count = commission && commission.drafts ? commission.drafts.length : 0
-    let revisions_count = store.get_stage_count('revision')
 
     const show_panel = !props.hidden || props.active
 
@@ -264,8 +263,7 @@ const PendingDraft = (props: ProcessProps) => {
                                     ev.preventDefault()
                                     set_skip_loading(true)
                                     store
-                                        .next_phase()
-                                        .then(() => { store.refresh() })
+                                        .skip_drafts()
                                         .then(() => set_skip_loading(false))
                                 }}>{ count ? t`Done` : t`Skip`}</Button>
                         </ButtonToolbar>
@@ -389,16 +387,22 @@ const Revision = (props: ProcessProps) => {
 }
 
 const PendingProduct = (props: ProcessProps) => {
+    const user = useUser()
+    const [count, set_count] = useState(0)
     const [accept_loading, set_accept_loading] = useState(false)
+
     const store = useCommissionStore()
     let commission = store.get_commission()
     const name = commission?.to_user.username ?? ''
     const done = props?.data?.done ?? false
 
-    const count = commission && commission.products ? commission.products.length : 0
-
-    const revisions_count = store.get_stage_count('revision')
     const show_panel = !props.hidden || props.active
+
+    useEffect(() => {
+        if (commission && store.is_unlocked(user, commission)) {
+            store.load_products(commission._id).then(r => set_count(r.length))
+        }
+    }, [commission])
 
     return (
         <CommissionStepItem {...props}>

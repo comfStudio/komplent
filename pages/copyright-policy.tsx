@@ -5,9 +5,8 @@ import { Blog, TinaPage } from '@components/App/Blog'
 export default class Page extends TinaPage {
 
   static async getInitialProps(ctx: NextPageContext) {
-    const slug = "terms-and-conditions"
+    const slug = "copyright-policy"
     let content = require(`./${slug}.json`)
-
 
     return {
         slug: slug,

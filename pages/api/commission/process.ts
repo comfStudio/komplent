@@ -8,19 +8,41 @@ import {
     ExApiRequest,
     ExApiResponse,
 } from '@server/middleware'
-import {process_commission_stages } from '@services/commission'
+import {process_commission_stages, CommissionProcess } from '@services/commission'
 
 const cors = microCors({ allowMethods: ['PUT', 'POST', 'OPTIONS'] })
 
 export default with_auth_middleware(
     async (req: ExApiRequest, res: ExApiResponse) => {
         try {
-            const { process_stages, data } = req.json
+            const { 
+                revoke_complete,
+                complete,
+                confirm_products,
+                confirm_drafts,
+                skip_drafts,
+                accept, 
+                decline,
+                process_stages, 
+                data } = req.json
 
             let r
             if (process_stages) {
                 r = await process_commission_stages(req.user, data?.stages)
-            } else {
+            } else if (decline) {
+                r = await CommissionProcess.decline_commission(req.user, data?.commission_id)
+            } else if (accept) {
+                r = await CommissionProcess.accept_commission(req.user, data?.commission_id)
+            } else if (skip_drafts) {
+                r = await CommissionProcess.skip_drafts(req.user, data?.commission_id)
+            } else if (confirm_drafts) {
+                r = await CommissionProcess.confirm_drafts(req.user, data?.commission_id)
+            } else if (confirm_products) {
+                r = await CommissionProcess.confirm_products(req.user, data?.commission_id)
+            } else if (complete) {
+                r = await CommissionProcess.complete(req.user, data?.commission_id)
+            } else if (revoke_complete) {
+                r = await CommissionProcess.revoke_complete(req.user, data?.commission_id)
             }
 
             res.status(OK).json(data_message(r))

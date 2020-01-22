@@ -10,6 +10,350 @@ import { TASK, CommissionPhaseT, CommissionPhaseType } from '@server/constants'
 import fairy from '@server/fairy'
 import { addDays } from 'date-fns'
 import { CommissionProcessType } from '@schema/user'
+import { commission } from '@utility/pages'
+
+export class CommissionProcess {
+
+    static async _load_commission(user, commission_id, handler: "client" | "creator" = undefined) {
+        const p = [
+            {
+                path: 'to_user',
+                populate: [
+                    {
+                        path: 'avatar',
+                    },
+                ]
+            },
+            {
+                path: 'from_user',
+                populate: [
+                    {
+                        path: 'avatar',
+                    },
+                ]
+            },
+            { path: 'drafts' },
+            { path: 'attachments' },
+            { path: 'phases' },
+            { path: 'stage' },
+        ]
+
+        const commission = await Commission.findById(commission_id).populate(p).select("-products")
+        if (!commission) {
+            throw Error("commission not found")
+        }
+
+        if (handler) {
+            if (handler === "client") {
+                user_among(user, commission.from_user)
+            } else {
+                user_among(user, commission.to_user)
+            }
+        }
+        return commission
+    }
+
+    static async _complete_phase(commission, done = true) {
+        commission.stage.done = done
+        commission.stage.done_date = done ? new Date() : null
+        await commission.stage.save()
+
+        return true
+    }
+
+    static _end_data(successfully?: boolean) {
+        return {
+            finished: true,
+            completed: successfully ? true : false,
+            end_date: new Date(),
+        }
+    }
+
+    static _end(commission, successfully?: boolean) {
+        commission.set({
+            ...this._end_data(successfully)
+        })
+    }
+
+    static _get_next_stages(commission) {
+        let d_stages: CommissionProcessType[] = commission.commission_process.filter(
+            v => !v.done
+        )
+        return d_stages
+    }
+
+    static async _unlock(user, commission) {
+
+        await this._add_phase(user, commission, 'unlock', {
+            done: true,
+        })
+
+        await this._add_phase(user, commission, 'complete', {
+            complete_previous_phase: false,
+        })
+
+        return commission
+    }
+
+    static _complete_default_stage(
+        commission,
+        on_stage: CommissionPhaseType | CommissionProcessType = undefined
+    ) {
+        if (typeof on_stage === 'object') {
+            on_stage = on_stage.type
+        }
+        let set = false
+        commission.commission_process.forEach(v => {
+            if (!v.done && !set && (!on_stage || on_stage === v.type)) {
+                set = true
+                v.done = true
+            }
+        })
+        commission.markModified("commission_process")
+        return commission
+    }
+
+    static async _add_phase(
+        user,
+        commission,
+        type: CommissionPhaseType | CommissionProcessType,
+        {
+            complete_previous_phase = true,
+            done = false,
+            data = undefined,
+        } = {}
+    ) {
+        if (complete_previous_phase) {
+            await this._complete_phase(commission, true)
+        }
+
+        this._complete_default_stage(commission)
+        
+        if (typeof type === 'object') {
+            type = type.type
+        }
+
+        const next_stages = this._get_next_stages(commission)
+        if (!next_stages.length || next_stages[0].type !== type ) {
+            log.warn(`Commission ${commission._id} expected next phase to be ${next_stages[0].type} not ${type}`)
+            return
+        }
+
+        const phase = new CommissionPhase({
+            type,
+            commission: commission._id,
+            done,
+            done_date: done ? new Date() : undefined,
+            data: data,
+            user: user._id,
+        })
+        await phase.save()
+        commission.phases.push(phase)
+        // eslint-disable-next-line
+        commission.stage = phase
+
+        schedule_unique({
+            key: commission._id.toString(),
+            when: "2 minutes",
+            task: TASK.commission_phase_updated,
+            data: {
+                user_id: user._id,
+                from_user_id: commission.from_user._id,
+                to_user_id: commission.to_user._id,
+                commission_id: commission._id,
+                phase: phase.toJSON(),
+            }
+        })
+
+        return commission
+    }
+
+    static async _next_phase(user, commission) {
+        let d_stages: CommissionProcessType[] = this._get_next_stages(commission)
+
+
+        if (d_stages.length) {
+            const skippable: CommissionPhaseType[] = [
+                CommissionPhaseT.refund,
+                CommissionPhaseT.reopen,
+                CommissionPhaseT.revision,
+                CommissionPhaseT.cancel,
+            ]
+
+            while (d_stages.length && d_stages[0].type === commission.stage.type) {
+                await this._complete_phase(commission, true)
+                d_stages.shift()
+            }
+
+            while (d_stages.length) {
+                let next_v = d_stages.shift()
+                if (skippable.includes(next_v.type)) {
+                    this._complete_default_stage(commission, next_v)
+                } else {
+                    if (next_v.type === 'unlock') {
+                        this._unlock(user, commission)
+                    } else {
+                        return await this._add_phase(user, commission, next_v, {
+                            done: false,
+                            complete_previous_phase: false,
+                        })
+                    }
+                    break
+                }
+            }
+        }
+    }
+
+    static _exhaust_revisions(commission) {
+        let d_stages: CommissionProcessType[] = this._get_next_stages(commission)
+        if (d_stages.length) {
+            let n = d_stages.shift()
+            while (n.type === 'revision') {
+                n = null
+                this._complete_default_stage(commission)
+                if (d_stages) {
+                    n = d_stages.shift()
+                }
+            }
+        }
+    }
+
+    static async decline_commission(user, commission_id: string) {
+        const commission = await this._load_commission(user, commission_id, "creator")
+        await this._complete_phase(commission)
+        commission.set({
+            accepted: false,
+            ...this._end_data(false)
+        })
+        await commission.save()
+        return await this._load_commission(user, commission_id)
+    }
+
+    static async accept_commission(user, commission_id: string) {
+        const commission = await this._load_commission(user, commission_id, "creator")
+
+        commission.set({
+            accepted: true,
+        })
+
+        await this._next_phase(user, commission)
+
+        await commission.save()
+
+        return commission
+    }
+
+    static async skip_drafts(user, commission_id: string) {
+        const commission = await this._load_commission(user, commission_id)
+
+        await this._next_phase(user, commission)
+
+        await commission.save()
+
+        return commission
+    }
+
+    static async confirm_drafts(user, commission_id: string) {
+        const commission = await this._load_commission(user, commission_id)
+
+        this._exhaust_revisions(commission)
+
+        await this._next_phase(user, commission)
+
+        await commission.save()
+        
+        return commission
+    }
+
+    static async confirm_products(user, commission_id: string) {
+        const commission = await this._load_commission(user, commission_id)
+
+        this._exhaust_revisions(commission)
+
+        await this._next_phase(user, commission)
+
+        await commission.save()
+        
+        return commission
+    }
+
+    static async complete(user, commission_id: string) {
+        const commission = await this._load_commission(user, commission_id)
+
+        const stage = commission.stage
+        if (stage.type !== 'complete') {
+            throw Error('Complete can only be done in the complete phase')
+        }
+
+        if (stage.done) {
+            throw Error('Commission is already completed')
+        }
+
+        let stage_data = {
+            confirmed: [],
+        }
+        if (stage.data) {
+            stage_data = { ...stage.data }
+        }
+
+        stage_data.confirmed = [user._id, ...stage_data.confirmed].reduce(
+            (unique, item) =>
+                unique.includes(item) ? unique : [...unique, item],
+            []
+        )
+
+        stage.data = stage_data
+        stage.markModified("data")
+
+        await stage.save()
+
+        let participants = [
+            commission.from_user._id,
+            commission.to_user._id,
+        ]
+
+        if (participants.every(v => stage_data.confirmed.includes(v))) {
+            this._complete_phase(commission, true)
+            this._end(commission)
+        }
+
+        await commission.save()
+
+        return await this._load_commission(user, commission_id)
+    }
+
+    static async revoke_complete(user, commission_id: string) {
+        const commission = await this._load_commission(user, commission_id)
+        
+        if (!commission.finished) {
+            const stage = commission.stage
+            if (stage.type !== 'complete') {
+                throw Error(
+                    'Revoke complete can only be done in the complete phase'
+                )
+            }
+            let complete_data = {
+                confirmed: [],
+            }
+            if (stage.data) {
+                complete_data = { ...stage.data }
+            }
+
+            complete_data.confirmed = complete_data.confirmed.filter(
+                v => v !== user._id
+            )
+
+            stage.data = complete_data
+            stage.markModified("data")
+
+            await stage.save()
+
+            return await this._load_commission(user, commission_id)
+        }
+    }
+
+}
+
 
 function _get_stage_index(stage_type: CommissionPhaseType, stages: CommissionProcessType[], {skip_first = 0, reversed = false} = {}) {
     let skipped = 0
@@ -233,10 +577,11 @@ export const remove_commission_asset = async (user, commission_id: string, asset
     return true
 }
 
-export const pay_commission = async (commission_id, payment_phase_id) => {
+export const pay_commission = async (user, commission_id, payment_phase_id) => {
 
-    let c = await Commission.findById(commission_id)
+    let c = await CommissionProcess._load_commission(user, commission_id, "client")
     if (c) {
+        user_among(user, c.from_user)
         let p = await CommissionPhase.findById(payment_phase_id)
         if (p) {
             let payment = new Payment({
@@ -248,7 +593,8 @@ export const pay_commission = async (commission_id, payment_phase_id) => {
             await payment.save()
             c.payments = [...c.payments, payment._id]
             await c.save()
-            return true
+            await CommissionProcess._next_phase(user, c)
+            return c
         }
     }
     throw Error("No commission or payment phase with given IDs found")

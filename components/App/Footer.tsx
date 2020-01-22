@@ -57,6 +57,7 @@ const Footer = () => {
                         <li className="text-gray-300">© Komplent 2019</li>
                         <li><Link href="/terms-and-conditions"><a>Terms of Use</a></Link></li>
                         <li><Link href="/privacy-policy"><a>Privacy Policy</a></Link></li>
+                        <li><Link href="/copyright-policy"><a>Copyright Policy</a></Link></li>
                     </ul>
                 </Col>
             </Row>

@@ -182,6 +182,25 @@ export const useCommissionStore = createStore(
             return r
         },
 
+        async fetch_process(action, data: object) {
+            let b: any = {data}
+            b[action] = true
+
+            let r = await fetch('/api/commission/process', {
+                method: 'post',
+                body: b,
+            })
+
+            let rc = (await r.json())
+            if (r.status === OK) {
+                rc = rc.data
+                this.setState({ commission: rc, stages: rc.commission_process })
+                return rc
+            } else {
+                throw Error(rc.error)
+            }
+        },
+
         async refresh() {
             let rc = await this.load(this.state.commission._id)
             if (rc) {
@@ -214,95 +233,6 @@ export const useCommissionStore = createStore(
             return r
         },
 
-        async complete_phase(done = true) {
-            let r = await update_db({
-                model: 'CommissionPhase',
-                data: {
-                    _id: this.state.commission.stage._id,
-                    done,
-                    done_date: done ? new Date() : null,
-                },
-                schema: commission_schema,
-                validate: true,
-            })
-            this.refresh()
-            return r
-        },
-
-        async complete_default_stage(
-            on_stage: CommissionPhaseType | CommissionProcessType = undefined
-        ) {
-            if (typeof on_stage === 'object') {
-                on_stage = on_stage.type
-            }
-            let d_stages = []
-            let set = false
-            this.state.stages.forEach(v => {
-                if (!v.done && !set && (!on_stage || on_stage === v.type)) {
-                    set = true
-                    v.done = true
-                    d_stages.push({ ...v })
-                } else {
-                    d_stages.push({ ...v })
-                }
-            })
-            this.setState({ stages: d_stages })
-            return await this.update({ commission_process: d_stages })
-        },
-
-        async add_phase(
-            type: CommissionPhaseType | CommissionProcessType,
-            {
-                complete_previous_phase = true,
-                refresh = false,
-                done = false,
-                params = {},
-                data = undefined,
-            } = {}
-        ) {
-            if (complete_previous_phase) {
-                await this.complete_phase()
-            }
-
-            await this.complete_default_stage()
-
-            if (typeof type === 'object') {
-                type = type.type
-            }
-
-            let r = await update_db({
-                model: 'CommissionPhase',
-                data: {
-                    type,
-                    commission: this.state.commission._id,
-                    done,
-                    done_date: done ? new Date() : undefined,
-                    data: data,
-                    user: this.state._current_user._id,
-                },
-                schema: commission_schema,
-                validate: true,
-                create: true,
-                ...params,
-            })
-            if (r.status) {
-                post_task_d_1_secs(TaskMethods.schedule_now, {
-                    task: TASK.commission_phase_updated,
-                    data: {
-                        user_id: this.state._current_user._id,
-                        from_user_id: this.state.commission.from_user._id,
-                        to_user_id: this.state.commission.to_user._id,
-                        commission_id: this.state.commission._id,
-                        phase: r.body.data,
-                    },
-                })
-            }
-            if (refresh && r.status) {
-                this.refresh()
-            }
-            return r
-        },
-
         async pay(phase_data: any) {
             let r = await fetch('/api/commission/pay', {
                 method: 'post',
@@ -310,69 +240,18 @@ export const useCommissionStore = createStore(
             })
 
             if (r.status === OK) {
-                r = await this.next_phase()
-                this.refresh()
+                const rc = (await r.json()).data
+                this.setState({ commission: rc, stages: rc.commission_process })
             }
-            return r
-        },
-
-        async unlock() {
-            let r = await this.add_phase('unlock', {
-                done: true,
-                refresh: false,
-            })
-            r = await this.add_phase('complete', {
-                complete_previous_phase: false,
-            })
-            if (r.status) {
-                this.refresh()
-            }
-            return r
-        },
-
-        async add_payment_phase(last = false) {
-            let count = 0
-            for (let p of this.state.commission.phases.filter(
-                v => v.type === 'pending_payment'
-            )) {
-                count += 1
-            }
-            let r = await this.add_phase('pending_payment', {
-                data: { count: count + 1, last: last },
-            })
             return r
         },
 
         async accept() {
-            let r = await this.update({
-                accepted: true,
-            })
-            if (r.status) {
-                r = await this.next_phase()
-                this.refresh()
-            }
-            return r
+            return await this.fetch_process("accept", { commission_id: this.state.commission._id })
         },
-
-        async exhaust_revisions() {
-            let d_stages: CommissionProcessType[] = this.get_next_stages()
-            if (d_stages.length) {
-                let n = d_stages.shift()
-                while (n.type === 'revision') {
-                    n = null
-                    this.complete_default_stage()
-                    if (d_stages) {
-                        n = d_stages.shift()
-                    }
-                }
-            }
-        },
-
+        
         async confirm_products() {
-            await this.exhaust_revisions()
-            let r = await this.next_phase()
-            this.refresh()
-            return r
+            return await this.fetch_process("confirm_products", { commission_id: this.state.commission._id })
         },
 
         async delete_product(_id) {
@@ -415,10 +294,11 @@ export const useCommissionStore = createStore(
         },
 
         async confirm_drafts() {
-            await this.exhaust_revisions()
-            let r = await this.next_phase()
-            this.refresh()
-            return r
+            return await this.fetch_process("confirm_drafts", { commission_id: this.state.commission._id })
+        },
+
+        async skip_drafts() {
+            return await this.fetch_process("skip_drafts", { commission_id: this.state.commission._id })
         },
 
         async add_revision_phase(visible = true) {
@@ -426,22 +306,6 @@ export const useCommissionStore = createStore(
                 data: { confirmed: [], visible },
             })
             return r
-        },
-
-        get_stage_count(stage_type: CommissionPhaseType, next = true) {
-            let count = 0
-            let stages = []
-            if (next) {
-                stages = this.get_next_stages()
-            }
-            let idx = 0
-            while (stages.length < idx && stages[idx]) {
-                if (stages[idx] === stage_type) {
-                    count++
-                }
-                idx++
-            }
-            return count
         },
 
         async confirm_revision(new_revision = false) {
@@ -502,131 +366,15 @@ export const useCommissionStore = createStore(
         },
 
         async revoke_complete() {
-            if (!this.state.commission.finished) {
-                const user_id = this.state._current_user._id
-                const stage = this.state.commission.stage
-                if (stage.type !== 'complete') {
-                    throw Error(
-                        'Revoke complete can only be done in the complete phase'
-                    )
-                }
-                let complete_data = {
-                    confirmed: [],
-                }
-                if (stage.data) {
-                    complete_data = { ...stage.data }
-                }
-
-                complete_data.confirmed = complete_data.confirmed.filter(
-                    v => v !== user_id
-                )
-
-                let r = await update_db({
-                    model: 'CommissionPhase',
-                    data: { _id: stage._id, data: complete_data },
-                    schema: commission_schema,
-                    validate: true,
-                })
-
-                await this.refresh()
-                return r
-            }
-        },
-
-        get_next_stages() {
-            let d_stages: CommissionProcessType[] = this.state.stages.filter(
-                v => !v.done
-            )
-            return d_stages
-        },
-
-        async next_phase() {
-            let d_stages: CommissionProcessType[] = this.get_next_stages()
-
-            if (d_stages.length) {
-                const skippable: CommissionPhaseType[] = [
-                    CommissionPhaseT.refund,
-                    CommissionPhaseT.reopen,
-                    CommissionPhaseT.revision,
-                    CommissionPhaseT.cancel,
-                ]
-
-                while (d_stages.length) {
-                    let next_v = d_stages.shift()
-                    if (skippable.includes(next_v.type)) {
-                        await this.complete_default_stage(next_v)
-                    } else {
-                        if (next_v.type === 'unlock') {
-                            this.unlock()
-                        } else {
-                            return await this.add_phase(next_v, {
-                                done: false,
-                                complete_previous_phase: true,
-                            })
-                        }
-                        break
-                    }
-                }
-            }
+            return await this.fetch_process("revoke_complete", { commission_id: this.state.commission._id })
         },
 
         async complete() {
-            const user_id = this.state._current_user._id
-            const stage = this.state.commission.stage
-            if (stage.type !== 'complete') {
-                throw Error('Complete can only be done in the complete phase')
-            }
-            let stage_data = {
-                confirmed: [],
-            }
-            if (stage.data) {
-                stage_data = { ...stage.data }
-            }
-
-            stage_data.confirmed = [user_id, ...stage_data.confirmed].reduce(
-                (unique, item) =>
-                    unique.includes(item) ? unique : [...unique, item],
-                []
-            )
-
-            let r = await update_db({
-                model: 'CommissionPhase',
-                data: { _id: stage._id, data: stage_data },
-                schema: commission_schema,
-                validate: true,
-            })
-            if (r.status) {
-                let participants = [
-                    this.state.commission.from_user._id,
-                    this.state.commission.to_user._id,
-                ]
-                if (participants.every(v => stage_data.confirmed.includes(v))) {
-                    this.complete_phase()
-                    r = await this.end(true)
-                }
-            }
-            await this.refresh()
-            return r
+            return await this.fetch_process("complete", { commission_id: this.state.commission._id })
         },
 
         async decline() {
-            this.complete_phase()
-            let r = await this.update({
-                accepted: false,
-                ...this._end(),
-            })
-            return r
-        },
-
-        _end(successfully?: boolean) {
-            return {
-                finished: true,
-                completed: successfully ? true : false,
-                end_date: new Date(),
-            }
-        },
-        async end(successfully?: boolean) {
-            return await this.update(this._end(successfully))
+            return await this.fetch_process("decline", { commission_id: this.state.commission._id })
         },
 
         async load_products(commission_id: string) {
