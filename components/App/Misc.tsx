@@ -1,14 +1,14 @@
-import React from 'react'
+import React, { memo } from 'react'
 import Button, { ButtonProps } from 'rsuite/lib/Button'
 import Head from 'next/head'
 
-export const ToggleButton = ({ active, appearance, ...props}: ButtonProps) => {
+export const ToggleButton = memo(function ToggleButton({ active, appearance, ...props}: ButtonProps) {
     return (
         <Button appearance={active ? "primary" : "ghost"} {...props}/>
     )
-}
+})
 
-export const CreatorHeadMeta = ({}) => {
+export const CreatorHeadMeta = memo(function CreatorHeadMeta({}) {
     return (
         <Head key="site-card">
             <meta name="twitter:card" content="profile_summary" />
@@ -21,18 +21,18 @@ export const CreatorHeadMeta = ({}) => {
             <meta property="og:profile:username" content="@username" />
         </Head>
     )
-}
+})
 
-export const DefaultHeadMeta = () => {
+export const DefaultHeadMeta = memo(function DefaultHeadMeta() {
     return (
         <>
             <meta name="twitter:site" content="@komplent" />
             <meta property="og:site_name " content="Komplent" />
         </>
     )
-}
+})
 
-export const StandardHeadMeta = () => {
+export const StandardHeadMeta = memo(function StandardHeadMeta() {
     return (
         <Head key="site-card">
             <meta name="twitter:card" content="summary" />
@@ -44,4 +44,4 @@ export const StandardHeadMeta = () => {
             <meta property="og:type" content="website" />
         </Head>
     )
-}
+})

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, memo } from 'react'
 import FsLightbox from 'fslightbox-react'; 
 import { Grid, Row, Col, Placeholder, List, Icon, Message } from 'rsuite'
 
@@ -17,7 +17,7 @@ import Upload from '@components/App/Upload'
 import { debounceReduce } from '@utility/misc'
 import { Asset } from './CommissionAssets'
 
-const CommissionDescription = () => {
+const CommissionDescription = memo(function CommissionDescription() {
     const user = useUser()
     const store = useCommissionStore()
 
@@ -152,6 +152,6 @@ const CommissionDescription = () => {
             </Row>
         </Grid>
     )
-}
+})
 
 export default CommissionDescription

@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, memo } from 'react'
 import { Placeholder } from 'rsuite'
 import classnames from 'classnames'
 import { HTMLElementProps } from '@utility/props'
@@ -11,7 +11,7 @@ interface Props extends HTMLElementProps, HTMLElementProps {
     loading?: boolean
 }
 
-export const Image = ({loading, w, h, className, src, ...props}: Props) => {
+export const Image = memo(function Image({loading, w, h, className, src, ...props}: Props) {
     let cls = classnames(className, { 'w-full': props.fluid, 'clickable': !!props.onClick })
 
     return src ? (
@@ -26,6 +26,6 @@ export const Image = ({loading, w, h, className, src, ...props}: Props) => {
             style={{ margin: 0 }}
         />
     )
-}
+})
 
 export default Image

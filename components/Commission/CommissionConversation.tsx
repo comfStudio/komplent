@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, memo } from 'react'
 import { Button } from 'rsuite'
 import { useCommissionStore } from '@store/commission'
 import { Conversation } from '@components/Inbox/InboxConversation'
@@ -6,7 +6,7 @@ import { CenterPanel } from '@components/App/MainLayout'
 import { t } from '@app/utility/lang'
 import Empty from '@components/App/Empty'
 
-const CommissionConversation = () => {
+const CommissionConversation = memo(function CommissionConversation() {
     const store = useCommissionStore()
     const [loading, set_loading] = useState(false)
 
@@ -33,6 +33,6 @@ const CommissionConversation = () => {
             </CenterPanel>}
         </>
     )
-}
+})
 
 export default CommissionConversation

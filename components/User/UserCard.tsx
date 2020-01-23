@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, memo } from 'react'
 import { Panel, Button, Grid, Row, Col, FlexboxGrid, ButtonToolbar, IconButton, Icon, Whisper, Tooltip } from 'rsuite'
 import Link from 'next/link'
 import classnames from 'classnames'
@@ -16,7 +16,7 @@ import {
 import { get_profile_name, get_profile_avatar_url } from '@utility/misc'
 import Tag, { TagProps } from 'rsuite/lib/Tag'
 
-export const CommissionBadge = ({data = undefined, color=undefined, ...props}: {data: any} & TagProps) => {
+export const CommissionBadge = memo(function CommissionBadge({data = undefined, color=undefined, ...props}: {data: any} & TagProps) {
 
     if (!data || data?.count === 0) {
         return null
@@ -49,7 +49,7 @@ export const CommissionBadge = ({data = undefined, color=undefined, ...props}: {
             </Tag>
         </Whisper>
     )
-}
+})
 
 interface Props extends HTMLElementProps, PanelProps {
     data: any
@@ -62,7 +62,7 @@ interface Props extends HTMLElementProps, PanelProps {
     noMessageButton?: boolean
 }
 
-export const UserCard = ({ fluid = true, bordered = true, bodyFill = true, ...props }: Props) => {
+export const UserCard = memo(function UserCard({ fluid = true, bordered = true, bodyFill = true, ...props }: Props) {
 
     const avatar_el = <div className={classnames("avatar", {small: props.small})}>
                         <Image w={props.small ? 40 : 80} h={props.small ? 40 : 80} src={get_profile_avatar_url(props.data)} />
@@ -128,6 +128,6 @@ export const UserCard = ({ fluid = true, bordered = true, bodyFill = true, ...pr
             {(props.data.type !== 'creator' || props.noLink) && el}
         </Panel>
     )
-}
+})
 
 export default UserCard

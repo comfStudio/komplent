@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, memo } from 'react'
 import {
     Grid,
     Row,
@@ -19,7 +19,7 @@ import { CommissionProcess } from '@components/Settings/CommissionsSettings'
 import debounce from 'lodash/debounce'
 import { useDebounce } from 'react-use'
 
-const Deadline = () => {
+const Deadline = memo(function Deadline() {
     const store = useCommissionStore()
     const commission = store.get_commission()
 
@@ -42,9 +42,9 @@ const Deadline = () => {
             </div>
         </EditGroup>
     )
-}
+})
 
-const CommissionOptions = () => {
+const CommissionOptions = memo(function CommissionOptions() {
     return (
         <Grid fluid>
             <h4>{t`General`}</h4>
@@ -57,6 +57,6 @@ const CommissionOptions = () => {
             </EditSection>
         </Grid>
     )
-}
+})
 
 export default CommissionOptions

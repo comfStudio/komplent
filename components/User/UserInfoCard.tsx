@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, memo } from 'react'
 import { Panel, Grid, Row, Col } from 'rsuite'
 import { Avatar } from '@components/Profile/ProfileHeader'
 import './UserInfoCard.scss'
@@ -14,7 +14,7 @@ interface UserInfoCardProps extends ReactProps {
     notBodyFill?: boolean
 }
 
-const UserInfoCard = (props: UserInfoCardProps) => {
+const UserInfoCard = memo(function UserInfoCard(props: UserInfoCardProps) {
 
     return (
         <Panel
@@ -33,6 +33,6 @@ const UserInfoCard = (props: UserInfoCardProps) => {
             <div className="body">{props.children}</div>
         </Panel>
     )
-}
+})
 
 export default UserInfoCard

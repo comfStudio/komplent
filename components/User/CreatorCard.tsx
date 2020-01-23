@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, memo } from 'react'
 import { Panel, Button, Grid, Row, Col, FlexboxGrid } from 'rsuite'
 import Link from 'next/link'
 
@@ -23,7 +23,7 @@ interface Props extends HTMLElementProps {
     fluid?: boolean
 }
 
-export const CreatorCard = ({ fluid = true, ...props }: Props) => {
+export const CreatorCard = memo(function CreatorCard({ fluid = true, ...props }: Props) {
     let rates = []
     if (props.data && props.data.rates) {
         rates = props.data.rates
@@ -103,6 +103,6 @@ export const CreatorCard = ({ fluid = true, ...props }: Props) => {
             </Link>
         </Panel>
     )
-}
+})
 
 export default CreatorCard

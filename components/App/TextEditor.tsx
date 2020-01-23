@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { PureComponent } from 'react'
 import classNames from 'classnames'
 import { base64StringToBlob } from 'blob-util'
 import { t } from '@app/utility/lang'
@@ -119,7 +119,7 @@ interface TextEditorProps {
     }) => void
 }
 
-export class TextEditor extends Component<TextEditorProps> {
+export class TextEditor extends PureComponent<TextEditorProps> {
     static defaultProps = {
         id: null,
         value: null,

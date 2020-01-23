@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, memo } from 'react'
 import { Grid, Col, Row, Button } from 'rsuite'
 
 import MainLayout, { GridContainer } from '@components/App/MainLayout'
@@ -16,7 +16,7 @@ interface Props extends ReactProps {
     activeKey?: 'commissions' | 'requests' | 'assets'
 }
 
-const CommissionsLayout = (props: Props) => {
+const CommissionsLayout = memo(function CommissionsLayout(props: Props) {
 
     const router = useRouter()
     const user_store = useUserStore()
@@ -62,6 +62,6 @@ const CommissionsLayout = (props: Props) => {
             </GridContainer>
         </MainLayout>
     )
-}
+})
 
 export default CommissionsLayout

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { memo } from 'react'
 import { Grid, Col, Row } from 'rsuite'
 
 import MainLayout, { GridContainer } from '@components/App/MainLayout'
@@ -13,7 +13,7 @@ interface Props extends ReactProps {
     pageProps?: object
 }
 
-const DashboardLayout = (props: Props) => {
+const DashboardLayout = memo(function DashboardLayout(props: Props) {
     const logged_in = useLoginStatus()
 
     return (
@@ -31,6 +31,6 @@ const DashboardLayout = (props: Props) => {
             </GridContainer>
         </MainLayout>
     )
-}
+})
 
 export default DashboardLayout

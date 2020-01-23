@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { memo } from 'react'
 import { Nav, Tag } from 'rsuite'
 import Link from 'next/link'
 
@@ -17,7 +17,7 @@ interface MenuProps {
     activeKey?: string
 }
 
-const CommissionMenu = (props: MenuProps) => {
+const CommissionMenu = memo(function CommissionMenu(props: MenuProps) {
     const user = useUser()
     const store = useCommissionStore()
     let commission = store.get_commission()
@@ -79,11 +79,11 @@ const CommissionMenu = (props: MenuProps) => {
             )}
         </Nav>
     )
-}
+})
 
 interface Props extends ReactProps, MenuProps {}
 
-export const CommissionLayout = (props: Props) => {
+export const CommissionLayout = memo(function CommissionLayout(props: Props) {
     const user = useUser()
     const store = useCommissionStore()
     let commission = store.get_commission()
@@ -101,6 +101,6 @@ export const CommissionLayout = (props: Props) => {
             {props.children}
         </MainLayout>
     )
-}
+})
 
 export default CommissionLayout

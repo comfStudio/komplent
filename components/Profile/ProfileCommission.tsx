@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, ReactNode } from 'react'
+import React, { useState, useRef, useEffect, ReactNode, memo } from 'react'
 import {
     Button,
     Panel,
@@ -87,14 +87,14 @@ const sort_rates_by_price = rates => {
 
 interface TotalPriceProps extends ReactProps, HTMLElementProps {}
 
-export const TotalPriceDisplay = (props: TotalPriceProps) => {
+export const TotalPriceDisplay = memo(function TotalPriceDisplay(props: TotalPriceProps) {
     let cls = 'text-xl leading-loose'
     return (
         <span className={classnames('text-xl leading-loose', props.className)}>
             Total Price: <span className="text-primary">{props.children}</span>
         </span>
     )
-}
+})
 
 interface CommissionCardProps extends HTMLElementProps {
     data: any
@@ -104,7 +104,7 @@ interface CommissionCardProps extends HTMLElementProps {
     link?: boolean
 }
 
-const CommissionCardHeader = (props: CommissionCardProps) => {
+const CommissionCardHeader = memo(function CommissionCardHeader(props: CommissionCardProps) {
     let { price, title, description, extras, commission_deadline } = props.data
     extras = props.extras || extras
 
@@ -157,9 +157,9 @@ const CommissionCardHeader = (props: CommissionCardProps) => {
             </Row>
         </Grid>
     )
-}
+})
 
-export const CommissionCardAddPlaceholder = (props: {onClick?: any}) => {
+export const CommissionCardAddPlaceholder = memo(function CommissionCardAddPlaceholder(props: {onClick?: any}) {
     return (
         <Panel
             bodyFill
@@ -185,9 +185,9 @@ export const CommissionCardAddPlaceholder = (props: {onClick?: any}) => {
             </div>
         </Panel>
     )
-}
+})
 
-export const CommissionCard = (props: CommissionCardProps) => {
+export const CommissionCard = memo(function CommissionCard(props: CommissionCardProps) {
     let image_url = get_image_url(props.data?.image, "small")
 
     const user = useUser()
@@ -248,7 +248,7 @@ export const CommissionCard = (props: CommissionCardProps) => {
             {!props.link && el}
         </div>
     )
-}
+})
 
 export const CommissionCardRadioGroup = () => {
     const router = useRouter()
@@ -287,7 +287,7 @@ interface CommissionTiersRowProps {
     onClick?: (data, ev) => void
 }
 
-export const CommissionTiersRow = (props: CommissionTiersRowProps) => {
+export const CommissionTiersRow = memo(function CommissionTiersRow(props: CommissionTiersRowProps) {
     const store = useCommissionRateStore()
     return (
         <Row gutter={16}>
@@ -325,7 +325,7 @@ export const CommissionTiersRow = (props: CommissionTiersRowProps) => {
             })}
         </Row>
     )
-}
+})
 
 const commission_request_model = {
     from_title: StringType().isRequired(t`This field is required.`)
@@ -372,7 +372,7 @@ interface LicensePanelProps {
     line?: boolean
 }
 
-const LicensePanel = (props: LicensePanelProps) => {
+const LicensePanel = memo(function LicensePanel(props: LicensePanelProps) {
 
     const [ show, set_show ] = useState(false)
 
@@ -401,7 +401,7 @@ const LicensePanel = (props: LicensePanelProps) => {
             {props.control}
         </Panel>
     )
-}
+})
 
 export const ProfileCommission = () => {
     const router = useRouter()

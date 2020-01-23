@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, memo } from 'react'
 import { Grid, Row, Col, Uploader, Icon, Button, Panel, IconButton, Message } from 'rsuite'
 import FsLightbox from 'fslightbox-react'; 
 import classnames from 'classnames'
@@ -29,7 +29,7 @@ interface ProductProps {
     onClick?: Function
 }
 
-export const Asset = (props: ProductProps) => {
+export const Asset = memo(function Asset(props: ProductProps) {
 
     const store = useCommissionStore()
     const commission = store.get_commission()
@@ -109,9 +109,9 @@ export const Asset = (props: ProductProps) => {
             </div>
         </Panel>
     )
-}
+})
 
-export const CommissionAssets = () => {
+export const CommissionAssets = memo(function CommissionAssets() {
     const user = useUser()
     const store = useCommissionStore()
     const commission = store.get_commission()
@@ -208,11 +208,11 @@ export const CommissionAssets = () => {
             }
         </Grid>
     )
-}
+})
 
 export default CommissionAssets
 
-export const CommissionDrafts = () => {
+export const CommissionDrafts = memo(function CommissionDrafts() {
     const user = useUser()
     const store = useCommissionStore()
     const commission = store.get_commission()
@@ -295,4 +295,4 @@ export const CommissionDrafts = () => {
             </Row>
         </Grid>
     )
-}
+})

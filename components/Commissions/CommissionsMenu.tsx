@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { memo } from 'react'
 import { Nav, Badge } from 'rsuite'
 import Link from 'next/link'
 
@@ -9,7 +9,7 @@ interface Props {
     activeKey?: 'commissions' | 'requests' | 'assets'
 }
 
-const CommissionsMenu = (props: Props) => {
+const CommissionsMenu = memo(function CommissionsMenu(props: Props) {
     const store = useUserStore()
 
     let active_comm_count = store.state.active_commissions_count
@@ -50,6 +50,6 @@ const CommissionsMenu = (props: Props) => {
             </Link> */}
         </Nav>
     )
-}
+})
 
 export default CommissionsMenu

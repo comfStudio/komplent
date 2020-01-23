@@ -1,4 +1,4 @@
-import React, { Children } from 'react'
+import React, { Children, memo } from 'react'
 import { Timeline, Icon, Panel, Steps } from 'rsuite'
 import { ReactProps, HTMLElementProps } from '@utility/props'
 import { formatDistanceToNow, format, toDate } from 'date-fns'
@@ -13,7 +13,7 @@ interface StepTitleProps extends ReactProps {
     onClick?: any
 }
 
-export const StepTitle = (props: StepTitleProps) => {
+export const StepTitle = memo(function StepTitle(props: StepTitleProps) {
     let date = props.date
     if (date) {
         if (typeof date === 'string') {
@@ -33,18 +33,18 @@ export const StepTitle = (props: StepTitleProps) => {
             )}
         </span>
     )
-}
+})
 
 interface StepPanelProps extends ReactProps, HTMLElementProps {}
 
-export const StepPanel = (props: StepPanelProps) => {
+export const StepPanel = memo(function StepPanel(props: StepPanelProps) {
     let cls = '' // 'step-panel'
     return (
         <div className={props.className ? props.className + ' ' + cls : cls}>
             {props.children}
         </div>
     )
-}
+})
 
 export interface CommissionStepItemProps extends ReactProps {
     active?: boolean
@@ -52,7 +52,7 @@ export interface CommissionStepItemProps extends ReactProps {
     status?: 'finish'|'wait'|'process'|'error' 
 }
 
-export const CommissionStepItem = (props: CommissionStepItemProps) => {
+export const CommissionStepItem = memo(function CommissionStepItem(props: CommissionStepItemProps) {
 
     let comps = Children.toArray(props.children)
     let title = _.remove(comps, v => v.type === StepTitle)
@@ -68,14 +68,14 @@ export const CommissionStepItem = (props: CommissionStepItemProps) => {
                 (props.selected ? ' selected' : '')
             }/>
     )
-}
+})
 
 interface CommissionStepProps extends ReactProps, HTMLElementProps {
     current?: number
     status?: 'finish'|'wait'|'process'|'error' 
 }
 
-const CommissionSteps = (props: CommissionStepProps) => {
+const CommissionSteps = memo(function CommissionSteps(props: CommissionStepProps) {
     let cls = '' //'commission-step'
     return (
         <Steps
@@ -85,6 +85,6 @@ const CommissionSteps = (props: CommissionStepProps) => {
             {props.children}
         </Steps>
     )
-}
+})
 
 export default CommissionSteps

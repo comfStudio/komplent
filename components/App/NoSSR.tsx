@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import { ReactProps } from '@utility/props';
 
 const DefaultOnSSR = () => (<span></span>);
@@ -7,7 +7,7 @@ interface Props extends ReactProps {
     onSSR?: React.ReactNode
 }
 
-class NoSSR extends Component<Props, { canRender: boolean }> {
+class NoSSR extends PureComponent<Props, { canRender: boolean }> {
 
     static defaultProps = {
         onSSR: <DefaultOnSSR/>

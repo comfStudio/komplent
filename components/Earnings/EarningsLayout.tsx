@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { memo } from 'react'
 
 import MainLayout from '@components/App/MainLayout'
 import { EarningsKey } from '@store/earnings'
@@ -9,7 +9,7 @@ interface Props extends ReactProps {
     activeKey?: EarningsKey
 }
 
-const EarningsLayout = (props: Props) => {
+const EarningsLayout = memo(function EarningsLayout(props: Props) {
     return (
         <MainLayout
             activeKey={props.activeKey}
@@ -18,6 +18,6 @@ const EarningsLayout = (props: Props) => {
             {props.children}
         </MainLayout>
     )
-}
+})
 
 export default EarningsLayout

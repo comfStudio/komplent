@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { memo } from 'react'
 import { useRouter } from 'next/router'
 import { Grid, Col, Row } from 'rsuite'
 
@@ -9,7 +9,7 @@ import Empty, { EmptyPanel } from '@components/App/Empty'
 import { t } from '@app/utility/lang'
 import * as pages from '@utility/pages'
 
-export const FollowLayout = (props: {url:string, UserComponent: React.ElementType, userComponentProps?: object} & HTMLElementProps) => {
+export const FollowLayout = memo(function FollowLayout(props: {url:string, UserComponent: React.ElementType, userComponentProps?: object} & HTMLElementProps) => {
     const router = useRouter()
 
     const store = useFollowStore()
@@ -28,6 +28,6 @@ export const FollowLayout = (props: {url:string, UserComponent: React.ElementTyp
             </Row>
         </Grid>
     )
-}
+})
 
 export default FollowLayout

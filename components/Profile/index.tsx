@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useLayoutEffect } from 'react'
+import React, { useEffect, useState, useLayoutEffect, memo } from 'react'
 import Router from 'next/router'
 import { Grid, Row, Col, Icon, IconButton, Panel, Button, Input, Modal, InputGroup } from 'rsuite'
 
@@ -35,7 +35,7 @@ interface LayoutProps extends ReactProps, MenuProps {
     activeKey?: string
 }
 
-export const ProfileLayout = (props: LayoutProps) => {
+export const ProfileLayout = memo(function ProfileLayout(props: LayoutProps) {
     return (
         <MainLayout
             activeKey="profile"
@@ -54,7 +54,7 @@ export const ProfileLayout = (props: LayoutProps) => {
             </PanelContainer>
         </MainLayout>
     )
-}
+})
 
 export const ProfileNameTag = () => {
     const { profile_user, profile_owner } = useProfileContext()
@@ -164,12 +164,12 @@ interface ProfileButtonProps {
     appearance?: any
 }
 
-export const ShareButton = ({
+export const ShareButton = memo(function ShareButton({
     profile_user,
     size = 'lg',
     className = 'mx-2',
     appearance,
-}: ProfileButtonProps) => {
+}: ProfileButtonProps) {
     if (!profile_user) {
         const p = useProfileUser()
         profile_user = p.profile_user
@@ -208,15 +208,15 @@ export const ShareButton = ({
             }}/>
         </>
     )
-}
+})
 
-export const FollowButton = ({
+export const FollowButton = memo(function FollowButton({
     current_user,
     profile_user,
     follow,
     size = 'lg',
     className = 'mx-3',
-}: ProfileButtonProps) => {
+}: ProfileButtonProps) {
     if (!follow) {
         const p = useProfileUser()
         current_user = p.current_user
@@ -284,7 +284,7 @@ export const FollowButton = ({
             {follow_obj ? t`Following` : t`Follow`}
         </IconButton>
     )
-}
+})
 
 export const GuidelineList = () => {
     const { profile_user } = useProfileUser()

@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Row, Col } from 'rsuite';
 
 import { t } from '@app/utility/lang'
 import * as pages from '@utility/pages'
 import Link from 'next/link';
 
-const Footer = () => {
+const Footer = memo(function Footer() {
     return (
         <>
             <Row className="text-white">
@@ -63,6 +63,6 @@ const Footer = () => {
             </Row>
         </>
     );
-};
+})
 
 export default Footer;

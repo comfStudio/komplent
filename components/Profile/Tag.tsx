@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, memo } from 'react'
 import {
     TagGroup as RTagGroup,
     Tag as RTag,
@@ -16,7 +16,7 @@ import './Tag.scss'
 
 interface TagProps extends RTagProps {}
 
-export const Tag = (props: TagProps) => {
+export const Tag = memo(function Tag(props: TagProps) {
     let cls = 'tag'
     return (
         <RTag
@@ -24,7 +24,7 @@ export const Tag = (props: TagProps) => {
             {...props}
         />
     )
-}
+})
 
 interface TagGroupProps extends RTagGroupProps {
     edit?: boolean
@@ -32,13 +32,13 @@ interface TagGroupProps extends RTagGroupProps {
     onChange?: Function
 }
 
-export const TagGroup = ({
+export const TagGroup = memo(function TagGroup({
     edit,
     children,
     filteredTagIds = [],
     onChange,
     ...props
-}: TagGroupProps) => {
+}: TagGroupProps) {
     const [editing, set_editing] = useState(false)
     const [value, set_value] = useState([])
     const store = useTagStore()
@@ -111,6 +111,6 @@ export const TagGroup = ({
             )}
         </RTagGroup>
     )
-}
+})
 
 export default Tag

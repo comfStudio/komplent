@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { memo } from 'react'
 
 import { useRouter } from 'next/router'
 import { Input, InputGroup, Icon } from 'rsuite'
@@ -7,7 +7,7 @@ const { Button } = InputGroup
 
 import { t } from '@app/utility/lang'
 
-const CommissionsSearch = () => {
+const CommissionsSearch = memo(function CommissionsSearch() {
 
     const router = useRouter()
 
@@ -22,6 +22,6 @@ const CommissionsSearch = () => {
             </InputGroup>
         </form>
     )
-}
+})
 
 export default CommissionsSearch

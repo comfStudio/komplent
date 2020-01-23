@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { memo } from 'react'
 import {
     Container as Layout,
     Header,
@@ -37,7 +37,7 @@ export interface MainLayoutProps extends ReactProps {
     noContentPadded?: boolean
 }
 
-export const MainLayout = (props: MainLayoutProps) => {
+export const MainLayout = memo(function MainLayout(props: MainLayoutProps) {
     const logged_in = useLoginStatus()
     const user = useUser()
     const email_verified = user ? user.email_verified : true
@@ -122,7 +122,7 @@ export const MainLayout = (props: MainLayoutProps) => {
             </FooterLayout>
         </Layout>
     )
-}
+})
 
 export interface CenterPanelProps extends ReactProps, HTMLElementProps {
     bordered?: boolean
@@ -131,7 +131,7 @@ export interface CenterPanelProps extends ReactProps, HTMLElementProps {
     subtitle?: string
 }
 
-export const CenterPanel = (props: CenterPanelProps) => {
+export const CenterPanel = memo(function CenterPanel(props: CenterPanelProps) {
     let cls = 'mx-auto text-center'
     if (props.padded) {
         cls += ` py-${typeof props.padded == 'number' ? props.padded : 5}`
@@ -146,13 +146,13 @@ export const CenterPanel = (props: CenterPanelProps) => {
             )}
         </Panel>
     )
-}
+})
 
 interface ContainerProps extends ReactProps, HTMLElementProps {
     padded?: boolean | number
 }
 
-export const Container = (props: ContainerProps) => {
+export const Container = memo(function Container(props: ContainerProps) {
     let cls = 'container mx-auto'
     if (props.padded) {
         cls += ` py-${typeof props.padded == 'number' ? props.padded : 5}`
@@ -160,9 +160,9 @@ export const Container = (props: ContainerProps) => {
     return (
         <div className={classnames(cls, props.className)}>{props.children}</div>
     )
-}
+})
 
-export const PageContainer = (props: ContainerProps) => {
+export const PageContainer = memo(function PageContainer(props: ContainerProps) {
     let cls = 'container mx-auto'
     if (props.padded) {
         cls += ` py-${typeof props.padded == 'number' ? props.padded : 5}`
@@ -170,7 +170,7 @@ export const PageContainer = (props: ContainerProps) => {
     return (
         <div className={classnames(cls, props.className)}>{props.children}</div>
     )
-}
+})
 
 interface PanelContainerProps extends ReactProps, HTMLElementProps {
     flex?: boolean
@@ -180,7 +180,7 @@ interface PanelContainerProps extends ReactProps, HTMLElementProps {
     header?: React.ReactNode
 }
 
-export const PanelContainer = (props: PanelContainerProps) => {
+export const PanelContainer = memo(function PanelContainer(props: PanelContainerProps) {
     let cls = 'panel-container'
     if (props.fluid) {
         cls += props.flex ? ' flex flex-grow' : ' w-full'
@@ -195,14 +195,14 @@ export const PanelContainer = (props: PanelContainerProps) => {
             {props.children}
         </Panel>
     )
-}
+})
 
 interface GridContainerProps extends ContainerProps {
     fluid?: boolean
     padded?: boolean | number
 }
 
-export const GridContainer = (props: GridContainerProps) => {
+export const GridContainer = memo(function GridContainer(props: GridContainerProps) {
     let cls = 'grid-container'
     if (props.fluid) {
         cls += ' !w-full'
@@ -215,6 +215,6 @@ export const GridContainer = (props: GridContainerProps) => {
             </Grid>
         </Container>
     )
-}
+})
 
 export default MainLayout

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, memo } from 'react'
 import { NextPageContext } from 'next'
 import cookies from 'nookies'
 import Router from 'next/router'
@@ -26,9 +26,9 @@ interface AsLoginProps {
     requested_page: string
 }
 
-const AsLoginPage = (props: AsLoginProps) => {
+const AsLoginPage = memo(function AsLoginPage (props: AsLoginProps) {
     return <LoginPage />
-}
+})
 
 export class AuthPage<T extends Props = Props> extends Page<T> {
     static async getInitialProps(ctx: NextPageContext) {

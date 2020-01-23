@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, memo } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { useCMS, useLocalForm, useWatchFormValues } from 'tinacms'
 
@@ -12,7 +12,7 @@ export class TinaPage<T = undefined> extends Component<T> {
   static TINA = true
 }
 
-export const Blog = (props: {title: string, subtitle: string, updated: string, fileRelativePath: string, body: string}) => {
+export const Blog = memo(function Blog(props: {title: string, subtitle: string, updated: string, fileRelativePath: string, body: string}) {
     // grab the instance of the CMS to access the registered git API
 let cms = useCMS()
 
@@ -84,15 +84,15 @@ return (
     <Markdown data={post.body}/>
   </BlogLayout>
 )
-}
+})
 
-export const Markdown = ({data}: {data: string}) => {
+export const Markdown = memo(function Markdown({data}: {data: string}) {
     return (
         <ReactMarkdown source={data}/>
     )
-}
+})
 
-export const BlogLayout = ({children, ...props}: MainLayoutProps) => {
+export const BlogLayout = memo(function BlogLayout({children, ...props}: MainLayoutProps) {
     return (
         <MainLayout {...props}>
             <div className="blog">
@@ -100,6 +100,6 @@ export const BlogLayout = ({children, ...props}: MainLayoutProps) => {
             </div>
         </MainLayout>
     )
-}
+})
 
 export default Blog

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, memo } from 'react'
 import { Modal, Button, Form } from 'rsuite'
 
 import { useUser } from '@app/client/hooks/user'
@@ -13,7 +13,7 @@ export const UserType = () => {}
 
 interface Props {}
 
-const UserTypeModal = (props: Props) => {
+const UserTypeModal = memo(function UserTypeModal(props: Props) {
     const store = useUserStore()
     if (store.state.current_user) {
         const [show, set_show] = useState(false)
@@ -79,6 +79,6 @@ const UserTypeModal = (props: Props) => {
     }
 
     return null
-}
+})
 
 export default UserTypeModal

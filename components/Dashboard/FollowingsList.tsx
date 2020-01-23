@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { memo } from 'react'
 import { useFollowerStore } from '@store/user'
 import { Grid, Row, Col, List, PanelGroup } from 'rsuite'
 import Link from 'next/link'
@@ -6,7 +6,7 @@ import { make_profile_urlpath } from '@utility/pages'
 import { PanelContainer } from '@components/App/MainLayout'
 import { t } from '@app/utility/lang'
 
-const FollowingsList = () => {
+const FollowingsList = memo(function FollowingsList() {
     const store = useFollowerStore()
 
     return (
@@ -35,6 +35,6 @@ const FollowingsList = () => {
             </PanelGroup>
         </PanelContainer>
     )
-}
+})
 
 export default FollowingsList

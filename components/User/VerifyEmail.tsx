@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import { Panel, Button } from 'rsuite';
 
 import { t } from '@app/utility/lang'
@@ -6,7 +6,7 @@ import { useUser } from '@hooks/user';
 import { fetch } from '@utility/request'
 import * as pages from '@utility/pages'
 
-const VerifyEmailPanel = (props) => {
+const VerifyEmailPanel = memo(function VerifyEmailPanel(props) {
     const user = useUser()
     const email = user?.email
     const [sent, set_sent] = useState(false)
@@ -26,6 +26,6 @@ const VerifyEmailPanel = (props) => {
             </p>
         </Panel>
     );
-};
+})
 
 export default VerifyEmailPanel;

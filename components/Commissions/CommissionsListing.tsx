@@ -1,4 +1,4 @@
-import React, { useReducer } from 'react'
+import React, { useReducer, memo } from 'react'
 import Link from 'next/link'
 import { List, Grid, Row, Col, Divider, Tag, ButtonToolbar, ButtonGroup, Button, PanelGroup } from 'rsuite'
 import { useRouter } from 'next/router'
@@ -13,19 +13,19 @@ import { CommissionItemPanelProps, CommissionItemPanel } from '@components/Commi
 import { EmptyPanel } from '@components/App/Empty'
 import { ToggleButton } from '@components/App/Misc'
 
-const CommissionListItem = (props: CommissionItemPanelProps) => {
+const CommissionListItem = memo(function CommissionListItem(props: CommissionItemPanelProps) {
     return (
         <List.Item className="!p-0">
             <CommissionItemPanel {...props}/>
         </List.Item>
     )
-}
+})
 
 interface CommissionListProps extends ReactProps {
     data: any[]
 }
 
-export const CommissionList = (props: CommissionListProps) => {
+export const CommissionList = memo(function CommissionList(props: CommissionListProps) {
 
     const user = useUser()
     const store = useCommissionsStore()
@@ -36,9 +36,9 @@ export const CommissionList = (props: CommissionListProps) => {
             {props.data.map(d => <CommissionListItem key={d._id} data={d} />)}
         </List>
     )
-}
+})
 
-export const RequestListing = () => {
+export const RequestListing = memo(function RequestListing() {
     const user = useUser()
     const store = useCommissionsStore()
     const router = useRouter()
@@ -79,13 +79,13 @@ export const RequestListing = () => {
             </Row>
         </Grid>
     )
-}
+})
 
 interface CommissionsListingProps {
     listtype?: 'received'|'sent'
 }
 
-export const CommissionsListing = (props: CommissionsListingProps) => {
+export const CommissionsListing = memo(function CommissionsListing(props: CommissionsListingProps) {
     const user = useUser()
     const store = useCommissionsStore()
     const router = useRouter()
@@ -146,6 +146,6 @@ export const CommissionsListing = (props: CommissionsListingProps) => {
             </Row>
         </Grid>
     )
-}
+})
 
 export default CommissionsListing

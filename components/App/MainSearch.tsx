@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { memo } from 'react'
 import { useRouter } from 'next/router'
 import { Input, InputGroup, Icon } from 'rsuite'
 
@@ -6,7 +6,7 @@ import { t } from '@app/utility/lang'
 
 const { Button } = InputGroup
 
-export const MainSearch = () => {
+export const MainSearch = memo(function MainSearch() {
     const router = useRouter()
 
     return (
@@ -23,6 +23,6 @@ export const MainSearch = () => {
             </InputGroup>
         </form>
     )
-}
+})
 
 export default MainSearch

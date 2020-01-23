@@ -1,10 +1,10 @@
 import ReactPlaceholder from 'react-placeholder'
 import 'react-placeholder/lib/reactPlaceholder.css'
 
-import React from 'react'
+import React, { memo } from 'react'
 
-const Placeholder = props => {
+const Placeholder = memo(function Placeholder(props) {
     return <ReactPlaceholder {...props} />
-}
+})
 
 export default Placeholder

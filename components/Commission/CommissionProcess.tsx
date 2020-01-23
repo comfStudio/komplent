@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, memo } from 'react'
 import { formatDistanceToNow, format, addDays } from 'date-fns'
 import { toDate } from 'date-fns-tz'
 import Link from 'next/link'
@@ -30,7 +30,7 @@ interface ProcessProps extends CommissionStepItemProps {
     active?: boolean
 }
 
-export const ApprovalButtons = () => {
+export const ApprovalButtons = memo(function ApprovalButtons() {
     const store = useCommissionStore()
     let commission = store.get_commission()
 
@@ -60,9 +60,9 @@ export const ApprovalButtons = () => {
                 }}>{t`Decline`}</Button>
         </ButtonToolbar>
     )
-}
+})
 
-const PendingApproval = (props: ProcessProps) => {
+const PendingApproval = memo(function PendingApproval(props: ProcessProps) {
     const store = useCommissionStore()
     let commission = store.get_commission()
     const to_name = commission ? commission.to_user.username : ''
@@ -103,9 +103,9 @@ const PendingApproval = (props: ProcessProps) => {
             )}
         </CommissionStepItem>
     )
-}
+})
 
-const PendingPayment = (props: ProcessProps) => {
+const PendingPayment = memo(function PendingPayment(props: ProcessProps) {
     const count =
         props.data && props.data.data && props.data.data.count
             ? props.data.data.count
@@ -168,9 +168,9 @@ const PendingPayment = (props: ProcessProps) => {
             )}
         </CommissionStepItem>
     )
-}
+})
 
-const RevisionButton = () => {
+const RevisionButton = memo(function RevisionButton() {
     const store = useCommissionStore()
     const [revision_loading, set_revisions_loading] = useState(false)
 
@@ -205,9 +205,9 @@ const RevisionButton = () => {
             )}
         </>
     )
-}
+})
 
-const PendingDraft = (props: ProcessProps) => {
+const PendingDraft = memo(function PendingDraft(props: ProcessProps) {
     const [accept_loading, set_accept_loading] = useState(false)
     const [skip_loading, set_skip_loading] = useState(false)
 
@@ -300,9 +300,9 @@ const PendingDraft = (props: ProcessProps) => {
             )}
         </CommissionStepItem>
     )
-}
+})
 
-const Revision = (props: ProcessProps) => {
+const Revision = memo(function Revision(props: ProcessProps) {
     const [accept_loading, set_accept_loading] = useState(false)
     const store = useCommissionStore()
     let commission = store.get_commission()
@@ -384,9 +384,9 @@ const Revision = (props: ProcessProps) => {
             )}
         </CommissionStepItem>
     )
-}
+})
 
-const PendingProduct = (props: ProcessProps) => {
+const PendingProduct = memo(function PendingProduct(props: ProcessProps) {
     const user = useUser()
     const [count, set_count] = useState(0)
     const [accept_loading, set_accept_loading] = useState(false)
@@ -454,9 +454,9 @@ const PendingProduct = (props: ProcessProps) => {
             )}
         </CommissionStepItem>
     )
-}
+})
 
-const Cancelled = (props: ProcessProps) => {
+const Cancelled = memo(function Cancelled(props: ProcessProps) {
     const store = useCommissionStore()
     let commission = store.get_commission()
     let name = ''
@@ -487,9 +487,9 @@ const Cancelled = (props: ProcessProps) => {
             </StepPanel>
         </CommissionStepItem>
     )
-}
+})
 
-const Expired = (props: ProcessProps) => {
+const Expired = memo(function Expired(props: ProcessProps) {
     return (
         <CommissionStepItem {...props}>
             <StepTitle onClick={props.onClick} date={props.done_date}>
@@ -503,9 +503,9 @@ const Expired = (props: ProcessProps) => {
             </StepPanel>
         </CommissionStepItem>
     )
-}
+})
 
-const Negotiating = (props: ProcessProps) => {
+const Negotiating = memo(function Negotiating(props: ProcessProps) {
     const store = useCommissionStore()
     let commission = store.get_commission()
     const current_user_id = props.is_owner ? commission.from_user._id : commission.to_user._id
@@ -530,9 +530,9 @@ const Negotiating = (props: ProcessProps) => {
             </StepPanel>
         </CommissionStepItem>
     )
-}
+})
 
-const Unlocked = (props: ProcessProps) => {
+const Unlocked = memo(function Unlocked(props: ProcessProps) {
     const done = props.data ? props.data.done : false
     const show_panel = !props.hidden || props.active
 
@@ -551,9 +551,9 @@ const Unlocked = (props: ProcessProps) => {
             )}
         </CommissionStepItem>
     )
-}
+})
 
-const Refund = (props: ProcessProps) => {
+const Refund = memo(function Refund(props: ProcessProps) {
     const done = props.data ? props.data.done : false
     const show_panel = !props.hidden || props.active
 
@@ -579,9 +579,9 @@ const Refund = (props: ProcessProps) => {
             )}
         </CommissionStepItem>
     )
-}
+})
 
-const Completed = (props: ProcessProps) => {
+const Completed = memo(function Completed(props: ProcessProps) {
     const store = useCommissionStore()
     let commission = store.get_commission()
 
@@ -689,7 +689,7 @@ const Completed = (props: ProcessProps) => {
             )}
         </CommissionStepItem>
     )
-}
+})
 
 interface ConfirmButtonProps {
     onRevoke?: any
@@ -699,7 +699,7 @@ interface ConfirmButtonProps {
     loading?: boolean
 }
 
-export const CompleteButton = (props: ConfirmButtonProps) => {
+export const CompleteButton = memo(function CompleteButton(props: ConfirmButtonProps) {
     return (
         <React.Fragment>
             {props.revoke && (
@@ -717,9 +717,9 @@ export const CompleteButton = (props: ConfirmButtonProps) => {
             )}
         </React.Fragment>
     )
-}
+})
 
-const CommissionProcess = () => {
+const CommissionProcess = memo(function CommissionProcess() {
     const user = useUser()
     const store = useCommissionStore()
     let commission = store.get_commission()
@@ -1063,6 +1063,6 @@ const CommissionProcess = () => {
             </NoSSR>
         </div>
     )
-}
+})
 
 export default CommissionProcess

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, memo } from 'react'
 import { Button, Panel, Progress } from 'rsuite'
 
 import { ProfileNameTag } from '@components/Profile'
@@ -19,7 +19,7 @@ import useProfileStore from '@store/profile'
 
 interface Props extends HTMLElementProps {}
 
-export const ProfileInfo = (props: Props) => {
+export const ProfileInfo = memo(function ProfileInfo(props: Props) {
     const {
         current_user,
         profile_user,
@@ -166,6 +166,6 @@ export const ProfileInfo = (props: Props) => {
             </div>
         </Panel>
     )
-}
+})
 
 export default ProfileInfo

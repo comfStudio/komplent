@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { memo } from 'react'
 import Head from 'next/head'
 
 import { HTMLElementProps, ReactProps } from '@utility/props'
@@ -22,7 +22,7 @@ interface IconProps extends HTMLElementProps, ReactProps {
     fixed?: boolean
 }
 
-export const Icon = (props: IconProps) => {
+export const Icon = memo(function Icon(props: IconProps) {
     let cls = 'bx'
     let itype = 'bx'
     switch (props.type) {
@@ -83,12 +83,12 @@ export const Icon = (props: IconProps) => {
             </Head>
         </i>
     )
-}
+})
 
-export const Title = (props: ReactProps) => {
+export const Title = memo(function Title(props: ReactProps) {
     return (
         <Head key="title">
             <title>{props.children}</title>
         </Head>
     )
-}
+})

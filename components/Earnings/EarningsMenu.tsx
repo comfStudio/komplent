@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { memo } from 'react'
 import { Nav } from 'rsuite'
 
 import { t } from '@app/utility/lang'
@@ -8,7 +8,7 @@ interface Props {
     activeKey?: string
 }
 
-const EarningsMenu = (props: Props) => {
+const EarningsMenu = memo(function EarningsMenu(props: Props) {
     return (
         <Nav appearance="subtle" activeKey={props.activeKey}>
             <Link href="/earnings" passHref>
@@ -32,6 +32,6 @@ const EarningsMenu = (props: Props) => {
             </Link>
         </Nav>
     )
-}
+})
 
 export default EarningsMenu

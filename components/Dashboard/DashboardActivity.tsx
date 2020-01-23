@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, memo } from 'react'
 import { Panel, PanelGroup, Avatar, Button } from 'rsuite'
 import Link from 'next/link'
 import classnames from 'classnames'
@@ -22,7 +22,7 @@ interface NotificationProps {
     data: any
 }
 
-const CommissionTitle = ({commission_id, user, className}: {commission_id: string, user: any, className?: string}) => {
+const CommissionTitle = memo(function CommissionTitle({commission_id, user, className}: {commission_id: string, user: any, className?: string}) {
     const [title, set_title] = useState()
 
     useEffect(() => {
@@ -44,9 +44,9 @@ const CommissionTitle = ({commission_id, user, className}: {commission_id: strin
     }, [commission_id, user])
 
     return <span className={className}>{t`The commission`} <span className="font-bold commission-title">{title}</span> {t`has been updated`}</span>
-}
+})
 
-const Notification = (props: NotificationProps) => {
+const Notification = memo(function Notification(props: NotificationProps) {
 
     const user = useUser()
     const store = useNotificationStore()
@@ -139,9 +139,9 @@ const Notification = (props: NotificationProps) => {
 
         </Panel>
     )
-}
+})
 
-const DashboardActivity = () => {
+const DashboardActivity = memo(function DashboardActivity() {
     const store = useNotificationStore()
     const user = useUser()
 
@@ -170,6 +170,6 @@ const DashboardActivity = () => {
         }}>{t`Load more`}</Button></div>
         </>
     )
-}
+})
 
 export default DashboardActivity

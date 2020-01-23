@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { memo } from 'react'
 import Link from 'next/link'
 import Button, { ButtonProps } from 'rsuite/lib/Button'
 import { IconButton, Icon, ButtonGroup } from 'rsuite'
@@ -12,13 +12,13 @@ interface CommissionButtonProps extends HTMLElementProps, ButtonProps {
     user?: any
 }
 
-export const CommissionButton = ({
+export const CommissionButton = memo(function CommissionButton({
     user,
     appearance = 'primary',
     size = 'lg',
     children,
     ...props
-}: CommissionButtonProps) => {
+}: CommissionButtonProps) {
     let path
     let count
     if (user) {
@@ -73,6 +73,6 @@ export const CommissionButton = ({
             )}
         </>
     )
-}
+})
 
 export default CommissionButton

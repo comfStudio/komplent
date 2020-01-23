@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import { Carousel, Grid, Col, Row, Panel } from 'rsuite';
 import { CarouselProvider, Slider, Slide, ButtonBack, ButtonNext } from 'pure-react-carousel';
 import 'pure-react-carousel/dist/react-carousel.es.css';
@@ -14,7 +14,7 @@ interface MultiCarouselProps extends HTMLElementProps, ReactProps {
     keyFunc?: (child: any, index: number) => any
 }
 
-const MultiCarousel = ({keyFunc = (child, idx) => idx, ...props}: MultiCarouselProps) => {
+const MultiCarousel = memo(function MultiCarousel({keyFunc = (child, idx) => idx, ...props}: MultiCarouselProps) {
 
     const [count, set_count] = useState(0)
 
@@ -44,6 +44,6 @@ const MultiCarousel = ({keyFunc = (child, idx) => idx, ...props}: MultiCarouselP
               </Slider>
         </CarouselProvider>
     );
-};
+})
 
 export default MultiCarousel;

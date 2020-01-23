@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, memo } from 'react'
 import { Row, Col, Panel, Icon, FlexboxGrid, Button } from 'rsuite'
 import FsLightbox from 'fslightbox-react'; 
 import classnames from 'classnames'
@@ -15,7 +15,7 @@ import { useGalleryStore } from '@store/profile'
 import './profile.scss'
 import MultiCarousel from '@components/App/MultiCarousel';
 
-const Gallery = (props: {data: any, user?: any, profile_owner?: boolean, store: any, onClick?: any}) => {
+const Gallery = memo(function Gallery(props: {data: any, user?: any, profile_owner?: boolean, store: any, onClick?: any}) {
     const [loading, set_loading] = useState(false)
 
     const src = get_image_url(props.data?.image, "thumb")
@@ -33,7 +33,7 @@ const Gallery = (props: {data: any, user?: any, profile_owner?: boolean, store: 
             }} block>{t`Delete`}</Button>}
         </Panel>
     )
-}
+})
 
 interface Props extends HTMLElementProps {
     fluid?: boolean
@@ -98,7 +98,7 @@ export const GalleryCarousel = () => {
     )
 }
 
-export const ProfileGallery = (props: Props) => {
+export const ProfileGallery = memo(function ProfileGallery(props: Props) {
     const { context: { profile_owner }} = useProfileUser()
     const store = useGalleryStore()
 
@@ -140,6 +140,6 @@ export const ProfileGallery = (props: Props) => {
             </Row>
         </GridContainer>
     )
-}
+})
 
 export default ProfileGallery

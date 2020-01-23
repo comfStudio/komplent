@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { memo } from 'react'
 import { Panel, PanelGroup, Progress, Tag } from 'rsuite'
 import { PanelContainer } from '@components/App/MainLayout'
 import Image from '@components/App/Image'
@@ -11,7 +11,7 @@ interface CommissionTitleProps {
     user?: any
 }
 
-export const CommissionTitle = (props: CommissionTitleProps) => {
+export const CommissionTitle = memo(function CommissionTitle(props: CommissionTitleProps) {
     return (
         <div className="inline-block w-full leading-loose text-base">
             <span className="float-left mr-1">
@@ -20,9 +20,9 @@ export const CommissionTitle = (props: CommissionTitleProps) => {
             Kanna Illustration
         </div>
     )
-}
+})
 
-export const CommissionProgress = props => {
+export const CommissionProgress = memo(function CommissionProgress(props) {
     return (
         <Panel>
             <CommissionTitle />
@@ -35,9 +35,9 @@ export const CommissionProgress = props => {
             </div>
         </Panel>
     )
-}
+})
 
-export const ActiveCommissions = () => {
+export const ActiveCommissions = memo(function ActiveCommissions() {
     return (
         <PanelContainer
             bordered
@@ -58,6 +58,6 @@ export const ActiveCommissions = () => {
             </PanelGroup>
         </PanelContainer>
     )
-}
+})
 
 export default ActiveCommissions

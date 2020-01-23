@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, memo } from 'react'
 import Router from 'next/router'
 
 import * as pages from '@utility/pages'
@@ -19,7 +19,7 @@ export const NoLoginPage = () => {
     return null
 }
 
-export const Auth = (props: Props) => {
+export const Auth = memo(function Auth(props: Props) {
     const logged_in = useLoginStatus()
 
     useEffect(() => {
@@ -38,6 +38,6 @@ export const Auth = (props: Props) => {
         ((logged_in && !props.inverse) || (!logged_in && props.inverse)) &&
         props.children
     )
-}
+})
 
 export default Auth

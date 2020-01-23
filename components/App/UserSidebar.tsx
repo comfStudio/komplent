@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { memo } from 'react'
 import { Grid, Col, Row, Divider } from 'rsuite'
 
 import { NavUserSidebar } from '@components/Header/NavUser'
@@ -17,7 +17,7 @@ interface Props {
     activeKey?: string
 }
 
-const UserSidebar = (props: Props) => {
+const UserSidebar = memo(function UserSidebar(props: Props) {
     const store = useUserStore()
     const user = store.state.current_user
 
@@ -73,6 +73,6 @@ const UserSidebar = (props: Props) => {
             </Grid>
         </NoProfileContext>
     )
-}
+})
 
 export default UserSidebar

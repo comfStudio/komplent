@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { memo } from 'react'
 import { Navbar, Nav } from 'rsuite'
 import Link from 'next/link'
 
@@ -10,7 +10,7 @@ export interface Props {
     activeKey?: string
 }
 
-export const ProfileMenu = (props: Props) => {
+export const ProfileMenu = memo(function ProfileMenu(props: Props) {
     const {
         context: { profile_path, profile_owner },
     } = useProfileUser()
@@ -72,6 +72,6 @@ export const ProfileMenu = (props: Props) => {
             </Navbar.Body>
         </Navbar>
     )
-}
+})
 
 export default ProfileMenu

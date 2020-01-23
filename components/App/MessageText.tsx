@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, memo } from 'react'
 import {useDebounce } from 'react-use'
 
 import TextEditor from '@components/App/TextEditor'
@@ -15,7 +15,7 @@ interface MessageTextProps {
     onChange?: (value) => void
 }
 
-export const MessageText = ({maxLength = 3500, ...props}: MessageTextProps) => {
+export const MessageText = memo(function MessageText({maxLength = 3500, ...props}: MessageTextProps) {
     const store = useUserStore()
     const user = store.state.current_user
     const update = useUpdateDatabase(
@@ -63,6 +63,6 @@ export const MessageText = ({maxLength = 3500, ...props}: MessageTextProps) => {
             onTextChange={({ delta }) => { set_delta(delta) } }
         />
     )
-}
+})
 
 export default MessageText;
