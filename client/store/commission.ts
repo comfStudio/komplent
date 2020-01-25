@@ -309,60 +309,11 @@ export const useCommissionStore = createStore(
         },
 
         async confirm_revision(new_revision = false) {
-            const user_id = this.state._current_user._id
-            const stage = this.state.commission.stage
-            if (stage.type !== 'revision') {
-                throw Error('Revision can only be done in the revision phase')
-            }
-            let stage_data = {
-                confirmed: [],
-            }
-            if (stage.data) {
-                stage_data = { ...stage.data }
-            }
-
-            stage_data.confirmed = [user_id, ...stage_data.confirmed].reduce(
-                (unique, item) =>
-                    unique.includes(item) ? unique : [...unique, item],
-                []
-            )
-
-            let r = await update_db({
-                model: 'CommissionPhase',
-                data: { _id: stage._id, data: stage_data },
-                schema: commission_schema,
-                validate: true,
-            })
-            if (r.status) {
-                let participants = [
-                    this.state.commission.from_user._id,
-                    this.state.commission.to_user._id,
-                ]
-                if (participants.every(v => stage_data.confirmed.includes(v))) {
-                    if (new_revision) {
-                        r = this.add_revision_phase()
-                    } else {
-                        r = this.next_phase()
-                    }
-                }
-                this.refresh()
-            }
-            return r
+            return await this.fetch_process("confirm_revision", { commission_id: this.state.commission._id })
         },
 
         async cancel() {
-            if (!this.state.commission.payments.length) {
-                let r = await this.add_phase('cancel', {
-                    done: true,
-                    complete_previous_phase: false,
-                })
-                if (r.status) {
-                    r = await this.end()
-                }
-                return r
-            } else {
-                throw Error("Cannot cancel a request that has had a transaction")
-            }
+            return await this.fetch_process("cancel", { commission_id: this.state.commission._id })
         },
 
         async revoke_complete() {

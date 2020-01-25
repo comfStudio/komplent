@@ -19,7 +19,7 @@ export default with_auth_middleware(
 
             let r
             if (accept) {
-                r = await accept_commission_price(commission_id)
+                r = await accept_commission_price(req.user, commission_id)
             } else {
                 r = await suggest_commission_price(req.user, commission_id, new_price)
             }

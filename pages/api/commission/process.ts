@@ -16,6 +16,8 @@ export default with_auth_middleware(
     async (req: ExApiRequest, res: ExApiResponse) => {
         try {
             const { 
+                confirm_revision,
+                cancel,
                 revoke_complete,
                 complete,
                 confirm_products,
@@ -43,6 +45,10 @@ export default with_auth_middleware(
                 r = await CommissionProcess.complete(req.user, data?.commission_id)
             } else if (revoke_complete) {
                 r = await CommissionProcess.revoke_complete(req.user, data?.commission_id)
+            } else if (cancel) {
+                r = await CommissionProcess.cancel(req.user, data?.commission_id)
+            } else if (confirm_revision) {
+                r = await CommissionProcess.confirm_revision(req.user, data?.commission_id)
             }
 
             res.status(OK).json(data_message(r))
