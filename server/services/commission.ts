@@ -135,7 +135,7 @@ export class CommissionProcess {
 
         const next_stages = this._get_next_stages(commission)
         if (!next_stages.length || next_stages[0].type !== type ) {
-            log.warn(`Commission ${commission._id} expected next phase to be ${next_stages[0].type} not ${type}`)
+            log.warn(`Commission ${commission._id} expected next phase to be ${next_stages?.[0]?.type} not ${type}`)
             return
         }
 
@@ -314,7 +314,7 @@ export class CommissionProcess {
 
         if (participants.every(v => stage_data.confirmed.includes(v))) {
             this._complete_phase(commission, true)
-            this._end(commission)
+            this._end(commission, true)
         }
 
         await commission.save()
@@ -360,7 +360,7 @@ export class CommissionProcess {
                 done: true,
                 complete_previous_phase: false,
             })
-            await this._end(commission, true)
+            await this._end(commission, false)
             await commission.save()
         } else {
             throw Error("Cannot cancel a request that has had a transaction")
@@ -696,8 +696,8 @@ export const pay_commission = async (user, commission_id, payment_phase_id) => {
             })
             await payment.save()
             c.payments = [...c.payments, payment._id]
-            await c.save()
             await CommissionProcess._next_phase(user, c)
+            await c.save()
             return c
         }
     }

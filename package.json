@@ -17,6 +17,7 @@
         "analyze:server": "cross-env BUNDLE_ANALYZE=server next build",
         "analyze:browser": "cross-env BUNDLE_ANALYZE=browser next build",
         "cosmos": "cosmos",
+        "setup_s3": "aws --endpoint-url=http://localhost:4572 s3 mb s3://komplent && aws --endpoint-url=http://localhost:4572 s3api put-bucket-acl --bucket komplent --acl public-read",
         "gen-test-data": "mgodatagen -a --url \"mongodb://komplent:komplent@localhost:27956,localhost:27955/komplent?replicaSet=devrs&authSource=admin\" -f ./__tests__/komplent_data.json"
     },
     "dependencies": {
