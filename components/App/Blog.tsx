@@ -54,7 +54,7 @@ let [post, form] = useLocalForm({
     return cms.api.git
       .writeToDisk({
         fileRelativePath: props.fileRelativePath,
-        content: JSON.stringify({ title: data.title, body: data.body, updated: new Date() }),
+        content: JSON.stringify({ title: data.title, subtitle: data.subtitle, body: data.body, updated: new Date() }),
       })
       .then(() => {
         return cms.api.git.commit({
@@ -68,7 +68,7 @@ let [post, form] = useLocalForm({
 let writeToDisk = React.useCallback(formState => {
   cms.api.git.writeToDisk({
     fileRelativePath: props.fileRelativePath,
-    content: JSON.stringify({ title: formState.values.title }),
+    content: JSON.stringify({ title: formState.values.title, subtitle: formState.values.subtitle, body: formState.values.body, updated: new Date() }),
   })
 }, [])
 
@@ -77,7 +77,7 @@ useWatchFormValues(form, writeToDisk)
 return (
   <BlogLayout>
     <h1>{post.title}</h1>
-    {!!post.subtitle && <h2 className="muted">{post.title}</h2>}
+    {!!post.subtitle && <h2 className="muted">{post.subtitle}</h2>}
     {post.updated &&
     <p className="muted mb-5">{t`Last updated:`} {formatDistanceToNow(new Date(post.updated), { addSuffix: true })}</p>
     }
