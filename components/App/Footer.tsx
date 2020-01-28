@@ -54,10 +54,11 @@ const Footer = memo(function Footer() {
             <Row>
                 <Col xs={24}>
                     <ul className="text-white footer-list">
-                        <li className="text-gray-300">© Komplent 2019</li>
-                        <li><Link href="/terms-and-conditions"><a>Terms of Use</a></Link></li>
-                        <li><Link href="/privacy-policy"><a>Privacy Policy</a></Link></li>
-                        <li><Link href="/copyright-policy"><a>Copyright Policy</a></Link></li>
+                        <li className="text-gray-300">© Requestable 2019</li>
+                        <li><Link href="/terms-and-conditions"><a>{t`Terms of Use`}</a></Link></li>
+                        <li><Link href="/refund-policy"><a>{t`Cancellation & Refund Policy`}</a></Link></li>
+                        <li><Link href="/privacy-policy"><a>{t`Privacy Policy`}</a></Link></li>
+                        <li><Link href="/copyright-policy"><a>{t`Copyright Policy`}</a></Link></li>
                     </ul>
                 </Col>
             </Row>
