@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 
-import { Commission, CommissionPhase, Payment, Attachment } from "@db/models"
+import { Commission, CommissionPhase, Payment, Attachment, User } from "@db/models"
 import { decimal128ToFloat, user_among } from "@utility/misc"
 import { upload_file } from '@services/aws'
 import log from '@utility/log'
@@ -14,7 +14,7 @@ import { commission } from '@utility/pages'
 
 export class CommissionProcess {
 
-    static async _load_commission(user, commission_id, handler: "client" | "creator" = undefined) {
+    static async load_commission(user, commission_id, handler: "client" | "creator" = undefined) {
         const p = [
             {
                 path: 'to_user',
@@ -56,6 +56,7 @@ export class CommissionProcess {
     static async _complete_phase(commission, done = true) {
         commission.stage.done = done
         commission.stage.done_date = done ? new Date() : null
+        this._complete_default_stage(commission, commission.stage.type)
         await commission.stage.save()
 
         return true
@@ -99,6 +100,7 @@ export class CommissionProcess {
         commission,
         on_stage: CommissionPhaseType | CommissionProcessType = undefined
     ) {
+        on_stage = on_stage ?? commission.stage
         if (typeof on_stage === 'object') {
             on_stage = on_stage.type
         }
@@ -127,8 +129,6 @@ export class CommissionProcess {
             await this._complete_phase(commission, true)
         }
 
-        this._complete_default_stage(commission)
-        
         if (typeof type === 'object') {
             type = type.type
         }
@@ -218,19 +218,30 @@ export class CommissionProcess {
         }
     }
 
+    static _has_accepted_suggested_price(commission) {
+        if (commission.suggested_price && commission.rate.price) {
+            return true
+        }
+        return false
+    }
+
     static async decline_commission(user, commission_id: string) {
-        const commission = await this._load_commission(user, commission_id, "creator")
+        const commission = await this.load_commission(user, commission_id, "creator")
         await this._complete_phase(commission)
         commission.set({
             accepted: false,
             ...this._end_data(false)
         })
         await commission.save()
-        return await this._load_commission(user, commission_id)
+        return await this.load_commission(user, commission_id)
     }
 
     static async accept_commission(user, commission_id: string) {
-        const commission = await this._load_commission(user, commission_id, "creator")
+        const commission = await this.load_commission(user, commission_id, "creator")
+
+        if (!this._has_accepted_suggested_price(commission)) {
+            throw Error("canoot accept before a price has been set")
+        }
 
         commission.set({
             accepted: true,
@@ -244,7 +255,7 @@ export class CommissionProcess {
     }
 
     static async skip_drafts(user, commission_id: string) {
-        const commission = await this._load_commission(user, commission_id)
+        const commission = await this.load_commission(user, commission_id)
 
         await this._next_phase(user, commission)
 
@@ -254,7 +265,7 @@ export class CommissionProcess {
     }
 
     static async confirm_drafts(user, commission_id: string) {
-        const commission = await this._load_commission(user, commission_id)
+        const commission = await this.load_commission(user, commission_id)
 
         this._exhaust_revisions(commission)
 
@@ -266,7 +277,7 @@ export class CommissionProcess {
     }
 
     static async confirm_products(user, commission_id: string) {
-        const commission = await this._load_commission(user, commission_id)
+        const commission = await this.load_commission(user, commission_id)
 
         this._exhaust_revisions(commission)
 
@@ -278,7 +289,7 @@ export class CommissionProcess {
     }
 
     static async complete(user, commission_id: string) {
-        const commission = await this._load_commission(user, commission_id)
+        const commission = await this.load_commission(user, commission_id)
 
         const stage = commission.stage
         if (stage.type !== 'complete') {
@@ -319,11 +330,11 @@ export class CommissionProcess {
 
         await commission.save()
 
-        return await this._load_commission(user, commission_id)
+        return await this.load_commission(user, commission_id)
     }
 
     static async revoke_complete(user, commission_id: string) {
-        const commission = await this._load_commission(user, commission_id)
+        const commission = await this.load_commission(user, commission_id)
         
         if (!commission.finished) {
             const stage = commission.stage
@@ -348,12 +359,12 @@ export class CommissionProcess {
 
             await stage.save()
 
-            return await this._load_commission(user, commission_id)
+            return await this.load_commission(user, commission_id)
         }
     }
 
     static async cancel(user, commission_id: string) {
-        const commission = await this._load_commission(user, commission_id)
+        const commission = await this.load_commission(user, commission_id)
 
         if (!commission.payments.length) {
             let r = await this._add_phase(user, commission, 'cancel', {
@@ -369,7 +380,7 @@ export class CommissionProcess {
     }
 
     static async confirm_revision(user, commission_id: string) {
-        const commission = await this._load_commission(user, commission_id)
+        const commission = await this.load_commission(user, commission_id)
 
         const stage = commission.stage
         if (stage.type !== 'revision') {
@@ -399,13 +410,13 @@ export class CommissionProcess {
         if (participants.every(v => stage_data.confirmed.includes(v))) {
             await this._next_phase(user, commission)
         }
-        return await this._load_commission(user, commission_id)
+        return await this.load_commission(user, commission_id)
     }
 
     static async can_request_revision(user, commission_id: any) {
         let commission
         if (typeof commission_id === 'string') {
-            commission = await this._load_commission(user, commission_id)
+            commission = await this.load_commission(user, commission_id)
         } else {
             commission = commission_id
         }
@@ -426,7 +437,7 @@ export class CommissionProcess {
     }
 
     static async request_revision(user, commission_id: string) {
-        const commission = await this._load_commission(user, commission_id)
+        const commission = await this.load_commission(user, commission_id)
         let err = false
 
         if (await this.can_request_revision(user, commission)) {
@@ -454,7 +465,7 @@ export class CommissionProcess {
             throw Error("no revision is allowed")
         }
 
-        return await this._load_commission(user, commission_id) 
+        return await this.load_commission(user, commission_id) 
     }
 }
 
@@ -683,7 +694,7 @@ export const remove_commission_asset = async (user, commission_id: string, asset
 
 export const pay_commission = async (user, commission_id, payment_phase_id) => {
 
-    let c = await CommissionProcess._load_commission(user, commission_id, "client")
+    let c = await CommissionProcess.load_commission(user, commission_id, "client")
     if (c) {
         user_among(user, c.from_user)
         let p = await CommissionPhase.findById(payment_phase_id)
@@ -709,12 +720,14 @@ export const suggest_commission_price = async (user, commission_id, new_price: n
     user_among(user, [c.to_user, c.from_user])
     if (c) {
         const valid_price = decimal128ToFloat(c.suggested_price) !== new_price && typeof new_price === 'number' && new_price >= 0
-        const valid_user = [c.to_user._id.toString(), c.from_user._id.toString()].includes(user._id.toString())
+        const valid_user = [c.to_user.toString(), c.from_user.toString()].includes(user._id.toString())
         if (valid_price && valid_user) {
             c.suggested_price = new_price
             c.suggested_price_user = user
             await c.save()
-            return true
+            return CommissionProcess.load_commission(user, commission_id)
+        } else {
+            throw Error("invalid price or permission error")
         }
     } else {
         throw Error("No commission found")
@@ -723,17 +736,16 @@ export const suggest_commission_price = async (user, commission_id, new_price: n
 }
 
 export const accept_commission_price = async (user, commission_id) => {
-    let c = await Commission.findById(commission_id)
-    user_among(user, c.suggested_price_user)
+    let c = await CommissionProcess.load_commission(user, commission_id)
+    user_among(user, [c.to_user, c.from_user])
     if (c) {
         c.rate = { ...c.rate, price: c.suggested_price }
+        CommissionProcess._next_phase(user, c)
         await c.save()
-        return true
+        return CommissionProcess.load_commission(user, commission_id)
     } else {
         throw Error("No commission found")
     }
-    return false
-
 }
 
 const schedule_expire_deadline = (commission_id: string, created: Date, deadline: number) => {
@@ -765,6 +777,21 @@ export const create_commission = async (from_user, data: any) => {
 
     const c = new Commission(data)
 
+    const custom_price = c.rate.price === null
+
+    if (!c.commission_process || !c.commission_process.length) {
+        let cp = await User.findById(c.to_user).select(
+            'commission_process'
+        )
+        if (cp) {
+            c.commission_process = cp.commission_process
+        }
+    }
+
+    if (custom_price) {
+        c.commission_process = [{ type: CommissionPhaseT.negotiate, done: false }, ...c.commission_process]
+    }
+    
     await c.save()
 
     schedule_expire_deadline(c._id, c.created, from_user.request_expire_deadline)

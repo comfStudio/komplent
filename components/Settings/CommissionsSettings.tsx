@@ -268,6 +268,8 @@ export const CommissionProcess = (props: CommissionProcessProps) => {
 
     const get_name = (v: CommissionPhaseType) => {
         switch (v) {
+            case 'negotiate':
+                return t`A price is negotiated`
             case 'pending_approval':
                 return t`Commission is approved`
             case 'pending_sketch':

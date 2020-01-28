@@ -40,15 +40,15 @@ const PriceSuggestionForm = (props: Props) => {
         <Form model={model} formValue={form_value} onChange={value => set_form_value(value)} ref={ref => set_form_ref(ref)}>
             {price_is_null(props.price) && <h4>{t`A price for this request needs to be set`}</h4>}
             {!price_is_null(props.price) && <h4>{t`${name} has suggested a price`}</h4>}
-            {!price_is_null(props.price) &&
             <FormGroup>
+            {!price_is_null(props.price) &&
                 <h5>{t`Suggested price`}: <span className="text-primary">{decimal128ToMoneyToString(props.price)}</span></h5>
-            </FormGroup>
             }
             {props.waiting && <Message type="info" description={t`Waiting for price confirmation`}/>}
             {!props.waiting &&
             <>
-                <FormGroup>
+                {!price_is_null(props.price) && <Button className="my-2" loading={accept_loading} onClick={(ev) => {ev.preventDefault(); set_accept_loading(true); if (props.onAcceptPrice) props.onAcceptPrice()}} appearance="primary" type="button">{t`Accept suggested price`}</Button>}
+                <FormGroup className="mt-4">
                     <ControlLabel>{t`Suggest a new price`}</ControlLabel>
                     <FormControl
                         name="new_price"
@@ -57,7 +57,6 @@ const PriceSuggestionForm = (props: Props) => {
                         type="number"
                     />
                 </FormGroup>
-                {!price_is_null(props.price) && <Button loading={accept_loading} onClick={(ev) => {ev.preventDefault(); set_accept_loading(true); if (props.onAcceptPrice) props.onAcceptPrice()}} appearance="primary" type="button" className="mr-2">{t`Accept suggested price`}</Button>}
                 <Button loading={suggest_loading} type="submit" onClick={(ev) => {
                     ev.preventDefault()
                     if (form_ref && form_ref.check()) {
@@ -69,8 +68,9 @@ const PriceSuggestionForm = (props: Props) => {
                             props.onSuggestPrice(form_value.new_price)
                         }
                     }
-                    }}>{t`Suggest price`}</Button>
+                    }}>{t`Suggest new price`}</Button>
             </>}
+            </FormGroup>
         </Form>
     );
 };

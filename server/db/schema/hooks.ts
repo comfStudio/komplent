@@ -76,14 +76,6 @@ user_schema.post('save', async function() {
 
 commission_schema.pre('save', async function() {
     this.wasNew = this.isNew
-    if (!this.commission_process || !this.commission_process.length) {
-        let cp = await User.findOne({ _id: this.to_user }).select(
-            'commission_process'
-        )
-        if (cp) {
-            this.commission_process = cp.commission_process
-        }
-    }
     if (this.rate && !this.commission_deadline) {
         this.commission_deadline = this.rate.commission_deadline
     }

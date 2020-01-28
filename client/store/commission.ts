@@ -201,8 +201,18 @@ export const useCommissionStore = createStore(
             }
         },
 
-        async refresh() {
-            let rc = await this.load(this.state.commission._id)
+        async refresh(req = undefined) {
+            let rc
+            if (req) {
+                rc = (await req.json())
+                if (req.status === OK) {
+                    rc = rc.data
+                } else {
+                    throw Error(rc.error)
+                }
+            } else {
+                rc = await this.load(this.state.commission._id)
+            }
             if (rc) {
                 this.setState({ commission: rc, stages: rc.commission_process })
             }
@@ -215,10 +225,7 @@ export const useCommissionStore = createStore(
                 body: { commission_id: this.state.commission._id, accept: true },
             })
 
-            if (r.status === OK) {
-                r = await this.next_phase()
-                r = await this.refresh()
-            }
+            this.refresh(r)
             return r
         },
 
@@ -227,9 +234,8 @@ export const useCommissionStore = createStore(
                 method: 'post',
                 body: { commission_id: this.state.commission._id, accept: false, new_price },
             })
-            if (r.status === OK) {
-                r = await this.refresh()
-            }
+            
+            this.refresh(r)
             return r
         },
 
@@ -437,17 +443,20 @@ export const useCommissionStore = createStore(
             let cols = {}
             commission_phases.forEach(v => {
                 switch (v) {
-                    case 'pending_approval':
+                    case 'negotiate':
                         cols[v] = 1
                         break
+                    case 'pending_approval':
+                        cols[v] = 2
+                        break
                     case 'unlock':
-                        cols[v] = 3
+                        cols[v] = 5
                         break
                     case 'complete':
-                        cols[v] = 4
+                        cols[v] = 6
                         break
                     default:
-                        cols[v] = 2
+                        cols[v] = 3
                 }
             })
             return cols

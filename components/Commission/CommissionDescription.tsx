@@ -45,6 +45,7 @@ const CommissionDescription = memo(function CommissionDescription() {
         set_is_owner(user._id === commission.from_user._id)
     }, [commission])
 
+
     return (
         <Grid fluid>
             <Row>
@@ -66,7 +67,7 @@ const CommissionDescription = memo(function CommissionDescription() {
                         <PriceSuggestionForm
                             onAcceptPrice={() => store.accept_suggested_price()}
                             onSuggestPrice={v => store.suggest_price(v)}
-                            waiting={commission.suggested_price_user === current_user_id}
+                            waiting={commission?.suggested_price_user === undefined && is_owner ? true : commission.suggested_price_user === current_user_id}
                             user={commission.suggested_price_user === commission.to_user._id ? commission.to_user : commission.from_user}
                             price={commission.suggested_price}/>
                         </>}

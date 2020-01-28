@@ -511,11 +511,12 @@ const Negotiating = memo(function Negotiating(props: ProcessProps) {
     const current_user_id = props.is_owner ? commission.from_user._id : commission.to_user._id
 
     const done = props?.data?.done ?? false
+    const price = price_is_null(commission.rate.price) ? t`None` : decimal128ToMoneyToString(commission.rate.price)
 
     return (
         <CommissionStepItem {...props}>
             <StepTitle onClick={props.onClick} date={props.done_date}>
-            {props.hidden || done ? t`Negotiated price` : t`Negotiating price`}
+            {props.hidden || done ? t`Negotiated price: ${price}` : t`Negotiating price`}
             </StepTitle>
             <StepPanel className="clearfix">
                 {!done && (
