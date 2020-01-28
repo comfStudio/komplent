@@ -90,7 +90,7 @@ export const CommissionStatus = () => {
     const user = store.state.current_user
     const [email_verified, set_email_verified] = useState(true)
 
-    const value = user.commissions_open ? 'open' : 'closed'
+    const value = user?.commissions_open ? 'open' : 'closed'
 
 
     return (
