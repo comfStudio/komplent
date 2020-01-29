@@ -334,6 +334,10 @@ export const useCommissionStore = createStore(
             return await this.fetch_process("decline", { commission_id: this.state.commission._id })
         },
 
+        async revision_info() {
+            return await this.fetch_process("revision_info", { commission_id: this.state.commission._id })
+        },
+
         async load_products(commission_id: string) {
 
             const comm_select = 'products'

@@ -413,7 +413,11 @@ export class CommissionProcess {
         return await this.load_commission(user, commission_id)
     }
 
-    static async can_request_revision(user, commission_id: any) {
+    static async revision_info(user, commission_id: any) {
+        let revision = {
+            can_request: false,
+            count: 0,
+        }
         let commission
         if (typeof commission_id === 'string') {
             commission = await this.load_commission(user, commission_id)
@@ -421,26 +425,29 @@ export class CommissionProcess {
             commission = commission_id
         }
         
-        
         if (commission.stage.type === 'pending_sketch' || commission.stage.type === 'pending_product') {
             const next_stages = this._get_next_stages(commission)
-            if (next_stages.length && next_stages[0].type === "revision" && next_stages[0].data.count) {
-                return true
+            if (next_stages.length && next_stages[0].type === "revision") {
+                revision.count = next_stages[0].data.count
+                if (next_stages[0].data.count) {
+                    revision.can_request = true
+                }
             }
         } else if (commission.stage.type === 'revision') {
+            revision.count = commission.stage.data.count
             if (commission.stage.data.count) {
-                return true
+                revision.can_request = true
             }
         }
 
-        return false
+        return revision
     }
 
     static async request_revision(user, commission_id: string) {
         const commission = await this.load_commission(user, commission_id)
         let err = false
 
-        if (await this.can_request_revision(user, commission)) {
+        if ((await this.revision_info(user, commission)).can_request) {
             const next_stages = this._get_next_stages(commission)
             const rev = next_stages[0]
             if (commission.stage.type !== "revision"){
