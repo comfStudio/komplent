@@ -10,6 +10,7 @@ import {
 } from '@server/middleware'
 import { create_conversation } from '@services/message'
 import { create_commission } from '@services/commission'
+import { update_user } from '@services/user'
 
 const cors = microCors({ allowMethods: ['PUT', 'POST', 'OPTIONS'] })
 
@@ -70,7 +71,11 @@ export default with_auth_middleware(
 
                 if (doc) {
                     if (code !== CREATED) {
-                        doc.set(data)
+                        if (model === 'User') {
+                            doc = await update_user(req.user, data, { save: false, document: doc })
+                        } else {
+                            doc.set(data)
+                        }
                     }
 
                     if (validate) {

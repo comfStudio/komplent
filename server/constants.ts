@@ -205,3 +205,9 @@ export enum MsgPageType {
     OAuthAlreadyLinked,
     CloseWindow,
 }
+
+
+
+export type UseFlag = Partial<{
+    has_setup_commission: boolean
+}>

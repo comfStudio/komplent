@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Grid, RadioGroup, Radio, SelectPicker, Button, Icon, List, CheckboxGroup, Toggle, InputGroup, Input, Modal, Checkbox, Whisper, Popover, IconButton, HelpBlock } from 'rsuite'
+import { useRouter } from 'next/router'
 import { useMount } from 'react-use'
 
 import { EditGroup, EditSection } from '.'
@@ -14,19 +15,31 @@ import { fetch } from '@utility/request'
 import { oauth_window } from '@client/misc'
 import { UploadType } from '@server/constants'
 import { useUser } from '@hooks/user'
+import * as pages from '@utility/pages'
 
 export const UserType = () => {
+    const router = useRouter()
+    const store = useUserStore()
+    const [creator_loading, set_creator_loading] = useState(false) 
+    const [consumer_loading, set_consumer_loading] = useState(false)
+
     return (
-        <EditGroup>
-            <span className="mr-2">{t`Type of user`}: </span>
-            <RadioGroup
-                name="user_type"
-                inline
-                appearance="picker"
-                defaultValue="consumer">
-                <Radio value="consumer">{t`Consumer`}</Radio>
-                <Radio value="creator">{t`Creator`}</Radio>
-            </RadioGroup>
+        <EditGroup title={t`Creator mode` + ':'}>
+            <span className="ml-2">
+                {store.state.current_user.type === 'consumer' && <Button onClick={ev => {
+                    ev.preventDefault()
+                    set_creator_loading(true)
+                    store.update_user({type: "creator"}).then(() => {
+                        set_creator_loading(false)
+                        router.push(pages.make_profile_urlpath(store.state.current_user))
+                    })
+                }} loading={creator_loading} appearance="primary">{t`Setup your page`}</Button>}
+                {store.state.current_user.type === 'creator' && <Button onClick={ev => {
+                    ev.preventDefault()
+                    set_consumer_loading(true)
+                    store.update_user({type: "consumer"}).then(() => set_consumer_loading(false))
+                }} loading={consumer_loading} appearance="ghost">{t`Disable your page`}</Button>}
+            </span>
         </EditGroup>
     )
 }

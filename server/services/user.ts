@@ -11,7 +11,7 @@ import {
     STATES,
     TASK,
 } from '@server/constants'
-import { generate_random_id } from '@utility/misc'
+import { generate_random_id, user_among } from '@utility/misc'
 import fairy from '@server/fairy'
 import { schedule_unique, schedule_unique_now } from '@server/tasks'
 import { jwt_sign } from '@server/misc'
@@ -33,6 +33,23 @@ export async function connect(MONGODB_URL) {
 export const create_user = async (data: IUser, { save = true, randomize_username = false, unverify_email = true } = {}) => {
     let u = new User()
     return await update_user_creds(u, data, {save, randomize_username, unverify_email})
+}
+
+export const update_user = async (user, data: any, { save = true, document = undefined }) => {
+    let obj = document ?? User.findById(data._id)
+    user_among(user._id, obj._id)
+
+    if (data.type && !["creator", "consumer"].includes(data.type)) {
+        throw Error("Invalid user type")
+    }
+
+    obj.set(data)
+
+    if (save) {
+        await obj.save()
+    }
+
+    return obj
 }
 
 export const update_user_creds = async (user, data: IUser, { save = true, randomize_username = false, require_old_password = false, unverify_email = true } = {}) => {

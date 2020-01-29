@@ -301,7 +301,7 @@ export const user_store_schema = new Schema({
         select: false,
         unique: true,
     },
-    has_selected_usertype: Boolean,
+    useflag: Mixed,
 })
 
 configure(user_store_schema)

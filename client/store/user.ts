@@ -7,7 +7,7 @@ import { createStore, bootstrapStoreDev } from '@client/store'
 import * as pages from '@utility/pages'
 import { fetch } from '@utility/request'
 import { is_server } from '@utility/misc'
-import { COOKIE_AUTH_TOKEN_KEY, AnalyticsType } from '@server/constants'
+import { COOKIE_AUTH_TOKEN_KEY, AnalyticsType, UseFlag } from '@server/constants'
 import { get_jwt_data, get_jwt_user } from '@server/middleware'
 import { update_db } from '@app/client/db'
 import user_schema, { user_store_schema } from '@schema/user'
@@ -36,7 +36,9 @@ export const useUserStore = createStore(
         current_user: undefined as any,
         is_creator: false,
         logged_in: undefined as boolean,
-        has_selected_usertype: true,
+        useflag: {
+            has_setup_commission: false
+        } as UseFlag,
         active_commissions_count: 0,
         active_requests_count: 0,
     },
@@ -238,10 +240,12 @@ export const useUserStore = createStore(
             }
             return r
         },
+        async toggle_useflag(flags: UseFlag) {
+            return await this.update_user({useflag: {...this.state.current_user.useflag, ...flags}})
+        },
         async save(state?: object) {
             let s = {
                 _id: this.state._id,
-                has_selected_usertype: this.state.has_selected_usertype,
                 user: this.state.current_user._id,
                 ...state,
             }
