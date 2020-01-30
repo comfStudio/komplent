@@ -15,7 +15,7 @@ import { capitalizeFirstLetter, decimal128ToMoneyToString, price_is_null } from 
 import { useUser } from '@hooks/user'
 import { ButtonToolbar, Button, Grid, Row, Col, Icon, Modal } from 'rsuite'
 import * as pages from '@utility/pages'
-import { CommissionPhaseType } from '@server/constants'
+import { CommissionPhaseType, RevisionInfo } from '@server/constants'
 import { CommissionProcessType } from '@schema/user'
 import NoSSR from '@components/App/NoSSR'
 import PriceSuggestionForm from '@components/Form/PriceSuggestionForm'
@@ -173,17 +173,17 @@ const PendingPayment = memo(function PendingPayment(props: ProcessProps) {
 const RevisionButton = memo(function RevisionButton() {
     const store = useCommissionStore()
     const [revision_loading, set_revisions_loading] = useState(false)
+    const [revision_info, set_revision_info] = useState(null as RevisionInfo)
 
-    let revisions_count = 0
-    let d_stages = store.get_next_stages()
-    while (d_stages[0].type === 'revision') {
-        let v = d_stages.shift()
-        revisions_count += v.count ?? 0
-    }
+    useEffect(() => {
+        store.revision_info().then(r => {
+            set_revision_info(r)
+        })
+    }, [store.state.commission])
 
     return (
         <>
-            {!!revisions_count && (
+            {!!revis && (
                 <Button
                     loading={revision_loading}
                     appearance="primary"
