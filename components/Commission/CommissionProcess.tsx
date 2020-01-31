@@ -15,7 +15,7 @@ import { capitalizeFirstLetter, decimal128ToMoneyToString, price_is_null } from 
 import { useUser } from '@hooks/user'
 import { ButtonToolbar, Button, Grid, Row, Col, Icon, Modal } from 'rsuite'
 import * as pages from '@utility/pages'
-import { CommissionPhaseType } from '@server/constants'
+import { CommissionPhaseType, RevisionInfo } from '@server/constants'
 import { CommissionProcessType } from '@schema/user'
 import NoSSR from '@components/App/NoSSR'
 import PriceSuggestionForm from '@components/Form/PriceSuggestionForm'
@@ -172,18 +172,22 @@ const PendingPayment = memo(function PendingPayment(props: ProcessProps) {
 
 const RevisionButton = memo(function RevisionButton() {
     const store = useCommissionStore()
-    const [revision_loading, set_revisions_loading] = useState(false)
+    let commission = store.get_commission()
+    const to_name = commission ? commission.to_user.username : ''
 
-    let revisions_count = 0
-    let d_stages = store.get_next_stages()
-    while (d_stages[0].type === 'revision') {
-        let v = d_stages.shift()
-        revisions_count += v.count ?? 0
-    }
+    const [revision_loading, set_revisions_loading] = useState(false)
+    const [revision_info, set_revision_info] = useState(null as RevisionInfo)
+    const revisions_count = revision_info?.count ?? 0
+
+    useEffect(() => {
+        store.revision_info().then(r => {
+            set_revision_info(r)
+        })
+    }, [store.state.commission])
 
     return (
         <>
-            {!!revisions_count && (
+            {revision_info.is_available && (
                 <Button
                     loading={revision_loading}
                     appearance="primary"
@@ -191,17 +195,22 @@ const RevisionButton = memo(function RevisionButton() {
                         ev.preventDefault()
                         set_revisions_loading(true)
                         store
-                            .add_revision_phase()
+                            .request_revision()
                             .then(() => set_revisions_loading(false))
                     }}>
                     {t`Request changes`}
-                    {` (${revisions_count})`}
+                    {` (${revisions_count} left)`}
                 </Button>
             )}
-            {!!!revisions_count && (
+            {revision_info.is_available && !revision_info.count && (
                 <Button
                     disabled={true}
-                    appearance="primary">{t`No changes are allowed`}</Button>
+                    appearance="primary">{t`No more revisions allowed`}</Button>
+            )}
+            {!revision_info.is_available && (
+                <Button
+                    disabled={true}
+                    appearance="primary">{t`${to_name} does not allow revisions`}</Button>
             )}
         </>
     )

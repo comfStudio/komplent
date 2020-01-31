@@ -6,7 +6,7 @@ import { decimal128ToFloat, user_among } from "@utility/misc"
 import { upload_file } from '@services/aws'
 import log from '@utility/log'
 import { schedule_unique, remove_unique_task, schedule_unique_now } from '@server/tasks'
-import { TASK, CommissionPhaseT, CommissionPhaseType } from '@server/constants'
+import { TASK, CommissionPhaseT, CommissionPhaseType, RevisionInfo } from '@server/constants'
 import fairy from '@server/fairy'
 import { addDays } from 'date-fns'
 import { CommissionProcessType } from '@schema/user'
@@ -414,8 +414,9 @@ export class CommissionProcess {
     }
 
     static async revision_info(user, commission_id: any) {
-        let revision = {
+        let revision: RevisionInfo = {
             can_request: false,
+            is_available: false,
             count: 0,
         }
         let commission
@@ -429,12 +430,14 @@ export class CommissionProcess {
             const next_stages = this._get_next_stages(commission)
             if (next_stages.length && next_stages[0].type === "revision") {
                 revision.count = next_stages[0].data.count
+                revision.is_available = true
                 if (next_stages[0].data.count) {
                     revision.can_request = true
                 }
             }
         } else if (commission.stage.type === 'revision') {
             revision.count = commission.stage.data.count
+            revision.is_available = true
             if (commission.stage.data.count) {
                 revision.can_request = true
             }

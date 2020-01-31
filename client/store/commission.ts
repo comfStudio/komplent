@@ -307,13 +307,6 @@ export const useCommissionStore = createStore(
             return await this.fetch_process("skip_drafts", { commission_id: this.state.commission._id })
         },
 
-        async add_revision_phase(visible = true) {
-            let r = await this.add_phase('revision', {
-                data: { confirmed: [], visible },
-            })
-            return r
-        },
-
         async confirm_revision(new_revision = false) {
             return await this.fetch_process("confirm_revision", { commission_id: this.state.commission._id })
         },
@@ -336,6 +329,10 @@ export const useCommissionStore = createStore(
 
         async revision_info() {
             return await this.fetch_process("revision_info", { commission_id: this.state.commission._id })
+        },
+
+        async request_revision() {
+            return await this.fetch_process("request_revision", { commission_id: this.state.commission._id })
         },
 
         async load_products(commission_id: string) {

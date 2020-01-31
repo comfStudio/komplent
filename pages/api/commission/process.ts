@@ -15,7 +15,8 @@ const cors = microCors({ allowMethods: ['PUT', 'POST', 'OPTIONS'] })
 export default with_auth_middleware(
     async (req: ExApiRequest, res: ExApiResponse) => {
         try {
-            const { 
+            const {
+                request_revision,
                 revision_info,
                 confirm_revision,
                 cancel,
@@ -52,6 +53,8 @@ export default with_auth_middleware(
                 r = await CommissionProcess.confirm_revision(req.user, data?.commission_id)
             } else if (revision_info) {
                 r = await CommissionProcess.revision_info(req.user, data?.commission_id)
+            } else if (request_revision) {
+                r = await CommissionProcess.request_revision(req.user, data?.commission_id)
             }
 
             res.status(OK).json(data_message(r))

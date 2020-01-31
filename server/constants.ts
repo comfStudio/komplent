@@ -206,7 +206,11 @@ export enum MsgPageType {
     CloseWindow,
 }
 
-
+export interface RevisionInfo {
+    can_request: boolean,
+    count: number,
+    is_available: boolean
+}
 
 export type UseFlag = Partial<{
     has_setup_commission: boolean
