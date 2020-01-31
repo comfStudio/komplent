@@ -172,8 +172,12 @@ const PendingPayment = memo(function PendingPayment(props: ProcessProps) {
 
 const RevisionButton = memo(function RevisionButton() {
     const store = useCommissionStore()
+    let commission = store.get_commission()
+    const to_name = commission ? commission.to_user.username : ''
+
     const [revision_loading, set_revisions_loading] = useState(false)
     const [revision_info, set_revision_info] = useState(null as RevisionInfo)
+    const revisions_count = revision_info?.count ?? 0
 
     useEffect(() => {
         store.revision_info().then(r => {
@@ -183,7 +187,7 @@ const RevisionButton = memo(function RevisionButton() {
 
     return (
         <>
-            {!!revis && (
+            {revision_info.is_available && (
                 <Button
                     loading={revision_loading}
                     appearance="primary"
@@ -191,17 +195,22 @@ const RevisionButton = memo(function RevisionButton() {
                         ev.preventDefault()
                         set_revisions_loading(true)
                         store
-                            .add_revision_phase()
+                            .request_revision()
                             .then(() => set_revisions_loading(false))
                     }}>
                     {t`Request changes`}
-                    {` (${revisions_count})`}
+                    {` (${revisions_count} left)`}
                 </Button>
             )}
-            {!!!revisions_count && (
+            {revision_info.is_available && !revision_info.count && (
                 <Button
                     disabled={true}
-                    appearance="primary">{t`No changes are allowed`}</Button>
+                    appearance="primary">{t`No more revisions allowed`}</Button>
+            )}
+            {!revision_info.is_available && (
+                <Button
+                    disabled={true}
+                    appearance="primary">{t`${to_name} does not allow revisions`}</Button>
             )}
         </>
     )
