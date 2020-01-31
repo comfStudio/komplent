@@ -1,3 +1,4 @@
+import { useLayoutEffect as oUseLayoutEffect, useEffect } from 'react'
 import crypto from 'crypto'
 import update from 'immutability-helper'
 import { Decimal128 } from 'bson'
@@ -185,3 +186,5 @@ export const get_image_url = (image_data, size: undefined | 'icon' | 'thumb' | '
         }
     }
 }
+
+export const useLayoutEffect = typeof window !== 'undefined' ? oUseLayoutEffect : useEffect
