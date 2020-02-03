@@ -12,6 +12,7 @@ import UserCard from '@components/User/UserCard'
 import { get_commission_title } from '@utility/misc'
 
 import './Commission.scss'
+import { CommissionStatusTag } from '.'
 
 interface MenuProps {
     activeKey?: string
@@ -93,11 +94,11 @@ export const CommissionLayout = memo(function CommissionLayout(props: Props) {
             header={
                 <div className="commission-header">
                     <UserCard noMessageButton commissionCountData={store.state.commission_count} data={user._id === commission.to_user._id ? commission.from_user : commission.to_user} bordered={false} small horizontal >
-                        <span className="flex">
-                            <h3 className="m-0 p-0 leading-none flex-grow-1">{get_commission_title(commission, user)}</h3>
+                        <span className="flex leading-relaxed">
+                            <h3 className="m-0 p-0 !leading-snug flex-grow">{get_commission_title(commission, user)}</h3>
                             <span>
                                 {t`Current status`}:
-                                <Tag color={"blue"}>{t`Queued`}</Tag>
+                                <CommissionStatusTag data={commission} className="ml-1"/>
                             </span>
                         </span>
                     </UserCard>

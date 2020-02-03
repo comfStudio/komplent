@@ -1,5 +1,6 @@
 import React from 'react'
 import Panel, { PanelProps } from 'rsuite/lib/Panel'
+import { TagProps } from 'rsuite/lib/Tag'
 import { List, Grid, Row, Col, Divider, Tag, ButtonToolbar, ButtonGroup, Button, PanelGroup } from 'rsuite'
 import Link from 'next/link'
 
@@ -15,6 +16,28 @@ import { formatDistanceToNow } from 'date-fns'
 
 export interface CommissionItemPanelProps extends PanelProps {
     data: any
+}
+
+export const CommissionStatusTag = ({data, ...props}: {data: any} & TagProps) => {
+    const user = useUser()
+    const is_owner = user?._id === data.from_user?._id
+
+    return (
+        <>
+        {!data.finished && !data.accepted && (
+            <Tag color="violet" {...props}>{is_owner ? t`Waiting for approval` : t`Queued`}</Tag>
+        )}
+        {!data.finished && data.accepted && (
+            <Tag color="blue" {...props}>{t`Active`}</Tag>
+        )}
+        {data.finished && data.completed && (
+            <Tag color="green" {...props}>{t`Completed`}</Tag>
+        )}
+        {data.finished && !data.completed && (
+            <Tag color="red" {...props}>{t`Unsuccessful`}</Tag>
+        )}
+        </>
+    )
 }
 
 export const CommissionItemPanel = (props: CommissionItemPanelProps) => {
@@ -50,18 +73,7 @@ export const CommissionItemPanel = (props: CommissionItemPanelProps) => {
                         <span className="flex-1 text-center muted">
                         </span>
                         <span>
-                            {!props.data.finished && !props.data.accepted && (
-                                <Tag color="violet">{t`Queued`}</Tag>
-                            )}
-                            {!props.data.finished && props.data.accepted && (
-                                <Tag color="blue">{t`Active`}</Tag>
-                            )}
-                            {props.data.finished && props.data.completed && (
-                                <Tag color="green">{t`Completed`}</Tag>
-                            )}
-                            {props.data.finished && !props.data.completed && (
-                                <Tag color="red">{t`Unsuccessful`}</Tag>
-                            )}
+                            <CommissionStatusTag data={props.data}/>
                             {props.data.finished &&
                                 !props.data.completed &&
                                 props.data.expire_date && (

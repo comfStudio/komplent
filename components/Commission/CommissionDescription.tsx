@@ -73,8 +73,12 @@ const CommissionDescription = memo(function CommissionDescription() {
                         </>}
                         {is_owner === false && (
                             <div>
+                                {(!commission.accepted && !commission.finished) &&
+                                <>
                                 <hr />
                                 <Message type="info" description={t`The commission process cannot be changed once the commission has been accepted. Make sure to review the process in Options.`} />
+                                </>
+                                }
                                 <hr />
                                 {!commission.accepted && !commission.finished && (
                                     <>

@@ -16,6 +16,7 @@ export default with_auth_middleware(
     async (req: ExApiRequest, res: ExApiResponse) => {
         try {
             const {
+                skip_revision,
                 request_revision,
                 revision_info,
                 confirm_revision,
@@ -55,6 +56,8 @@ export default with_auth_middleware(
                 r = await CommissionProcess.revision_info(req.user, data?.commission_id)
             } else if (request_revision) {
                 r = await CommissionProcess.request_revision(req.user, data?.commission_id)
+            } else if (skip_revision) {
+                r = await CommissionProcess.skip_revision(req.user, data?.commission_id)
             }
 
             res.status(OK).json(data_message(r))

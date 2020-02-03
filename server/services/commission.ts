@@ -50,6 +50,7 @@ export class CommissionProcess {
                 user_among(user, commission.to_user)
             }
         }
+
         return commission
     }
 
@@ -139,12 +140,22 @@ export class CommissionProcess {
             return
         }
 
+        let phase_data = data
+
+        switch (type) {
+            case CommissionPhaseT.revision:
+                phase_data = {count: next_stages[0].count, ...phase_data}
+                break
+            default:
+                break
+        }
+
         const phase = new CommissionPhase({
             type,
             commission: commission._id,
             done,
             done_date: done ? new Date() : undefined,
-            data: data,
+            data: phase_data,
             user: user._id,
         })
         await phase.save()
@@ -176,7 +187,6 @@ export class CommissionProcess {
             const skippable: CommissionPhaseType[] = [
                 CommissionPhaseT.refund,
                 CommissionPhaseT.reopen,
-                CommissionPhaseT.revision,
                 CommissionPhaseT.cancel,
             ]
 
@@ -390,7 +400,7 @@ export class CommissionProcess {
             confirmed: [],
         }
         if (stage.data) {
-            stage_data = { ...stage.data }
+            stage_data = {...stage_data, ...stage.data}
         }
 
         stage_data.confirmed = [user._id, ...stage_data.confirmed].reduce(
@@ -407,7 +417,10 @@ export class CommissionProcess {
             commission.from_user._id,
             commission.to_user._id,
         ]
-        if (participants.every(v => stage_data.confirmed.includes(v))) {
+
+        const rev_info = await this.revision_info(user, commission)
+
+        if (!rev_info.can_request && participants.every(v => stage_data.confirmed.includes(v))) {
             await this._next_phase(user, commission)
         }
         return await this.load_commission(user, commission_id)
@@ -426,8 +439,8 @@ export class CommissionProcess {
             commission = commission_id
         }
         
+        const next_stages = this._get_next_stages(commission)
         if (commission.stage.type === 'pending_sketch' || commission.stage.type === 'pending_product') {
-            const next_stages = this._get_next_stages(commission)
             if (next_stages.length && next_stages[0].type === "revision") {
                 revision.count = next_stages[0].data.count
                 revision.is_available = true
@@ -436,15 +449,26 @@ export class CommissionProcess {
                 }
             }
         } else if (commission.stage.type === 'revision') {
-            revision.count = commission.stage.data.count
+            revision.count = commission.stage?.data?.count ?? 0
             revision.is_available = true
-            if (commission.stage.data.count) {
+            if (revision.count) {
                 revision.can_request = true
             }
         }
 
         return revision
     }
+
+    static async skip_revision(user, commission_id: string) {
+        const commission = await this.load_commission(user, commission_id)
+
+        await this._next_phase(user, commission)
+
+        await commission.save()
+
+        return commission
+    }
+
 
     static async request_revision(user, commission_id: string) {
         const commission = await this.load_commission(user, commission_id)
@@ -455,10 +479,12 @@ export class CommissionProcess {
             const rev = next_stages[0]
             if (commission.stage.type !== "revision"){
                 await this._add_phase(user, commission, 'revision', {
-                    data: { confirmed: [], count: rev.count },
+                    data: { confirmed: [], count: rev.count, is_requesting: true },
                 })
             } else if (commission.stage.type === "revision") {
                 if (commission.stage.data.count) {
+                    commission.stage.confirmed = []
+                    commission.stage.data.is_requesting = true
                     commission.stage.data.count--
                     commission.stage.markModified("data")
                     await commission.stage.save()

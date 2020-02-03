@@ -36,6 +36,7 @@ import { OK } from 'http-status-codes'
 import { license_schema } from '@schema/general'
 import { conversation_schema } from '@schema/message'
 import useUserStore from './user'
+import { useState, useEffect } from 'react'
 
 export const useCommissionStore = createStore(
     {
@@ -92,11 +93,12 @@ export const useCommissionStore = createStore(
             return u && u.length ? u[0] : null
         },
         get_commission() {
-            let c
+            let d =
+
             if (this.state.commission) {
-                c = {
-                    ...this.state.commission,
+                d = {
                     rate: {
+                        ...this.state.commission,
                         ...this.state.commission.rate,
                         price: {
                             $numberDecimal: this.state.commission.rate.price,
@@ -110,7 +112,14 @@ export const useCommissionStore = createStore(
                         : this.state.commission.extras,
                 }
             }
-            return c || {}
+
+            const [c, set_c] = useState(d || {})
+
+            useEffect(() => {
+                set_c(d)
+            }, [this.state.commission])
+
+            return c
         },
         async create_commission(data, ...params) {
             let d = { ...data }
@@ -182,7 +191,7 @@ export const useCommissionStore = createStore(
             return r
         },
 
-        async fetch_process(action, data: object) {
+        async fetch_process(action, data: object, update_state = true) {
             let b: any = {data}
             b[action] = true
 
@@ -194,7 +203,9 @@ export const useCommissionStore = createStore(
             let rc = (await r.json())
             if (r.status === OK) {
                 rc = rc.data
-                this.setState({ commission: rc, stages: rc.commission_process })
+                if (update_state) {
+                    this.setState({ commission: rc, stages: rc.commission_process })
+                }
                 return rc
             } else {
                 throw Error(rc.error)
@@ -328,7 +339,11 @@ export const useCommissionStore = createStore(
         },
 
         async revision_info() {
-            return await this.fetch_process("revision_info", { commission_id: this.state.commission._id })
+            return await this.fetch_process("revision_info", { commission_id: this.state.commission._id }, false)
+        },
+
+        async skip_revision() {
+            return await this.fetch_process("skip_revision", { commission_id: this.state.commission._id })
         },
 
         async request_revision() {

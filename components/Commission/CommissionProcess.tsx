@@ -183,11 +183,11 @@ const RevisionButton = memo(function RevisionButton() {
         store.revision_info().then(r => {
             set_revision_info(r)
         })
-    }, [store.state.commission])
+    }, [commission])
 
     return (
         <>
-            {revision_info.is_available && (
+            {revision_info?.is_available && (
                 <Button
                     loading={revision_loading}
                     appearance="primary"
@@ -202,12 +202,12 @@ const RevisionButton = memo(function RevisionButton() {
                     {` (${revisions_count} left)`}
                 </Button>
             )}
-            {revision_info.is_available && !revision_info.count && (
+            {revision_info?.is_available && !revision_info?.count && (
                 <Button
                     disabled={true}
                     appearance="primary">{t`No more revisions allowed`}</Button>
             )}
-            {!revision_info.is_available && (
+            {!revision_info?.is_available && (
                 <Button
                     disabled={true}
                     appearance="primary">{t`${to_name} does not allow revisions`}</Button>
@@ -314,21 +314,20 @@ const PendingDraft = memo(function PendingDraft(props: ProcessProps) {
 const Revision = memo(function Revision(props: ProcessProps) {
     const [accept_loading, set_accept_loading] = useState(false)
     const store = useCommissionStore()
-    let commission = store.get_commission()
+    const commission = store.get_commission()
     const name = commission ? commission.from_user.username : ''
     const done = props.data ? props.data.done : false
+    const is_requesting = props?.data?.data?.is_requesting
 
     let from_confirmed = false
     let to_confirmed = false
 
-    if (props.data?.data) {
-        from_confirmed = props.data.data.confirmed.includes(
-            commission.from_user._id
-        )
-        to_confirmed = props.data.data.confirmed.includes(
-            commission.to_user._id
-        )
-    }
+    from_confirmed = props?.data?.data?.confirmed?.includes(
+        commission.from_user._id
+    )
+    to_confirmed = props?.data?.data?.confirmed?.includes(
+        commission.to_user._id
+    )
 
     const show_panel = !props.hidden || props.active
 
@@ -339,26 +338,32 @@ const Revision = memo(function Revision(props: ProcessProps) {
             </StepTitle>
             {show_panel && (
                 <StepPanel>
-                    {done && <p>{t`Changed were requested.`}</p>}
-                    {!done && !props.is_owner && !to_confirmed && (
+                    {done && is_requesting && <p>{t`Changed were requested.`}</p>}
+                    {!done && !props.is_owner && is_requesting && !to_confirmed && (
                         <p>{t`@${name} is asking for changes.`}</p>
                     )}
                     {!done && !commission.finished && (
                         <>
-                            {!props.is_owner && !to_confirmed && (
+                            {props.is_owner && !is_requesting && (
+                                <p>{t`Do you want anything changed?`}</p>
+                            )}
+                            {!props.is_owner && !is_requesting && (
+                                <p>{t`Please wait for @${name}.`}</p>
+                            )}
+                            {!props.is_owner && is_requesting && !to_confirmed && (
                                 <p>{t`Please complete the requested changes and upload a new revision.`}</p>
                             )}
-                            {props.is_owner && !to_confirmed && (
+                            {props.is_owner && is_requesting && !to_confirmed && (
                                 <p>{t`Please wait for the requested changes to be completed.`}</p>
                             )}
-                            {!props.is_owner && to_confirmed && (
+                            {!props.is_owner && is_requesting && to_confirmed && (
                                 <p>{t`Please wait for @${name} to confirm the changes.`}</p>
                             )}
-                            {props.is_owner && to_confirmed && (
+                            {props.is_owner && is_requesting && to_confirmed && (
                                 <p>{t`Waiting for you to confirm the requested changes.`}</p>
                             )}
                             <ButtonToolbar>
-                                {!props.is_owner && !to_confirmed && (
+                                {!props.is_owner && is_requesting && !to_confirmed && (
                                     <Button
                                         loading={accept_loading}
                                         color="green"
@@ -372,7 +377,7 @@ const Revision = memo(function Revision(props: ProcessProps) {
                                                 )
                                         }}>{t`Done`}</Button>
                                 )}
-                                {props.is_owner && to_confirmed && (
+                                {props.is_owner && is_requesting && to_confirmed && (
                                     <Button
                                         loading={accept_loading}
                                         color="green"
@@ -385,6 +390,22 @@ const Revision = memo(function Revision(props: ProcessProps) {
                                                     set_accept_loading(false)
                                                 )
                                         }}>{t`Confirm`}</Button>
+                                )}
+                                {props.is_owner && !is_requesting && (
+                                    <RevisionButton/>
+                                )}
+                                {props.is_owner && (
+                                    <Button
+                                        loading={accept_loading}
+                                        onClick={ev => {
+                                            ev.preventDefault()
+                                            set_accept_loading(true)
+                                            store
+                                                .skip_revision()
+                                                .then(() =>
+                                                    set_accept_loading(false)
+                                                )
+                                        }}>{t`Skip`}</Button>
                                 )}
                             </ButtonToolbar>
                         </>
@@ -437,24 +458,23 @@ const PendingProduct = memo(function PendingProduct(props: ProcessProps) {
                             {!props.is_owner && !!count && (
                                 <p>{t`You have added ${count} asset(s).`}</p>
                             )}
-                            {!!count && (
-                                <ButtonToolbar>
-                                    <Button
-                                        loading={accept_loading}
-                                        color="green"
-                                        onClick={ev => {
-                                            ev.preventDefault()
-                                            set_accept_loading(true)
-                                            store
-                                                .confirm_products()
-                                                .then(() =>
-                                                    set_accept_loading(false)
-                                                )
-                                        }}>{t`Done`}</Button>
-                                    {props.is_owner && <RevisionButton />}
-                                </ButtonToolbar>
-                            )}
-                            {!!!count && (
+                            <ButtonToolbar>
+                                {!!count && (
+                                <Button
+                                    loading={accept_loading}
+                                    color="green"
+                                    onClick={ev => {
+                                        ev.preventDefault()
+                                        set_accept_loading(true)
+                                        store
+                                            .confirm_products()
+                                            .then(() =>
+                                                set_accept_loading(false)
+                                            )
+                                    }}>{t`Done`}</Button>
+                                    )}
+                            </ButtonToolbar>
+                            {!!!count && !props.is_owner && (
                                 <p>{t`Please upload the assets in the Assets tab.`}</p>
                             )}
                         </>

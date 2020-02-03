@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useLayoutEffect } from 'react'
 import useGlobalHook, { Store as HookStore } from '@znemz/use-global-hook'
-import { useMount } from 'react-use'
+import { useMount, useIsomorphicLayoutEffect } from 'react-use'
 import { createContainer, ContainerProviderProps } from 'unstated-next'
 import useMethods from 'use-methods'
 
@@ -115,7 +115,6 @@ export function createStore<S, A extends StoreActions<Partial<S>>>(
     on_init: Function = null
 ) {
     let inited = false
-    let old_initial_state = undefined
 
     const methods = draft => ({
         setState(next_state: Partial<S>) {
@@ -135,13 +134,12 @@ export function createStore<S, A extends StoreActions<Partial<S>>>(
             [state, { setState }] = useMethods(methods, i_state)
         }
 
-        if (initial_state) {
-            let initial_state_s = JSON.stringify(initial_state)
-            if (old_initial_state && old_initial_state !== initial_state_s) {
+        useIsomorphicLayoutEffect(() => {
+            if (initial_state) {
                 setState(i_state)
             }
-            old_initial_state = initial_state_s
-        }
+        }, [initial_state])
+
 
         return { state, setState }
     }
