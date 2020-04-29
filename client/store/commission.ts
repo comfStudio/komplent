@@ -1,6 +1,6 @@
 import bodybuilder from 'bodybuilder'
 
-import { createStore, bootstrapStoreDev } from '@client/store'
+import { createStore } from '@client/store'
 import { update_db } from '@app/client/db'
 import {
     comission_rate_schema,
@@ -93,7 +93,7 @@ export const useCommissionStore = createStore(
             return u && u.length ? u[0] : null
         },
         get_commission() {
-            let d =
+            let d = {}
 
             if (this.state.commission) {
                 d = {

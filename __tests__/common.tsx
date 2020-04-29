@@ -3,8 +3,12 @@ import cookies from 'nookies'
 import unfetch from 'isomorphic-unfetch'
 import { when, resetAllWhenMocks } from 'jest-when'
 
-import { StoreProvider } from '@pages/_app'
+import mongoose from 'mongoose';
+import { MongoMemoryReplSet } from 'mongodb-memory-server';
+
+import { StoreProvider, server_initialize } from '@pages/_app'
 import { COOKIE_AUTH_TOKEN_KEY } from '@server/constants'
+import { RequestMethod } from 'node-mocks-http'
 
 export const S = Cmp => {
     return props => (
@@ -173,4 +177,52 @@ export const resetAuth = () => {
     resetAllWhenMocks()
 }
 
-setupCookies()
+export function prepareJSONbody(method: RequestMethod, body: object, headers = {}, extra = {}) {
+    return {
+        method,
+        body,
+        headers: {'content-type':'application/json', ...headers},
+        ...extra
+      }
+}
+
+export function setupServices() {
+
+    jest.setTimeout(30000);
+
+    const replSet = new MongoMemoryReplSet({
+    replSet: { storageEngine: 'wiredTiger' },
+    });
+    return replSet.waitUntilRunning().then(async () => {
+        mongoose.Promise = Promise;
+
+        return await replSet.getUri().then(async (mongoUri) => {
+        const mongooseOpts = {
+            // options for mongoose 4.11.3 and above
+            autoReconnect: true,
+            reconnectTries: Number.MAX_VALUE,
+            reconnectInterval: 1000,
+        };
+    
+        mongoose.connection.on('error', (e) => {
+            if (e.message.code === 'ETIMEDOUT') {
+            console.log(e);
+            mongoose.connect(mongoUri, mongooseOpts);
+            }
+            console.log(e);
+        });
+    
+        mongoose.connection.once('open', () => {
+            console.log(`MongoDB successfully connected to ${mongoUri}`);
+        });
+    
+    
+        await mongoose.connect(mongoUri, mongooseOpts)
+    
+        await server_initialize()
+    
+        });
+
+    })
+
+}

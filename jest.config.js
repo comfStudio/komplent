@@ -45,16 +45,22 @@ let jest_config = {
 module.exports = {
     projects: [
         {
-            displayName: 'server',
-            testRegex: '/__tests__/.*\\.server.test.(ts|tsx|js)$',
+            displayName: 'general',
+            testRegex: '/__tests__/unit/.*\\.test.(ts|tsx|js)$',
             testEnvironment: 'node',
             ...jest_config,
         },
-        {
-            displayName: 'client',
-            testRegex: '/__tests__/.*\\.client.test.(ts|tsx|js)$',
-            testEnvironment: 'jsdom',
-            ...jest_config,
-        },
+        // {
+        //     displayName: 'server',
+        //     testRegex: '/__tests__/.*\\.server.test.(ts|tsx|js)$',
+        //     testEnvironment: 'node',
+        //     ...jest_config,
+        // },
+        // {
+        //     displayName: 'client',
+        //     testRegex: '/__tests__/.*\\.client.test.(ts|tsx|js)$',
+        //     testEnvironment: 'jsdom',
+        //     ...jest_config,
+        // },
     ],
 }

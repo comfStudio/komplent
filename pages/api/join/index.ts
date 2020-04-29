@@ -38,6 +38,7 @@ export default with_middleware(
                     )
                 }
             } catch (err) {
+                global.log.error(err)
                 res.status(BAD_REQUEST).json(error_message(err.message))
             }
         } else {

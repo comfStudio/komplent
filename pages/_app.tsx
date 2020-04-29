@@ -6,6 +6,7 @@ import Router from 'next/router'
 import localForage from 'localforage'
 import { Tina, TinaCMS } from 'tinacms'
 import { GitClient } from '@tinacms/git-client'
+import log from '@utility/log'
 
 import { Title } from '@components/App'
 import { is_server } from '@utility/misc'
@@ -47,32 +48,35 @@ import { configure_commission_fairy_handlers } from '@services/commission'
 // Router.onRouteChangeComplete = () => NProgress.done();
 // Router.onRouteChangeError = () => NProgress.done();
 
-const client_initialize = async () => {
+export const client_initialize = async () => {
     localForage.config({
         name: 'komplent',
         version: 1.0,
         storeName: 'komplent', // Should be alphanumeric, with underscores.
         description: 'komplent',
     })
+    log.info("Client initialized")
 }
 
-const server_initialize = async () => {
-    if (!global.initialized) {
+export const server_initialize = async ({mongodb_url, } = {mongodb_url: CONFIG.MONGODB_URL}) => {
+    if (!global.initialized || process.env.NODE_ENV === 'test') {
         global.store = {}
         global.initialized = true
         setup_scheduler(CONFIG.REDIS_URL)
         setup_aws()
         setup_email({})
-        await connect(CONFIG.MONGODB_URL)
+        configure_fairy()
+        configure_user_fairy_handlers()
+        configure_commission_fairy_handlers()
+        
+        await connect(mongodb_url)
         if (STATES.MONGODB_CONNECTED) {
             synchronize_indexes()
             await create_tag_defaults()
             await create_user_defaults()
             await setup_streams()
         }
-        configure_fairy()
-        configure_user_fairy_handlers()
-        configure_commission_fairy_handlers()
+        log.info("Server initialized")
     }
 }
 
@@ -129,7 +133,7 @@ class KomplentApp extends App {
     }
 }
 
-if (!process.env.BUILDING) {
+if (!process.env.BUILDING && process.env.NODE_ENV !== 'test') {
     if (is_server()) {
         server_initialize()
     } else {

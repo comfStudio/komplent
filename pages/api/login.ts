@@ -34,7 +34,7 @@ export default with_middleware(
                         res.status(OK).json(
                             Object.assign(message('Logged in'), {
                                 token,
-                                user: u,
+                                user: {...u, password: undefined},
                             })
                         )
                     } else {
@@ -48,6 +48,7 @@ export default with_middleware(
                     )
                 }
             } catch (err) {
+                global.log.error(err)
                 res.status(BAD_REQUEST).json(error_message(err.message))
             }
         } else {

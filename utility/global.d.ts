@@ -6,5 +6,6 @@ declare namespace NodeJS {
         user_room: any
         primus: any
         Primus: any
+        log: any
     }
 }
