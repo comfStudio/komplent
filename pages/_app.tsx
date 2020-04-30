@@ -38,6 +38,7 @@ import useEarningsStore from '@store/earnings'
 import CONFIG from '@server/config'
 import { synchronize_indexes } from '@services/search'
 import useProfileStore, { useGalleryStore } from '@store/profile'
+import { setup_persistent_sessions } from '@services/psession'
 import { setup_email } from '@services/email'
 import { create_tag_defaults } from '@services/tag'
 import { create_user_defaults, configure_user_fairy_handlers } from '@services/user'
@@ -60,9 +61,10 @@ export const client_initialize = async () => {
 
 export const server_initialize = async ({mongodb_url, } = {mongodb_url: CONFIG.MONGODB_URL}) => {
     if (!global.initialized || process.env.NODE_ENV === 'test') {
-        global.store = {}
+        global.store = {} as any
         global.initialized = true
         setup_scheduler(CONFIG.REDIS_URL)
+        setup_persistent_sessions(CONFIG.REDIS_URL)
         setup_aws()
         setup_email({})
         configure_fairy()

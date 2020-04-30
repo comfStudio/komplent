@@ -1,8 +1,8 @@
-import { createMocks } from 'node-mocks-http';
 import login_handler from '@pages/api/login';
 import join_handler from '@pages/api/join';
+import logout_handler from '@pages/api/logout';
 
-import { prepareJSONbody, setupServices } from '../../common'
+import { prepareJSONbody, setupServices, createHTTPMocks } from '../../common'
 
 beforeAll(async () => {
   await setupServices()
@@ -19,7 +19,7 @@ describe('Auth API', () => {
   describe('Join API', () => {
 
     it('should join with credentials', async () => {
-      const { req, res } = createMocks(prepareJSONbody('POST', user_creds)
+      const { req, res } = createHTTPMocks(prepareJSONbody('POST', user_creds)
         );
       await join_handler(req, res);
       expect(res._getStatusCode()).toBe(200);
@@ -34,7 +34,7 @@ describe('Auth API', () => {
       {...user_creds, username: undefined},
       {...user_creds, email: undefined},
     ])("should not join only with '%p'", async (args) => {
-      const { req, res } = createMocks(prepareJSONbody('POST', args)
+      const { req, res } = createHTTPMocks(prepareJSONbody('POST', args)
         );
       await join_handler(req, res);
       expect(res._getStatusCode()).toBe(400);
@@ -42,7 +42,7 @@ describe('Auth API', () => {
     });
 
     it('should not join if already exists', async () => {
-      const { req, res } = createMocks(prepareJSONbody('POST', user_creds)
+      const { req, res } = createHTTPMocks(prepareJSONbody('POST', user_creds)
         );
       await join_handler(req, res);
       expect(res._getStatusCode()).toBe(400);
@@ -54,7 +54,7 @@ describe('Auth API', () => {
   describe('Login API', () => {
 
     it('should login with name credentials', async () => {
-      const { req, res } = createMocks(prepareJSONbody('POST', {name: user_creds.username, password: user_creds.password})
+      const { req, res } = createHTTPMocks(prepareJSONbody('POST', {name: user_creds.username, password: user_creds.password})
         );
       await login_handler(req, res);
       expect(res._getStatusCode()).toBe(200);
@@ -73,7 +73,7 @@ describe('Auth API', () => {
       {password: user_creds.password},
       {...user_creds},
     ])("should not login only with '%p'", async (args) => {
-      const { req, res } = createMocks(prepareJSONbody('POST', args)
+      const { req, res } = createHTTPMocks(prepareJSONbody('POST', args)
         );
       await login_handler(req, res);
       expect(res._getStatusCode()).toBe(400);
@@ -85,7 +85,7 @@ describe('Auth API', () => {
       {name: "hmmm123", password: user_creds.password},
       {name: "okayyy", password: "5676"},
     ])("should not login with wrong name or password '%p'", async (args) => {
-      const { req, res } = createMocks(prepareJSONbody('POST', args)
+      const { req, res } = createHTTPMocks(prepareJSONbody('POST', args)
         );
       await login_handler(req, res);
       expect(res._getStatusCode()).toBe(400);
@@ -93,27 +93,66 @@ describe('Auth API', () => {
     });
     
     it("can't register if logged in", async () => {
-      const { req:login_req, res:login_res } = createMocks(prepareJSONbody('POST', {name: user_creds.username, password: user_creds.password})
+      const { req:login_req, res:login_res } = createHTTPMocks(prepareJSONbody('POST', {name: user_creds.username, password: user_creds.password})
         );
       await login_handler(login_req, login_res);
       expect(login_res._getStatusCode()).toBe(200);
-      let { req, res } = createMocks(prepareJSONbody('POST', user_creds, {Authorization: `Bearer ${login_res._getJSONData().token}`}));
+      let { req, res } = createHTTPMocks(prepareJSONbody('POST', user_creds, {headers:{Authorization: `Bearer ${login_res._getJSONData().token}`}}));
       await join_handler(req, res);
       expect(res._getStatusCode()).toBe(400);
       expect(res._getJSONData()).toEqual({error:"Already logged in"});
     });
 
     it("can't login if logged in", async () => {
-      const { req:login_req, res:login_res } = createMocks(prepareJSONbody('POST', {name: user_creds.username, password: user_creds.password})
+      const { req:login_req, res:login_res } = createHTTPMocks(prepareJSONbody('POST', {name: user_creds.username, password: user_creds.password})
         );
       await login_handler(login_req, login_res);
       expect(login_res._getStatusCode()).toBe(200);
-      let { req, res } = createMocks(prepareJSONbody('POST', {name: user_creds.username, password: user_creds.password}, {Authorization: `Bearer ${login_res._getJSONData().token}`}));
+      let { req, res } = createHTTPMocks(prepareJSONbody('POST', {name: user_creds.username, password: user_creds.password}, {headers:{Authorization: `Bearer ${login_res._getJSONData().token}`}}));
       await join_handler(req, res);
       expect(res._getStatusCode()).toBe(400);
       expect(res._getJSONData()).toEqual({error:"Already logged in"});
     });
   
+   })
+
+   describe('Logout API', () => {
+
+    
+    it("can logout if logged in", async () => {
+      const { req:login_req, res:login_res } = createHTTPMocks(prepareJSONbody('POST', {name: user_creds.username, password: user_creds.password})
+        );
+      await login_handler(login_req, login_res);
+      expect(login_res._getStatusCode()).toBe(200);
+      let { req, res } = createHTTPMocks(prepareJSONbody('POST', {}, {headers:{Authorization: `Bearer ${login_res._getJSONData().token}`}}));
+      await logout_handler(req, res);
+      expect(res._getStatusCode()).toBe(200);
+      expect(res._getJSONData()).toEqual({msg:"Logged out"});
+    });
+
+    it("cannot logout if no active users", async () => {
+      let { req, res } = createHTTPMocks(prepareJSONbody('POST', {}));
+      await logout_handler(req, res);
+      expect(res._getStatusCode()).toBe(400);
+      expect(res._getJSONData()).toEqual({error:"No active user"});
+    });
+
+    it("should have no active users after logout/token should be invalidated", async () => {
+      const { req:login_req, res:login_res } = createHTTPMocks(prepareJSONbody('POST', {name: user_creds.username, password: user_creds.password})
+        );
+      await login_handler(login_req, login_res);
+      expect(login_res._getStatusCode()).toBe(200);
+      let { req, res } = createHTTPMocks(prepareJSONbody('POST', {}, {headers:{Authorization: `Bearer ${login_res._getJSONData().token}`}}));
+      await logout_handler(req, res);
+      expect(res._getStatusCode()).toBe(200);
+      expect(res._getJSONData()).toEqual({msg:"Logged out"});
+      
+      let { req: req2, res: res2 } = createHTTPMocks(prepareJSONbody('POST', {}, {headers:{Authorization: `Bearer ${login_res._getJSONData().token}`}}));
+      await logout_handler(req2, res2);
+      expect(res._getStatusCode()).toBe(400);
+      expect(res._getJSONData()).toEqual({error:"No active user"});
+    });
+
    })
 
  })

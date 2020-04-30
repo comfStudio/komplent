@@ -1,6 +1,6 @@
 import { NextApiResponse } from 'next'
 import microCors from 'micro-cors'
-import { OK } from 'http-status-codes'
+import { OK, BAD_REQUEST } from 'http-status-codes'
 
 import { with_middleware, ExApiRequest, ExApiResponse } from '@server/middleware'
 import { error_message, message } from '@utility/message'
@@ -14,13 +14,12 @@ export default with_middleware(
         if (req.user) {
             const { redirect } = req.json
             await logout_user(req, res)
-            req.session = null
             if (redirect) {
                 return res.redirect(302, pages.home)
             }
             res.status(OK).json(message('Logged out'))
         } else {
-            res.status(OK).json(error_message('No active user'))
+            res.status(BAD_REQUEST).json(error_message('No active user'))
         }
     }
 )

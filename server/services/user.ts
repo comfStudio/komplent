@@ -3,21 +3,22 @@ import bcrypt from 'bcryptjs'
 
 import { User } from '@db/models'
 import { IUser } from '@schema/user'
-import { cookie_session } from '@server/middleware'
+import { cookie_session, get_jwt_data } from '@server/middleware'
 import {
     JWT_KEY,
     JWT_EXPIRATION,
     CRYPTO_COST_FACTOR,
     STATES,
     TASK,
+    JWTData,
 } from '@server/constants'
 import { generate_random_id, user_among } from '@utility/misc'
 import fairy from '@server/fairy'
 import { schedule_unique, schedule_unique_now } from '@server/tasks'
+import { psession_create, psession_update, psession_remove } from '@services/psession'
 import { jwt_sign } from '@server/misc'
 
 export async function connect(MONGODB_URL) {
-    console.log(MONGODB_URL)
     if (MONGODB_URL) {
         if (mongoose.connection.readyState == 0) {
             await mongoose.connect(MONGODB_URL, {
@@ -140,7 +141,15 @@ export const login_user = async (user: IUser, password, req, res) => {
 
 export const login_user_without_password = async (user: IUser, req, res) => {
     if (user && req && res) {
-        const token = jwt_sign({ username: user.username, user_id: user._id, password_change_date: user.password_change_date.getTime() })
+        const stoken = await psession_create(user, req.ip_address)
+        const token = jwt_sign({
+            username: user.username,
+            user_id: user.id.toString(),
+            password_change_date: user.password_change_date.getTime(),
+            psession_token: stoken
+        } as JWTData)
+        await psession_update(stoken, {jwt_token: token})
+        // eslint-disable-next-line
         req.session.jwt_token = token
         fairy().emit("user_logged_in", user)
         return token
@@ -152,6 +161,13 @@ export const logout_user = async (req, res) => {
     if (req && res) {
         if (!req.session) {
             cookie_session(req, res)
+        } else {
+            if (req.session.jwt_token) {
+                let token = get_jwt_data(req.session.jwt_token).psession_token
+                if (token) {
+                    psession_remove(token)
+                }
+            }
         }
         if (req.user) {
             fairy().emit("user_logged_out", req.user)

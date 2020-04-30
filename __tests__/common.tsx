@@ -8,7 +8,7 @@ import { MongoMemoryReplSet } from 'mongodb-memory-server';
 
 import { StoreProvider, server_initialize } from '@pages/_app'
 import { COOKIE_AUTH_TOKEN_KEY } from '@server/constants'
-import { RequestMethod } from 'node-mocks-http'
+import { RequestMethod, createMocks } from 'node-mocks-http'
 
 export const S = Cmp => {
     return props => (
@@ -177,7 +177,7 @@ export const resetAuth = () => {
     resetAllWhenMocks()
 }
 
-export function prepareJSONbody(method: RequestMethod, body: object, headers = {}, extra = {}) {
+export function prepareJSONbody(method: RequestMethod, body: object, {headers = {}, extra = {}} = {}) {
     return {
         method,
         body,
@@ -225,4 +225,12 @@ export function setupServices() {
 
     })
 
+}
+
+export function createHTTPMocks(...args) {
+    let {req, res} = createMocks(...args)
+    req.socket = {
+        remoteAddress: "127.0.0.1"
+    }
+    return {req, res}
 }

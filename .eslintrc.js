@@ -21,10 +21,11 @@ module.exports = {
         ecmaVersion: 2018,
         sourceType: 'module',
     },
-    plugins: ['react', '@typescript-eslint'],
+    plugins: ['react', '@typescript-eslint', 'react-hooks'],
     rules: {
         'react-hooks/rules-of-hooks': 'error',
         'react-hooks/exhaustive-deps': 'warn',
+        "@typescript-eslint/explicit-function-return-type": "off",
         'no-extra-boolean-cast': 'off',
         'no-unused-vars': 'off',
         'no-empty': 'warn',

@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken'
+import { URL } from 'url'
 
 import { is_server } from '@utility/misc'
 import { Text } from '@db/models'
@@ -37,4 +38,18 @@ export const jwt_sign = (data, expiresIn = JWT_EXPIRATION) => {
 
 export const jwt_verify = token => {
     return jwt.verify(token, JWT_KEY)
+}
+
+export const redis_url_parse = (url) => {
+    const parsedURL = new URL(url)
+    let d = {
+        host: parsedURL.hostname || 'localhost',
+        port: Number(parsedURL.port || 6379),
+        database: (parsedURL.pathname || '/0').substr(1) || '0',
+        password: parsedURL.password ? decodeURIComponent(parsedURL.password) : null
+    }
+    // if (d.host === 'localhost') {
+    //     d.host = "127.0.0.1"
+    // }
+    return d
 }

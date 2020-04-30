@@ -18,11 +18,12 @@ export let scheduler: Scheduler = global.store
 
 export const setup_scheduler = async SCHEDULER_URL => {
     if (!scheduler && SCHEDULER_URL) {
+        const options = {prefix: "::scheduler"}
         scheduler = global.store.scheduler = {
-            ...user_tasks(new Bull('user', SCHEDULER_URL)),
-            ...commission_tasks(new Bull('commission', SCHEDULER_URL)),
-            ...cdn_tasks(new Bull('cdn', SCHEDULER_URL)),
-            ...monetary_tasks(new Bull('monetary', SCHEDULER_URL)),
+            ...user_tasks(new Bull('user', SCHEDULER_URL, options)),
+            ...commission_tasks(new Bull('commission', SCHEDULER_URL, options)),
+            ...cdn_tasks(new Bull('cdn', SCHEDULER_URL, options)),
+            ...monetary_tasks(new Bull('monetary', SCHEDULER_URL, options)),
         }
     }
     if (scheduler) {

@@ -20,6 +20,13 @@ export const COOKIE_AUTH_TOKEN_KEY = '_auth_token'
 
 export const CRYPTO_COST_FACTOR = 12
 
+export interface JWTData {
+    username: string
+    user_id: string
+    password_change_date: number
+    psession_token: string
+}
+
 export enum TaskPriority {
     HIGHEST = 1,
     HIGH = 5,
