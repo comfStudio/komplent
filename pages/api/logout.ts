@@ -9,6 +9,31 @@ import * as pages from '@utility/pages'
 
 const cors = microCors({ allowMethods: ['POST', 'GET'] })
 
+/**
+ * 
+ * @api {GET|POST} /logout Logout active user
+ * @apiName logout
+ * @apiGroup Authentication
+ * @apiVersion  0.1.0
+ * @apiPermission auth
+ * 
+ * @apiParam  {Boolean} redirect Whether to redirect to home after successful logout
+ * 
+ * @apiSuccess (200) {String} msg Logout message
+ * 
+ * @apiParamExample  {JSON} Request-Example:
+ * {
+ *     redirect : true
+ * }
+ * 
+ * 
+ * @apiSuccessExample {JSON} Success-Response:
+ * {
+ *     msg : "Logged out"
+ * }
+ * 
+ * 
+ */
 export default with_middleware(
     async (req: ExApiRequest, res: ExApiResponse) => {
         if (req.user) {

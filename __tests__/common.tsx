@@ -177,7 +177,12 @@ export const resetAuth = () => {
     resetAllWhenMocks()
 }
 
-export function prepareJSONbody(method: RequestMethod, body: object, {headers = {}, extra = {}} = {}) {
+export function prepareJSONbody(method: RequestMethod, body: object, {headers = {}, extra = {}, token = undefined} = {}) {
+
+    if (token) {
+        headers = {...headers, Authorization: `Bearer ${token}`}
+    }
+
     return {
         method,
         body,

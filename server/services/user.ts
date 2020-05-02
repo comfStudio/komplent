@@ -31,9 +31,11 @@ export async function connect(MONGODB_URL) {
     }
 }
 
-export const create_user = async (data: IUser, { save = true, randomize_username = false, unverify_email = true } = {}) => {
+export const create_user = async (data: IUser, { save = true, randomize_username = false, unverify_email = true, creator = false } = {}) => {
     let u = new User()
-    return await update_user_creds(u, data, {save, randomize_username, unverify_email})
+    u = await update_user_creds(u, data, {save, randomize_username, unverify_email})
+
+    return u
 }
 
 export const update_user = async (user, data: any, { save = true, document = undefined }) => {
@@ -51,6 +53,10 @@ export const update_user = async (user, data: any, { save = true, document = und
     }
 
     return obj
+}
+
+export const update_user_type = async () => {
+
 }
 
 export const update_user_creds = async (user, data: IUser, { save = true, randomize_username = false, require_old_password = false, unverify_email = true } = {}) => {

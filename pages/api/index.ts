@@ -4,6 +4,12 @@ import '@db'
 import { User } from '@db/models'
 import { with_middleware, ExApiRequest } from '@server/middleware'
 
+/**
+ * @apiDefine auth Authentication required
+ * A user needs to be authenticated
+ */
+
+
 export default with_middleware((req: ExApiRequest, res: NextApiResponse) => {
     if (req.method === 'POST') {
         // Process your POST request

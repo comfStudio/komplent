@@ -9,6 +9,36 @@ import { login_user } from '@services/user'
 
 const cors = microCors({ allowMethods: ['POST', 'OPTIONS'] })
 
+/**
+ * 
+ * @api {POST} /login Login user
+ * @apiName login
+ * @apiGroup Authentication
+ * @apiVersion  0.1.0
+ * 
+ * @apiParam  {String} name Username or email
+ * @apiParam  {String} password Password
+ * 
+ * @apiSuccess (200) {String} msg Logged in
+ * @apiSuccess (200) {String} token JWT token
+ * @apiSuccess (200) {String} user User object
+ * 
+ * @apiParamExample  {JSON} Request-Example:
+ * {
+ *     name : test@test.com
+ *     password : password123
+ * }
+ * 
+ * 
+ * @apiSuccessExample {JSON} Success-Response:
+ * {
+ *     msg : "Logged in"
+ *     token : "5465ih567n56l9g33450t0p54p8"
+ *     user : {...}
+ * }
+ * 
+ * 
+ */
 export default with_middleware(
     async (req: ExApiRequest, res: NextApiResponse) => {
         if (!req.user) {

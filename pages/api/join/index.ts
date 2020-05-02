@@ -9,11 +9,40 @@ import { create_user } from '@services/user'
 
 const cors = microCors({ allowMethods: ['POST'] })
 
+/**
+ * 
+ * @api {POST} /join Join user
+ * @apiName join
+ * @apiGroup Authentication
+ * @apiVersion  0.1.0
+ * 
+ * @apiParam  {String} email Email
+ * @apiParam  {String} username Username
+ * @apiParam  {String} password Password
+ * @apiParam  {String} creator=false Join user as a creator
+ * 
+ * @apiSuccess (200) {String} msg Joined
+ * 
+ * @apiParamExample  {JSON} Request-Example:
+ * {
+ *     email : test@test.com
+ *     username : test1
+ *     password : password123
+ * }
+ * 
+ * 
+ * @apiSuccessExample {JSON} Success-Response:
+ * {
+ *     msg : "Joined"
+ * }
+ * 
+ * 
+ */
 export default with_middleware(
     async (req: ExApiRequest, res: NextApiResponse) => {
         if (!req.user) {
             try {
-                const { email, username, password } = req.json
+                const { email, username, password, creator } = req.json
                 if (email && username && password) {
                     if (
                         !(await User.check_exists({
@@ -25,7 +54,7 @@ export default with_middleware(
                             username,
                             email,
                             password,
-                        }, {save: true})
+                        }, {save: true, creator})
                         res.status(OK).json(message('Joined'))
                     } else {
                         res.status(BAD_REQUEST).json(
