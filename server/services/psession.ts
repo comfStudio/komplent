@@ -55,12 +55,28 @@ export function psession_update(token, data: PesistentSessionData){
 
 export function psession_remove(token){
     return new Promise<number>((resolve, reject) => {
-        global.store.persistent_session.set({
+        global.store.persistent_session.kill({
             app: session_namespace,
             token: token,
         }, (err, resp) => {
             if (!err) {
-                global.log.debug(`Removed token (${resp.kill}) ${token}`)
+                global.log.debug(`Removed session (${resp.kill}) ${token}`)
+                resolve(resp.kill)
+            } else {
+                reject(err)
+            }
+        })
+    })
+}
+
+export function psession_remove_by_user(user){
+    return new Promise<number>((resolve, reject) => {
+        global.store.persistent_session.killsoid({
+            app: session_namespace,
+            id: user.id.toString(),
+        }, (err, resp) => {
+            if (!err) {
+                global.log.debug(`Removed all sessions (${resp.kill}) by ${user.id.toString()}`)
                 resolve(resp.kill)
             } else {
                 reject(err)

@@ -67,6 +67,13 @@ export const is_logged_in = async (req, res) => {
             try {
                 let auth_user = await get_jwt_user(jwt_data)
                 if (auth_user) {
+                    if (!req.session) {
+                        cookie_session(req, res)
+                    }
+                    if (!req?.session?.jwt_token) {
+                        // eslint-disable-next-line
+                        req.session.jwt_token = token
+                    }
                     return auth_user
                 }
             } catch (err) {}

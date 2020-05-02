@@ -186,14 +186,14 @@ export function prepareJSONbody(method: RequestMethod, body: object, {headers = 
       }
 }
 
-export function setupServices() {
+export async function setupServices() {
 
     jest.setTimeout(30000);
 
     const replSet = new MongoMemoryReplSet({
     replSet: { storageEngine: 'wiredTiger' },
     });
-    return replSet.waitUntilRunning().then(async () => {
+    await replSet.waitUntilRunning().then(async () => {
         mongoose.Promise = Promise;
 
         return await replSet.getUri().then(async (mongoUri) => {
@@ -225,6 +225,17 @@ export function setupServices() {
 
     })
 
+    return {
+        mongodb:replSet
+    }
+
+}
+
+export function stopServices(obj = {} as any) {
+    mongoose.disconnect()
+    if (obj.mongodb) {
+        obj.mongodb.stop()
+    }
 }
 
 export function createHTTPMocks(...args) {

@@ -17,9 +17,9 @@ export default with_middleware(
             if (redirect) {
                 return res.redirect(302, pages.home)
             }
-            res.status(OK).json(message('Logged out'))
+            return res.status(OK).json(message('Logged out'))
         } else {
-            res.status(BAD_REQUEST).json(error_message('No active user'))
+            return res.status(BAD_REQUEST).json(error_message('No active user'))
         }
     }
 )

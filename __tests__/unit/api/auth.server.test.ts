@@ -2,10 +2,12 @@ import login_handler from '@pages/api/login';
 import join_handler from '@pages/api/join';
 import logout_handler from '@pages/api/logout';
 
-import { prepareJSONbody, setupServices, createHTTPMocks } from '../../common'
+import { prepareJSONbody, setupServices, createHTTPMocks, stopServices } from '../../common'
+
+let services
 
 beforeAll(async () => {
-  await setupServices()
+  services = await setupServices()
 });
 
 const user_creds = {
@@ -137,7 +139,7 @@ describe('Auth API', () => {
       expect(res._getJSONData()).toEqual({error:"No active user"});
     });
 
-    it("should have no active users after logout/token should be invalidated", async () => {
+    it("should have no active users after logout/token is invalidated", async () => {
       const { req:login_req, res:login_res } = createHTTPMocks(prepareJSONbody('POST', {name: user_creds.username, password: user_creds.password})
         );
       await login_handler(login_req, login_res);
@@ -149,10 +151,14 @@ describe('Auth API', () => {
       
       let { req: req2, res: res2 } = createHTTPMocks(prepareJSONbody('POST', {}, {headers:{Authorization: `Bearer ${login_res._getJSONData().token}`}}));
       await logout_handler(req2, res2);
-      expect(res._getStatusCode()).toBe(400);
-      expect(res._getJSONData()).toEqual({error:"No active user"});
+      expect(res2._getStatusCode()).toBe(400);
+      expect(res2._getJSONData()).toEqual({error:"No active user"});
     });
 
    })
 
  })
+
+ afterAll(async () => {
+  stopServices(services)
+});

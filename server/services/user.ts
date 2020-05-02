@@ -15,7 +15,7 @@ import {
 import { generate_random_id, user_among } from '@utility/misc'
 import fairy from '@server/fairy'
 import { schedule_unique, schedule_unique_now } from '@server/tasks'
-import { psession_create, psession_update, psession_remove } from '@services/psession'
+import { psession_create, psession_update, psession_remove, psession_exists } from '@services/psession'
 import { jwt_sign } from '@server/misc'
 
 export async function connect(MONGODB_URL) {
@@ -159,14 +159,11 @@ export const login_user_without_password = async (user: IUser, req, res) => {
 
 export const logout_user = async (req, res) => {
     if (req && res) {
-        if (!req.session) {
-            cookie_session(req, res)
-        } else {
-            if (req.session.jwt_token) {
-                let token = get_jwt_data(req.session.jwt_token).psession_token
-                if (token) {
-                    psession_remove(token)
-                }
+        if (req.session?.jwt_token) {
+            let token = get_jwt_data(req.session.jwt_token).psession_token
+            if (token) {
+                const r = await psession_remove(token)
+
             }
         }
         if (req.user) {
