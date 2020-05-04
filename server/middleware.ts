@@ -17,7 +17,9 @@ import { psession_exists } from '@services/psession'
 export interface ExApiRequest extends NextApiRequest {
     user?: any
     json?: any
-    session?: any
+    session?: {
+        jwt_token: string
+    }
     ip_address?: string
     cookie?(name: string, value: any, options: object)
 }

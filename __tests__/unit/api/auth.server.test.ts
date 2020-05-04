@@ -3,6 +3,8 @@ import join_handler from '@pages/api/join';
 import logout_handler from '@pages/api/logout';
 
 import { prepareJSONbody, setupServices, createHTTPMocks, stopServices } from '../../common'
+import * as user_services from '@services/user';
+import fairy from '@server/fairy';
 
 let services
 
@@ -20,12 +22,17 @@ describe('Auth API', () => {
 
   describe('Join API', () => {
 
-    it('should join with credentials', async () => {
+    it('should join with credentials and user joined event was called and activation mail sent', async () => {
+      const event_fn = jest.fn(user => null)
+      fairy()?.on("user_joined", event_fn)
       const { req, res } = createHTTPMocks(prepareJSONbody('POST', user_creds)
         );
       await join_handler(req, res);
       expect(res._getStatusCode()).toBe(200);
       expect(res._getJSONData()).toEqual({msg:"Joined"});
+      await new Promise((r) => setTimeout(r, 1000));
+      expect(event_fn).toBeCalled();
+      fairy()?.removeListener("user_joined", event_fn)
     });
 
     it.each([

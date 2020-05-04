@@ -188,3 +188,10 @@ export const get_image_url = (image_data, size: undefined | 'icon' | 'thumb' | '
 }
 
 export const useLayoutEffect = typeof window !== 'undefined' ? oUseLayoutEffect : useEffect
+
+export function validate_password(pass: string) {
+    if (pass.length >= 8 ) {
+        return true
+    }
+    return false
+}

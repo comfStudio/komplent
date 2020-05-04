@@ -13,8 +13,8 @@ import { user_has_password, send_activate_email } from '@services/user'
  * @apiPermission auth
  * @apiVersion  0.1.0
  * 
- * @apiParam  {Boolean} has_password Check if user has set a password
- * @apiParam  {Boolean} send_confirmation_email Send user an activation email
+ * @apiParam  {Boolean} has_password=undefined Check if user has set a password
+ * @apiParam  {Boolean} send_confirmation_email=undefined Send user an activation email
  * 
  * @apiSuccess (200) {Boolean} has_password Whether user has a password set
  * @apiSuccess (200) {Boolean} send_confirmation_email Email was sent successfully

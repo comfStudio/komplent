@@ -23,6 +23,7 @@ import fairy from '@server/fairy'
 import { message_schema, conversation_schema } from './message'
 
 user_schema.pre('save', async function() {
+    this.wasNew = this.isNew
     if (!this.name) {
         this.name = this.username
     }

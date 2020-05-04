@@ -12,10 +12,10 @@ import {
     TASK,
     JWTData,
 } from '@server/constants'
-import { generate_random_id, user_among } from '@utility/misc'
+import { generate_random_id, user_among, validate_password } from '@utility/misc'
 import fairy from '@server/fairy'
 import { schedule_unique, schedule_unique_now } from '@server/tasks'
-import { psession_create, psession_update, psession_remove, psession_exists } from '@services/psession'
+import { psession_create, psession_update, psession_remove, psession_exists, psession_remove_by_user } from '@services/psession'
 import { jwt_sign } from '@server/misc'
 
 export async function connect(MONGODB_URL) {
@@ -69,11 +69,17 @@ export const update_user_creds = async (user, data: IUser, { save = true, random
                 throw Error("Old password does not match")
             }
         }
+
+        if (!validate_password(_data.password)) {
+            throw Error("Password validation failed")
+        }
+
         // eslint-disable-next-line
         user.password = await bcrypt.hash(_data.password, CRYPTO_COST_FACTOR)
         // eslint-disable-next-line
         user.password_change_date = new Date()
         delete _data.password
+        await psession_remove_by_user(user)
     }
 
     if (_data.username) {
@@ -224,7 +230,7 @@ export const unlink_provider = async (user_id, provider) => {
     return true
 }
 
-export const send_activate_email = user => {
+export function send_activate_email (user) {
     if (!user.email_verified) {
         schedule_unique_now({ key: user._id, task: TASK.activate_email, data: { user_id: user._id } })
         return true

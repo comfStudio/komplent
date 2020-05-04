@@ -18,7 +18,7 @@ export type CommissionProcessType = { type: CommissionPhaseType; done: boolean, 
 
 export const user_schema = new Schema(
     {
-        name: { type: String, es_indexed: true, maxLength: 120, },
+        name: { type: String, es_indexed: true, maxlength: 120, },
         type: {
             type: String,
             enum: ['creator', 'consumer', 'staff'],
@@ -47,14 +47,14 @@ export const user_schema = new Schema(
             unique: true,
             index: true,
             trim: true,
-            minLength: 3,
-            maxLength: 60,
+            minlength: 3,
+            maxlength: 60,
             lowercase: true,
             es_indexed: true,
             // validate: optional_with_length(3, 60)
         },
         password_change_date: { type: Date, default: Date.now },
-        password: { type: String, minLength: 8, select: false },
+        password: { type: String, minlength: 8, select: false },
         avatar: {
             type: ObjectId,
             ref: 'Image',
@@ -65,7 +65,7 @@ export const user_schema = new Schema(
         anonymous: { type: Boolean, default: false },
         socials: [{ url: String, name: String }],
         notice_visible: { type: Boolean, default: false },
-        notice: { type: String, maxLength: 250 },
+        notice: { type: String, maxlength: 250 },
         profile_color: String,
         display_currency: String,
         request_expire_deadline: { type: Number, default: 30, },
