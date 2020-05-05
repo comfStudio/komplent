@@ -4,7 +4,7 @@ import update from 'immutability-helper'
 import { Decimal128 } from 'bson'
 import dinero from 'dinero.js'
 import debounce from 'lodash/debounce'
-import { NSFWType, NSFW_LEVEL } from '@server/constants'
+import { NSFWType, NSFW_LEVEL, RESERVED_USERNAMES } from '@server/constants'
 
 export const iupdate = update
 
@@ -191,6 +191,13 @@ export const useLayoutEffect = typeof window !== 'undefined' ? oUseLayoutEffect 
 
 export function validate_password(pass: string) {
     if (pass.length >= 8 ) {
+        return true
+    }
+    return false
+}
+
+export function validate_username(name: string) {
+    if (name.length >= 3 && name && !RESERVED_USERNAMES.includes(name) ) {
         return true
     }
     return false

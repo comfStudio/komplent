@@ -12,7 +12,7 @@ import {
     TASK,
     JWTData,
 } from '@server/constants'
-import { generate_random_id, user_among, validate_password } from '@utility/misc'
+import { generate_random_id, user_among, validate_password, validate_username } from '@utility/misc'
 import fairy from '@server/fairy'
 import { schedule_unique, schedule_unique_now } from '@server/tasks'
 import { psession_create, psession_update, psession_remove, psession_exists, psession_remove_by_user } from '@services/psession'
@@ -83,6 +83,11 @@ export const update_user_creds = async (user, data: IUser, { save = true, random
     }
 
     if (_data.username) {
+
+        if (!validate_username(_data.username)) {
+            throw Error("Username validation failed")
+        }
+
         user.username = data.username
         if (randomize_username) {
             if (!user.username || (user.username && (await User.findOne({username:user.username}).countDocuments()))) {

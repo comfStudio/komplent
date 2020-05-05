@@ -3,6 +3,7 @@ import creds_handler from '@pages/api/update_user_creds';
 import { prepareJSONbody, setupServices, createHTTPMocks, stopServices } from '../../common'
 import { join_user_and_login } from './commonapi';
 import * as user_services from '@services/user';
+import { RESERVED_USERNAMES } from '@server/constants';
 
 const user_creds = {
   username: 'admin_creds',
@@ -51,8 +52,7 @@ describe('User Credentials API', () => {
       token = res._getJSONData().data.token
     });
 
-    it('should not be allowed to change to invalid username', async () => {
-      const nname = "1"
+    it.each(["1", RESERVED_USERNAMES[0], "22"])("should not be allowed to change to invalid username '%p'", async (nname) => {
       const { req, res } = createHTTPMocks(prepareJSONbody('POST', {data: {username: nname}}, {token: token})
         );
       await creds_handler(req, res);
