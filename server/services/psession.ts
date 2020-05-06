@@ -1,5 +1,4 @@
 import RedisSessions from 'redis-sessions'
-import { redis_url_parse } from '../misc'
 
 export interface PesistentSessionData {
     jwt_token?: string
